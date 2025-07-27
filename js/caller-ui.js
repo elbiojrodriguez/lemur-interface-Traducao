@@ -11,6 +11,7 @@ window.onload = () => {
   const remoteVideo = document.getElementById('remoteVideo');
   const pipContainer = document.querySelector('.local-pip');
 
+  // O botão "Off" agora tem ícone de microfone mas mantém a mesma função
   document.getElementById('offBtn').onclick = () => window.close();
 
   navigator.mediaDevices.getUserMedia({ 
@@ -18,7 +19,7 @@ window.onload = () => {
     audio: true 
   }).then(stream => {
     localVideo.srcObject = stream;
-    localVideo.style.display = 'none'; // Mantém o vídeo local oculto
+    localVideo.style.display = 'none';
 
     document.getElementById('callActionBtn').onclick = () => {
       const targetId = prompt('Digite o ID do destinatário');
@@ -31,7 +32,6 @@ window.onload = () => {
   });
 
   rtcCore.setRemoteStreamCallback(stream => {
-    // Mostra o vídeo remoto no PIP
     const pipVideo = pipContainer.querySelector('video') || document.createElement('video');
     pipVideo.srcObject = stream;
     pipVideo.autoplay = true;
