@@ -1,7 +1,7 @@
 import WebRTCCore from '../core/webrtc-core.js';
 
 window.onload = () => {
-  const rtcCore = new WebRTCCore('https://lemur-signal.onrender.com');
+  const rtcCore = new WebRTCCore('https://lemur-interface-traducao.onrender.com');
   const myId = crypto.randomUUID().substr(0, 8);
   document.getElementById('myId').innerHTML = `Seu ID: <strong>${myId}</strong>`;
   rtcCore.initialize(myId);
@@ -26,7 +26,6 @@ window.onload = () => {
         localVideo.srcObject = stream;
 
         rtcCore.handleIncomingCall(offer, stream, (remoteStream) => {
-          // Substitui o vídeo local pelo remoto no PIP
           localVideo.srcObject = remoteStream;
         });
 
@@ -38,7 +37,6 @@ window.onload = () => {
   };
 
   rtcCore.setRemoteStreamCallback(stream => {
-    // Substitui o vídeo local pelo remoto no PIP
     localVideo.srcObject = stream;
   });
 };
