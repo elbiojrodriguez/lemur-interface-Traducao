@@ -8,8 +8,8 @@ window.onload = () => {
   rtcCore.setupSocketHandlers();
 
   const localVideo = document.getElementById('localVideo');
-  // remoteVideo está presente mas oculto
   const remoteVideo = document.getElementById('remoteVideo');
+  const pipContainer = document.querySelector('.local-pip');
 
   document.getElementById('offBtn').onclick = () => window.close();
 
@@ -18,6 +18,7 @@ window.onload = () => {
     audio: true 
   }).then(stream => {
     localVideo.srcObject = stream;
+    localVideo.style.display = 'none'; // Mantém o vídeo local oculto
 
     document.getElementById('callActionBtn').onclick = () => {
       const targetId = prompt('Digite o ID do destinatário');
@@ -30,7 +31,19 @@ window.onload = () => {
   });
 
   rtcCore.setRemoteStreamCallback(stream => {
-    // Substitui o vídeo local pelo remoto no PIP
-    localVideo.srcObject = stream;
+    // Mostra o vídeo remoto no PIP
+    const pipVideo = pipContainer.querySelector('video') || document.createElement('video');
+    pipVideo.srcObject = stream;
+    pipVideo.autoplay = true;
+    pipVideo.playsinline = true;
+    pipVideo.style.display = 'block';
+    pipVideo.style.width = '100%';
+    pipVideo.style.height = '100%';
+    pipVideo.style.objectFit = 'cover';
+    
+    if (!pipContainer.contains(pipVideo)) {
+      pipContainer.innerHTML = '';
+      pipContainer.appendChild(pipVideo);
+    }
   });
 };
