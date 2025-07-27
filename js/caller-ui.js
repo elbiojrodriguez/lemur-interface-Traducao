@@ -13,7 +13,14 @@ window.onload = () => {
   const transcriptionEl = document.getElementById('transcription');
   const micBtn = document.getElementById('offBtn');
 
-  // Configuração do reconhecimento de voz
+  // Verifica se o navegador suporta reconhecimento de voz
+  if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+    console.error('API de reconhecimento de voz não suportada');
+    micBtn.innerHTML = '<i class="material-icons">mic_off</i>';
+    micBtn.title = 'Reconhecimento de voz não suportado';
+    return;
+  }
+
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   const recognition = new SpeechRecognition();
   recognition.continuous = true;
@@ -21,49 +28,81 @@ window.onload = () => {
   recognition.lang = 'pt-BR';
 
   let isListening = false;
+  let finalTranscript = '';
+  let timeoutId;
 
-  // Eventos do reconhecimento de voz
   recognition.onresult = (event) => {
+    clearTimeout(timeoutId);
     let interimTranscript = '';
-    let finalTranscript = '';
-
+    
     for (let i = event.resultIndex; i < event.results.length; i++) {
       const transcript = event.results[i][0].transcript;
       if (event.results[i].isFinal) {
-        finalTranscript += transcript;
+        finalTranscript += transcript + ' ';
       } else {
         interimTranscript += transcript;
       }
     }
 
-    transcriptionEl.textContent = finalTranscript || interimTranscript;
+    // Mostra o texto transcrito
+    transcriptionEl.textContent = finalTranscript + interimTranscript;
+    transcriptionEl.style.display = 'block';
+
+    // Reseta o temporizador quando há atividade
+    timeoutId = setTimeout(() => {
+      transcriptionEl.style.display = 'none';
+      finalTranscript = '';
+    }, 5000);
   };
 
   recognition.onerror = (event) => {
-    console.error('Erro no reconhecimento de voz:', event.error);
+    console.error('Erro no reconhecimento:', event.error);
+    transcriptionEl.textContent = 'Erro ao ouvir. Tente novamente.';
+    resetMicButton();
   };
 
-  // Controle do botão do microfone
-  micBtn.onmousedown = micBtn.ontouchstart = () => {
+  recognition.onend = () => {
+    if (isListening) {
+      // Reconecta automaticamente se ainda estiver no modo de escuta
+      recognition.start();
+    }
+  };
+
+  const resetMicButton = () => {
+    isListening = false;
+    micBtn.innerHTML = '<i class="material-icons">mic</i>';
+    micBtn.style.backgroundColor = '#ff4444';
+  };
+
+  // Eventos de toque/pressionar
+  micBtn.addEventListener('mousedown', startListening);
+  micBtn.addEventListener('touchstart', startListening, { passive: true });
+  
+  micBtn.addEventListener('mouseup', stopListening);
+  micBtn.addEventListener('touchend', stopListening);
+  micBtn.addEventListener('mouseleave', stopListening);
+
+  function startListening(e) {
+    e.preventDefault();
     try {
       recognition.start();
       isListening = true;
       micBtn.innerHTML = '<i class="material-icons">mic_off</i>';
       micBtn.style.backgroundColor = '#4CAF50';
       transcriptionEl.textContent = 'Ouvindo...';
-    } catch (e) {
-      console.error('Erro ao iniciar reconhecimento:', e);
+      transcriptionEl.style.display = 'block';
+    } catch (err) {
+      console.error('Erro ao iniciar microfone:', err);
+      transcriptionEl.textContent = 'Erro ao acessar microfone';
     }
-  };
+  }
 
-  micBtn.onmouseup = micBtn.ontouchend = () => {
+  function stopListening() {
     if (isListening) {
       recognition.stop();
-      isListening = false;
-      micBtn.innerHTML = '<i class="material-icons">mic</i>';
-      micBtn.style.backgroundColor = '#ff4444';
+      resetMicButton();
     }
-  };
+  }
 
   // Fechar janela com clique duplo
   micBtn.ondblclick = () => {
