@@ -8,7 +8,8 @@
 </head>
 <body>
   <div class="remote-container">
-    <video id="remoteVideo" autoplay playsinline></video>
+    <!-- Vídeo remoto ocultado -->
+    <video id="remoteVideo" autoplay playsinline style="display: none;"></video>
   </div>
 
   <div class="local-pip">
@@ -31,9 +32,7 @@
     <span id="myId" class="id-display">Seu ID: <strong>carregando...</strong></span>
   </div>
 
-  <!-- Socket.io do servidor FireWeb -->
   <script src="https://lemur-signal.onrender.com/socket.io/socket.io.js"></script>
-  <!-- Lógica modular -->
   <script type="module" src="js/receiver-ui.js"></script>
 </body>
 </html>
