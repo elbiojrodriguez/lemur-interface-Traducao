@@ -8,7 +8,8 @@
 </head>
 <body>
   <div class="remote-container">
-    <video id="remoteVideo" autoplay playsinline></video>
+    <!-- Vídeo remoto ocultado -->
+    <video id="remoteVideo" autoplay playsinline style="display: none;"></video>
     <div id="statusMessage">Esperando resposta do dono...</div>
   </div>
 
@@ -32,9 +33,25 @@
     <span id="myId"></span>
   </div>
 
-  <!-- Socket.io do servidor FireWeb -->
   <script src="https://lemur-signal.onrender.com/socket.io/socket.io.js"></script>
-  <!-- Lógica modular -->
+  <script type="module">
+    const urlParams = new URLSearchParams(window.location.search);
+    const targetId = urlParams.get('id');
+
+    navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+      .then(stream => {
+        document.getElementById('localVideo').srcObject = stream;
+        sendCall(targetId, stream);
+      })
+      .catch(err => {
+        alert("Permita acesso à câmera e microfone para continuar.");
+      });
+
+    function sendCall(toId, stream) {
+      // Cria peer, gera offer, envia via socket
+      // Exatamente como você já faz no botão "Call"
+    }
+  </script>
   <script type="module" src="js/caller-ui.js"></script>
 </body>
 </html>
