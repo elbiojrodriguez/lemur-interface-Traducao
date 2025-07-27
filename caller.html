@@ -5,15 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Caller - Videochamada Mobile</title>
   <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <style>
     body {
-      background-color: #87CEEB; /* Cor celeste de fundo */
+      background-color: #87CEEB;
       margin: 0;
       padding: 0;
       overflow: hidden;
     }
     .remote-container {
-      display: none; /* Esconde completamente o container remoto */
+      display: none;
     }
     .local-pip {
       position: absolute;
@@ -27,16 +28,30 @@
       z-index: 10;
     }
     .pip-horizon {
-      display: none; /* Remove a linha horizontal */
+      display: none;
+    }
+    .controls button {
+      border: none;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      font-size: 16px;
+      cursor: pointer;
+      margin: 0 10px;
+    }
+    #offBtn {
+      background-color: #ff4444;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
   </style>
 </head>
 <body>
-  <!-- Vídeo remoto agora será mostrado no PIP -->
   <video id="remoteVideo" autoplay playsinline style="display: none;"></video>
   <div id="statusMessage" style="display: none;">Esperando resposta do dono...</div>
 
-  <!-- PIP mostrará o vídeo remoto quando disponível -->
   <div class="local-pip">
     <video id="localVideo" autoplay muted playsinline style="display: none;"></video>
   </div>
@@ -48,7 +63,7 @@
 
   <div class="controls">
     <button id="callActionBtn">Call</button>
-    <button id="offBtn">Off</button>
+    <button id="offBtn"><i class="material-icons">mic</i></button>
   </div>
 
   <div class="info-overlay">
@@ -64,7 +79,7 @@
       .then(stream => {
         const localVideo = document.getElementById('localVideo');
         localVideo.srcObject = stream;
-        localVideo.style.display = 'none'; // Mantém o vídeo local oculto
+        localVideo.style.display = 'none';
         
         if (targetId) {
           sendCall(targetId, stream);
