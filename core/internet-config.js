@@ -1,4 +1,4 @@
-export const SIGNALING_SERVER_URL = 'https://fireweb-sfe0.onrender.com';
+export const SIGNALING_SERVER_URL = 'https://lemur-interface-traducao.onrender.com';
 
 export const getIceServers = () => {
   return [
