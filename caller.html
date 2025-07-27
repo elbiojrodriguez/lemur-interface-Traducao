@@ -4,21 +4,19 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Caller - Videochamada Mobile</title>
+  <link rel="stylesheet" href="style.css" />
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <style>
     body {
-      background-color: #87CEEB; /* Celeste background */
+      background-color: #87CEEB;
       margin: 0;
       padding: 0;
       overflow: hidden;
       font-family: Arial, sans-serif;
-      height: 100vh;
     }
-    
     .remote-container {
       display: none;
     }
-    
     .local-pip {
       position: absolute;
       bottom: 100px;
@@ -30,60 +28,25 @@
       box-shadow: 0 4px 8px rgba(0,0,0,0.2);
       z-index: 10;
     }
-    
     .pip-horizon {
       display: none;
     }
-    
-    .controls {
-      position: fixed;
-      bottom: 20px;
-      left: 0;
-      right: 0;
-      display: flex;
-      justify-content: center;
-      gap: 30px;
-    }
-    
     .controls button {
       border: none;
       border-radius: 50%;
-      width: 60px;
-      height: 60px;
+      width: 50px;
+      height: 50px;
       font-size: 16px;
       cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      margin: 0 10px;
     }
-    
-    #callActionBtn {
-      background-color: #4285F4;
-      color: white;
-    }
-    
     #offBtn {
       background-color: #ff4444;
       color: white;
-      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
-    
-    .mic-icon {
-      font-size: 24px;
-    }
-    
-    .mic-off::after {
-      content: "";
-      position: absolute;
-      top: 50%;
-      left: 10%;
-      right: 10%;
-      height: 2px;
-      background: white;
-      transform: rotate(-45deg);
-    }
-    
     #transcription {
       position: absolute;
       top: 50%;
@@ -95,51 +58,27 @@
       text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
       max-width: 80%;
       padding: 10px;
-      display: none;
-    }
-    
-    .ad-space {
-      position: fixed;
-      bottom: 100px;
-      left: 0;
-      right: 0;
-      text-align: center;
-      color: white;
-      font-size: 12px;
-    }
-    
-    .info-overlay {
-      position: fixed;
-      top: 20px;
-      left: 20px;
-      background: rgba(0,0,0,0.5);
-      color: white;
-      padding: 5px 10px;
-      border-radius: 5px;
-      font-size: 14px;
     }
   </style>
 </head>
 <body>
-  <!-- Hidden remote video -->
   <video id="remoteVideo" autoplay playsinline style="display: none;"></video>
-  <div id="statusMessage" style="display: none;"></div>
+  <div id="statusMessage" style="display: none;">Esperando resposta do dono...</div>
 
-  <!-- PIP container (will show remote video) -->
   <div class="local-pip">
     <video id="localVideo" autoplay muted playsinline style="display: none;"></video>
   </div>
 
-  <!-- Transcription display -->
   <div id="transcription"></div>
 
   <div class="ad-space">
-    <span>Espaço reservado para publicidade</span>
+    <span>Espaço reservado</span><br />
+    <span>para publicidade</span>
   </div>
 
   <div class="controls">
     <button id="callActionBtn">Call</button>
-    <button id="offBtn"><i class="material-icons mic-icon mic-off">mic</i></button>
+    <button id="offBtn"><i class="material-icons">mic</i></button>
   </div>
 
   <div class="info-overlay">
@@ -147,133 +86,6 @@
   </div>
 
   <script src="https://lemur-signal.onrender.com/socket.io/socket.io.js"></script>
-  <script type="module">
-    import WebRTCCore from './core/webrtc-core.js';
-
-    // Initialize WebRTC
-    const rtcCore = new WebRTCCore('https://lemur-signal.onrender.com');
-    const myId = crypto.randomUUID().substr(0, 8);
-    document.getElementById('myId').textContent = myId;
-    rtcCore.initialize(myId);
-    rtcCore.setupSocketHandlers();
-
-    // Get DOM elements
-    const localVideo = document.getElementById('localVideo');
-    const pipContainer = document.querySelector('.local-pip');
-    const transcriptionEl = document.getElementById('transcription');
-    const micBtn = document.getElementById('offBtn');
-
-    // Voice recognition setup
-    let recognition;
-    let isListening = false;
-    
-    try {
-      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-      recognition = new SpeechRecognition();
-      recognition.continuous = true;
-      recognition.interimResults = true;
-      recognition.lang = 'pt-BR';
-
-      recognition.onresult = (event) => {
-        let final = '';
-        let interim = '';
-        
-        for (let i = event.resultIndex; i < event.results.length; i++) {
-          if (event.results[i].isFinal) {
-            final += event.results[i][0].transcript;
-          } else {
-            interim += event.results[i][0].transcript;
-          }
-        }
-        
-        transcriptionEl.textContent = final || interim;
-        transcriptionEl.style.display = 'block';
-      };
-
-      recognition.onerror = (event) => {
-        console.error('Recognition error:', event.error);
-        stopListening();
-      };
-    } catch (e) {
-      console.error('Speech recognition not supported', e);
-      micBtn.disabled = true;
-      micBtn.title = 'Reconhecimento de voz não suportado';
-    }
-
-    // Microphone button handlers
-    const startListening = () => {
-      if (!recognition) return;
-      
-      try {
-        recognition.start();
-        isListening = true;
-        micBtn.innerHTML = '<i class="material-icons mic-icon">mic</i>';
-        micBtn.style.backgroundColor = '#4CAF50';
-        transcriptionEl.textContent = 'Ouvindo...';
-        transcriptionEl.style.display = 'block';
-      } catch (err) {
-        console.error('Mic error:', err);
-      }
-    };
-
-    const stopListening = () => {
-      if (!recognition) return;
-      
-      recognition.stop();
-      isListening = false;
-      micBtn.innerHTML = '<i class="material-icons mic-icon mic-off">mic</i>';
-      micBtn.style.backgroundColor = '#ff4444';
-    };
-
-    micBtn.addEventListener('mousedown', startListening);
-    micBtn.addEventListener('touchstart', startListening);
-    micBtn.addEventListener('mouseup', stopListening);
-    micBtn.addEventListener('touchend', stopListening);
-    micBtn.addEventListener('mouseleave', stopListening);
-
-    // Double click to close
-    micBtn.addEventListener('dblclick', () => window.close());
-
-    // WebRTC video setup
-    navigator.mediaDevices.getUserMedia({ 
-      video: { facingMode: 'user' }, 
-      audio: true 
-    }).then(stream => {
-      localVideo.srcObject = stream;
-      localVideo.style.display = 'none';
-
-      document.getElementById('callActionBtn').onclick = () => {
-        const targetId = prompt('Digite o ID do destinatário');
-        if (targetId) {
-          rtcCore.startCall(targetId.trim(), stream);
-        }
-      };
-    }).catch(err => {
-      console.error('Camera error:', err);
-    });
-
-    // Handle remote stream
-    rtcCore.setRemoteStreamCallback(stream => {
-      const pipVideo = pipContainer.querySelector('video') || document.createElement('video');
-      pipVideo.srcObject = stream;
-      pipVideo.autoplay = true;
-      pipVideo.playsinline = true;
-      pipVideo.style.width = '100%';
-      pipVideo.style.height = '100%';
-      pipVideo.style.objectFit = 'cover';
-      
-      if (!pipContainer.contains(pipVideo)) {
-        pipContainer.innerHTML = '';
-        pipContainer.appendChild(pipVideo);
-      }
-    });
-
-    // Handle URL parameters for direct calling
-    const urlParams = new URLSearchParams(window.location.search);
-    const targetId = urlParams.get('id');
-    if (targetId && localVideo.srcObject) {
-      rtcCore.startCall(targetId, localVideo.srcObject);
-    }
-  </script>
+  <script type="module" src="js/caller-ui.js"></script>
 </body>
 </html>
