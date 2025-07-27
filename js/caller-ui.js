@@ -1,6 +1,6 @@
 import WebRTCCore from '../core/webrtc-core.js';
 
-window.onload = async () => {
+window.onload = () => {
   const rtcCore = new WebRTCCore('https://lemur-signal.onrender.com');
   const myId = crypto.randomUUID().substr(0, 8);
   document.getElementById('myId').textContent = myId;
@@ -13,29 +13,14 @@ window.onload = async () => {
   const transcriptionEl = document.getElementById('transcription');
   const micBtn = document.getElementById('offBtn');
 
-  // Configuração inicial do ícone
-  micBtn.innerHTML = '<i class="material-icons mic-icon mic-off">mic</i>';
-  
-  // Verificação de suporte
-  if (!('webkitSpeechRecognition' in window)) {
-    console.error('API de voz não suportada');
-    transcriptionEl.textContent = "Seu navegador não suporta reconhecimento de voz";
-    return;
-  }
-
-  const SpeechRecognition = window.webkitSpeechRecognition || window.SpeechRecognition;
+  // Configuração do reconhecimento de voz
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   const recognition = new SpeechRecognition();
   recognition.continuous = true;
   recognition.interimResults = true;
   recognition.lang = 'pt-BR';
 
   let isListening = false;
-
-  // Função para mostrar o texto transcrito
-  const showTranscription = (text) => {
-    transcriptionEl.textContent = text;
-    transcriptionEl.style.display = 'block';
-  };
 
   // Eventos do reconhecimento de voz
   recognition.onresult = (event) => {
@@ -45,60 +30,45 @@ window.onload = async () => {
     for (let i = event.resultIndex; i < event.results.length; i++) {
       const transcript = event.results[i][0].transcript;
       if (event.results[i].isFinal) {
-        finalTranscript += transcript + ' ';
+        finalTranscript += transcript;
       } else {
         interimTranscript += transcript;
       }
     }
 
-    if (finalTranscript) {
-      showTranscription(finalTranscript);
-    } else if (interimTranscript) {
-      showTranscription(interimTranscript);
-    }
+    transcriptionEl.textContent = finalTranscript || interimTranscript;
   };
 
   recognition.onerror = (event) => {
-    console.error('Erro:', event.error);
-    showTranscription('Erro ao acessar o microfone');
-    stopListening();
+    console.error('Erro no reconhecimento de voz:', event.error);
   };
 
-  recognition.onend = () => {
-    if (isListening) {
-      recognition.start(); // Reconecta se ainda estiver ativo
-    }
-  };
-
-  const startListening = () => {
+  // Controle do botão do microfone
+  micBtn.onmousedown = micBtn.ontouchstart = () => {
     try {
       recognition.start();
       isListening = true;
-      micBtn.innerHTML = '<i class="material-icons mic-icon">mic</i>';
+      micBtn.innerHTML = '<i class="material-icons">mic_off</i>';
       micBtn.style.backgroundColor = '#4CAF50';
-      showTranscription('Ouvindo...');
-    } catch (error) {
-      console.error('Erro ao iniciar:', error);
-      showTranscription('Clique novamente para ativar');
+      transcriptionEl.textContent = 'Ouvindo...';
+    } catch (e) {
+      console.error('Erro ao iniciar reconhecimento:', e);
     }
   };
 
-  const stopListening = () => {
-    recognition.stop();
-    isListening = false;
-    micBtn.innerHTML = '<i class="material-icons mic-icon mic-off">mic</i>';
-    micBtn.style.backgroundColor = '#ff4444';
+  micBtn.onmouseup = micBtn.ontouchend = () => {
+    if (isListening) {
+      recognition.stop();
+      isListening = false;
+      micBtn.innerHTML = '<i class="material-icons">mic</i>';
+      micBtn.style.backgroundColor = '#ff4444';
+    }
   };
 
-  // Event handlers
-  micBtn.addEventListener('mousedown', startListening);
-  micBtn.addEventListener('touchstart', startListening);
-  micBtn.addEventListener('mouseup', stopListening);
-  micBtn.addEventListener('touchend', stopListening);
-  micBtn.addEventListener('mouseleave', stopListening);
-
   // Fechar janela com clique duplo
-  micBtn.ondblclick = () => window.close();
+  micBtn.ondblclick = () => {
+    window.close();
+  };
 
   // Restante do código WebRTC
   navigator.mediaDevices.getUserMedia({ 
@@ -110,7 +80,9 @@ window.onload = async () => {
 
     document.getElementById('callActionBtn').onclick = () => {
       const targetId = prompt('Digite o ID do destinatário');
-      if (targetId) rtcCore.startCall(targetId.trim(), stream);
+      if (targetId) {
+        rtcCore.startCall(targetId.trim(), stream);
+      }
     };
   }).catch(err => {
     console.error('Erro ao acessar câmera:', err);
@@ -121,6 +93,7 @@ window.onload = async () => {
     pipVideo.srcObject = stream;
     pipVideo.autoplay = true;
     pipVideo.playsinline = true;
+    pipVideo.style.display = 'block';
     pipVideo.style.width = '100%';
     pipVideo.style.height = '100%';
     pipVideo.style.objectFit = 'cover';
