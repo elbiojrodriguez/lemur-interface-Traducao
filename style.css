@@ -1,0 +1,173 @@
+ /* Reset mobile */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  background: #000;
+  min-height: 100vh;
+  height: 100%;
+  overflow: hidden;
+  position: relative;
+  font-family: Arial, sans-serif;
+}
+
+/* Containers de vídeo */
+.remote-container {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
+
+#remoteVideo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  background: #111;
+}
+
+/* Vídeo local em PIP com moldura verde */
+.local-pip {
+  position: absolute;
+  bottom: calc(80px + 60px);
+  right: 20px;
+  width: 34.5%;
+  max-width: 138px;
+  height: 184px;
+  transform: translateX(-17%);
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+  border: 2px solid #4CAF50;
+  z-index: 10;
+}
+
+#localVideo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scaleX(-1);
+}
+
+/* Linha de horizonte abaixo do PIP */
+.pip-horizon {
+  position: absolute;
+  bottom: calc(80px + 60px - 2px);
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background: rgba(76, 175, 80, 0.6);
+  z-index: 9;
+}
+
+/* Faixa visível com texto de publicidade */
+.ad-space {
+  position: absolute;
+  bottom: 10px;
+  width: 100%;
+  text-align: center;
+  color: #ccc;
+  font-size: 14px;
+  z-index: 8;
+  line-height: 1.2;
+  font-family: Arial, sans-serif;
+}
+
+/* Controles principais: botão verde e vermelho */
+.controls {
+  position: absolute;
+  bottom: calc(80px + 60px);
+  left: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  z-index: 20;
+}
+
+.controls button {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  border: none;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+  backdrop-filter: blur(6px);
+  color: white;
+}
+
+#callActionBtn {
+  background: #4CAF50;
+}
+
+#offBtn {
+  background: #F44336;
+}
+
+/* Overlay de informações */
+.info-overlay {
+  position: absolute;
+  top: 20px;
+  left: 0;
+  right: 0;
+  z-index: 30;
+  color: white;
+  text-align: center;
+  background: rgba(0, 0, 0, 0.5);
+  padding: 10px;
+  border-radius: 0 0 10px 10px;
+}
+
+/* Destaque visual para ID */
+.id-display {
+  display: inline-block;
+  font-size: 16px;
+  font-weight: bold;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 6px 12px;
+  border-radius: 20px;
+  user-select: all;
+  cursor: pointer;
+  color: white;
+}
+
+/* Mensagem de status centralizada */
+#statusMessage {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  text-align: center;
+  font-size: 18px;
+  color: white;
+  z-index: 15;
+  text-shadow: 0 0 5px rgba(0,0,0,0.7);
+  padding: 0 20px;
+}
+
+/* Responsivo para telas pequenas */
+@media (max-width: 400px) {
+  .controls button {
+    width: 50px;
+    height: 50px;
+    font-size: 16px;
+  }
+
+  .local-pip {
+    height: 120px;
+    max-width: 100px;
+    bottom: calc(60px + 60px);
+  }
+
+  .info-overlay {
+    padding: 8px;
+  }
+
+  #statusMessage {
+    font-size: 16px;
+  }
+}
