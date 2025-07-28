@@ -1,50 +1,37 @@
 import WebRTCCore from '../core/webrtc-core.js';
+import { SIGNALING_SERVER_URL } from '../core/internet-config.js';
 
 window.onload = () => {
-  const rtcCore = new WebRTCCore('https://lemur-signal.onrender.com');
+  const rtcCore = new WebRTCCore(SIGNALING_SERVER_URL);
   const myId = crypto.randomUUID().substr(0, 8);
-  document.getElementById('myId').innerHTML = `Seu ID: <strong>${myId}</strong>`;
+  document.getElementById('myId').textContent = myId;
   rtcCore.initialize(myId);
   rtcCore.setupSocketHandlers();
 
   const localVideo = document.getElementById('localVideo');
   const remoteVideo = document.getElementById('remoteVideo');
 
-  // Opcional: Esconder remoteVideo se não for usado
-  remoteVideo.style.display = 'none';
-
   document.getElementById('offBtn').onclick = () => window.close();
 
-  rtcCore.onIncomingCall = (offer) => {
-    const btn = document.getElementById('callActionBtn');
-    btn.textContent = 'Join';
-    btn.style.display = 'block';
-    btn.disabled = false;
+  navigator.mediaDevices.getUserMedia({ 
+    video: { facingMode: 'user' }, 
+    audio: true 
+  }).then(stream => {
+    // Seu vídeo local agora vai para remoteVideo (PIP ou fundo)
+    remoteVideo.srcObject = stream; // <<-- Alteração aqui
 
-    btn.onclick = () => {
-      navigator.mediaDevices.getUserMedia({
-        video: { facingMode: 'user' },
-        audio: true
-      }).then(stream => {
-        // Não exibe o stream local (seu vídeo) no localVideo
-        // Em vez disso, o localVideo vai mostrar o stream remoto
-        // Se quiser exibir seu vídeo em outro lugar, use remoteVideo
-        remoteVideo.srcObject = stream; // (Opcional, se quiser ver seu próprio vídeo em remoteVideo)
-
-        rtcCore.handleIncomingCall(offer, stream, (remoteStream) => {
-          // Exibe o vídeo do visitante (remoto) no localVideo (PIP)
-          localVideo.srcObject = remoteStream;
-        });
-
-        btn.disabled = true;
-      }).catch(err => {
-        console.error('Erro ao acessar câmera:', err);
-      });
+    document.getElementById('callActionBtn').onclick = () => {
+      const targetId = prompt('Digite o ID do destinatário');
+      if (targetId) {
+        rtcCore.startCall(targetId.trim(), stream);
+      }
     };
-  };
+  }).catch(err => {
+    console.error('Erro ao acessar câmera:', err);
+  });
 
   rtcCore.setRemoteStreamCallback(stream => {
-    // Sempre que chegar um stream remoto, ele vai para o localVideo
-    localVideo.srcObject = stream;
+    // O vídeo do visitante agora vai para localVideo (tela principal)
+    localVideo.srcObject = stream; // <<-- Alteração aqui
   });
 };
