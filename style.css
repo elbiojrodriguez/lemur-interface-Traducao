@@ -15,16 +15,19 @@ body {
   font-family: Arial, sans-serif;
 }
 
-/* Box azul celeste de fundo (NOVO) */
+/* Box azul celeste centralizado (2x maior que o PIP) */
 body::before {
   content: "";
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: #87CEEB; /* Azul celeste */
-  z-index: -2; /* Fica atrás de tudo, mas acima do fundo preto padrão */
+  top: 50%;
+  left: 50%;
+  width: 69%; /* 2x a largura do PIP (34.5% * 2) */
+  height: 368px; /* 2x a altura do PIP (184px * 2) */
+  background: #87CEEB;
+  border-radius: 16px;
+  transform: translate(-50%, -50%);
+  z-index: -1;
+  opacity: 0.8;
 }
 
 /* Containers de vídeo */
