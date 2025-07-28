@@ -1,1 +1,40 @@
-<!DOCTYPE html> <html lang="pt-BR"> <head> <meta charset="UTF-8" /> <meta name="viewport" content="width=device-width, initial-scale=1.0" /> <title>Caller - Videochamada Mobile</title> <link rel="stylesheet" href="style.css" /> <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"> <style> body { background-color: #87CEEB; margin: 0; padding: 0; overflow: hidden; font-family: Arial, sans-serif; } .remote-container { display: none; } .local-pip { position: absolute; bottom: 100px; right: 20px; width: 120px; height: 160px; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 8px rgba(0,0,0,0.2); z-index: 10; } .pip-horizon { display: none; } .controls button { border: none; border-radius: 50%; width: 50px; height: 50px; font-size: 16px; cursor: pointer; margin: 0 10px; } #offBtn { background-color: #ff4444; color: white; display: flex; align-items: center; justify-content: center; } #transcription { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: white; font-size: 24px; text-align: center; text-shadow: 1px 1px 2px rgba(0,0,0,0.5); max-width: 80%; padding: 10px; } </style> </head> <body> <video id="remoteVideo" autoplay playsinline style="display: none;"></video> <div id="statusMessage" style="display: none;">Esperando resposta do dono...</div> <div class="local-pip"> <video id="localVideo" autoplay muted playsinline style="display: none;"></video> </div> <div id="transcription"></div> <div class="ad-space"> <span>Espaço reservado</span><br /> <span>para publicidade</span> </div> <div class="controls"> <button id="callActionBtn">Call</button> <button id="offBtn"><i class="material-icons">mic</i></button> </div> <div class="info-overlay"> <span id="myId"></span> </div> <script src="https://lemur-signal.onrender.com/socket.io/socket.io.js"></script> <script type="module" src="js/caller-ui.js"></script> </body> </html> import WebRTCCore from '../core/webrtc-core.js'; window.onload = () => { const rtcCore = new WebRTCCore('https://lemur-signal.onrender.com'); const myId = crypto.randomUUID().substr(0, 8); document.getElementById('myId').textContent = myId; rtcCore.initialize(myId); rtcCore.setupSocketHandlers(); const localVideo = document.getElementById('localVideo'); const remoteVideo = document.getElementById('remoteVideo'); const pipContainer = document.querySelector('.local-pip'); const transcriptionEl = document.getElementById('transcription'); const micBtn = document.getElementById('offBtn'); // Configuração do reconhecimento de voz const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition; const recognition = new SpeechRecognition(); recognition.continuous = true; recognition.interimResults = true; recognition.lang = 'pt-BR'; let isListening = false; // Eventos do reconhecimento de voz recognition.onresult = (event) => { let interimTranscript = ''; let finalTranscript = ''; for (let i = event.resultIndex; i < event.results.length; i++) { const transcript = event.results[i][0].transcript; if (event.results[i].isFinal) { finalTranscript += transcript; } else { interimTranscript += transcript; } } transcriptionEl.textContent = finalTranscript || interimTranscript; }; recognition.onerror = (event) => { console.error('Erro no reconhecimento de voz:', event.error); }; // Controle do botão do microfone micBtn.onmousedown = micBtn.ontouchstart = () => { try { recognition.start(); isListening = true; micBtn.innerHTML = '<i class="material-icons">mic_off</i>'; micBtn.style.backgroundColor = '#4CAF50'; transcriptionEl.textContent = 'Ouvindo...'; } catch (e) { console.error('Erro ao iniciar reconhecimento:', e); } }; micBtn.onmouseup = micBtn.ontouchend = () => { if (isListening) { recognition.stop(); isListening = false; micBtn.innerHTML = '<i class="material-icons">mic</i>'; micBtn.style.backgroundColor = '#ff4444'; } }; // Fechar janela com clique duplo micBtn.ondblclick = () => { window.close(); }; // Restante do código WebRTC navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: true }).then(stream => { localVideo.srcObject = stream; localVideo.style.display = 'none'; document.getElementById('callActionBtn').onclick = () => { const targetId = prompt('Digite o ID do destinatário'); if (targetId) { rtcCore.startCall(targetId.trim(), stream); } }; }).catch(err => { console.error('Erro ao acessar câmera:', err); }); rtcCore.setRemoteStreamCallback(stream => { const pipVideo = pipContainer.querySelector('video') || document.createElement('video'); pipVideo.srcObject = stream; pipVideo.autoplay = true; pipVideo.playsinline = true; pipVideo.style.display = 'block'; pipVideo.style.width = '100%'; pipVideo.style.height = '100%'; pipVideo.style.objectFit = 'cover'; if (!pipContainer.contains(pipVideo)) { pipContainer.innerHTML = ''; pipContainer.appendChild(pipVideo); } }); };
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Caller - Videochamada Mobile</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="remote-container">
+    <video id="remoteVideo" autoplay playsinline></video>
+    <div id="statusMessage">Esperando resposta do dono...</div>
+  </div>
+
+  <div class="local-pip">
+    <video id="localVideo" autoplay muted playsinline></video>
+  </div>
+
+  <div class="pip-horizon"></div>
+
+  <div class="ad-space">
+    <span>Espaço reservado</span><br />
+    <span>para publicidade</span>
+  </div>
+
+  <div class="controls">
+    <button id="callActionBtn">Call</button>
+    <button id="offBtn">Off</button>
+  </div>
+
+  <div class="info-overlay">
+    <span id="myId"></span>
+  </div>
+
+  <!-- Socket.io do servidor FireWeb -->
+  <script src="https://lemur-signal.onrender.com/socket.io/socket.io.js"></script>
+  <!-- Lógica modular -->
+  <script type="module" src="js/caller-ui.js"></script>
+</body>
+</html>
