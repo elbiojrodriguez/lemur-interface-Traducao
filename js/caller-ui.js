@@ -11,6 +11,22 @@ window.onload = () => {
   const localVideo = document.getElementById('localVideo');
   const remoteVideo = document.getElementById('remoteVideo');
 
+  // Aplica estilos para inverter as posições dos vídeos
+  localVideo.style.position = 'absolute';
+  localVideo.style.width = '100%';
+  localVideo.style.height = '100%';
+  localVideo.style.objectFit = 'cover';
+  localVideo.style.zIndex = '1'; // Fundo
+
+  remoteVideo.style.position = 'absolute';
+  remoteVideo.style.width = '30%';
+  remoteVideo.style.height = '30%';
+  remoteVideo.style.bottom = '20px';
+  remoteVideo.style.right = '20px';
+  remoteVideo.style.border = '2px solid white';
+  remoteVideo.style.borderRadius = '8px';
+  remoteVideo.style.zIndex = '2'; // Sobreposição (PIP)
+
   document.getElementById('offBtn').onclick = () => window.close();
 
   navigator.mediaDevices.getUserMedia({ 
