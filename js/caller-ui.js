@@ -1,51 +1,50 @@
 import WebRTCCore from '../core/webrtc-core.js';
-import { SIGNALING_SERVER_URL } from '../core/internet-config.js';
 
 window.onload = () => {
-  const rtcCore = new WebRTCCore(SIGNALING_SERVER_URL);
+  const rtcCore = new WebRTCCore('https://lemur-signal.onrender.com');
   const myId = crypto.randomUUID().substr(0, 8);
-  document.getElementById('myId').textContent = myId;
+  document.getElementById('myId').innerHTML = `Seu ID: <strong>${myId}</strong>`;
   rtcCore.initialize(myId);
   rtcCore.setupSocketHandlers();
 
   const localVideo = document.getElementById('localVideo');
   const remoteVideo = document.getElementById('remoteVideo');
 
-  // Aplica estilos para inverter as posições dos vídeos
-  localVideo.style.position = 'absolute';
-  localVideo.style.width = '100%';
-  localVideo.style.height = '100%';
-  localVideo.style.objectFit = 'cover';
-  localVideo.style.zIndex = '1'; // Fundo
-
-  remoteVideo.style.position = 'absolute';
-  remoteVideo.style.width = '30%';
-  remoteVideo.style.height = '30%';
-  remoteVideo.style.bottom = '20px';
-  remoteVideo.style.right = '20px';
-  remoteVideo.style.border = '2px solid white';
-  remoteVideo.style.borderRadius = '8px';
-  remoteVideo.style.zIndex = '2'; // Sobreposição (PIP)
+  // Opcional: Esconder remoteVideo se não for usado
+  remoteVideo.style.display = 'none';
 
   document.getElementById('offBtn').onclick = () => window.close();
 
-  navigator.mediaDevices.getUserMedia({ 
-    video: { facingMode: 'user' }, 
-    audio: true 
-  }).then(stream => {
-    localVideo.srcObject = stream;
+  rtcCore.onIncomingCall = (offer) => {
+    const btn = document.getElementById('callActionBtn');
+    btn.textContent = 'Join';
+    btn.style.display = 'block';
+    btn.disabled = false;
 
-    document.getElementById('callActionBtn').onclick = () => {
-      const targetId = prompt('Digite o ID do destinatário');
-      if (targetId) {
-        rtcCore.startCall(targetId.trim(), stream);
-      }
+    btn.onclick = () => {
+      navigator.mediaDevices.getUserMedia({
+        video: { facingMode: 'user' },
+        audio: true
+      }).then(stream => {
+        // Não exibe o stream local (seu vídeo) no localVideo
+        // Em vez disso, o localVideo vai mostrar o stream remoto
+        // Se quiser exibir seu vídeo em outro lugar, use remoteVideo
+        remoteVideo.srcObject = stream; // (Opcional, se quiser ver seu próprio vídeo em remoteVideo)
+
+        rtcCore.handleIncomingCall(offer, stream, (remoteStream) => {
+          // Exibe o vídeo do visitante (remoto) no localVideo (PIP)
+          localVideo.srcObject = remoteStream;
+        });
+
+        btn.disabled = true;
+      }).catch(err => {
+        console.error('Erro ao acessar câmera:', err);
+      });
     };
-  }).catch(err => {
-    console.error('Erro ao acessar câmera:', err);
-  });
+  };
 
   rtcCore.setRemoteStreamCallback(stream => {
-    remoteVideo.srcObject = stream;
+    // Sempre que chegar um stream remoto, ele vai para o localVideo
+    localVideo.srcObject = stream;
   });
 };
