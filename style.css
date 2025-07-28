@@ -15,6 +15,18 @@ body {
   font-family: Arial, sans-serif;
 }
 
+/* Box azul celeste de fundo (NOVO) */
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #87CEEB; /* Azul celeste */
+  z-index: -2; /* Fica atrás de tudo, mas acima do fundo preto padrão */
+}
+
 /* Containers de vídeo */
 .remote-container {
   position: absolute;
