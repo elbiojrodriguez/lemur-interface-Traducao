@@ -1,29 +1,35 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Caller - Videochamada Mobile</title>
-  <link rel="stylesheet" href="style.css" />
-</head>
-<body>
-  <div class="remote-container">
-    <video id="remoteVideo" autoplay playsinline></video>
-  </div>
+import WebRTCCore from '../core/webrtc-core.js';
+import { SIGNALING_SERVER_URL } from '../core/internet-config.js';
 
-  <div class="local-pip">
-    <video id="localVideo" autoplay muted playsinline></video>
-  </div>
+window.onload = () => {
+  const rtcCore = new WebRTCCore(SIGNALING_SERVER_URL);
+  const myId = crypto.randomUUID().substr(0, 8);
+  document.getElementById('myId').textContent = myId;
+  rtcCore.initialize(myId);
+  rtcCore.setupSocketHandlers();
 
-  <div class="controls">
-    <button id="callActionBtn">Call</button>
-  </div>
+  const localVideo = document.getElementById('localVideo');
+  const remoteVideo = document.getElementById('remoteVideo');
 
-  <div class="info-overlay">
-    <span id="myId"></span>
-  </div>
+  navigator.mediaDevices.getUserMedia({ 
+    video: { facingMode: 'user' }, 
+    audio: true 
+  }).then(stream => {
+    // Seu vídeo local agora vai para remoteVideo (PIP ou fundo)
+    remoteVideo.srcObject = stream; // <<-- Alteração aqui
 
-  <script src="https://lemur-signal.onrender.com/socket.io/socket.io.js"></script>
-  <script type="module" src="js/caller-ui.js"></script>
-</body>
-</html>
+    document.getElementById('callActionBtn').onclick = () => {
+      const targetId = prompt('Digite o ID do destinatário');
+      if (targetId) {
+        rtcCore.startCall(targetId.trim(), stream);
+      }
+    };
+  }).catch(err => {
+    console.error('Erro ao acessar câmera:', err);
+  });
+
+  rtcCore.setRemoteStreamCallback(stream => {
+    // O vídeo do visitante agora vai para localVideo (tela principal)
+    localVideo.srcObject = stream; // <<-- Alteração aqui
+  });
+};
