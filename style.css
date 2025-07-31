@@ -7,7 +7,7 @@
 }
 
 body {
-  background: transparent; /* ou background: white; para fundo branco */
+  background: transparent;
   min-height: 100vh;
   height: 100%;
   overflow: hidden;
@@ -50,7 +50,7 @@ body {
   transform: scaleX(-1);
 }
 
-/* Controles principais: botão verde e vermelho */
+/* Controles principais: botão verde */
 .controls {
   position: absolute;
   bottom: calc(80px + 60px);
@@ -91,7 +91,17 @@ body {
   border-radius: 0 0 10px 10px;
 }
 
-/* Destaque visual para ID */
+/* Container do QR Code */
+.info-overlay #qrcode {
+  margin: 10px auto;
+  padding: 12px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  display: inline-block;
+}
+
+/* Destaque visual para ID (opcional - pode ser removido se não for mais usado) */
 .id-display {
   display: inline-block;
   font-size: 16px;
@@ -120,5 +130,11 @@ body {
 
   .info-overlay {
     padding: 8px;
+  }
+
+  /* Ajustes do QR Code para mobile */
+  .info-overlay #qrcode {
+    padding: 8px;
+    max-width: 90%;
   }
 }
