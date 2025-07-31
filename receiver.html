@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Receiver - Videochamada Mobile</title>
   <link rel="stylesheet" href="style.css" />
+  <!-- Adicione esta linha para o gerador de QR Code -->
+  <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
 </head>
 <body>
   <div class="remote-container">
@@ -20,7 +22,8 @@
   </div>
 
   <div class="info-overlay">
-    <span id="myId" class="id-display">Seu ID: <strong>carregando...</strong></span>
+    <!-- Substitua o texto pelo container do QR Code -->
+    <div id="qrcode"></div>
   </div>
 
   <script src="https://lemur-signal.onrender.com/socket.io/socket.io.js"></script>
