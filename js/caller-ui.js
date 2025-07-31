@@ -1,4 +1,3 @@
-// /js/caller-ui.js
 import WebRTCCore from '../core/webrtc-core.js';
 import { QRCodeScanner } from './qr-code-utils.js';
 
@@ -13,11 +12,29 @@ window.onload = () => {
   const remoteVideo = document.getElementById('remoteVideo');
   let targetId = null;
 
+  // Verifica se há ID na URL
+  const urlParams = new URLSearchParams(window.location.search);
+  const targetIdFromUrl = urlParams.get('targetId');
+  
+  if (targetIdFromUrl) {
+    targetId = targetIdFromUrl;
+    document.getElementById('callActionBtn').style.display = 'block';
+  }
+
   // Configura o scanner de QR Code
   document.getElementById('scanBtn').onclick = () => {
-    QRCodeScanner.start('reader', (decodedId) => {
-      targetId = decodedId;
-      document.getElementById('callActionBtn').style.display = 'block';
+    QRCodeScanner.start('reader', (decodedUrl) => {
+      try {
+        const url = new URL(decodedUrl);
+        if (url.pathname.endsWith('/caller.html')) {
+          targetId = url.searchParams.get('targetId');
+          if (targetId) {
+            document.getElementById('callActionBtn').style.display = 'block';
+          }
+        }
+      } catch (e) {
+        console.error("QR Code inválido:", e);
+      }
     });
   };
 
