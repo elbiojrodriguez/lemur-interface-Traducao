@@ -15,21 +15,6 @@ body {
   font-family: Arial, sans-serif;
 }
 
-/* Box azul celeste centralizado (2x maior que o PIP) */
-body::before {
-  content: "";
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  width: 69%; /* 2x a largura do PIP (34.5% * 2) */
-  height: 368px; /* 2x a altura do PIP (184px * 2) */
-  background: #87CEEB;
-  border-radius: 16px;
-  transform: translate(-50%, -50%);
-  z-index: -1;
-  opacity: 0.8;
-}
-
 /* Containers de vídeo */
 .remote-container {
   position: absolute;
@@ -65,30 +50,6 @@ body::before {
   transform: scaleX(-1);
 }
 
-/* Linha de horizonte abaixo do PIP */
-.pip-horizon {
-  position: absolute;
-  bottom: calc(80px + 60px - 2px);
-  left: 0;
-  width: 100%;
-  height: 1px;
-  background: rgba(76, 175, 80, 0.6);
-  z-index: 9;
-}
-
-/* Faixa visível com texto de publicidade */
-.ad-space {
-  position: absolute;
-  bottom: 10px;
-  width: 100%;
-  text-align: center;
-  color: #ccc;
-  font-size: 14px;
-  z-index: 8;
-  line-height: 1.2;
-  font-family: Arial, sans-serif;
-}
-
 /* Controles principais: botão verde e vermelho */
 .controls {
   position: absolute;
@@ -114,10 +75,6 @@ body::before {
 
 #callActionBtn {
   background: #4CAF50;
-}
-
-#offBtn {
-  background: #F44336;
 }
 
 /* Overlay de informações */
@@ -147,21 +104,6 @@ body::before {
   color: white;
 }
 
-/* Mensagem de status centralizada */
-#statusMessage {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 100%;
-  text-align: center;
-  font-size: 18px;
-  color: white;
-  z-index: 15;
-  text-shadow: 0 0 5px rgba(0,0,0,0.7);
-  padding: 0 20px;
-}
-
 /* Responsivo para telas pequenas */
 @media (max-width: 400px) {
   .controls button {
@@ -178,9 +120,5 @@ body::before {
 
   .info-overlay {
     padding: 8px;
-  }
-
-  #statusMessage {
-    font-size: 16px;
   }
 }
