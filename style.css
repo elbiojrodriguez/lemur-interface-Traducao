@@ -7,7 +7,7 @@
 }
 
 body {
-  background: #000;
+  background: transparent; /* ou background: white; para fundo branco */
   min-height: 100vh;
   height: 100%;
   overflow: hidden;
