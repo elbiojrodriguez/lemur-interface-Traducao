@@ -1,29 +1,42 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Receiver - Videochamada Mobile</title>
-  <link rel="stylesheet" href="style.css" />
-</head>
-<body>
-  <div class="remote-container">
-    <video id="remoteVideo" autoplay playsinline style="display: none;"></video>
-  </div>
+import WebRTCCore from '../core/webrtc-core.js';
 
-  <div class="local-pip">
-    <video id="localVideo" autoplay muted playsinline></video>
-  </div>
+window.onload = () => {
+  const rtcCore = new WebRTCCore('https://lemur-signal.onrender.com');
+  const myId = crypto.randomUUID().substr(0, 8);
+  document.getElementById('myId').innerHTML = `Seu ID: <strong>${myId}</strong>`;
+  rtcCore.initialize(myId);
+  rtcCore.setupSocketHandlers();
 
-  <div class="controls">
-    <button id="callActionBtn" style="display:none;">Join</button>
-  </div>
+  const localVideo = document.getElementById('localVideo');
+  const remoteVideo = document.getElementById('remoteVideo');
 
-  <div class="info-overlay">
-    <span id="myId" class="id-display">Seu ID: <strong>carregando...</strong></span>
-  </div>
+  rtcCore.onIncomingCall = (offer) => {
+    const btn = document.getElementById('callActionBtn');
+    btn.textContent = 'Join';
+    btn.style.display = 'block';
+    btn.disabled = false;
 
-  <script src="https://lemur-signal.onrender.com/socket.io/socket.io.js"></script>
-  <script type="module" src="js/receiver-ui.js"></script>
-</body>
-</html>
+    btn.onclick = () => {
+      navigator.mediaDevices.getUserMedia({
+        video: { facingMode: 'user' },
+        audio: true
+      }).then(stream => {
+        localVideo.srcObject = stream;
+
+        rtcCore.handleIncomingCall(offer, stream, (remoteStream) => {
+          // Substitui o vídeo local pelo remoto no PIP
+          localVideo.srcObject = remoteStream;
+        });
+
+        btn.disabled = true;
+      }).catch(err => {
+        console.error('Erro ao acessar câmera:', err);
+      });
+    };
+  };
+
+  rtcCore.setRemoteStreamCallback(stream => {
+    // Substitui o vídeo local pelo remoto no PIP
+    localVideo.srcObject = stream;
+  });
+};
