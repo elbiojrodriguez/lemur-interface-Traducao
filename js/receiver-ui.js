@@ -1,4 +1,3 @@
-// /js/receiver-ui.js
 import WebRTCCore from '../core/webrtc-core.js';
 import { QRCodeGenerator } from './qr-code-utils.js';
 
@@ -6,8 +5,9 @@ window.onload = () => {
   const rtcCore = new WebRTCCore();
   const myId = crypto.randomUUID().substr(0, 8);
   
-  // Substitui o texto pelo QR Code
-  QRCodeGenerator.generate("qrcode", myId);
+  // Gera URL completa para o caller com o ID como parâmetro
+  const callerUrl = `${window.location.origin}/caller.html?targetId=${myId}`;
+  QRCodeGenerator.generate("qrcode", callerUrl);
   
   rtcCore.initialize(myId);
   rtcCore.setupSocketHandlers();
