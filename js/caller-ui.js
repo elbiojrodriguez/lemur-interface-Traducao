@@ -11,14 +11,11 @@ window.onload = () => {
   const localVideo = document.getElementById('localVideo');
   const remoteVideo = document.getElementById('remoteVideo');
 
-  document.getElementById('offBtn').onclick = () => window.close();
-
   navigator.mediaDevices.getUserMedia({ 
     video: { facingMode: 'user' }, 
     audio: true 
   }).then(stream => {
-    // Seu vídeo local agora vai para remoteVideo (PIP ou fundo)
-    remoteVideo.srcObject = stream; // <<-- Alteração aqui
+    remoteVideo.srcObject = stream;
 
     document.getElementById('callActionBtn').onclick = () => {
       const targetId = prompt('Digite o ID do destinatário');
@@ -31,7 +28,6 @@ window.onload = () => {
   });
 
   rtcCore.setRemoteStreamCallback(stream => {
-    // O vídeo do visitante agora vai para localVideo (tela principal)
-    localVideo.srcObject = stream; // <<-- Alteração aqui
+    localVideo.srcObject = stream;
   });
 };
