@@ -1,8 +1,9 @@
+// /js/caller-ui.js
 import WebRTCCore from '../core/webrtc-core.js';
-import { SIGNALING_SERVER_URL } from '../core/internet-config.js';
+import { QRCodeScanner } from './qr-code-utils.js';
 
 window.onload = () => {
-  const rtcCore = new WebRTCCore(SIGNALING_SERVER_URL);
+  const rtcCore = new WebRTCCore();
   const myId = crypto.randomUUID().substr(0, 8);
   document.getElementById('myId').textContent = myId;
   rtcCore.initialize(myId);
@@ -10,26 +11,28 @@ window.onload = () => {
 
   const localVideo = document.getElementById('localVideo');
   const remoteVideo = document.getElementById('remoteVideo');
+  let targetId = null;
 
-  navigator.mediaDevices.getUserMedia({ 
-    video: { facingMode: 'user' }, 
-    audio: true 
-  }).then(stream => {
-    // Seu vídeo local agora vai para remoteVideo (PIP ou fundo)
-    remoteVideo.srcObject = stream; // <<-- Alteração aqui
+  // Configura o scanner de QR Code
+  document.getElementById('scanBtn').onclick = () => {
+    QRCodeScanner.start('reader', (decodedId) => {
+      targetId = decodedId;
+      document.getElementById('callActionBtn').style.display = 'block';
+    });
+  };
 
-    document.getElementById('callActionBtn').onclick = () => {
-      const targetId = prompt('Digite o ID do destinatário');
-      if (targetId) {
-        rtcCore.startCall(targetId.trim(), stream);
-      }
-    };
-  }).catch(err => {
-    console.error('Erro ao acessar câmera:', err);
-  });
+  // Configura o botão de chamada
+  document.getElementById('callActionBtn').onclick = () => {
+    if (!targetId) return;
+    
+    navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+      .then(stream => {
+        remoteVideo.srcObject = stream;
+        rtcCore.startCall(targetId, stream);
+      });
+  };
 
   rtcCore.setRemoteStreamCallback(stream => {
-    // O vídeo do visitante agora vai para localVideo (tela principal)
-    localVideo.srcObject = stream; // <<-- Alteração aqui
+    localVideo.srcObject = stream;
   });
 };
