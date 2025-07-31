@@ -10,8 +10,6 @@ window.onload = () => {
   const localVideo = document.getElementById('localVideo');
   const remoteVideo = document.getElementById('remoteVideo');
 
-  document.getElementById('offBtn').onclick = () => window.close();
-
   rtcCore.onIncomingCall = (offer) => {
     const btn = document.getElementById('callActionBtn');
     btn.textContent = 'Join';
@@ -26,7 +24,6 @@ window.onload = () => {
         localVideo.srcObject = stream;
 
         rtcCore.handleIncomingCall(offer, stream, (remoteStream) => {
-          // Substitui o vídeo local pelo remoto no PIP
           localVideo.srcObject = remoteStream;
         });
 
@@ -38,7 +35,6 @@ window.onload = () => {
   };
 
   rtcCore.setRemoteStreamCallback(stream => {
-    // Substitui o vídeo local pelo remoto no PIP
     localVideo.srcObject = stream;
   });
 };
