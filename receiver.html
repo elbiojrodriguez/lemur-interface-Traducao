@@ -3,32 +3,49 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Receiver - Videochamada Mobile</title>
+  <title>Video Call - Receber Chamada</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="style.css" />
-  <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
 </head>
 <body>
-  <!-- Container principal (existente) -->
-  <div class="remote-container">
+  <!-- Main Video Container -->
+  <div class="video-container">
     <video id="remoteVideo" autoplay playsinline></video>
   </div>
 
-  <!-- PIP local (existente) -->
-  <div class="local-pip">
+  <!-- Local Video PIP -->
+  <div class="local-video-container">
     <video id="localVideo" autoplay muted playsinline></video>
   </div>
 
-  <!-- Controles (modificado) -->
-  <div class="controls">
-    <button id="callActionBtn">Join</button>
+  <!-- Connection Info (shown when waiting for call) -->
+  <div class="connection-ui" id="connectionUI">
+    <div class="peer-info">
+      <h2>Aguardando chamada...</h2>
+      <p>Seu ID: <span id="peerId" class="peer-id"></span></p>
+      <p class="share-instruction">Compartilhe este código para receber chamadas</p>
+    </div>
+    
+    <div id="qrcode" class="qr-display"></div>
+    
+    <button id="copyBtn" class="action-btn">
+      <i class="fas fa-copy"></i> Copiar Link
+    </button>
   </div>
 
-  <!-- Overlay de informações (agora com QR Code) -->
-  <div class="info-overlay">
-    <div id="qrcode" class="qrcode-container"></div>
+  <!-- Call Controls (shown during active call) -->
+  <div class="call-controls">
+    <button id="endCallBtn" class="control-btn">
+      <i class="fas fa-phone-slash"></i>
+    </button>
   </div>
 
+  <!-- Status Messages -->
+  <div class="status-message" id="callStatus"></div>
+
+  <!-- WebRTC Dependencies -->
   <script src="https://lemur-signal.onrender.com/socket.io/socket.io.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
   <script type="module" src="js/receiver-ui.js"></script>
 </body>
 </html>
