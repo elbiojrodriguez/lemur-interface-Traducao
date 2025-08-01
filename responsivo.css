@@ -36,21 +36,17 @@ body {
 }
 
 /* Vídeo local em PIP */
-.video-wrapper:nth-child(2) {
-  position: absolute;
-  bottom: calc(80px + 60px);
-  right: 20px;
-  width: 34.5%;
-  max-width: 138px;
-  height: 184px;
-  transform: translateX(-17%);
-
-  
-  /* Estilo visual inspirado no QR Code */
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-  border-radius: 2px solid #4CAF50
-;
-  z-index: 10;
+.video-wrapper:nth-child(2) { 
+position: absolute; 
+bottom: calc(80px + 60px); 
+right: 20px; 
+width: 34.5%; 
+max-width: 138px; 
+height: 184px; 
+transform: translateX(-17%); 
+border-radius: 8px; overflow: hidden; 
+box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); 
+border: 2px solid #4CAF50; z-index: 10; 
 }
 
 .video-wrapper:nth-child(2) video {
