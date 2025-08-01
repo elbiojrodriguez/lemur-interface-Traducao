@@ -1,55 +1,35 @@
- import WebRTCCore from '../core/webrtc-core.js';
-import { QRCodeScanner } from './qr-code-utils.js';
+import WebRTCCore from '../core/webrtc-core.js';
 
-window.onload = () => {
+window.onload = async () => {
   const rtcCore = new WebRTCCore();
   const myId = crypto.randomUUID().substr(0, 8);
-  document.getElementById('myId').textContent = myId;
+  
+  // 1. Inicialização básica
   rtcCore.initialize(myId);
   rtcCore.setupSocketHandlers();
-
-  const localVideo = document.getElementById('localVideo');
-  const remoteVideo = document.getElementById('remoteVideo');
-  let targetId = null;
-
-  // Verifica se há ID na URL
-  const urlParams = new URLSearchParams(window.location.search);
-  const targetIdFromUrl = urlParams.get('targetId');
   
-  if (targetIdFromUrl) {
-    targetId = targetIdFromUrl;
-    document.getElementById('callActionBtn').style.display = 'block';
-  }
+  // 2. Verifica parâmetro na URL
+  const urlParams = new URLSearchParams(window.location.search);
+  const targetId = urlParams.get('targetId');
 
-  // Configura o scanner de QR Code
-  document.getElementById('scanBtn').onclick = () => {
-    QRCodeScanner.start('reader', (decodedUrl) => {
-      try {
-        const url = new URL(decodedUrl);
-        if (url.pathname.endsWith('/caller.html')) {
-          targetId = url.searchParams.get('targetId');
-          if (targetId) {
-            document.getElementById('callActionBtn').style.display = 'block';
-          }
-        }
-      } catch (e) {
-        console.error("QR Code inválido:", e);
-      }
-    });
-  };
-
-  // Configura o botão de chamada
-  document.getElementById('callActionBtn').onclick = () => {
-    if (!targetId) return;
-    
-    navigator.mediaDevices.getUserMedia({ video: true, audio: true })
-      .then(stream => {
-        remoteVideo.srcObject = stream;
-        rtcCore.startCall(targetId, stream);
+  if (targetId) {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ 
+        video: true, 
+        audio: true 
       });
-  };
-
-  rtcCore.setRemoteStreamCallback(stream => {
-    localVideo.srcObject = stream;
-  });
+      
+      document.getElementById('remoteVideo').srcObject = stream;
+      rtcCore.startCall(targetId, stream);
+      
+      // Configura callback para vídeo remoto
+      rtcCore.setRemoteStreamCallback(remoteStream => {
+        document.getElementById('localVideo').srcObject = remoteStream;
+      });
+      
+    } catch (error) {
+      console.error('Erro ao acessar mídia:', error);
+      // Adicione aqui tratamento visual de erro se necessário
+    }
+  }
 };
