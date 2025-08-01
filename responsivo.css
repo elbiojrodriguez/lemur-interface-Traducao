@@ -40,9 +40,9 @@ body {
   position: absolute;
   bottom: calc(80px + 60px);
   right: 20px;
-  width: 69%;
-  max-width: 276px;
-  height: 368px;
+  width: 34.5%;
+  max-width: 166px;
+  height: 294px;
   transform: translateX(-17%);
   border-radius: 8px;
   overflow: hidden;
@@ -132,8 +132,8 @@ body {
   }
 
   .video-wrapper:nth-child(2) {
-    height: 240px;
-    max-width: 200px;
+    height: 120px;
+    max-width: 100px;
     bottom: calc(60px + 60px);
   }
 
