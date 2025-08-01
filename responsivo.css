@@ -38,11 +38,11 @@ body {
 /* Vídeo local em PIP */
 .video-wrapper:nth-child(2) {
   position: absolute;
-  bottom: calc(60px + 60px);
+  bottom: 20px;
   right: 20px;
-  width: 20vw; /* 20% da largura da tela */
-  max-width: 120px; /* limite para não ficar gigante */
-  aspect-ratio: 9 / 16; /* altura automática baseada na largura */
+  width: 150px; /* igual ao QR Code */
+  max-width: 150px;
+  aspect-ratio: 9 / 16;
   border-radius: 8px;
   overflow: hidden;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
