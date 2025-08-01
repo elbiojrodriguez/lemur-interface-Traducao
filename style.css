@@ -1,4 +1,4 @@
-/* Base Styles */
+/* Reset mobile */
 * {
   margin: 0;
   padding: 0;
@@ -7,39 +7,39 @@
 }
 
 body {
-  font-family: 'Segoe UI', Roboto, sans-serif;
-  background: #121212;
-  color: white;
-  height: 100vh;
+  background: transparent;
+  min-height: 100vh;
+  height: 100%;
   overflow: hidden;
   position: relative;
+  font-family: Arial, sans-serif;
 }
 
-/* Video Containers */
-.video-container {
-  position: relative;
-  width: 100%;
-  height: 100%;
-}
-
-#remoteVideo {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  background: #000;
-}
-
-.local-video-container {
+/* Containers de vídeo */
+.remote-container {
   position: absolute;
-  bottom: 20px;
+  width: 100%;
+  height: 100%;
+}
+
+/* Oculta o vídeo remoto */
+#remoteVideo {
+  display: none;
+}
+
+/* Vídeo local em PIP com moldura verde */
+.local-pip {
+  position: absolute;
+  bottom: calc(80px + 60px);
   right: 20px;
-  width: 30%;
-  max-width: 150px;
-  aspect-ratio: 9/16;
-  border-radius: 12px;
+  width: 34.5%;
+  max-width: 138px;
+  height: 184px;
+  transform: translateX(-17%);
+  border-radius: 8px;
   overflow: hidden;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-  border: 3px solid #4CAF50;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+  border: 2px solid #4CAF50;
   z-index: 10;
 }
 
@@ -50,157 +50,91 @@ body {
   transform: scaleX(-1);
 }
 
-/* Call Controls */
-.call-controls {
+/* Controles principais: botão verde */
+.controls {
   position: absolute;
-  bottom: 30px;
-  left: 0;
-  right: 0;
+  bottom: calc(80px + 60px);
+  left: 20px;
   display: flex;
-  justify-content: center;
-  gap: 24px;
+  flex-direction: column;
+  gap: 16px;
   z-index: 20;
 }
 
-.control-btn {
+.controls button {
   width: 60px;
   height: 60px;
   border-radius: 50%;
   border: none;
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  font-size: 18px;
+  font-weight: bold;
   cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.control-btn:hover {
-  transform: scale(1.1);
-}
-
-.control-btn i {
-  font-size: 24px;
+  backdrop-filter: blur(6px);
+  color: white;
 }
 
 #callActionBtn {
   background: #4CAF50;
 }
 
-#endCallBtn {
-  background: #F44336;
-  display: none;
-}
-
-/* QR Code & Connection UI */
-.connection-ui {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.8);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  z-index: 30;
-  padding: 20px;
-}
-
-#qrcode {
-  background: white;
-  padding: 12px;
-  border-radius: 12px;
-  margin: 20px 0;
-}
-
-.peer-info {
-  text-align: center;
-  margin-bottom: 20px;
-}
-
-.peer-id {
-  background: rgba(255, 255, 255, 0.1);
-  padding: 8px 16px;
-  border-radius: 20px;
-  font-size: 14px;
-  margin: 10px 0;
-  display: inline-block;
-}
-
-.action-btn {
-  background: #4CAF50;
-  color: white;
-  border: none;
-  padding: 12px 24px;
-  border-radius: 25px;
-  font-weight: bold;
-  margin: 8px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.action-btn:hover {
-  background: #45a049;
-}
-
-/* Status Messages */
-.status-message {
+/* Overlay de informações */
+.info-overlay {
   position: absolute;
   top: 20px;
   left: 0;
   right: 0;
+  z-index: 30;
+  color: white;
   text-align: center;
-  z-index: 40;
-  background: rgba(0, 0, 0, 0.7);
+  background: rgba(0, 0, 0, 0.5);
   padding: 10px;
-  border-radius: 0 0 12px 12px;
+  border-radius: 0 0 10px 10px;
 }
 
-/* QR Scanner */
-#reader {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 50;
-  background: black;
+/* Container do QR Code */
+.info-overlay #qrcode {
+  margin: 10px auto;
+  padding: 12px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  display: inline-block;
 }
 
-#reader button {
-  display: none;
+/* Destaque visual para ID (opcional - pode ser removido se não for mais usado) */
+.id-display {
+  display: inline-block;
+  font-size: 16px;
+  font-weight: bold;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 6px 12px;
+  border-radius: 20px;
+  user-select: all;
+  cursor: pointer;
+  color: white;
 }
 
-/* Responsive Adjustments */
-@media (max-width: 500px) {
-  .local-video-container {
-    width: 25%;
-    max-width: 120px;
-    bottom: 15px;
-    right: 15px;
-  }
-
-  .control-btn {
+/* Responsivo para telas pequenas */
+@media (max-width: 400px) {
+  .controls button {
     width: 50px;
     height: 50px;
+    font-size: 16px;
   }
 
-  .connection-ui {
-    padding: 15px;
+  .local-pip {
+    height: 120px;
+    max-width: 100px;
+    bottom: calc(60px + 60px);
   }
-}
 
-/* Animation for incoming call */
-@keyframes pulse {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.05); }
-  100% { transform: scale(1); }
-}
+  .info-overlay {
+    padding: 8px;
+  }
 
-.incoming-call {
-  animation: pulse 2s infinite;
+  /* Ajustes do QR Code para mobile */
+  .info-overlay #qrcode {
+    padding: 8px;
+    max-width: 90%;
+  }
 }
