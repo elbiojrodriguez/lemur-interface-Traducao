@@ -1,5 +1,4 @@
 import WebRTCCore from '../core/webrtc-core.js';
-import { QRCodeScanner } from './qr-code-utils.js';
 
 window.onload = () => {
   const rtcCore = new WebRTCCore();
@@ -31,23 +30,6 @@ window.onload = () => {
     targetId = targetIdFromUrl;
     document.getElementById('callActionBtn').style.display = 'block';
   }
-
-  // Configura o scanner de QR Code
-  document.getElementById('scanBtn').onclick = () => {
-    QRCodeScanner.start('reader', (decodedUrl) => {
-      try {
-        const url = new URL(decodedUrl);
-        if (url.pathname.endsWith('/caller.html')) {
-          targetId = url.searchParams.get('targetId');
-          if (targetId) {
-            document.getElementById('callActionBtn').style.display = 'block';
-          }
-        }
-      } catch (e) {
-        console.error("QR Code inválido:", e);
-      }
-    });
-  };
 
   // Configura o botão de chamada
   document.getElementById('callActionBtn').onclick = () => {
