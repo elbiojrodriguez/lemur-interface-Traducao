@@ -15,10 +15,13 @@ window.onload = () => {
   const localVideo = document.getElementById('localVideo');
   
   rtcCore.onIncomingCall = (offer) => {
-    navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+    // 🔇 Captura apenas vídeo, sem áudio
+    navigator.mediaDevices.getUserMedia({ video: true, audio: false })
       .then(stream => {
         localVideo.srcObject = stream;
         rtcCore.handleIncomingCall(offer, stream, (remoteStream) => {
+          // 🔇 Silencia qualquer áudio recebido
+          remoteStream.getAudioTracks().forEach(track => track.enabled = false);
           localVideo.srcObject = remoteStream;
         });
       });
