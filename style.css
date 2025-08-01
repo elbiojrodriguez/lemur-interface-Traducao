@@ -1,3 +1,8 @@
+/* 
+==========================================
+ESTILOS EXISTENTES (MANTIDOS INTACTOS) 
+==========================================
+*/
 /* Reset mobile */
 * {
   margin: 0;
@@ -91,17 +96,7 @@ body {
   border-radius: 0 0 10px 10px;
 }
 
-/* Container do QR Code */
-.info-overlay #qrcode {
-  margin: 10px auto;
-  padding: 12px;
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-  display: inline-block;
-}
-
-/* Destaque visual para ID (opcional - pode ser removido se não for mais usado) */
+/* Destaque visual para ID */
 .id-display {
   display: inline-block;
   font-size: 16px;
@@ -131,8 +126,46 @@ body {
   .info-overlay {
     padding: 8px;
   }
+}
 
-  /* Ajustes do QR Code para mobile */
+/*
+==========================================
+NOVOS ESTILOS (ADICIONADOS NO FINAL) 
+==========================================
+*/
+
+/* 1. Esconde elementos que não serão mais usados */
+#callActionBtn, #scanBtn {
+  display: none !important;
+}
+
+/* 2. Estilos para o QR Code (não interfere nos existentes) */
+.info-overlay #qrcode {
+  margin: 10px auto;
+  padding: 12px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  display: inline-block;
+}
+
+/* 3. Leitor de QR Code (fullscreen transparente) */
+#reader {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1000;
+  background: rgba(0,0,0,0.7);
+}
+
+#reader button {
+  display: none; /* Oculta botão padrão do scanner */
+}
+
+/* Ajustes responsivos para QR Code */
+@media (max-width: 400px) {
   .info-overlay #qrcode {
     padding: 8px;
     max-width: 90%;
