@@ -44,12 +44,18 @@ body {
   max-width: 138px;
   height: 184px;
   transform: translateX(-17%);
-  border-radius: 8px;
+  
+  /* Estilo visual inspirado no QR Code */
+  background: white;
+  padding: 12px;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  border: none;
+
   overflow: hidden;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-  border: 2px solid #4CAF50;
   z-index: 10;
 }
+
 
 .video-wrapper:nth-child(2) video {
   transform: scaleX(-1);
