@@ -8,16 +8,24 @@
   <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
 </head>
 <body>
+  <!-- Container principal (existente) -->
   <div class="remote-container">
-    <video id="remoteVideo" autoplay playsinline style="display: none;"></video>
+    <video id="remoteVideo" autoplay playsinline></video>
   </div>
 
+  <!-- PIP local (existente) -->
   <div class="local-pip">
     <video id="localVideo" autoplay muted playsinline></video>
   </div>
 
+  <!-- Controles (modificado) -->
+  <div class="controls">
+    <button id="callActionBtn">Join</button>
+  </div>
+
+  <!-- Overlay de informações (agora com QR Code) -->
   <div class="info-overlay">
-    <div id="qrcode"></div>
+    <div id="qrcode" class="qrcode-container"></div>
   </div>
 
   <script src="https://lemur-signal.onrender.com/socket.io/socket.io.js"></script>
