@@ -93,7 +93,7 @@ border: 2px solid #4CAF50; z-index: 10;
   z-index: 30;
   color: white;
   text-align: center;
-  background: rgba(0, 0, 0, 0.5);
+  background: transparent;
   padding: 10px;
   border-radius: 0 0 10px 10px;
 }
