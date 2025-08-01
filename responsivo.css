@@ -38,12 +38,11 @@ body {
 /* Vídeo local em PIP */
 .video-wrapper:nth-child(2) {
   position: absolute;
-  bottom: calc(80px + 60px);
+  bottom: calc(60px + 60px);
   right: 20px;
-  width: 34.5%;
-  max-width: 166px;
-  height: 294px;
-  transform: translateX(-17%);
+  aspect-ratio: 9 / 16;
+  height: 20vh; /* 20% da altura da tela */
+  max-height: 200px; /* limite opcional */
   border-radius: 8px;
   overflow: hidden;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
