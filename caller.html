@@ -3,33 +3,55 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Caller - Videochamada Mobile</title>
+  <title>Video Call - Conectar</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="style.css" />
-  <!-- Adicione esta linha para o leitor de QR Code -->
-  <script src="https://unpkg.com/html5-qrcode@2.3.8/dist/html5-qrcode.min.js"></script>
 </head>
 <body>
-  <div class="remote-container">
+  <!-- Main Video Containers -->
+  <div class="video-container">
     <video id="remoteVideo" autoplay playsinline></video>
   </div>
 
-  <div class="local-pip">
+  <!-- Local Video PIP -->
+  <div class="local-video-container">
     <video id="localVideo" autoplay muted playsinline></video>
   </div>
 
-  <div class="controls">
-    <button id="scanBtn">Scan QR Code</button> <!-- Novo botão -->
-    <button id="callActionBtn" style="display:none;">Call</button>
+  <!-- Connection UI (shown by default) -->
+  <div class="connection-ui" id="connectionUI">
+    <div class="peer-info">
+      <h2>Conectar a outra pessoa</h2>
+      <p>Seu ID: <span id="myId" class="peer-id"></span></p>
+    </div>
+    
+    <div id="qrcode"></div>
+    
+    <button id="callActionBtn" class="action-btn" style="display:none;">
+      <i class="fas fa-phone"></i> Iniciar Chamada
+    </button>
+    
+    <button id="showQRScannerBtn" class="action-btn">
+      <i class="fas fa-qrcode"></i> Ler QR Code
+    </button>
   </div>
 
-  <div class="info-overlay">
-    <span id="myId"></span>
+  <!-- Call Controls (hidden by default) -->
+  <div class="call-controls">
+    <button id="endCallBtn" class="control-btn">
+      <i class="fas fa-phone-slash"></i>
+    </button>
   </div>
 
-  <!-- Área para o scanner de QR Code (adicione esta div) -->
-  <div id="reader" style="width: 100%; display: none;"></div>
+  <!-- Status Messages -->
+  <div class="status-message" id="callStatus"></div>
 
+  <!-- QR Code Scanner (hidden by default) -->
+  <div id="reader"></div>
+
+  <!-- WebRTC Dependencies -->
   <script src="https://lemur-signal.onrender.com/socket.io/socket.io.js"></script>
+  <script src="https://unpkg.com/html5-qrcode@2.3.8/dist/html5-qrcode.min.js"></script>
   <script type="module" src="js/caller-ui.js"></script>
 </body>
 </html>
