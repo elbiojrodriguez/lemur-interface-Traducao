@@ -171,3 +171,12 @@ NOVOS ESTILOS (ADICIONADOS NO FINAL)
     max-width: 90%;
   }
 }
+/* ===== Correção para o scanner ===== */
+#reader:not(:has(iframe)) {
+  display: none !important;
+}
+
+#reader.html5-qrcode-element {
+  background: transparent !important;
+  box-shadow: none !important;
+}
