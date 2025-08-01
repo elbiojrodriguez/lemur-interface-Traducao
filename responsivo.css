@@ -7,7 +7,7 @@
 }
 
 body {
-  background: #000;
+  background: transparent;
   font-family: Arial, sans-serif;
   height: 100vh;
   overflow: hidden;
