@@ -11,6 +11,17 @@ window.onload = () => {
   const localVideo = document.getElementById('localVideo');
   const remoteVideo = document.getElementById('remoteVideo');
   let targetId = null;
+  let localStream = null;
+
+  // 🔓 Solicita acesso à câmera logo na abertura
+  navigator.mediaDevices.getUserMedia({ video: true, audio: false })
+    .then(stream => {
+      localStream = stream;
+      remoteVideo.srcObject = stream;
+    })
+    .catch(error => {
+      console.error("Erro ao acessar a câmera:", error);
+    });
 
   // Verifica se há ID na URL
   const urlParams = new URLSearchParams(window.location.search);
@@ -35,19 +46,13 @@ window.onload = () => {
       } catch (e) {
         console.error("QR Code inválido:", e);
       }
-      });
+    });
   };
 
   // Configura o botão de chamada
   document.getElementById('callActionBtn').onclick = () => {
-    if (!targetId) return;
-    
-    // 🔇 Captura apenas vídeo, sem áudio
-    navigator.mediaDevices.getUserMedia({ video: true, audio: false })
-      .then(stream => {
-        remoteVideo.srcObject = stream;
-        rtcCore.startCall(targetId, stream);
-      });
+    if (!targetId || !localStream) return;
+    rtcCore.startCall(targetId, localStream);
   };
 
   // 🔇 Silencia qualquer áudio recebido
