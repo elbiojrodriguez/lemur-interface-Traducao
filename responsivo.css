@@ -132,10 +132,11 @@ body {
   }
 
   .video-wrapper:nth-child(2) {
-    height: 120px;
-    max-width: 100px;
-    bottom: calc(60px + 60px);
-  }
+  height: 144px;
+  aspect-ratio: 9 / 16;
+  bottom: calc(60px + 60px);
+  max-width: unset; /* opcional, para não limitar */
+}
 
   .info-overlay {
     padding: 8px;
