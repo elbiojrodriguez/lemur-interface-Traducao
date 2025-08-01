@@ -1,30 +1,55 @@
-window.onload = async () => {
+import WebRTCCore from '../core/webrtc-core.js';
+import { QRCodeScanner } from './qr-code-utils.js';
+
+window.onload = () => {
   const rtcCore = new WebRTCCore();
   const myId = crypto.randomUUID().substr(0, 8);
-  
+  document.getElementById('myId').textContent = myId;
   rtcCore.initialize(myId);
-  rtcCore.setupSocketHandlers(); // LINHA ADICIONADA
-  
-  const urlParams = new URLSearchParams(window.location.search);
-  const targetId = urlParams.get('targetId');
+  rtcCore.setupSocketHandlers();
 
-  if (targetId) {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ 
-        video: true, 
-        audio: true 
-      });
-      
-      // CORREÇÃO DOS VÍDEOS:
-      document.getElementById('localVideo').srcObject = stream; // Alterado para local
-      rtcCore.startCall(targetId, stream);
-      
-      rtcCore.setRemoteStreamCallback(remoteStream => {
-        document.getElementById('remoteVideo').srcObject = remoteStream; // Alterado para remote
-      });
-      
-    } catch (error) {
-      console.error('Erro:', error);
-    }
+  const localVideo = document.getElementById('localVideo');
+  const remoteVideo = document.getElementById('remoteVideo');
+  let targetId = null;
+
+  // Verifica se há ID na URL
+  const urlParams = new URLSearchParams(window.location.search);
+  const targetIdFromUrl = urlParams.get('targetId');
+  
+  if (targetIdFromUrl) {
+    targetId = targetIdFromUrl;
+    document.getElementById('callActionBtn').style.display = 'block';
   }
+
+  // Configura o scanner de QR Code
+  document.getElementById('scanBtn').onclick = () => {
+    QRCodeScanner.start('reader', (decodedUrl) => {
+      try {
+        const url = new URL(decodedUrl);
+        if (url.pathname.endsWith('/caller.html')) {
+          targetId = url.searchParams.get('targetId');
+          if (targetId) {
+            document.getElementById('callActionBtn').style.display = 'block';
+          }
+        }
+      } catch (e) {
+        console.error("QR Code inválido:", e);
+      }
+    });
+  };
+
+  // Configura o botão de chamada
+  document.getElementById('callActionBtn').onclick = () => {
+    if (!targetId) return;
+    
+    navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+      .then(stream => {
+        remoteVideo.srcObject = stream;
+        rtcCore.startCall(targetId, stream);
+      });
+  };
+
+  rtcCore.setRemoteStreamCallback(stream => {
+    localVideo.srcObject = stream;
+  });
 };
