@@ -11,8 +11,9 @@ window.onload = () => {
   const localVideo = document.getElementById('localVideo');
   const remoteVideo = document.getElementById('remoteVideo');
   let targetId = null;
+  let localStream = null;
 
-  // Verifica se há ID na URL
+  // Check for ID in URL
   const urlParams = new URLSearchParams(window.location.search);
   const targetIdFromUrl = urlParams.get('targetId');
   
@@ -21,35 +22,66 @@ window.onload = () => {
     document.getElementById('callActionBtn').style.display = 'block';
   }
 
-  // Configura o scanner de QR Code
-  document.getElementById('scanBtn').onclick = () => {
-    QRCodeScanner.start('reader', (decodedUrl) => {
-      try {
-        const url = new URL(decodedUrl);
-        if (url.pathname.endsWith('/caller.html')) {
-          targetId = url.searchParams.get('targetId');
-          if (targetId) {
-            document.getElementById('callActionBtn').style.display = 'block';
+  // Setup QR Code scanner
+  document.getElementById('scanBtn').onclick = async () => {
+    try {
+      await QRCodeScanner.start('reader', (decodedUrl) => {
+        try {
+          const url = new URL(decodedUrl);
+          if (url.pathname.endsWith('/caller.html')) {
+            targetId = url.searchParams.get('targetId');
+            if (targetId) {
+              document.getElementById('callActionBtn').style.display = 'block';
+              document.getElementById('qrStatus').textContent = 'QR Code válido!';
+            }
           }
+        } catch (e) {
+          console.error("QR Code inválido:", e);
+          document.getElementById('qrStatus').textContent = 'QR Code inválido';
         }
-      } catch (e) {
-        console.error("QR Code inválido:", e);
-      }
-    });
+      });
+    } catch (error) {
+      console.error("Erro ao iniciar scanner:", error);
+      document.getElementById('qrStatus').textContent = 'Erro ao acessar câmera';
+    }
   };
 
-  // Configura o botão de chamada
-  document.getElementById('callActionBtn').onclick = () => {
+  // Setup call button
+  document.getElementById('callActionBtn').onclick = async () => {
     if (!targetId) return;
     
-    navigator.mediaDevices.getUserMedia({ video: true, audio: true })
-      .then(stream => {
-        remoteVideo.srcObject = stream;
-        rtcCore.startCall(targetId, stream);
+    try {
+      document.getElementById('callStatus').textContent = 'Conectando...';
+      localStream = await navigator.mediaDevices.getUserMedia({ 
+        video: true, 
+        audio: true 
       });
+      
+      localVideo.srcObject = localStream;
+      remoteVideo.srcObject = null; // Clear previous stream
+      
+      rtcCore.startCall(targetId, localStream);
+      document.getElementById('callStatus').textContent = 'Chamando...';
+    } catch (error) {
+      console.error("Erro ao iniciar chamada:", error);
+      document.getElementById('callStatus').textContent = 'Erro ao conectar';
+    }
   };
 
+  // Handle incoming remote stream
   rtcCore.setRemoteStreamCallback(stream => {
-    localVideo.srcObject = stream;
+    remoteVideo.srcObject = stream;
+    document.getElementById('callStatus').textContent = 'Conectado';
+  });
+
+  // Handle call end
+  rtcCore.setOnCallEndCallback(() => {
+    if (localStream) {
+      localStream.getTracks().forEach(track => track.stop());
+      localStream = null;
+    }
+    localVideo.srcObject = null;
+    remoteVideo.srcObject = null;
+    document.getElementById('callStatus').textContent = 'Chamada encerrada';
   });
 };
