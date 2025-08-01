@@ -133,7 +133,7 @@ body {
 
   .video-wrapper:nth-child(2) {
     height: 240px;
-    max-width: 20px;
+    max-width: 200px;
     bottom: calc(60px + 60px);
   }
 
