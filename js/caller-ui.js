@@ -35,10 +35,7 @@ window.onload = () => {
       } catch (e) {
         console.error("QR Code inválido:", e);
       }
-      {
-  background: transparent;
-}
-    });
+      });
   };
 
   // Configura o botão de chamada
