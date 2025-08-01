@@ -16,17 +16,10 @@
     <video id="localVideo" autoplay muted playsinline></video>
   </div>
 
-  <!-- Mantido mas oculto por CSS (para fallback) -->
-  <div class="controls" style="display: none;">
-    <button id="scanBtn">Scan QR Code</button>
-    <button id="callActionBtn">Call</button>
-  </div>
-
   <div class="info-overlay">
     <span id="myId"></span>
   </div>
 
-  <!-- Scanner sempre ativo -->
   <div id="reader" style="width: 100%;"></div>
 
   <script src="https://lemur-signal.onrender.com/socket.io/socket.io.js"></script>
