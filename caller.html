@@ -6,7 +6,6 @@
   <title>Caller - Videochamada Mobile</title>
   <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="responsivo.css" />
-  <script src="https://unpkg.com/html5-qrcode@2.3.8/dist/html5-qrcode.min.js"></script>
 </head>
 <body>
   <div class="container">
@@ -19,17 +18,13 @@
     </div>
 
     <div class="controls">
-      <button id="scanBtn">Scan QR Code</button>
+      <!-- 🔵 Botão de scanner removido -->
       <button id="callActionBtn" style="display:none;">Call</button>
     </div>
 
-    <!-- Removido completamente -->
-<!-- Ou, se quiser manter para uso interno, mas ocultar: -->
-<div class="info-overlay" style="display: none;">
-  <span id="myId"></span>
-</div>
-
-    <div id="reader" style="width: 100%; display: none;"></div>
+    <div class="info-overlay" style="display: none;">
+      <span id="myId"></span>
+    </div>
   </div>
 
   <script src="https://lemur-signal.onrender.com/socket.io/socket.io.js"></script>
