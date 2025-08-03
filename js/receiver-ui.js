@@ -6,7 +6,7 @@ window.onload = () => {
   const myId = crypto.randomUUID().substr(0, 8);
   let localStream = null;
 
-  // Solicita acesso à câmera (sem exibir ainda)
+  // Solicita acesso à câmera
   navigator.mediaDevices.getUserMedia({ video: true, audio: false })
     .then(stream => {
       localStream = stream;
@@ -23,7 +23,6 @@ window.onload = () => {
   rtcCore.setupSocketHandlers();
 
   const localVideo = document.getElementById('localVideo');
-  const qrContainer = document.getElementById('qrContainer');
 
   rtcCore.onIncomingCall = (offer) => {
     if (!localStream) {
@@ -32,13 +31,14 @@ window.onload = () => {
     }
 
     rtcCore.handleIncomingCall(offer, localStream, (remoteStream) => {
-      // Oculta o QR Code ao conectar
-      if (qrContainer) qrContainer.style.display = 'none';
-
-      // Silencia áudio recebido
+      // 🔇 Silencia áudio recebido
       remoteStream.getAudioTracks().forEach(track => track.enabled = false);
 
-      // Exibe vídeo remoto
+      // 🔥 Oculta o QR Code (sem alterar mais nada)
+      const qrElement = document.getElementById('qrcode');
+      if (qrElement) qrElement.style.display = 'none';
+
+      // Exibe vídeo remoto no PIP
       localVideo.srcObject = remoteStream;
     });
   };
