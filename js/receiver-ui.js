@@ -4,20 +4,18 @@ import { QRCodeGenerator } from './qr-code-utils.js';
 window.onload = () => {
   const rtcCore = new WebRTCCore();
   const myId = crypto.randomUUID().substr(0, 8);
-
   let localStream = null;
 
-  // 🔓 Solicita acesso à câmera logo na abertura, mas NÃO exibe
+  // Solicita acesso à câmera (sem exibir ainda)
   navigator.mediaDevices.getUserMedia({ video: true, audio: false })
     .then(stream => {
       localStream = stream;
-      // Não atribuímos ao localVideo aqui
     })
     .catch(error => {
       console.error("Erro ao acessar a câmera:", error);
     });
 
-  // Gera URL completa para o caller com o ID como parâmetro
+  // Gera QR Code com link para caller
   const callerUrl = `${window.location.origin}/caller.html?targetId=${myId}`;
   QRCodeGenerator.generate("qrcode", callerUrl);
 
@@ -25,6 +23,7 @@ window.onload = () => {
   rtcCore.setupSocketHandlers();
 
   const localVideo = document.getElementById('localVideo');
+  const qrContainer = document.getElementById('qrContainer');
 
   rtcCore.onIncomingCall = (offer) => {
     if (!localStream) {
@@ -33,9 +32,14 @@ window.onload = () => {
     }
 
     rtcCore.handleIncomingCall(offer, localStream, (remoteStream) => {
-      // 🔇 Silencia qualquer áudio recebido
+      // Oculta o QR Code ao conectar
+      if (qrContainer) qrContainer.style.display = 'none';
+
+      // Silencia áudio recebido
       remoteStream.getAudioTracks().forEach(track => track.enabled = false);
-      localVideo.srcObject = remoteStream; // Aqui sim mostramos a câmera do caller
+
+      // Exibe vídeo remoto
+      localVideo.srcObject = remoteStream;
     });
   };
 };
