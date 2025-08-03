@@ -10,16 +10,18 @@
 </head>
 <body>
   <div class="container">
+    <!-- QR Code visível antes da conexão -->
+    <div id="qrContainer" class="info-overlay">
+      <div id="qrcode" class="qrcode-container"></div>
+      <p>Escaneie o QR para conectar</p>
+    </div>
+
+    <!-- Vídeos visíveis após conexão -->
     <div class="video-wrapper">
       <video id="remoteVideo" autoplay playsinline></video>
     </div>
-
     <div class="video-wrapper">
       <video id="localVideo" autoplay muted playsinline></video>
-    </div>
-
-        <div class="info-overlay">
-      <div id="qrcode" class="qrcode-container"></div>
     </div>
   </div>
 
