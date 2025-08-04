@@ -99,10 +99,10 @@ body {
 /* 🔵 Box azul centralizado */
 .chat-input-box {
   position: absolute;
-  bottom: 1000px; /* Ajuste conforme a altura do PIP */
+  bottom: 100px; /* Ajuste conforme a altura do PIP */
   left: 50%;
   transform: translateX(-50%);
-  width: 100%;
+  width: 60%;
   height: 160px; /* Altura aproximada do PIP */
   border: 2px solid #007BFF;
   border-radius: 12px;
