@@ -77,6 +77,39 @@ body {
   background: #4CAF50;
 }
 
+/* 🔻 Balões com bandeiras */
+.language-bubbles {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+}
+
+.lang-btn {
+  width: 40px;
+  height: 40px;
+  font-size: 20px;
+  border-radius: 50%;
+  border: none;
+  background-color: rgba(0, 0, 0, 0.3);
+  color: white;
+  cursor: pointer;
+  backdrop-filter: blur(4px);
+}
+
+/* 🔵 Box azul centralizado */
+.chat-input-box {
+  position: absolute;
+  bottom: 100px; /* Ajuste conforme a altura do PIP */
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60%;
+  height: 160px; /* Altura aproximada do PIP */
+  border: 2px solid #007BFF;
+  border-radius: 12px;
+  background-color: rgba(255, 255, 255, 0.1);
+  z-index: 20;
+}
+
 /* Overlay de informações */
 .info-overlay {
   position: absolute;
@@ -101,7 +134,7 @@ body {
   display: inline-block;
 }
 
-/* Destaque visual para ID (opcional - pode ser removido se não for mais usado) */
+/* Destaque visual para ID */
 .id-display {
   display: inline-block;
   font-size: 16px;
@@ -132,22 +165,20 @@ body {
     padding: 8px;
   }
 
-  /* Ajustes do QR Code para mobile */
   .info-overlay #qrcode {
     padding: 8px;
     max-width: 90%;
   }
-  .chat-input-box {
-  position: absolute;
-  bottom: 100px; /* Ajuste conforme a altura do PIP */
-  left: 50%;
-  transform: translateX(-50%);
-  width: 60%;
-  height: 160px; /* Altura aproximada do PIP */
-  border: 2px solid #007BFF;
-  border-radius: 12px;
-  background-color: rgba(255, 255, 255, 0.1);
-  z-index: 20;
-}
 
+  .chat-input-box {
+    width: 80%;
+    height: 120px;
+    bottom: 80px;
+  }
+
+  .lang-btn {
+    width: 36px;
+    height: 36px;
+    font-size: 18px;
+  }
 }
