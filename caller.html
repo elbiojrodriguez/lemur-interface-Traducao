@@ -1,28 +1,60 @@
-<div class="container">
-  <!-- 🔹 Box azul centralizado -->
-  <div class="chat-input-box">
-    <!-- Conteúdo opcional aqui -->
-  </div>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Caller - Videochamada Mobile</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="responsivo.css" />
 
-  <div class="video-wrapper">
-    <video id="remoteVideo" autoplay playsinline></video>
-  </div>
+  <style>
+    /* 🔵 Estilo do box azul */
+    .chat-input-box {
+      position: absolute;
+      bottom: 100px; /* Ajuste conforme necessário */
+      left: 50%;
+      transform: translateX(-50%);
+      width: 60%;
+      height: 160px; /* Altura aproximada do PIP */
+      border: 2px solid #007BFF;
+      border-radius: 12px;
+      background-color: rgba(255, 255, 255, 0.1);
+      z-index: 20;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    
+    <!-- 🔹 Box azul centralizado -->
+    <div class="chat-input-box"></div>
 
-  <div class="video-wrapper">
-    <video id="localVideo" autoplay muted playsinline></video>
-  </div>
+    <div class="video-wrapper">
+      <video id="remoteVideo" autoplay playsinline></video>
+    </div>
 
-  <div class="controls">
-    <button id="callActionBtn" style="display:none;">Call</button>
+    <div class="video-wrapper">
+      <video id="localVideo" autoplay muted playsinline></video>
+    </div>
 
-    <div class="language-bubbles">
-      <button class="lang-btn">🇬🇧</button>
-      <button class="lang-btn">🇧🇷</button>
-      <button class="lang-btn">🇪🇸</button>
+    <div class="controls">
+      <!-- 🔵 Botão de scanner removido -->
+      <button id="callActionBtn" style="display:none;">Call</button>
+
+      <!-- 🔻 Balões com bandeiras -->
+      <div class="language-bubbles">
+        <button class="lang-btn">🇬🇧</button>
+        <button class="lang-btn">🇧🇷</button>
+        <button class="lang-btn">🇪🇸</button>
+      </div>
+    </div>
+
+    <div class="info-overlay" style="display: none;">
+      <span id="myId"></span>
     </div>
   </div>
 
-  <div class="info-overlay" style="display: none;">
-    <span id="myId"></span>
-  </div>
-</div>
+  <script src="https://lemur-signal.onrender.com/socket.io/socket.io.js"></script>
+  <script type="module" src="js/caller-ui.js"></script>
+</body>
+</html>
