@@ -1,6 +1,67 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Caller - Videochamada Mobile</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="responsivo.css" />
+  <style>
+    .chat-input-box {
+      position: absolute;
+      bottom: 350px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80%;
+      height: 160px;
+      border: 2px solid #007BFF;
+      border-radius: 12px;
+      background-color: rgba(255, 255, 255, 0.8);
+      z-index: 20;
+      color: #003366;
+      font-size: 1.2em;
+      padding: 10px;
+      overflow-y: auto;
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 🔹 Box azul centralizado -->
+  <div class="chat-input-box" id="chatBox">Clique na bandeira para falar</div>
+
+  <div class="container">
+    <div class="video-wrapper">
+      <video id="remoteVideo" autoplay playsinline></video>
+    </div>
+
+    <div class="video-wrapper">
+      <video id="localVideo" autoplay muted playsinline></video>
+    </div>
+
+    <div class="controls">
+      <!-- ✅ Botão verde visível -->
+      <button id="callActionBtn" class="call-button">Call</button>
+
+      <!-- 🔻 Balões com bandeiras -->
+      <div class="language-bubbles">
+        <button class="lang-btn" data-lang="en-US">🇬🇧</button>
+        <button class="lang-btn" data-lang="pt-BR">🇧🇷</button>
+        <button class="lang-btn" data-lang="es-ES">🇪🇸</button>
+      </div>
+    </div>
+
+    <div class="info-overlay" style="display: none;">
+      <span id="myId"></span>
+    </div>
+  </div>
+
+  <script src="https://lemur-signal.onrender.com/socket.io/socket.io.js"></script>
+  <script type="module" src="js/caller-ui.js"></script>
+</body>
+<html lang="pt-BR">
+<head>
   <meta charset="UTF-8">
   <title>Seletor de Idioma para Fala</title>
   <style>
