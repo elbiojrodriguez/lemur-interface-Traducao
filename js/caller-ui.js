@@ -12,7 +12,6 @@ window.onload = () => {
   let targetId = null;
   let localStream = null;
 
-  // 🔓 Solicita acesso à câmera logo na abertura
   navigator.mediaDevices.getUserMedia({ video: true, audio: false })
     .then(stream => {
       localStream = stream;
@@ -22,7 +21,6 @@ window.onload = () => {
       console.error("Erro ao acessar a câmera:", error);
     });
 
-  // Verifica se há ID na URL
   const urlParams = new URLSearchParams(window.location.search);
   const targetIdFromUrl = urlParams.get('targetId');
   
@@ -31,18 +29,16 @@ window.onload = () => {
     document.getElementById('callActionBtn').style.display = 'block';
   }
 
-  // Configura o botão de chamada
   document.getElementById('callActionBtn').onclick = () => {
     if (!targetId || !localStream) return;
     rtcCore.startCall(targetId, localStream);
   };
 
-  // 🔇 Silencia qualquer áudio recebido
   rtcCore.setRemoteStreamCallback(stream => {
     stream.getAudioTracks().forEach(track => track.enabled = false);
     localVideo.srcObject = stream;
   });
-// 🎙️ Reconhecimento de voz
+
   const chatBox = document.getElementById('chatBox');
   const langButtons = document.querySelectorAll('.lang-btn');
 
@@ -52,6 +48,35 @@ window.onload = () => {
       startSpeechRecognition(lang);
     };
   });
+
+  // 🔻 Seletor manual
+  const manualSelect = document.getElementById('manualLang');
+  manualSelect.onchange = () => {
+    const selectedLang = manualSelect.value;
+    startSpeechRecognition(selectedLang);
+  };
+
+  // 🔻 Detecção automática do idioma do navegador
+  const userLang = navigator.language || 'en-US';
+  const autoLangContainer = document.getElementById('autoLangContainer');
+
+  const langMap = {
+    'pt-BR': '🇧🇷',
+    'en-US': '🇬🇧',
+    'es-ES': '🇪🇸',
+    'fr-FR': '🇫🇷',
+    'de-DE': '🇩🇪',
+    'ru-RU': '🇷🇺',
+    'ja-JP': '🇯🇵',
+    'zh-CN': '🇨🇳'
+  };
+
+  const flag = langMap[userLang] || '🌐';
+
+  const autoBtn = document.createElement('button');
+  autoBtn.innerHTML = `${flag} 🎤`;
+  autoBtn.onclick = () => startSpeechRecognition(userLang);
+  autoLangContainer.appendChild(autoBtn);
 
   function startSpeechRecognition(language) {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
