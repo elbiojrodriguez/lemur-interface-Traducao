@@ -7,29 +7,31 @@
   <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="responsivo.css" />
   <style>
-    /* 🔵 Estilo do box azul */
     .chat-input-box {
       position: absolute;
-      bottom: 350px; /* Ajuste conforme necessário */
+      bottom: 350px;
       left: 50%;
       transform: translateX(-50%);
       width: 80%;
-      height: 160px; /* Altura aproximada do PIP */
+      height: 160px;
       border: 2px solid #007BFF;
       border-radius: 12px;
       background-color: rgba(255, 255, 255, 0.1);
       z-index: 20;
+      color: white;
+      font-size: 1.2em;
+      padding: 10px;
+      overflow-y: auto;
     }
   </style>
 </head>
 <body>
 
- <!-- 🔹 Box azul centralizado -->
-    <div class="chat-input-box"></div>
-  
+  <!-- 🔹 Box azul centralizado -->
+  <div class="chat-input-box" id="chatBox">Clique na bandeira para falar</div>
+
   <div class="container">
-  
-        <div class="video-wrapper">
+    <div class="video-wrapper">
       <video id="remoteVideo" autoplay playsinline></video>
     </div>
 
@@ -38,14 +40,12 @@
     </div>
 
     <div class="controls">
-      <!-- 🔵 Botão de scanner removido -->
       <button id="callActionBtn" style="display:none;">Call</button>
 
-      <!-- 🔻 Balões com bandeiras -->
       <div class="language-bubbles">
-        <button class="lang-btn">🇬🇧</button>
-        <button class="lang-btn">🇧🇷</button>
-        <button class="lang-btn">🇪🇸</button>
+        <button class="lang-btn" data-lang="en-US">🇬🇧</button>
+        <button class="lang-btn" data-lang="pt-BR">🇧🇷</button>
+        <button class="lang-btn" data-lang="es-ES">🇪🇸</button>
       </div>
     </div>
 
