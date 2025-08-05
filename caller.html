@@ -25,23 +25,9 @@
       text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
     }
 
-    .language-selector {
+    .auto-lang-button {
       margin-top: 20px;
       text-align: center;
-    }
-
-    .language-selector select {
-      padding: 8px;
-      font-size: 1em;
-      border-radius: 6px;
-    }
-
-    .auto-lang-button {
-      margin-top: 10px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 8px;
     }
 
     .auto-lang-button button {
@@ -54,6 +40,13 @@
       display: flex;
       align-items: center;
       gap: 6px;
+    }
+
+    #google_translate_element {
+      position: fixed;
+      top: 0;
+      right: 0;
+      z-index: 9999;
     }
   </style>
 </head>
@@ -86,25 +79,22 @@
     </div>
   </div>
 
-  <!-- 🔻 Seletor de idioma manual -->
-  <div class="language-selector">
-    <label for="manualLang">Escolher idioma:</label>
-    <select id="manualLang">
-      <option value="en-US">🇬🇧 Inglês</option>
-      <option value="pt-BR">🇧🇷 Português</option>
-      <option value="es-ES">🇪🇸 Espanhol</option>
-      <option value="fr-FR">🇫🇷 Francês</option>
-      <option value="de-DE">🇩🇪 Alemão</option>
-      <option value="ru-RU">🇷🇺 Russo</option>
-      <option value="ja-JP">🇯🇵 Japonês</option>
-      <option value="zh-CN">🇨🇳 Chinês</option>
-    </select>
-  </div>
-
   <!-- 🔻 Botão automático com idioma detectado -->
   <div class="auto-lang-button" id="autoLangContainer"></div>
 
-  <script src="https://lemur-signal.onrender.com/socket.io/socket.io.js"></script>
+  <!-- 🔻 Google Translate Widget -->
+  <div id="google_translate_element"></div>
+  <script type="text/javascript">
+    function googleTranslateElementInit() {
+      new google.translate.TranslateElement({
+        pageLanguage: 'pt',
+        includedLanguages: 'en,es,pt,fr,de,ru,ja,zh-CN',
+        layout: google.translate.TranslateElement.InlineLayout.SIMPLE
+      }, 'google_translate_element');
+    }
+  </script>
+  <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
   <script type="module" src="js/caller-ui.js"></script>
 </body>
 </html>
