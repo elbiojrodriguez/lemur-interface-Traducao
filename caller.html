@@ -24,35 +24,12 @@
       text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
     }
 
-    .idioma-selector {
-      margin-top: 15px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .idioma-selector label {
-      font-weight: bold;
-    }
-
-    .idioma-selector select {
-      padding: 8px;
-      font-size: 1em;
-      border-radius: 6px;
-      border: 1px solid #007BFF;
-    }
-  </style>
-</head>
 <body>
 
-  <!-- 🔹 Box azul com seleção de idioma -->
-  <div class="chat-input-box" id="chatBox">
-    Clique na bandeira para falar
+  <h2>Selecione o idioma que você vai falar:</h2>
 
-    <div class="idioma-selector">
-      <label for="idioma">Idioma do dispositivo:</label>
-      <select id="idioma">
-        <option value="en-US">🇺🇸 Inglês (EUA)</option>
+  <select id="languageSelector">
+    <option value="en-US">🇺🇸 Inglês (EUA)</option>
     <option value="en-GB">🇬🇧 Inglês (UK)</option>
     <option value="pt-BR">🇧🇷 Português (BR)</option>
     <option value="es-ES">🇪🇸 Espanhol</option>
@@ -64,10 +41,22 @@
     <option value="ru-RU">🇷🇺 Russo</option>
     <option value="ko-KR">🇰🇷 Coreano</option>
     <option value="ar-SA">🇸🇦 Árabe</option>
-        <!-- Adicione mais idiomas se quiser -->
-      </select>
-    </div>
-  </div>
+  </select>
+
+  <div class="selected-info" id="selectedInfo">Nenhum idioma selecionado.</div>
+
+  <script>
+    const selector = document.getElementById('languageSelector');
+    const info = document.getElementById('selectedInfo');
+
+    selector.onchange = () => {
+      const selectedText = selector.options[selector.selectedIndex].text;
+      const selectedValue = selector.value;
+      info.textContent = `Idioma selecionado: ${selectedText} (${selectedValue})`;
+    };
+  </script>
+
+</body>
 
   <div class="container">
     <div class="video-wrapper">
