@@ -22,24 +22,70 @@ window.onload = () => {
       console.error("Erro ao acessar a câmera:", error);
     });
 
+
   // Verifica se há ID na URL
   const urlParams = new URLSearchParams(window.location.search);
   const targetIdFromUrl = urlParams.get('targetId');
-  
+
   if (targetIdFromUrl) {
     targetId = targetIdFromUrl;
     document.getElementById('callActionBtn').style.display = 'block';
   }
 
-  // Configura o botão de chamada
+  // ✅ Botão de chamada
   document.getElementById('callActionBtn').onclick = () => {
-    if (!targetId || !localStream) return;
-    rtcCore.startCall(targetId, localStream);
+    if (!targetId) return;
+    rtcCore.startCall(targetId);
   };
 
-  // 🔇 Silencia qualquer áudio recebido
+  // 🔇 Recebe o vídeo remoto e exibe corretamente
   rtcCore.setRemoteStreamCallback(stream => {
     stream.getAudioTracks().forEach(track => track.enabled = false);
-    localVideo.srcObject = stream;
+    remoteVideo.srcObject = stream; // Tela cheia
+    localVideo.srcObject = stream;  // PIP
   });
+
+  // 🎙️ Reconhecimento de voz
+  const chatBox = document.getElementById('chatBox');
+  const langButtons = document.querySelectorAll('.lang-btn');
+
+  langButtons.forEach(button => {
+    button.onclick = () => {
+      const lang = button.dataset.lang;
+      startSpeechRecognition(lang);
+    };
+  });
+
+  function startSpeechRecognition(language) {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      chatBox.textContent = "Reconhecimento de voz não suportado neste navegador.";
+      return;
+    }
+
+    const recognition = new SpeechRecognition();
+    recognition.lang = language;
+    recognition.interimResults = true;
+    recognition.continuous = false;
+
+    chatBox.textContent = "🎤 Ouvindo...";
+
+    recognition.onresult = (event) => {
+      let transcript = '';
+      for (let i = event.resultIndex; i < event.results.length; ++i) {
+        transcript += event.results[i][0].transcript;
+      }
+      chatBox.textContent = transcript;
+    };
+
+    recognition.onerror = (event) => {
+      chatBox.textContent = "Erro: " + event.error;
+    };
+
+    recognition.onend = () => {
+      chatBox.textContent += "\n✅ Fala encerrada.";
+    };
+
+    recognition.start();
+  }
 };
