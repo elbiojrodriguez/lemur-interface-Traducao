@@ -1,116 +1,66 @@
-import WebRTCCore from '../core/webrtc-core.js';
-
-window.onload = () => {
-  const rtcCore = new WebRTCCore();
-  const myId = crypto.randomUUID().substr(0, 8);
-  document.getElementById('myId').textContent = myId;
-  rtcCore.initialize(myId);
-  rtcCore.setupSocketHandlers();
-
-  const localVideo = document.getElementById('localVideo');
-  const remoteVideo = document.getElementById('remoteVideo');
-  let targetId = null;
-  let localStream = null;
-
-  navigator.mediaDevices.getUserMedia({ video: true, audio: false })
-    .then(stream => {
-      localStream = stream;
-      remoteVideo.srcObject = stream;
-    })
-    .catch(error => {
-      console.error("Erro ao acessar a câmera:", error);
-    });
-
-  const urlParams = new URLSearchParams(window.location.search);
-  const targetIdFromUrl = urlParams.get('targetId');
-  
-  if (targetIdFromUrl) {
-    targetId = targetIdFromUrl;
-    document.getElementById('callActionBtn').style.display = 'block';
-  }
-
-  document.getElementById('callActionBtn').onclick = () => {
-    if (!targetId || !localStream) return;
-    rtcCore.startCall(targetId, localStream);
-  };
-
-  rtcCore.setRemoteStreamCallback(stream => {
-    stream.getAudioTracks().forEach(track => track.enabled = false);
-    localVideo.srcObject = stream;
-  });
-
-  const chatBox = document.getElementById('chatBox');
-
-  // 🔻 Botões de bandeiras
-  const langButtons = document.querySelectorAll('.lang-btn');
-  langButtons.forEach(button => {
-    button.onclick = () => {
-      const lang = button.dataset.lang;
-      startSpeechRecognition(lang);
-    };
-  });
-
-  // 🔻 Seletor completo
-  const languageSelector = document.getElementById('languageSelector');
-  languageSelector.onchange = () => {
-    const selectedLang = languageSelector.value;
-    startSpeechRecognition(selectedLang);
-  };
-
-  // 🔻 Botão automático com idioma do dispositivo
-  const userLang = navigator.language || 'en-US';
-  const flagMap = {
-    'pt-BR': '🇧🇷',
-    'en-US': '🇺🇸',
-    'en-GB': '🇬🇧',
-    'es-ES': '🇪🇸',
-    'fr-FR': '🇫🇷',
-    'de-DE': '🇩🇪',
-    'it-IT': '🇮🇹',
-    'ja-JP': '🇯🇵',
-    'zh-CN': '🇨🇳',
-    'ru-RU': '🇷🇺',
-    'ko-KR': '🇰🇷',
-    'ar-SA': '🇸🇦'
-  };
-
-  const flag = flagMap[userLang] || '🌐';
-  const autoBtn = document.createElement('button');
-  autoBtn.innerHTML = `${flag} Falar (${userLang}) 🎤`;
-  autoBtn.onclick = () => startSpeechRecognition(userLang);
-  document.getElementById('autoLangContainer').appendChild(autoBtn);
-
-  // 🔻 Função de reconhecimento de voz
-  function startSpeechRecognition(language) {
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SpeechRecognition) {
-      chatBox.textContent = "Reconhecimento de voz não suportado neste navegador.";
-      return;
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Seletor de Idioma para Fala</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 40px;
+      background-color: #f5f5f5;
+      text-align: center;
     }
 
-    const recognition = new SpeechRecognition();
-    recognition.lang = language;
-    recognition.interimResults = true;
-    recognition.continuous = false;
+    h2 {
+      margin-bottom: 20px;
+    }
 
-    chatBox.textContent = `🎤 Ouvindo (${language})...`;
+    select {
+      font-size: 1.1em;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      width: 300px;
+    }
 
-    recognition.onresult = (event) => {
-      let transcript = '';
-      for (let i = event.resultIndex; i < event.results.length; ++i) {
-        transcript += event.results[i][0].transcript;
-      }
-      chatBox.textContent = transcript;
+    .selected-info {
+      margin-top: 20px;
+      font-size: 1.2em;
+      color: #333;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Selecione o idioma que você vai falar:</h2>
+
+  <select id="languageSelector">
+    <option value="en-US">🇺🇸 Inglês (EUA)</option>
+    <option value="en-GB">🇬🇧 Inglês (UK)</option>
+    <option value="pt-BR">🇧🇷 Português (BR)</option>
+    <option value="es-ES">🇪🇸 Espanhol</option>
+    <option value="fr-FR">🇫🇷 Francês</option>
+    <option value="de-DE">🇩🇪 Alemão</option>
+    <option value="it-IT">🇮🇹 Italiano</option>
+    <option value="ja-JP">🇯🇵 Japonês</option>
+    <option value="zh-CN">🇨🇳 Chinês</option>
+    <option value="ru-RU">🇷🇺 Russo</option>
+    <option value="ko-KR">🇰🇷 Coreano</option>
+    <option value="ar-SA">🇸🇦 Árabe</option>
+  </select>
+
+  <div class="selected-info" id="selectedInfo">Nenhum idioma selecionado.</div>
+
+  <script>
+    const selector = document.getElementById('languageSelector');
+    const info = document.getElementById('selectedInfo');
+
+    selector.onchange = () => {
+      const selectedText = selector.options[selector.selectedIndex].text;
+      const selectedValue = selector.value;
+      info.textContent = `Idioma selecionado: ${selectedText} (${selectedValue})`;
     };
+  </script>
 
-    recognition.onerror = (event) => {
-      chatBox.textContent = "Erro: " + event.error;
-    };
-
-    recognition.onend = () => {
-      chatBox.textContent += "\n✅ Fala encerrada.";
-    };
-
-    recognition.start();
-  }
-};
+</body>
+</html>
