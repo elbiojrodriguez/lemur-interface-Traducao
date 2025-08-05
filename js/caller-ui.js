@@ -40,8 +40,9 @@ window.onload = () => {
   });
 
   const chatBox = document.getElementById('chatBox');
-  const langButtons = document.querySelectorAll('.lang-btn');
 
+  // 🔻 Botões de bandeiras
+  const langButtons = document.querySelectorAll('.lang-btn');
   langButtons.forEach(button => {
     button.onclick = () => {
       const lang = button.dataset.lang;
@@ -49,35 +50,37 @@ window.onload = () => {
     };
   });
 
-  // 🔻 Seletor manual
-  const manualSelect = document.getElementById('manualLang');
-  manualSelect.onchange = () => {
-    const selectedLang = manualSelect.value;
+  // 🔻 Seletor completo
+  const languageSelector = document.getElementById('languageSelector');
+  languageSelector.onchange = () => {
+    const selectedLang = languageSelector.value;
     startSpeechRecognition(selectedLang);
   };
 
-  // 🔻 Detecção automática do idioma do navegador
+  // 🔻 Botão automático com idioma do dispositivo
   const userLang = navigator.language || 'en-US';
-  const autoLangContainer = document.getElementById('autoLangContainer');
-
-  const langMap = {
+  const flagMap = {
     'pt-BR': '🇧🇷',
-    'en-US': '🇬🇧',
+    'en-US': '🇺🇸',
+    'en-GB': '🇬🇧',
     'es-ES': '🇪🇸',
     'fr-FR': '🇫🇷',
     'de-DE': '🇩🇪',
-    'ru-RU': '🇷🇺',
+    'it-IT': '🇮🇹',
     'ja-JP': '🇯🇵',
-    'zh-CN': '🇨🇳'
+    'zh-CN': '🇨🇳',
+    'ru-RU': '🇷🇺',
+    'ko-KR': '🇰🇷',
+    'ar-SA': '🇸🇦'
   };
 
-  const flag = langMap[userLang] || '🌐';
-
+  const flag = flagMap[userLang] || '🌐';
   const autoBtn = document.createElement('button');
-  autoBtn.innerHTML = `${flag} 🎤`;
+  autoBtn.innerHTML = `${flag} Falar (${userLang}) 🎤`;
   autoBtn.onclick = () => startSpeechRecognition(userLang);
-  autoLangContainer.appendChild(autoBtn);
+  document.getElementById('autoLangContainer').appendChild(autoBtn);
 
+  // 🔻 Função de reconhecimento de voz
   function startSpeechRecognition(language) {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) {
@@ -90,7 +93,7 @@ window.onload = () => {
     recognition.interimResults = true;
     recognition.continuous = false;
 
-    chatBox.textContent = "🎤 Ouvindo...";
+    chatBox.textContent = `🎤 Ouvindo (${language})...`;
 
     recognition.onresult = (event) => {
       let transcript = '';
