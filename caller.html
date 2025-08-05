@@ -24,6 +24,37 @@
       overflow-y: auto;
       text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
     }
+
+    .language-selector {
+      margin-top: 20px;
+      text-align: center;
+    }
+
+    .language-selector select {
+      padding: 8px;
+      font-size: 1em;
+      border-radius: 6px;
+    }
+
+    .auto-lang-button {
+      margin-top: 10px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .auto-lang-button button {
+      font-size: 1.5em;
+      padding: 10px 14px;
+      border: none;
+      border-radius: 50px;
+      background-color: #e0e0e0;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
   </style>
 </head>
 <body>
@@ -41,10 +72,8 @@
     </div>
 
     <div class="controls">
-      <!-- ✅ Botão verde visível -->
       <button id="callActionBtn" class="call-button">Call</button>
 
-      <!-- 🔻 Balões com bandeiras -->
       <div class="language-bubbles">
         <button class="lang-btn" data-lang="en-US">🇬🇧</button>
         <button class="lang-btn" data-lang="pt-BR">🇧🇷</button>
@@ -56,6 +85,24 @@
       <span id="myId"></span>
     </div>
   </div>
+
+  <!-- 🔻 Seletor de idioma manual -->
+  <div class="language-selector">
+    <label for="manualLang">Escolher idioma:</label>
+    <select id="manualLang">
+      <option value="en-US">🇬🇧 Inglês</option>
+      <option value="pt-BR">🇧🇷 Português</option>
+      <option value="es-ES">🇪🇸 Espanhol</option>
+      <option value="fr-FR">🇫🇷 Francês</option>
+      <option value="de-DE">🇩🇪 Alemão</option>
+      <option value="ru-RU">🇷🇺 Russo</option>
+      <option value="ja-JP">🇯🇵 Japonês</option>
+      <option value="zh-CN">🇨🇳 Chinês</option>
+    </select>
+  </div>
+
+  <!-- 🔻 Botão automático com idioma detectado -->
+  <div class="auto-lang-button" id="autoLangContainer"></div>
 
   <script src="https://lemur-signal.onrender.com/socket.io/socket.io.js"></script>
   <script type="module" src="js/caller-ui.js"></script>
