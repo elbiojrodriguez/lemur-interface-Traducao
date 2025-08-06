@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Seletor de Bandeiras</title>
+  <title>Seletor de Idioma com Bandeiras</title>
   <style>
     .flag-selector {
       position: relative;
@@ -14,6 +14,7 @@
       width: 40px;
       height: 30px;
       border: 2px solid #ccc;
+      border-radius: 4px;
     }
 
     .flag-options {
@@ -25,6 +26,8 @@
       border: 1px solid #ccc;
       padding: 5px;
       z-index: 10;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+      border-radius: 6px;
     }
 
     .flag-options img {
@@ -33,23 +36,34 @@
       margin: 5px;
       cursor: pointer;
       transition: transform 0.2s;
+      border-radius: 4px;
     }
 
     .flag-options img:hover {
       transform: scale(1.1);
+      box-shadow: 0 0 5px rgba(0,0,0,0.3);
     }
   </style>
 </head>
 <body>
 
 <div class="flag-selector" onclick="toggleFlags()">
-  <img id="selectedFlag" class="selected-flag" src="https://flagcdn.com/w40/us.png" alt="Selected Flag">
+  <!-- Bandeira da ONU como ícone principal -->
+  <img id="selectedFlag" class="selected-flag" src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6e/Flag_of_the_United_Nations.svg/40px-Flag_of_the_United_Nations.svg.png" alt="Idioma Global">
+  
   <div class="flag-options" id="flagOptions">
-    <img src="https://flagcdn.com/w40/us.png" alt="English" onclick="selectFlag(this)">
-    <img src="https://flagcdn.com/w40/br.png" alt="Português" onclick="selectFlag(this)">
-    <img src="https://flagcdn.com/w40/fr.png" alt="Français" onclick="selectFlag(this)">
-    <img src="https://flagcdn.com/w40/de.png" alt="Deutsch" onclick="selectFlag(this)">
-    <img src="https://flagcdn.com/w40/es.png" alt="Español" onclick="selectFlag(this)">
+    <img src="https://flagcdn.com/w40/us.png" alt="en-US">
+    <img src="https://flagcdn.com/w40/gb.png" alt="en-GB">
+    <img src="https://flagcdn.com/w40/br.png" alt="pt-BR">
+    <img src="https://flagcdn.com/w40/es.png" alt="es-ES">
+    <img src="https://flagcdn.com/w40/fr.png" alt="fr-FR">
+    <img src="https://flagcdn.com/w40/de.png" alt="de-DE">
+    <img src="https://flagcdn.com/w40/it.png" alt="it-IT">
+    <img src="https://flagcdn.com/w40/jp.png" alt="ja-JP">
+    <img src="https://flagcdn.com/w40/cn.png" alt="zh-CN">
+    <img src="https://flagcdn.com/w40/ru.png" alt="ru-RU">
+    <img src="https://flagcdn.com/w40/kr.png" alt="ko-KR">
+    <img src="https://flagcdn.com/w40/sa.png" alt="ar-SA">
   </div>
 </div>
 
@@ -62,7 +76,7 @@
   function selectFlag(img) {
     document.getElementById('selectedFlag').src = img.src;
     document.getElementById('flagOptions').style.display = 'none';
-    console.log("Idioma selecionado:", img.alt); // Aqui você pode disparar uma ação
+    console.log("Idioma selecionado:", img.alt); // Aqui você pode usar o valor para mudar idioma
   }
 
   // Fecha se clicar fora
@@ -71,6 +85,11 @@
     if (!selector.contains(e.target)) {
       document.getElementById('flagOptions').style.display = 'none';
     }
+  });
+
+  // Adiciona evento para cada bandeira
+  document.querySelectorAll('.flag-options img').forEach(img => {
+    img.addEventListener('click', () => selectFlag(img));
   });
 </script>
 
