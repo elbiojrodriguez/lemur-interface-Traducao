@@ -1,13 +1,4 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Caller - Videochamada Mobile</title>
-  <link rel="stylesheet" href="style.css" />
-  <link rel="stylesheet" href="responsivo.css" />
-  
-  <!-- 🔘 Seletor de idioma minimalista -->
+<!-- 🔘 Seletor de idioma minimalista -->
 <select id="languageSelector">
   <option value="en-US">🇺🇸 Inglês (EUA)</option>
   <option value="en-GB">🇬🇧 Inglês (UK)</option>
@@ -36,47 +27,3 @@
     info.textContent = `Idioma selecionado: ${selectedText} (${selectedValue})`;
   };
 </script>
-
-  <!-- 🎥 BLOCO DE VÍDEO: Câmeras local e remota -->
-  <div class="container">
-    <div class="video-wrapper">
-      <video id="remoteVideo" autoplay playsinline></video>
-    </div>
-
-    <div class="video-wrapper">
-      <video id="localVideo" autoplay muted playsinline></video>
-    </div>
-
-    <!-- 🎛️ CONTROLES: Botão de chamada + bandeiras -->
-    <div class="controls">
-      <button id="callActionBtn" class="call-button">Call</button>
-
-      <div class="language-bubbles">
-        <button class="lang-btn" data-lang="en-US">🇬🇧</button>
-        <button class="lang-btn" data-lang="pt-BR">🇧🇷</button>
-        <button class="lang-btn" data-lang="es-ES">🇪🇸</button>
-      </div>
-    </div>
-
-    <!-- 🆔 IDENTIFICADOR DO USUÁRIO -->
-    <div class="info-overlay" style="display: none;">
-      <span id="myId"></span>
-    </div>
-  </div>
-
-  <!-- 📜 SCRIPTS -->
-  <script>
-    const selector = document.getElementById('languageSelector');
-    const info = document.getElementById('selectedInfo');
-
-    selector.onchange = () => {
-      const selectedText = selector.options[selector.selectedIndex].text;
-      const selectedValue = selector.value;
-      info.textContent = `Idioma selecionado: ${selectedText} (${selectedValue})`;
-    };
-  </script>
-
-  <script src="https://lemur-signal.onrender.com/socket.io/socket.io.js"></script>
-  <script type="module" src="js/caller-ui.js"></script>
-</body>
-</html>
