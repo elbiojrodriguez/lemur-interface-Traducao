@@ -51,7 +51,7 @@ window.onload = () => {
   const chatBox = document.querySelector('.chat-input-box');
   const textDisplay = document.createElement('div');
   textDisplay.style.padding = '10px';
-  textDisplay.style.color = 'red';
+  textDisplay.style.color = 'blak';
   textDisplay.style.textAlign = 'center';
   textDisplay.style.height = '100%';
   textDisplay.style.display = 'flex';
