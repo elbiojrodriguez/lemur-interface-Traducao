@@ -42,30 +42,4 @@ window.onload = () => {
     stream.getAudioTracks().forEach(track => track.enabled = false);
     localVideo.srcObject = stream;
   });
-
-  // 🌍 Detector de idioma + botão visual
-  const languageMap = {
-    'pt': { name: 'Português', flag: '🇧🇷' },
-    'en': { name: 'English', flag: '🇺🇸' },
-    'es': { name: 'Español', flag: '🇪🇸' },
-    'fr': { name: 'Français', flag: '🇫🇷' },
-    'de': { name: 'Deutsch', flag: '🇩🇪' },
-    'it': { name: 'Italiano', flag: '🇮🇹' },
-    'ja': { name: '日本語', flag: '🇯🇵' },
-    'zh': { name: '中文', flag: '🇨🇳' }
-  };
-
-  const detectedLang = navigator.language.slice(0, 2);
-  const langInfo = languageMap[detectedLang] || { name: detectedLang, flag: '🌐' };
-
-  const languageBtn = document.getElementById('languageBtn');
-  languageBtn.textContent = `${langInfo.flag}`;
-  languageBtn.title = `Idioma detectado: ${langInfo.name}`;
-  languageBtn.style.display = 'inline-block';
-
-  // 🔊 Clique no botão de idioma (pode iniciar reconhecimento de fala futuramente)
-  languageBtn.onclick = () => {
-    alert(`Idioma ativo: ${langInfo.name}`);
-    // Aqui você pode iniciar reconhecimento de fala, se quiser
-  };
 };
