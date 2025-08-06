@@ -1,1 +1,55 @@
+<!-- 🌐 BOTÃO COM BANDEIRA DAS NAÇÕES UNIDAS + SELETOR DE IDIOMA -->
+<style>
+  #languageButton {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 40px;
+    margin-right: 10px;
+  }
 
+  #languageSelector {
+    font-size: 16px;
+    padding: 8px;
+  }
+</style>
+
+<!-- 🔘 BOTÃO + SELECT LADO A LADO -->
+<div>
+  <button id="languageButton" title="Selecionar idioma">🌐</button>
+  <select id="languageSelector">
+    <option value="" selected disabled>— Selecione —</option>
+    <option value="en-US">🇺🇸 Inglês (EUA)</option>
+    <option value="en-GB">🇬🇧 Inglês (UK)</option>
+    <option value="pt-BR">🇧🇷 Português (BR)</option>
+    <option value="es-ES">🇪🇸 Espanhol</option>
+    <option value="fr-FR">🇫🇷 Francês</option>
+    <option value="de-DE">🇩🇪 Alemão</option>
+    <option value="it-IT">🇮🇹 Italiano</option>
+    <option value="ja-JP">🇯🇵 Japonês</option>
+    <option value="zh-CN">🇨🇳 Chinês</option>
+    <option value="ru-RU">🇷🇺 Russo</option>
+    <option value="ko-KR">🇰🇷 Coreano</option>
+    <option value="ar-SA">🇸🇦 Árabe</option>
+  </select>
+</div>
+
+<!-- 🔧 SCRIPT PARA ABRIR O SELECT AO CLICAR NO BOTÃO -->
+<script>
+  const languageButton = document.getElementById('languageButton');
+  const languageSelector = document.getElementById('languageSelector');
+
+  languageButton.addEventListener('click', () => {
+    languageSelector.focus(); // Foca no seletor
+    languageSelector.size = 12; // Abre como lista suspensa
+
+    // Fecha a lista quando o usuário seleciona ou sai
+    languageSelector.addEventListener('blur', () => {
+      languageSelector.size = 1;
+    });
+
+    languageSelector.addEventListener('change', () => {
+      languageSelector.size = 1;
+    });
+  });
+</script>
