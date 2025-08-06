@@ -6,30 +6,10 @@
   <title>Caller - Videochamada Mobile</title>
   <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="responsivo.css" />
-  <style>
-    /* 🔵 Estilo do box azul */
-    .chat-input-box {
-      position: absolute;
-      bottom: 350px; /* Ajuste conforme necessário */
-      left: 50%;
-      transform: translateX(-50%);
-      width: 80%;
-      height: 160px; /* Altura aproximada do PIP */
-      border: 2px solid #007BFF;
-      border-radius: 12px;
-      background-color: rgba(255, 255, 255, 0.1);
-      z-index: 20;
-    }
-  </style>
 </head>
 <body>
-
- <!-- 🔹 Box azul centralizado -->
-    <div class="chat-input-box"></div>
-  
   <div class="container">
-  
-        <div class="video-wrapper">
+    <div class="video-wrapper">
       <video id="remoteVideo" autoplay playsinline></video>
     </div>
 
@@ -40,13 +20,6 @@
     <div class="controls">
       <!-- 🔵 Botão de scanner removido -->
       <button id="callActionBtn" style="display:none;">Call</button>
-
-      <!-- 🔻 Balões com bandeiras -->
-      <div class="language-bubbles">
-        <button class="lang-btn">🇬🇧</button>
-        <button class="lang-btn">🇧🇷</button>
-        <button class="lang-btn">🇪🇸</button>
-      </div>
     </div>
 
     <div class="info-overlay" style="display: none;">
