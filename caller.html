@@ -1,61 +1,85 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Caller - Videochamada Mobile</title>
-  <link rel="stylesheet" href="style.css" />
-  <link rel="stylesheet" href="responsivo.css" />
+  <meta charset="UTF-8">
+  <title>htmlB - Receptor de A / Ativo B</title>
   <style>
-    .chat-input-box {
-      position: absolute;
-      bottom: 350px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 80%;
-      height: 160px;
-      border: 2px solid #007BFF;
-      border-radius: 12px;
-      background-color: rgba(255, 255, 255, 0.8);/* fundo mais visível */
-      z-index: 20;
-      color: #003366; /* azul escuro para contraste */
-      font-size: 1.2em;
-      padding: 10px;
-      overflow-y: auto;
-      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3); /* sombra leve */
-    }
+    body { font-family: Arial, sans-serif; padding: 2rem; background-color: #f0f0f0; }
+    .box { margin-top: 1rem; padding: 1rem; border: 1px solid #ccc; background-color: #fff; }
+    button, select { font-size: 1rem; padding: 0.5rem 1rem; margin: 0.5rem 0; }
   </style>
 </head>
 <body>
+  <h2>🔴 Recepção de A</h2>
+  <div class="box" id="receivedFromA">Aguardando...</div>
 
-  <!-- 🔹 Box azul centralizado -->
-  <div class="chat-input-box" id="chatBox">Clique na bandeira para falar</div>
+  <h2>🟢 Ativo B</h2>
+  <button id="startBtn">🎙️ Iniciar Gravação</button>
+  <select id="targetLanguageSelect">
+    <option value="en">Inglês</option>
+    <option value="es">Espanhol</option>
+    <option value="fr">Francês</option>
+    <option value="de">Alemão</option>
+    <option value="pt">Português</option>
+  </select>
+  <div class="box" id="originalText"></div>
+  <div class="box" id="translatedText"></div>
 
-  <div class="container">
-    <div class="video-wrapper">
-      <video id="remoteVideo" autoplay playsinline></video>
-    </div>
+  <script>
+    const startBtn = document.getElementById('startBtn');
+    const targetLanguageSelect = document.getElementById('targetLanguageSelect');
+    const originalTextDiv = document.getElementById('originalText');
+    const translatedTextDiv = document.getElementById('translatedText');
+    const receivedFromA = document.getElementById('receivedFromA');
 
-    <div class="video-wrapper">
-      <video id="localVideo" autoplay muted playsinline></video>
-    </div>
+    let socket;
+    let mediaRecorder;
+    let isRecording = false;
 
-    <div class="controls">
-      <button id="callActionBtn" style="display:none;">Call</button>
+    startBtn.onclick = async () => {
+      if (isRecording) {
+        mediaRecorder.stop();
+        socket.close();
+        isRecording = false;
+        startBtn.textContent = '🎙️ Iniciar Gravação';
+        return;
+      }
 
-      <div class="language-bubbles">
-        <button class="lang-btn" data-lang="en-US">🇬🇧</button>
-        <button class="lang-btn" data-lang="pt-BR">🇧🇷</button>
-        <button class="lang-btn" data-lang="es-ES">🇪🇸</button>
-      </div>
-    </div>
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        socket = new WebSocket('ws://localhost:8080');
 
-    <div class="info-overlay" style="display: none;">
-      <span id="myId"></span>
-    </div>
-  </div>
+        socket.onopen = () => {
+          socket.send(JSON.stringify({
+            target: targetLanguageSelect.value,
+            clientType: 'B'
+          }));
 
-  <script src="https://lemur-signal.onrender.com/socket.io/socket.io.js"></script>
-  <script type="module" src="js/caller-ui.js"></script>
+          mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
+          mediaRecorder.ondataavailable = (event) => {
+            if (event.data.size > 0 && socket.readyState === WebSocket.OPEN) {
+              socket.send(event.data);
+            }
+          };
+
+          mediaRecorder.start(250);
+          isRecording = true;
+          startBtn.textContent = '⏹️ Parar Gravação';
+        };
+
+        socket.onmessage = (event) => {
+          const data = JSON.parse(event.data);
+          if (data.from === 'A') {
+            receivedFromA.innerText += data.translated + '\n';
+          } else {
+            if (data.original) originalTextDiv.innerText += data.original + '\n';
+            if (data.translated) translatedTextDiv.innerText += data.translated + '\n';
+          }
+        };
+      } catch (err) {
+        console.error('Erro:', err);
+      }
+    };
+  </script>
 </body>
 </html>
