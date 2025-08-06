@@ -85,36 +85,40 @@ window.onload = () => {
   languageMenu.style.boxShadow = '0 2px 10px rgba(0,0,0,0.2)';
   languageMenu.style.padding = '10px';
   languageMenu.style.zIndex = '1000';
-  languageMenu.style.minWidth = '200px';
+  languageMenu.style.minWidth = '60px';
   
-  // Idiomas disponíveis
+  // Idiomas disponíveis (apenas com bandeiras)
   const languages = [
-    { code: 'en-US', flag: '🇺🇸'},
-    { code: 'pt-BR', flag: '🇧🇷', name: 'Português (BR)' },
-    { code: 'es-ES', flag: '🇪🇸', name: 'Espanhol' },
-    { code: 'fr-FR', flag: '🇫🇷', name: 'Francês' },
-    { code: 'de-DE', flag: '🇩🇪', name: 'Alemão' },
-    { code: 'ja-JP', flag: '🇯🇵', name: 'Japonês' },
-    { code: 'zh-CN', flag: '🇨🇳', name: 'Chinês' },
-    { code: 'ru-RU', flag: '🇷🇺', name: 'Russo' },
-    { code: 'ar-SA', flag: '🇸🇦', name: 'Árabe' }
+    { code: 'en-US', flag: '🇺🇸' },
+    { code: 'pt-BR', flag: '🇧🇷' },
+    { code: 'es-ES', flag: '🇪🇸' },
+    { code: 'fr-FR', flag: '🇫🇷' },
+    { code: 'de-DE', flag: '🇩🇪' },
+    { code: 'ja-JP', flag: '🇯🇵' },
+    { code: 'zh-CN', flag: '🇨🇳' },
+    { code: 'ru-RU', flag: '🇷🇺' },
+    { code: 'ar-SA', flag: '🇸🇦' }
   ];
 
-  // Adiciona opções de idioma ao menu
+  // Adiciona opções de idioma ao menu (apenas bandeiras)
   languages.forEach(lang => {
     const langBtn = document.createElement('button');
     langBtn.className = 'lang-option';
-    langBtn.innerHTML = `${lang.flag} ${lang.name}`;
+    langBtn.innerHTML = `${lang.flag}`;
     langBtn.dataset.langCode = lang.code;
     langBtn.style.display = 'block';
     langBtn.style.width = '100%';
     langBtn.style.padding = '8px 12px';
-    langBtn.style.textAlign = 'left';
+    langBtn.style.textAlign = 'center';
     langBtn.style.border = 'none';
     langBtn.style.background = 'none';
     langBtn.style.cursor = 'pointer';
     langBtn.style.borderRadius = '4px';
     langBtn.style.margin = '2px 0';
+    langBtn.style.fontSize = '24px';
+    
+    // Tooltip com o nome do idioma
+    langBtn.title = getLanguageName(lang.code);
     
     langBtn.addEventListener('mouseover', () => {
       langBtn.style.backgroundColor = '#f0f0f0';
@@ -128,6 +132,22 @@ window.onload = () => {
   });
 
   document.body.appendChild(languageMenu);
+
+  // Função auxiliar para obter o nome do idioma (para o tooltip)
+  function getLanguageName(code) {
+    const languageNames = {
+      'en-US': 'Inglês (EUA)',
+      'pt-BR': 'Português (BR)',
+      'es-ES': 'Espanhol',
+      'fr-FR': 'Francês',
+      'de-DE': 'Alemão',
+      'ja-JP': 'Japonês',
+      'zh-CN': 'Chinês',
+      'ru-RU': 'Russo',
+      'ar-SA': 'Árabe'
+    };
+    return languageNames[code] || code;
+  }
 
   // Controle do menu
   unButton.addEventListener('click', (e) => {
@@ -156,7 +176,7 @@ window.onload = () => {
     languageMenu.addEventListener('click', (e) => {
       if (e.target.classList.contains('lang-option')) {
         const langCode = e.target.dataset.langCode;
-        const flag = e.target.textContent.split(' ')[0];
+        const flag = e.target.textContent;
         
         recognition.stop();
         recognition.lang = langCode;
