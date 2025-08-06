@@ -1,97 +1,36 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Seletor de Idioma com Bandeiras</title>
-  <style>
-    .flag-selector {
-      position: relative;
-      display: inline-block;
-      cursor: pointer;
-    }
+<!-- 🌐 SELECT ESTILIZADO COMO BOTÃO COM BANDEIRA -->
+<style>
+  #languageSelector {
+    font-size: 40px;
+    padding: 5px 10px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    appearance: none; /* remove estilo padrão */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/e/e6/UN_emblem.svg/40px-UN_emblem.svg.png');
 
-    .selected-flag {
-      width: 40px;
-      height: 30px;
-      border: 2px solid #ccc;
-      border-radius: 4px;
-    }
-
-    .flag-options {
-      display: none;
-      position: absolute;
-      top: 40px;
-      left: 0;
-      background: white;
-      border: 1px solid #ccc;
-      padding: 5px;
-      z-index: 10;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-      border-radius: 6px;
-    }
-
-    .flag-options img {
-      width: 40px;
-      height: 30px;
-      margin: 5px;
-      cursor: pointer;
-      transition: transform 0.2s;
-      border-radius: 4px;
-    }
-
-    .flag-options img:hover {
-      transform: scale(1.1);
-      box-shadow: 0 0 5px rgba(0,0,0,0.3);
-    }
-  </style>
-</head>
-<body>
-
-<div class="flag-selector" onclick="toggleFlags()">
-  <!-- Bandeira da ONU como ícone principal -->
-  <img id="selectedFlag" class="selected-flag" src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6e/Flag_of_the_United_Nations.svg/40px-Flag_of_the_United_Nations.svg.png" alt="Idioma Global">
-  
-  <div class="flag-options" id="flagOptions">
-    <img src="https://flagcdn.com/w40/us.png" alt="en-US">
-    <img src="https://flagcdn.com/w40/gb.png" alt="en-GB">
-    <img src="https://flagcdn.com/w40/br.png" alt="pt-BR">
-    <img src="https://flagcdn.com/w40/es.png" alt="es-ES">
-    <img src="https://flagcdn.com/w40/fr.png" alt="fr-FR">
-    <img src="https://flagcdn.com/w40/de.png" alt="de-DE">
-    <img src="https://flagcdn.com/w40/it.png" alt="it-IT">
-    <img src="https://flagcdn.com/w40/jp.png" alt="ja-JP">
-    <img src="https://flagcdn.com/w40/cn.png" alt="zh-CN">
-    <img src="https://flagcdn.com/w40/ru.png" alt="ru-RU">
-    <img src="https://flagcdn.com/w40/kr.png" alt="ko-KR">
-    <img src="https://flagcdn.com/w40/sa.png" alt="ar-SA">
-  </div>
-</div>
-
-<script>
-  function toggleFlags() {
-    const options = document.getElementById('flagOptions');
-    options.style.display = options.style.display === 'block' ? 'none' : 'block';
+    background-repeat: no-repeat;
+    background-position: center left;
+    background-size: 30px;
+    padding-left: 40px;
   }
+</style>
 
-  function selectFlag(img) {
-    document.getElementById('selectedFlag').src = img.src;
-    document.getElementById('flagOptions').style.display = 'none';
-    console.log("Idioma selecionado:", img.alt); // Aqui você pode usar o valor para mudar idioma
-  }
-
-  // Fecha se clicar fora
-  document.addEventListener('click', function(e) {
-    const selector = document.querySelector('.flag-selector');
-    if (!selector.contains(e.target)) {
-      document.getElementById('flagOptions').style.display = 'none';
-    }
-  });
-
-  // Adiciona evento para cada bandeira
-  document.querySelectorAll('.flag-options img').forEach(img => {
-    img.addEventListener('click', () => selectFlag(img));
-  });
-</script>
-
-</body>
-</html>
+<!-- 🔘 SELECT FUNCIONANDO COMO BOTÃO -->
+<select id="languageSelector">
+  <option value="" selected disabled>🌐</option>
+  <option value="en-US">🇺🇸 Inglês (EUA)</option>
+  <option value="en-GB">🇬🇧 Inglês (UK)</option>
+  <option value="pt-BR">🇧🇷 Português (BR)</option>
+  <option value="es-ES">🇪🇸 Espanhol</option>
+  <option value="fr-FR">🇫🇷 Francês</option>
+  <option value="de-DE">🇩🇪 Alemão</option>
+  <option value="it-IT">🇮🇹 Italiano</option>
+  <option value="ja-JP">🇯🇵 Japonês</option>
+  <option value="zh-CN">🇨🇳 Chinês</option>
+  <option value="ru-RU">🇷🇺 Russo</option>
+  <option value="ko-KR">🇰🇷 Coreano</option>
+  <option value="ar-SA">🇸🇦 Árabe</option>
+</select>
