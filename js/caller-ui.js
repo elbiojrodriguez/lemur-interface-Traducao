@@ -89,7 +89,7 @@ window.onload = () => {
   
   // Idiomas disponíveis
   const languages = [
-    { code: 'en-US', flag: '🇺🇸', name: 'Inglês (EUA)' },
+    { code: 'en-US', flag: '🇺🇸',' },
     { code: 'pt-BR', flag: '🇧🇷', name: 'Português (BR)' },
     { code: 'es-ES', flag: '🇪🇸', name: 'Espanhol' },
     { code: 'fr-FR', flag: '🇫🇷', name: 'Francês' },
