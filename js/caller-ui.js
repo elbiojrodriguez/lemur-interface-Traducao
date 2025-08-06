@@ -1,109 +1,45 @@
-const express = require('express');
-const WebSocket = require('ws');
-const { SpeechClient } = require('@google-cloud/speech');
-const { TranslationServiceClient } = require('@google-cloud/translate').v3;
-const stream = require('stream');
-const path = require('path');
+import WebRTCCore from '../core/webrtc-core.js';
 
-const app = express();
-const PORT = 8080;
-const dirname = __dirname;
+window.onload = () => {
+  const rtcCore = new WebRTCCore();
+  const myId = crypto.randomUUID().substr(0, 8);
+  document.getElementById('myId').textContent = myId;
+  rtcCore.initialize(myId);
+  rtcCore.setupSocketHandlers();
 
-const GOOGLE_CONFIG = {
-  keyFilename: path.join(dirname, 'GOOGLECREDENTIALSJSON.json'),
-  projectId: 'transcricao-tempo-real-novo'
-};
+  const localVideo = document.getElementById('localVideo');
+  const remoteVideo = document.getElementById('remoteVideo');
+  let targetId = null;
+  let localStream = null;
 
-// Servir HTMLs
-app.get('/', (req, res) => res.sendFile(path.join(dirname, 'index.html')));
-app.get('/recepcao.html', (req, res) => res.sendFile(path.join(dirname, 'recepcao.html')));
+  // 🔓 Solicita acesso à câmera logo na abertura
+  navigator.mediaDevices.getUserMedia({ video: true, audio: false })
+    .then(stream => {
+      localStream = stream;
+      remoteVideo.srcObject = stream;
+    })
+    .catch(error => {
+      console.error("Erro ao acessar a câmera:", error);
+    });
 
-const server = app.listen(PORT, () => {
-  console.log(`🚀 Servidor rodando na porta ${PORT}`);
-});
+  // Verifica se há ID na URL
+  const urlParams = new URLSearchParams(window.location.search);
+  const targetIdFromUrl = urlParams.get('targetId');
+  
+  if (targetIdFromUrl) {
+    targetId = targetIdFromUrl;
+    document.getElementById('callActionBtn').style.display = 'block';
+  }
 
-const wss = new WebSocket.Server({ server });
-
-wss.on('connection', (ws) => {
-  console.log('📡 Cliente conectado ✅');
-
-  const speechClient = new SpeechClient(GOOGLE_CONFIG);
-  const translationClient = new TranslationServiceClient(GOOGLE_CONFIG);
-
-  let recognizeStream = null;
-  let targetLanguage = '';
-  let clientType = ''; // 'A' ou 'B'
-
-  const speechRequest = {
-    config: {
-      encoding: 'WEBM_OPUS',
-      sampleRateHertz: 48000,
-      languageCode: 'pt-BR',
-      alternativeLanguageCodes: ['en-US', 'es-ES', 'fr-FR', 'de-DE', 'ar-SA', 'zh-CN'],
-      enableAutomaticPunctuation: true,
-    },
-    interimResults: false
+  // Configura o botão de chamada
+  document.getElementById('callActionBtn').onclick = () => {
+    if (!targetId || !localStream) return;
+    rtcCore.startCall(targetId, localStream);
   };
 
-  ws.on('message', async (msg) => {
-    try {
-      const parsed = JSON.parse(msg);
-      if (parsed.target !== undefined) {
-        targetLanguage = parsed.target;
-        clientType = parsed.clientType || '';
-        console.log(`🌐 Idioma de destino: ${targetLanguage || 'Nenhum'} | Tipo: ${clientType}`);
-        return;
-      }
-    } catch (e) {
-      // Não é JSON, então é áudio
-    }
-
-    if (!recognizeStream) {
-      recognizeStream = speechClient.streamingRecognize(speechRequest)
-        .on('data', async (data) => {
-          const result = data.results[0];
-          if (result?.isFinal) {
-            const transcript = result.alternatives[0].transcript;
-            const detectedLanguage = result.languageCode || 'pt-BR';
-            const sourceLanguage = detectedLanguage.split('-')[0];
-
-            const response = {
-              original: transcript,
-              from: clientType
-            };
-
-            if (targetLanguage) {
-              try {
-                const [translation] = await translationClient.translateText({
-                  parent: `projects/${GOOGLE_CONFIG.projectId}/locations/global`,
-                  contents: [transcript],
-                  mimeType: 'text/plain',
-                  sourceLanguageCode: sourceLanguage,
-                  targetLanguageCode: targetLanguage,
-                });
-                response.translated = translation.translations[0].translatedText;
-              } catch (err) {
-                console.error('❌ Erro na tradução:', err.message);
-                response.translated = '[Erro na tradução]';
-              }
-            }
-
-            // Envia para todos os clientes conectados
-            wss.clients.forEach((client) => {
-              if (client.readyState === WebSocket.OPEN) {
-                client.send(JSON.stringify(response));
-              }
-            });
-          }
-        });
-    }
-
-    const audioStream = new stream.PassThrough();
-    audioStream.end(msg);
-    audioStream.pipe(recognizeStream, { end: false });
+  // 🔇 Silencia qualquer áudio recebido
+  rtcCore.setRemoteStreamCallback(stream => {
+    stream.getAudioTracks().forEach(track => track.enabled = false);
+    localVideo.srcObject = stream;
   });
-
-  ws.on('close', () => {
-    if (recognizeStream) recognizeStream.destroy();
-  });
-});
+};
