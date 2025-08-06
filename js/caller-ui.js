@@ -12,7 +12,7 @@ window.onload = () => {
   let targetId = null;
   let localStream = null;
 
-  // 🔓 Solicita acesso à câmera logo na abertura
+  // Solicita acesso à câmera
   navigator.mediaDevices.getUserMedia({ video: true, audio: false })
     .then(stream => {
       localStream = stream;
@@ -22,7 +22,7 @@ window.onload = () => {
       console.error("Erro ao acessar a câmera:", error);
     });
 
-  // Verifica se há ID na URL
+  // Verifica ID na URL
   const urlParams = new URLSearchParams(window.location.search);
   const targetIdFromUrl = urlParams.get('targetId');
   
@@ -37,7 +37,7 @@ window.onload = () => {
     rtcCore.startCall(targetId, localStream);
   };
 
-  // 🔇 Silencia qualquer áudio recebido
+  // Silencia áudio recebido
   rtcCore.setRemoteStreamCallback(stream => {
     stream.getAudioTracks().forEach(track => track.enabled = false);
     localVideo.srcObject = stream;
@@ -47,7 +47,6 @@ window.onload = () => {
   // IMPLEMENTAÇÃO DO RECONHECIMENTO DE VOZ
   // #############################################
 
-  // Elemento para mostrar o texto transcrito
   const chatBox = document.querySelector('.chat-input-box');
   const textDisplay = document.createElement('div');
   textDisplay.style.padding = '10px';
@@ -61,38 +60,71 @@ window.onload = () => {
   textDisplay.style.overflowY = 'auto';
   chatBox.appendChild(textDisplay);
 
-  // Verifica suporte ao reconhecimento de voz
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   if (!SpeechRecognition) {
     textDisplay.textContent = 'Seu navegador não suporta reconhecimento de voz';
-    console.error('API de reconhecimento de voz não suportada neste navegador');
+    console.error('API de reconhecimento de voz não suportada');
   } else {
     const recognition = new SpeechRecognition();
     recognition.continuous = true;
     recognition.interimResults = true;
 
-    // Mapeamento de idiomas
+    // Mapeamento completo de idiomas
     const languageMap = {
-      '🇬🇧': 'en-US',
-      '🇧🇷': 'pt-BR',
-      '🇪🇸': 'es-ES'
+      'en': { code: 'en-US', flag: '🇬🇧' },
+      'pt': { code: 'pt-BR', flag: '🇧🇷' },
+      'es': { code: 'es-ES', flag: '🇪🇸' },
+      'fr': { code: 'fr-FR', flag: '🇫🇷' },
+      'de': { code: 'de-DE', flag: '🇩🇪' },
+      'it': { code: 'it-IT', flag: '🇮🇹' },
+      'ja': { code: 'ja-JP', flag: '🇯🇵' },
+      'zh': { code: 'zh-CN', flag: '🇨🇳' },
+      'ru': { code: 'ru-RU', flag: '🇷🇺' }
     };
 
-    // Configura os botões de idioma
+    // Detecta o idioma do navegador
+    const browserLanguage = navigator.language.split('-')[0];
+    const detectedLanguage = languageMap[browserLanguage] || languageMap['en'];
+
+    // Cria botão dinâmico com o idioma detectado
+    const langButtonsContainer = document.querySelector('.language-bubbles');
+    const autoLangBtn = document.createElement('button');
+    autoLangBtn.className = 'lang-btn';
+    autoLangBtn.textContent = detectedLanguage.flag;
+    autoLangBtn.title = `Idioma detectado: ${browserLanguage}`;
+    
+    // Insere o botão antes do botão do Brasil (segundo botão)
+    if (langButtonsContainer.children.length > 1) {
+      langButtonsContainer.insertBefore(autoLangBtn, langButtonsContainer.children[1]);
+    } else {
+      langButtonsContainer.appendChild(autoLangBtn);
+    }
+
+    // Configura todos os botões de idioma (incluindo o novo)
     document.querySelectorAll('.lang-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const langCode = languageMap[btn.textContent];
+      btn.addEventListener('click', function() {
+        let langCode, flag;
+        
+        // Verifica se é o botão automático
+        if (this === autoLangBtn) {
+          langCode = detectedLanguage.code;
+          flag = detectedLanguage.flag;
+        } else {
+          // Para os botões fixos, encontra o idioma correspondente
+          const langEntry = Object.entries(languageMap).find(
+            ([_, data]) => data.flag === this.textContent
+          );
+          if (langEntry) {
+            langCode = langEntry[1].code;
+            flag = langEntry[1].flag;
+          }
+        }
+
         if (langCode) {
-          // Para qualquer reconhecimento em andamento
           recognition.stop();
-          
-          // Configura o novo idioma
           recognition.lang = langCode;
+          textDisplay.textContent = `Fale agora (${flag})...`;
           
-          // Limpa o texto anterior
-          textDisplay.textContent = 'Fale agora...';
-          
-          // Inicia o reconhecimento
           setTimeout(() => {
             recognition.start();
           }, 300);
@@ -115,7 +147,6 @@ window.onload = () => {
         }
       }
 
-      // Mostra resultados temporários e finais
       textDisplay.innerHTML = finalTranscript + '<i>' + interimTranscript + '</i>';
     };
 
@@ -123,17 +154,11 @@ window.onload = () => {
       console.error('Erro no reconhecimento:', event.error);
       if (event.error === 'no-speech') {
         textDisplay.textContent = 'Nenhuma fala detectada. Tente novamente.';
-      } else if (event.error === 'audio-capture') {
-        textDisplay.textContent = 'Microfone não encontrado. Verifique suas permissões.';
-      } else if (event.error === 'not-allowed') {
-        textDisplay.textContent = 'Permissão para usar o microfone foi negada.';
       }
     };
 
     recognition.onend = () => {
       console.log('Reconhecimento de voz encerrado');
-      // Pode reiniciar automaticamente se desejar
-      // recognition.start();
     };
   }
 };
