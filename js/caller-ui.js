@@ -44,7 +44,7 @@ window.onload = () => {
   });
 
   // #############################################
-  // IMPLEMENTAÇÃO SIMPLIFICADA DO RECONHECIMENTO DE VOZ
+  // IMPLEMENTAÇÃO DO RECONHECIMENTO DE VOZ
   // #############################################
 
   const chatBox = document.querySelector('.chat-input-box');
@@ -87,25 +87,26 @@ window.onload = () => {
   languageMenu.style.zIndex = '1000';
   languageMenu.style.minWidth = '60px';
   
-  // Idiomas disponíveis (apenas com bandeiras)
+  // Idiomas disponíveis com mensagens correspondentes
   const languages = [
-    { code: 'en-US', flag: '🇺🇸' },
-    { code: 'pt-BR', flag: '🇧🇷' },
-    { code: 'es-ES', flag: '🇪🇸' },
-    { code: 'fr-FR', flag: '🇫🇷' },
-    { code: 'de-DE', flag: '🇩🇪' },
-    { code: 'ja-JP', flag: '🇯🇵' },
-    { code: 'zh-CN', flag: '🇨🇳' },
-    { code: 'ru-RU', flag: '🇷🇺' },
-    { code: 'ar-SA', flag: '🇸🇦' }
+    { code: 'en-US', flag: '🇺🇸', speakText: 'Speak now' },
+    { code: 'pt-BR', flag: '🇧🇷', speakText: 'Fale agora' },
+    { code: 'es-ES', flag: '🇪🇸', speakText: 'Habla ahora' },
+    { code: 'fr-FR', flag: '🇫🇷', speakText: 'Parlez maintenant' },
+    { code: 'de-DE', flag: '🇩🇪', speakText: 'Sprechen Sie jetzt' },
+    { code: 'ja-JP', flag: '🇯🇵', speakText: '話してください' },
+    { code: 'zh-CN', flag: '🇨🇳', speakText: '现在说话' },
+    { code: 'ru-RU', flag: '🇷🇺', speakText: 'Говорите сейчас' },
+    { code: 'ar-SA', flag: '🇸🇦', speakText: 'تحدث الآن' }
   ];
 
-  // Adiciona opções de idioma ao menu (apenas bandeiras)
+  // Adiciona opções de idioma ao menu
   languages.forEach(lang => {
     const langBtn = document.createElement('button');
     langBtn.className = 'lang-option';
     langBtn.innerHTML = `${lang.flag}`;
     langBtn.dataset.langCode = lang.code;
+    langBtn.dataset.speakText = lang.speakText;
     langBtn.style.display = 'block';
     langBtn.style.width = '100%';
     langBtn.style.padding = '8px 12px';
@@ -177,10 +178,11 @@ window.onload = () => {
       if (e.target.classList.contains('lang-option')) {
         const langCode = e.target.dataset.langCode;
         const flag = e.target.textContent;
+        const speakText = e.target.dataset.speakText;
         
         recognition.stop();
         recognition.lang = langCode;
-        textDisplay.textContent = `Fale agora (${flag})...`;
+        textDisplay.textContent = `${flag} ${speakText}...`;
         
         setTimeout(() => recognition.start(), 300);
         languageMenu.style.display = 'none';
