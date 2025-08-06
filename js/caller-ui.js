@@ -50,7 +50,7 @@ window.onload = () => {
   const chatBox = document.querySelector('.chat-input-box');
   const textDisplay = document.createElement('div');
   textDisplay.style.padding = '10px';
-  textDisplay.style.color = 'blak';
+  textDisplay.style.color = 'black';
   textDisplay.style.textAlign = 'center';
   textDisplay.style.height = '100%';
   textDisplay.style.display = 'flex';
@@ -71,65 +71,95 @@ window.onload = () => {
 
     // Mapeamento completo de idiomas
     const languageMap = {
-      'en': { code: 'en-US', flag: '🇬🇧' },
-      'pt': { code: 'pt-BR', flag: '🇧🇷' },
-      'es': { code: 'es-ES', flag: '🇪🇸' },
-      'fr': { code: 'fr-FR', flag: '🇫🇷' },
-      'de': { code: 'de-DE', flag: '🇩🇪' },
-      'it': { code: 'it-IT', flag: '🇮🇹' },
-      'ja': { code: 'ja-JP', flag: '🇯🇵' },
-      'zh': { code: 'zh-CN', flag: '🇨🇳' },
-      'ru': { code: 'ru-RU', flag: '🇷🇺' }
+      'en': { code: 'en-US', flag: '🇬🇧', name: 'Inglês' },
+      'pt': { code: 'pt-BR', flag: '🇧🇷', name: 'Português' },
+      'es': { code: 'es-ES', flag: '🇪🇸', name: 'Espanhol' },
+      'fr': { code: 'fr-FR', flag: '🇫🇷', name: 'Francês' },
+      'de': { code: 'de-DE', flag: '🇩🇪', name: 'Alemão' },
+      'it': { code: 'it-IT', flag: '🇮🇹', name: 'Italiano' },
+      'ja': { code: 'ja-JP', flag: '🇯🇵', name: 'Japonês' },
+      'zh': { code: 'zh-CN', flag: '🇨🇳', name: 'Chinês' },
+      'ko': { code: 'ko-KR', flag: '🇰🇷', name: 'Coreano' },
+      'ru': { code: 'ru-RU', flag: '🇷🇺', name: 'Russo' }
     };
 
-    // Detecta o idioma do navegador
-    const browserLanguage = navigator.language.split('-')[0];
-    const detectedLanguage = languageMap[browserLanguage] || languageMap['en'];
-
-    // Cria botão dinâmico com o idioma detectado
+    // Cria o botão da ONU e menu de idiomas
     const langButtonsContainer = document.querySelector('.language-bubbles');
-    const autoLangBtn = document.createElement('button');
-    autoLangBtn.className = 'lang-btn';
-    autoLangBtn.textContent = detectedLanguage.flag;
-    autoLangBtn.title = `Idioma detectado: ${browserLanguage}`;
-    
-    // Insere o botão antes do botão do Brasil (segundo botão)
-    if (langButtonsContainer.children.length > 1) {
-      langButtonsContainer.insertBefore(autoLangBtn, langButtonsContainer.children[1]);
-    } else {
-      langButtonsContainer.appendChild(autoLangBtn);
-    }
+    const unBtn = document.createElement('button');
+    unBtn.className = 'lang-btn un-btn';
+    unBtn.textContent = '🇺🇳';
+    unBtn.title = 'Selecionar idioma';
 
-    // Configura todos os botões de idioma (incluindo o novo)
-    document.querySelectorAll('.lang-btn').forEach(btn => {
-      btn.addEventListener('click', function() {
-        let langCode, flag;
+    const languageMenu = document.createElement('div');
+    languageMenu.className = 'language-menu';
+
+    // Adiciona os botões de idioma no menu
+    Object.values(languageMap).forEach(lang => {
+      const langBtn = document.createElement('button');
+      langBtn.className = 'lang-option';
+      langBtn.textContent = lang.flag;
+      langBtn.title = lang.name;
+      langBtn.dataset.langCode = lang.code;
+      languageMenu.appendChild(langBtn);
+    });
+
+    // Adiciona os elementos ao DOM
+    langButtonsContainer.insertBefore(unBtn, langButtonsContainer.firstChild);
+    langButtonsContainer.appendChild(languageMenu);
+
+    // Controla a abertura/fechamento do menu
+    unBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      languageMenu.classList.toggle('active');
+    });
+
+    // Fecha o menu quando clicar fora
+    document.addEventListener('click', (e) => {
+      if (!languageMenu.contains(e.target) && e.target !== unBtn) {
+        languageMenu.classList.remove('active');
+      }
+    });
+
+    // Seleção de idioma
+    languageMenu.addEventListener('click', (e) => {
+      if (e.target.classList.contains('lang-option') && e.target.dataset.langCode) {
+        const langCode = e.target.dataset.langCode;
+        const flag = e.target.textContent;
+        const langName = e.target.title;
         
-        // Verifica se é o botão automático
-        if (this === autoLangBtn) {
-          langCode = detectedLanguage.code;
-          flag = detectedLanguage.flag;
-        } else {
-          // Para os botões fixos, encontra o idioma correspondente
-          const langEntry = Object.entries(languageMap).find(
-            ([_, data]) => data.flag === this.textContent
-          );
-          if (langEntry) {
-            langCode = langEntry[1].code;
-            flag = langEntry[1].flag;
-          }
-        }
+        // Atualiza o botão da ONU para mostrar a bandeira selecionada
+        unBtn.textContent = flag;
+        unBtn.title = `Idioma selecionado: ${langName}`;
+        
+        // Fecha o menu
+        languageMenu.classList.remove('active');
+        
+        // Configura e inicia o reconhecimento de voz
+        recognition.stop();
+        recognition.lang = langCode;
+        textDisplay.textContent = `Fale agora (${flag})...`;
+        
+        setTimeout(() => {
+          recognition.start();
+        }, 300);
+      }
+    });
 
-        if (langCode) {
+    // Configura os botões de idioma originais
+    document.querySelectorAll('.lang-btn:not(.un-btn)').forEach(btn => {
+      btn.addEventListener('click', function() {
+        const langEntry = Object.values(languageMap).find(
+          lang => lang.flag === this.textContent
+        );
+        
+        if (langEntry) {
           recognition.stop();
-          recognition.lang = langCode;
-          textDisplay.textContent = `Fale agora (${flag})...`;
+          recognition.lang = langEntry.code;
+          textDisplay.textContent = `Fale agora (${langEntry.flag})...`;
           
           setTimeout(() => {
             recognition.start();
           }, 300);
-          
-          console.log(`Reconhecimento iniciado para ${langCode}`);
         }
       });
     });
@@ -154,6 +184,10 @@ window.onload = () => {
       console.error('Erro no reconhecimento:', event.error);
       if (event.error === 'no-speech') {
         textDisplay.textContent = 'Nenhuma fala detectada. Tente novamente.';
+      } else if (event.error === 'audio-capture') {
+        textDisplay.textContent = 'Microfone não encontrado. Verifique suas permissões.';
+      } else if (event.error === 'not-allowed') {
+        textDisplay.textContent = 'Permissão para usar o microfone foi negada.';
       }
     };
 
