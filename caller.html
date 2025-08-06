@@ -1,48 +1,35 @@
-<!-- 🌐 BOTÃO COM BANDEIRA DAS NAÇÕES UNIDAS -->
+<!-- 🌐 SELECT ESTILIZADO COMO BOTÃO COM BANDEIRA -->
 <style>
-  #languageButton {
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-size: 40px;
-  }
-
   #languageSelector {
-    display: none; /* começa escondido */
-    margin-top: 10px;
-    font-size: 16px;
-    padding: 8px;
+    font-size: 40px;
+    padding: 5px 10px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    appearance: none; /* remove estilo padrão */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/e/e6/UN_emblem.svg/40px-UN_emblem.svg.png');
+    background-repeat: no-repeat;
+    background-position: center left;
+    background-size: 30px;
+    padding-left: 40px;
   }
 </style>
 
-<!-- 🔘 BOTÃO + SELECT ESCONDIDO -->
-<div>
-  <button id="languageButton" title="Selecionar idioma">🌐</button>
-  <br>
-  <select id="languageSelector">
-    <option value="" selected disabled>— Selecione —</option>
-    <option value="en-US">🇺🇸 Inglês (EUA)</option>
-    <option value="en-GB">🇬🇧 Inglês (UK)</option>
-    <option value="pt-BR">🇧🇷 Português (BR)</option>
-    <option value="es-ES">🇪🇸 Espanhol</option>
-    <option value="fr-FR">🇫🇷 Francês</option>
-    <option value="de-DE">🇩🇪 Alemão</option>
-    <option value="it-IT">🇮🇹 Italiano</option>
-    <option value="ja-JP">🇯🇵 Japonês</option>
-    <option value="zh-CN">🇨🇳 Chinês</option>
-    <option value="ru-RU">🇷🇺 Russo</option>
-    <option value="ko-KR">🇰🇷 Coreano</option>
-    <option value="ar-SA">🇸🇦 Árabe</option>
-  </select>
-</div>
-
-<!-- 🔧 SCRIPT PARA MOSTRAR O SELECT -->
-<script>
-  const languageButton = document.getElementById('languageButton');
-  const languageSelector = document.getElementById('languageSelector');
-
-  languageButton.addEventListener('click', () => {
-    languageSelector.style.display = 'block'; // mostra o seletor
-    languageSelector.focus(); // foca nele
-  });
-</script>
+<!-- 🔘 SELECT FUNCIONANDO COMO BOTÃO -->
+<select id="languageSelector">
+  <option value="" selected disabled>🌐 Selecione idioma</option>
+  <option value="en-US">🇺🇸 Inglês (EUA)</option>
+  <option value="en-GB">🇬🇧 Inglês (UK)</option>
+  <option value="pt-BR">🇧🇷 Português (BR)</option>
+  <option value="es-ES">🇪🇸 Espanhol</option>
+  <option value="fr-FR">🇫🇷 Francês</option>
+  <option value="de-DE">🇩🇪 Alemão</option>
+  <option value="it-IT">🇮🇹 Italiano</option>
+  <option value="ja-JP">🇯🇵 Japonês</option>
+  <option value="zh-CN">🇨🇳 Chinês</option>
+  <option value="ru-RU">🇷🇺 Russo</option>
+  <option value="ko-KR">🇰🇷 Coreano</option>
+  <option value="ar-SA">🇸🇦 Árabe</option>
+</select>
