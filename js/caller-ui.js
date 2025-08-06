@@ -44,7 +44,7 @@ window.onload = () => {
   });
 
   // #############################################
-  // IMPLEMENTAÇÃO DO RECONHECIMENTO DE VOZ
+  // IMPLEMENTAÇÃO DO RECONHECIMENTO DE VOZ COM MODAL
   // #############################################
 
   const chatBox = document.querySelector('.chat-input-box');
@@ -60,81 +60,135 @@ window.onload = () => {
   textDisplay.style.overflowY = 'auto';
   chatBox.appendChild(textDisplay);
 
+  // Cria o modal de seleção de idiomas
+  const languageModal = document.createElement('div');
+  languageModal.id = 'languageModal';
+  languageModal.style.display = 'none';
+  languageModal.style.position = 'fixed';
+  languageModal.style.top = '0';
+  languageModal.style.left = '0';
+  languageModal.style.width = '100%';
+  languageModal.style.height = '100%';
+  languageModal.style.backgroundColor = 'rgba(0,0,0,0.6)';
+  languageModal.style.zIndex = '999';
+  languageModal.style.justifyContent = 'center';
+  languageModal.style.alignItems = 'center';
+
+  const modalContent = document.createElement('div');
+  modalContent.className = 'modal-content';
+  modalContent.style.backgroundColor = 'white';
+  modalContent.style.padding = '20px';
+  modalContent.style.borderRadius = '8px';
+  modalContent.style.maxWidth = '400px';
+  modalContent.style.width = '90%';
+  modalContent.style.textAlign = 'center';
+
+  const modalTitle = document.createElement('h2');
+  modalTitle.textContent = 'Escolha seu idioma:';
+  modalContent.appendChild(modalTitle);
+
+  const languageSelector = document.createElement('select');
+  languageSelector.id = 'languageSelector';
+  languageSelector.style.width = '100%';
+  languageSelector.style.padding = '10px';
+  languageSelector.style.fontSize = '16px';
+  languageSelector.style.margin = '10px 0';
+
+  // Opções de idiomas
+  const languages = [
+    { value: 'en-US', label: '🇺🇸 Inglês (EUA)', flag: '🇺🇸' },
+    { value: 'en-GB', label: '🇬🇧 Inglês (UK)', flag: '🇬🇧' },
+    { value: 'pt-BR', label: '🇧🇷 Português (BR)', flag: '🇧🇷' },
+    { value: 'es-ES', label: '🇪🇸 Espanhol', flag: '🇪🇸' },
+    { value: 'fr-FR', label: '🇫🇷 Francês', flag: '🇫🇷' },
+    { value: 'de-DE', label: '🇩🇪 Alemão', flag: '🇩🇪' },
+    { value: 'it-IT', label: '🇮🇹 Italiano', flag: '🇮🇹' },
+    { value: 'ja-JP', label: '🇯🇵 Japonês', flag: '🇯🇵' },
+    { value: 'zh-CN', label: '🇨🇳 Chinês', flag: '🇨🇳' },
+    { value: 'ru-RU', label: '🇷🇺 Russo', flag: '🇷🇺' },
+    { value: 'ko-KR', label: '🇰🇷 Coreano', flag: '🇰🇷' },
+    { value: 'ar-SA', label: '🇸🇦 Árabe', flag: '🇸🇦' }
+  ];
+
+  const defaultOption = document.createElement('option');
+  defaultOption.value = '';
+  defaultOption.textContent = '— Selecione —';
+  defaultOption.selected = true;
+  defaultOption.disabled = true;
+  languageSelector.appendChild(defaultOption);
+
+  languages.forEach(lang => {
+    const option = document.createElement('option');
+    option.value = lang.value;
+    option.textContent = lang.label;
+    option.dataset.flag = lang.flag;
+    languageSelector.appendChild(option);
+  });
+
+  modalContent.appendChild(languageSelector);
+
+  const closeBtn = document.createElement('button');
+  closeBtn.className = 'close-btn';
+  closeBtn.textContent = 'Fechar';
+  closeBtn.style.marginTop = '15px';
+  closeBtn.style.backgroundColor = '#0078D7';
+  closeBtn.style.color = 'white';
+  closeBtn.style.border = 'none';
+  closeBtn.style.padding = '10px 20px';
+  closeBtn.style.borderRadius = '6px';
+  closeBtn.style.cursor = 'pointer';
+  modalContent.appendChild(closeBtn);
+
+  languageModal.appendChild(modalContent);
+  document.body.appendChild(languageModal);
+
+  // Cria o botão da ONU
+  const languageButton = document.createElement('button');
+  languageButton.id = 'languageButton';
+  languageButton.textContent = '🌐';
+  languageButton.title = 'Selecionar idioma';
+  languageButton.style.background = 'none';
+  languageButton.style.border = 'none';
+  languageButton.style.cursor = 'pointer';
+  languageButton.style.fontSize = '40px';
+  languageButton.style.position = 'absolute';
+  languageButton.style.bottom = '20px';
+  languageButton.style.right = '20px';
+  languageButton.style.zIndex = '100';
+
+  // Adiciona o botão ao container de controles
+  document.querySelector('.controls').appendChild(languageButton);
+
+  // Event listeners para o modal
+  languageButton.addEventListener('click', () => {
+    languageModal.style.display = 'flex';
+  });
+
+  closeBtn.addEventListener('click', () => {
+    languageModal.style.display = 'none';
+  });
+
+  // Configura o reconhecimento de voz
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SpeechRecognition) {
-    textDisplay.textContent = 'Seu navegador não suporta reconhecimento de voz';
-    console.error('API de reconhecimento de voz não suportada');
-  } else {
-    const recognition = new SpeechRecognition();
+  let recognition = null;
+
+  if (SpeechRecognition) {
+    recognition = new SpeechRecognition();
     recognition.continuous = true;
     recognition.interimResults = true;
 
-    // Mapeamento completo de idiomas
-    const languageMap = {
-      'en': { code: 'en-US', flag: '🇬🇧', name: 'Inglês' },
-      'pt': { code: 'pt-BR', flag: '🇧🇷', name: 'Português' },
-      'es': { code: 'es-ES', flag: '🇪🇸', name: 'Espanhol' },
-      'fr': { code: 'fr-FR', flag: '🇫🇷', name: 'Francês' },
-      'de': { code: 'de-DE', flag: '🇩🇪', name: 'Alemão' },
-      'it': { code: 'it-IT', flag: '🇮🇹', name: 'Italiano' },
-      'ja': { code: 'ja-JP', flag: '🇯🇵', name: 'Japonês' },
-      'zh': { code: 'zh-CN', flag: '🇨🇳', name: 'Chinês' },
-      'ko': { code: 'ko-KR', flag: '🇰🇷', name: 'Coreano' },
-      'ru': { code: 'ru-RU', flag: '🇷🇺', name: 'Russo' }
-    };
+    languageSelector.addEventListener('change', (e) => {
+      const selectedOption = e.target.options[e.target.selectedIndex];
+      if (!selectedOption.value) return;
 
-    // Cria o botão da ONU e menu de idiomas
-    const langButtonsContainer = document.querySelector('.language-bubbles');
-    const unBtn = document.createElement('button');
-    unBtn.className = 'lang-btn un-btn';
-    unBtn.textContent = '🇺🇳';
-    unBtn.title = 'Selecionar idioma';
-
-    const languageMenu = document.createElement('div');
-    languageMenu.className = 'language-menu';
-
-    // Adiciona os botões de idioma no menu
-    Object.values(languageMap).forEach(lang => {
-      const langBtn = document.createElement('button');
-      langBtn.className = 'lang-option';
-      langBtn.textContent = lang.flag;
-      langBtn.title = lang.name;
-      langBtn.dataset.langCode = lang.code;
-      languageMenu.appendChild(langBtn);
-    });
-
-    // Adiciona os elementos ao DOM
-    langButtonsContainer.insertBefore(unBtn, langButtonsContainer.firstChild);
-    langButtonsContainer.appendChild(languageMenu);
-
-    // Controla a abertura/fechamento do menu
-    unBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      languageMenu.classList.toggle('active');
-    });
-
-    // Fecha o menu quando clicar fora
-    document.addEventListener('click', (e) => {
-      if (!languageMenu.contains(e.target) && e.target !== unBtn) {
-        languageMenu.classList.remove('active');
-      }
-    });
-
-    // Seleção de idioma
-    languageMenu.addEventListener('click', (e) => {
-      if (e.target.classList.contains('lang-option') && e.target.dataset.langCode) {
-        const langCode = e.target.dataset.langCode;
-        const flag = e.target.textContent;
-        const langName = e.target.title;
-        
-        // Atualiza o botão da ONU para mostrar a bandeira selecionada
-        unBtn.textContent = flag;
-        unBtn.title = `Idioma selecionado: ${langName}`;
-        
-        // Fecha o menu
-        languageMenu.classList.remove('active');
-        
-        // Configura e inicia o reconhecimento de voz
+      const langCode = selectedOption.value;
+      const flag = selectedOption.dataset.flag;
+      
+      // Fecha o modal
+      languageModal.style.display = 'none';
+      
+      // Configura e inicia o reconhecimento de voz
+      if (recognition) {
         recognition.stop();
         recognition.lang = langCode;
         textDisplay.textContent = `Fale agora (${flag})...`;
@@ -143,25 +197,6 @@ window.onload = () => {
           recognition.start();
         }, 300);
       }
-    });
-
-    // Configura os botões de idioma originais
-    document.querySelectorAll('.lang-btn:not(.un-btn)').forEach(btn => {
-      btn.addEventListener('click', function() {
-        const langEntry = Object.values(languageMap).find(
-          lang => lang.flag === this.textContent
-        );
-        
-        if (langEntry) {
-          recognition.stop();
-          recognition.lang = langEntry.code;
-          textDisplay.textContent = `Fale agora (${langEntry.flag})...`;
-          
-          setTimeout(() => {
-            recognition.start();
-          }, 300);
-        }
-      });
     });
 
     recognition.onresult = (event) => {
@@ -194,5 +229,8 @@ window.onload = () => {
     recognition.onend = () => {
       console.log('Reconhecimento de voz encerrado');
     };
+  } else {
+    textDisplay.textContent = 'Seu navegador não suporta reconhecimento de voz';
+    console.error('API de reconhecimento de voz não suportada neste navegador');
   }
 };
