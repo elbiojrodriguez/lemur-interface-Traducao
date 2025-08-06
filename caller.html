@@ -1,60 +1,85 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Caller - Videochamada Mobile</title>
-  <link rel="stylesheet" href="style.css" />
-  <link rel="stylesheet" href="responsivo.css" />
-  <style>
-    /* 🔵 Estilo do box azul */
-    .chat-input-box {
-      position: absolute;
-      bottom: 350px; /* Ajuste conforme necessário */
-      left: 50%;
-      transform: translateX(-50%);
-      width: 80%;
-      height: 200px; /* Altura aproximada do PIP */
-      border: 2px solid #007BFF;
-      border-radius: 12px;
-      background-color: rgba(255, 255, 255, 0.1);
-      z-index: 20;
-    }
-  </style>
-</head>
-<body>
+<!-- 🌐 BOTÃO COM BANDEIRA DAS NAÇÕES UNIDAS -->
+<style>
+  #languageButton {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 40px;
+  }
 
- <!-- 🔹 Box azul centralizado -->
-    <div class="chat-input-box"></div>
-  
-  <div class="container">
-  
-        <div class="video-wrapper">
-      <video id="remoteVideo" autoplay playsinline></video>
-    </div>
+  #languageModal {
+    display: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.6);
+    z-index: 999;
+    justify-content: center;
+    align-items: center;
+  }
 
-    <div class="video-wrapper">
-      <video id="localVideo" autoplay muted playsinline></video>
-    </div>
+  .modal-content {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    max-width: 400px;
+    width: 90%;
+    text-align: center;
+  }
 
-    <div class="controls">
-      <!-- 🔵 Botão de scanner removido -->
-      <button id="callActionBtn" style="display:none;">Call</button>
+  .modal-content select {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+  }
 
-      <!-- 🔻 Balões com bandeiras -->
-      <div class="language-bubbles">
-        <button class="lang-btn">🇬🇧</button>
-        <button class="lang-btn">🇧🇷</button>
-        <button class="lang-btn">🇪🇸</button>
-      </div>
-    </div>
+  .close-btn {
+    margin-top: 15px;
+    background: #0078D7;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+</style>
 
-    <div class="info-overlay" style="display: none;">
-      <span id="myId"></span>
-    </div>
+<!-- 🌐 BOTÃO COM BANDEIRA -->
+<button id="languageButton" title="Selecionar idioma">🌐</button>
+
+<!-- 🗂️ MODAL COM SELETOR DE IDIOMA -->
+<div id="languageModal">
+  <div class="modal-content">
+    <h2>Escolha seu idioma:</h2>
+    <select id="languageSelector">
+      <option value="" selected disabled>— Selecione —</option>
+      <option value="en-US">🇺🇸 Inglês (EUA)</option>
+      <option value="en-GB">🇬🇧 Inglês (UK)</option>
+      <option value="pt-BR">🇧🇷 Português (BR)</option>
+      <option value="es-ES">🇪🇸 Espanhol</option>
+      <option value="fr-FR">🇫🇷 Francês</option>
+      <option value="de-DE">🇩🇪 Alemão</option>
+      <option value="it-IT">🇮🇹 Italiano</option>
+      <option value="ja-JP">🇯🇵 Japonês</option>
+      <option value="zh-CN">🇨🇳 Chinês</option>
+      <option value="ru-RU">🇷🇺 Russo</option>
+      <option value="ko-KR">🇰🇷 Coreano</option>
+      <option value="ar-SA">🇸🇦 Árabe</option>
+    </select>
+    <button class="close-btn" onclick="closeModal()">Fechar</button>
   </div>
+</div>
 
-  <script src="https://lemur-signal.onrender.com/socket.io/socket.io.js"></script>
-  <script type="module" src="js/caller-ui.js"></script>
-</body>
-</html>
+<!-- 🔧 SCRIPT PARA ABRIR E FECHAR -->
+<script>
+  const languageButton = document.getElementById('languageButton');
+  const languageModal = document.getElementById('languageModal');
+
+  languageButton.addEventListener('click', () => {
+    languageModal.style.display = 'flex';
+  });
+
+  function closeModal() {
+    languageModal.style.display = 'none';
+  }
+</script>
