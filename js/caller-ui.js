@@ -103,7 +103,7 @@ window.onload = () => {
     { value: 'fr-FR', label: '🇫🇷 Francês', flag: '🇫🇷' },
     { value: 'de-DE', label: '🇩🇪 Alemão', flag: '🇩🇪' },
     { value: 'it-IT', label: '🇮🇹 Italiano', flag: '🇮🇹' },
-    { value: 'ja-JP', label: '🇯🇵 Japonês', flag: '🇯🇵' },
+    { value: 'ja-JP', label: '.', flag: '🇯🇵' },
     { value: 'zh-CN', label: '🇨🇳 Chinês', flag: '🇨🇳' },
     { value: 'ru-RU', label: '🇷🇺 Russo', flag: '🇷🇺' },
     { value: 'ko-KR', label: '🇰🇷 Coreano', flag: '🇰🇷' },
