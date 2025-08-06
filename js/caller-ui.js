@@ -50,7 +50,7 @@ window.onload = () => {
   const chatBox = document.querySelector('.chat-input-box');
   const textDisplay = document.createElement('div');
   textDisplay.style.padding = '10px';
-  textDisplay.style.color = 'black';
+  textDisplay.style.color = 'white';
   textDisplay.style.textAlign = 'center';
   textDisplay.style.height = '100%';
   textDisplay.style.display = 'flex';
@@ -60,133 +60,78 @@ window.onload = () => {
   textDisplay.style.overflowY = 'auto';
   chatBox.appendChild(textDisplay);
 
-  // Criação do botão da ONU
-  const unButton = document.createElement('button');
-  unButton.className = 'lang-btn un-btn';
-  unButton.textContent = '🌐';
-  unButton.title = 'Selecionar idioma';
-  unButton.style.background = 'none';
-  unButton.style.border = 'none';
-  unButton.style.cursor = 'pointer';
-  unButton.style.fontSize = '40px';
-  unButton.style.position = 'absolute';
-  unButton.style.bottom = '20px';
-  unButton.style.right = '20px';
-  unButton.style.zIndex = '100';
-  document.querySelector('.controls').appendChild(unButton);
-
-  // Menu de idiomas flutuante
-  const languageMenu = document.createElement('div');
-  languageMenu.className = 'language-menu';
-  languageMenu.style.display = 'none';
-  languageMenu.style.position = 'absolute';
-  languageMenu.style.backgroundColor = 'white';
-  languageMenu.style.borderRadius = '8px';
-  languageMenu.style.boxShadow = '0 2px 10px rgba(0,0,0,0.2)';
-  languageMenu.style.padding = '10px';
-  languageMenu.style.zIndex = '1000';
-  languageMenu.style.minWidth = '60px';
-  
-  // Idiomas disponíveis com mensagens correspondentes
-  const languages = [
-    { code: 'en-US', flag: '🇺🇸', speakText: 'Speak now' },
-    { code: 'pt-BR', flag: '🇧🇷', speakText: 'Fale agora' },
-    { code: 'es-ES', flag: '🇪🇸', speakText: 'Habla ahora' },
-    { code: 'fr-FR', flag: '🇫🇷', speakText: 'Parlez maintenant' },
-    { code: 'de-DE', flag: '🇩🇪', speakText: 'Sprechen Sie jetzt' },
-    { code: 'ja-JP', flag: '🇯🇵', speakText: '話してください' },
-    { code: 'zh-CN', flag: '🇨🇳', speakText: '现在说话' },
-    { code: 'ru-RU', flag: '🇷🇺', speakText: 'Говорите сейчас' },
-    { code: 'ar-SA', flag: '🇸🇦', speakText: 'تحدث الآن' }
-  ];
-
-  // Adiciona opções de idioma ao menu
-  languages.forEach(lang => {
-    const langBtn = document.createElement('button');
-    langBtn.className = 'lang-option';
-    langBtn.innerHTML = `${lang.flag}`;
-    langBtn.dataset.langCode = lang.code;
-    langBtn.dataset.speakText = lang.speakText;
-    langBtn.style.display = 'block';
-    langBtn.style.width = '100%';
-    langBtn.style.padding = '8px 12px';
-    langBtn.style.textAlign = 'center';
-    langBtn.style.border = 'none';
-    langBtn.style.background = 'none';
-    langBtn.style.cursor = 'pointer';
-    langBtn.style.borderRadius = '4px';
-    langBtn.style.margin = '2px 0';
-    langBtn.style.fontSize = '24px';
-    
-    // Tooltip com o nome do idioma
-    langBtn.title = getLanguageName(lang.code);
-    
-    langBtn.addEventListener('mouseover', () => {
-      langBtn.style.backgroundColor = '#f0f0f0';
-    });
-    
-    langBtn.addEventListener('mouseout', () => {
-      langBtn.style.backgroundColor = 'transparent';
-    });
-    
-    languageMenu.appendChild(langBtn);
-  });
-
-  document.body.appendChild(languageMenu);
-
-  // Função auxiliar para obter o nome do idioma (para o tooltip)
-  function getLanguageName(code) {
-    const languageNames = {
-      'en-US': 'Inglês (EUA)',
-      'pt-BR': 'Português (BR)',
-      'es-ES': 'Espanhol',
-      'fr-FR': 'Francês',
-      'de-DE': 'Alemão',
-      'ja-JP': 'Japonês',
-      'zh-CN': 'Chinês',
-      'ru-RU': 'Russo',
-      'ar-SA': 'Árabe'
-    };
-    return languageNames[code] || code;
-  }
-
-  // Controle do menu
-  unButton.addEventListener('click', (e) => {
-    e.stopPropagation();
-    const rect = unButton.getBoundingClientRect();
-    languageMenu.style.display = 'block';
-    languageMenu.style.top = `${rect.top - languageMenu.offsetHeight - 10}px`;
-    languageMenu.style.left = `${rect.left}px`;
-  });
-
-  // Fecha o menu ao clicar fora
-  document.addEventListener('click', () => {
-    languageMenu.style.display = 'none';
-  });
-
-  // Configuração do reconhecimento de voz
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-  let recognition = null;
-
-  if (SpeechRecognition) {
-    recognition = new SpeechRecognition();
+  if (!SpeechRecognition) {
+    textDisplay.textContent = 'Seu navegador não suporta reconhecimento de voz';
+    console.error('API de reconhecimento de voz não suportada');
+  } else {
+    const recognition = new SpeechRecognition();
     recognition.continuous = true;
     recognition.interimResults = true;
 
-    // Seleção de idioma
-    languageMenu.addEventListener('click', (e) => {
-      if (e.target.classList.contains('lang-option')) {
-        const langCode = e.target.dataset.langCode;
-        const flag = e.target.textContent;
-        const speakText = e.target.dataset.speakText;
+    // Mapeamento completo de idiomas
+    const languageMap = {
+      'en': { code: 'en-US', flag: '🇬🇧' },
+      'pt': { code: 'pt-BR', flag: '🇧🇷' },
+      'es': { code: 'es-ES', flag: '🇪🇸' },
+      'fr': { code: 'fr-FR', flag: '🇫🇷' },
+      'de': { code: 'de-DE', flag: '🇩🇪' },
+      'it': { code: 'it-IT', flag: '🇮🇹' },
+      'ja': { code: 'ja-JP', flag: '🇯🇵' },
+      'zh': { code: 'zh-CN', flag: '🇨🇳' },
+      'ru': { code: 'ru-RU', flag: '🇷🇺' }
+    };
+
+    // Detecta o idioma do navegador
+    const browserLanguage = navigator.language.split('-')[0];
+    const detectedLanguage = languageMap[browserLanguage] || languageMap['en'];
+
+    // Cria botão dinâmico com o idioma detectado
+    const langButtonsContainer = document.querySelector('.language-bubbles');
+    const autoLangBtn = document.createElement('button');
+    autoLangBtn.className = 'lang-btn';
+    autoLangBtn.textContent = detectedLanguage.flag;
+    autoLangBtn.title = `Idioma detectado: ${browserLanguage}`;
+    
+    // Insere o botão antes do botão do Brasil (segundo botão)
+    if (langButtonsContainer.children.length > 1) {
+      langButtonsContainer.insertBefore(autoLangBtn, langButtonsContainer.children[1]);
+    } else {
+      langButtonsContainer.appendChild(autoLangBtn);
+    }
+
+    // Configura todos os botões de idioma (incluindo o novo)
+    document.querySelectorAll('.lang-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        let langCode, flag;
         
-        recognition.stop();
-        recognition.lang = langCode;
-        textDisplay.textContent = `${flag} ${speakText}...`;
-        
-        setTimeout(() => recognition.start(), 300);
-        languageMenu.style.display = 'none';
-      }
+        // Verifica se é o botão automático
+        if (this === autoLangBtn) {
+          langCode = detectedLanguage.code;
+          flag = detectedLanguage.flag;
+        } else {
+          // Para os botões fixos, encontra o idioma correspondente
+          const langEntry = Object.entries(languageMap).find(
+            ([_, data]) => data.flag === this.textContent
+          );
+          if (langEntry) {
+            langCode = langEntry[1].code;
+            flag = langEntry[1].flag;
+          }
+        }
+
+        if (langCode) {
+          recognition.stop();
+          recognition.lang = langCode;
+          textDisplay.textContent = `Fale agora (${flag})...`;
+          
+          setTimeout(() => {
+            recognition.start();
+          }, 300);
+          
+          console.log(`Reconhecimento iniciado para ${langCode}`);
+        }
+      });
     });
 
     recognition.onresult = (event) => {
@@ -209,18 +154,11 @@ window.onload = () => {
       console.error('Erro no reconhecimento:', event.error);
       if (event.error === 'no-speech') {
         textDisplay.textContent = 'Nenhuma fala detectada. Tente novamente.';
-      } else if (event.error === 'audio-capture') {
-        textDisplay.textContent = 'Microfone não encontrado. Verifique suas permissões.';
-      } else if (event.error === 'not-allowed') {
-        textDisplay.textContent = 'Permissão para usar o microfone foi negada.';
       }
     };
 
     recognition.onend = () => {
       console.log('Reconhecimento de voz encerrado');
     };
-  } else {
-    textDisplay.textContent = 'Seu navegador não suporta reconhecimento de voz';
-    console.error('API de reconhecimento de voz não suportada neste navegador');
   }
 };
