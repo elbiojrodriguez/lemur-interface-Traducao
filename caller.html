@@ -7,59 +7,29 @@
   <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="responsivo.css" />
   <style>
-    /* 🔷 Estilo do box azul */
+    /* 🔵 Estilo do box azul */
     .chat-input-box {
       position: absolute;
-      bottom: 350px;
+      bottom: 350px; /* Ajuste conforme necessário */
       left: 50%;
       transform: translateX(-50%);
       width: 80%;
-      height: auto;
+      height: 160px; /* Altura aproximada do PIP */
       border: 2px solid #007BFF;
       border-radius: 12px;
-      background-color: rgba(255, 255, 255, 0.8);
+      background-color: rgba(255, 255, 255, 0.1);
       z-index: 20;
-      color: #003366;
-      font-size: 1.2em;
-      padding: 20px;
-      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
-    }
-
-    .selected-info {
-      margin-top: 10px;
-      font-size: 1em;
-      color: #333;
     }
   </style>
- </head>
+</head>
 <body>
 
-  <!-- 🔷 BOX AZUL: Entrada de fala + seletor de idioma -->
-  <div class="chat-input-box" id="chatBox">
-    <h2>Selecione o idioma que você vai falar:</h2>
-
-    <select id="languageSelector">
-       <option value="" selected disabled>— Selecione aqui —</option>
-      <option value="en-US">🇺🇸 Inglês (EUA)</option>
-      <option value="en-GB">🇬🇧 Inglês (UK)</option>
-      <option value="pt-BR">🇧🇷 Português (BR)</option>
-      <option value="es-ES">🇪🇸 Espanhol</option>
-      <option value="fr-FR">🇫🇷 Francês</option>
-      <option value="de-DE">🇩🇪 Alemão</option>
-      <option value="it-IT">🇮🇹 Italiano</option>
-      <option value="ja-JP">🇯🇵 Japonês</option>
-      <option value="zh-CN">🇨🇳 Chinês</option>
-      <option value="ru-RU">🇷🇺 Russo</option>
-      <option value="ko-KR">🇰🇷 Coreano</option>
-      <option value="ar-SA">🇸🇦 Árabe</option>
-    </select>
-
-    <div class="selected-info" id="selectedInfo">Nenhum idioma selecionado.</div>
-  </div>
-
-  <!-- 🎥 BLOCO DE VÍDEO: Câmeras local e remota -->
+ <!-- 🔹 Box azul centralizado -->
+    <div class="chat-input-box"></div>
+  
   <div class="container">
-    <div class="video-wrapper">
+  
+        <div class="video-wrapper">
       <video id="remoteVideo" autoplay playsinline></video>
     </div>
 
@@ -67,34 +37,22 @@
       <video id="localVideo" autoplay muted playsinline></video>
     </div>
 
-    <!-- 🎛️ CONTROLES: Botão de chamada + bandeiras -->
     <div class="controls">
-      <button id="callActionBtn" class="call-button">Call</button>
+      <!-- 🔵 Botão de scanner removido -->
+      <button id="callActionBtn" style="display:none;">Call</button>
 
+      <!-- 🔻 Balões com bandeiras -->
       <div class="language-bubbles">
-        <button class="lang-btn" data-lang="en-US">🇬🇧</button>
-        <button class="lang-btn" data-lang="pt-BR">🇧🇷</button>
-        <button class="lang-btn" data-lang="es-ES">🇪🇸</button>
+        <button class="lang-btn">🇬🇧</button>
+        <button class="lang-btn">🇧🇷</button>
+        <button class="lang-btn">🇪🇸</button>
       </div>
     </div>
 
-    <!-- 🆔 IDENTIFICADOR DO USUÁRIO -->
     <div class="info-overlay" style="display: none;">
       <span id="myId"></span>
     </div>
   </div>
-
-  <!-- 📜 SCRIPTS -->
-  <script>
-    const selector = document.getElementById('languageSelector');
-    const info = document.getElementById('selectedInfo');
-
-    selector.onchange = () => {
-      const selectedText = selector.options[selector.selectedIndex].text;
-      const selectedValue = selector.value;
-      info.textContent = `Idioma selecionado: ${selectedText} (${selectedValue})`;
-    };
-  </script>
 
   <script src="https://lemur-signal.onrender.com/socket.io/socket.io.js"></script>
   <script type="module" src="js/caller-ui.js"></script>
