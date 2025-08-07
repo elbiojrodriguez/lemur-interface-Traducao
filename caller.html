@@ -25,6 +25,7 @@
       gap: 10px;
       justify-content: center;
       margin-top: 10px;
+      position: relative;
     }
 
     .lang-btn {
@@ -33,6 +34,36 @@
       border: none;
       background: none;
       cursor: pointer;
+    }
+
+    .language-menu {
+      display: none;
+      position: absolute;
+      top: -220px;
+      left: 0;
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+      padding: 10px;
+      z-index: 1000;
+      min-width: 60px;
+    }
+
+    .lang-option {
+      display: block;
+      width: 100%;
+      padding: 8px 12px;
+      text-align: center;
+      border: none;
+      background: none;
+      cursor: pointer;
+      border-radius: 4px;
+      margin: 2px 0;
+      font-size: 24px;
+    }
+
+    .lang-option:hover {
+      background-color: #f0f0f0;
     }
   </style>
 </head>
@@ -58,6 +89,9 @@
 
         <!-- Balão seletor de idioma -->
         <button id="langSelectorBtn" class="lang-btn" title="Selecionar idioma">🌐</button>
+
+        <!-- Menu flutuante de idiomas -->
+        <div id="languageMenu" class="language-menu"></div>
       </div>
     </div>
 
