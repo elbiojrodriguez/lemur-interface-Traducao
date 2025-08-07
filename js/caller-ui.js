@@ -23,38 +23,40 @@ window.onload = () => {
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   let recognition = null;
 
-  const defaultLang = {
-    code: 'pt-BR',
-    flag: '🇧🇷',
-    speakText: 'Fale agora',
-    name: 'Português'
+  const languages = {
+    'pt-BR': { flag: '🇧🇷', speakText: 'Fale agora', name: 'Português' },
+    'es-ES': { flag: '🇪🇸', speakText: 'Habla ahora', name: 'Español' }
   };
 
-  let currentLang = defaultLang;
+  let currentLangCode = 'pt-BR';
+  let currentLang = languages[currentLangCode];
+
+  const currentLangBubble = document.getElementById('currentLangBubble');
+  const langSelectorBtn = document.getElementById('langSelectorBtn');
+
+  function updateCurrentLangBubble() {
+    currentLangBubble.textContent = currentLang.flag;
+    currentLangBubble.title = `Idioma atual: ${currentLang.name}`;
+    textDisplay.textContent = `${currentLang.flag} ${currentLang.speakText}...`;
+  }
 
   if (SpeechRecognition) {
     recognition = new SpeechRecognition();
     recognition.continuous = true;
     recognition.interimResults = true;
-    recognition.lang = currentLang.code;
+    recognition.lang = currentLangCode;
 
-    textDisplay.textContent = `${currentLang.flag} ${currentLang.speakText}...`;
+    updateCurrentLangBubble();
 
-    document.querySelectorAll('.lang-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const langCode = btn.dataset.langCode;
-        const speakText = btn.dataset.speakText;
-        const flag = btn.textContent;
-        const langName = btn.title;
+    langSelectorBtn.addEventListener('click', () => {
+      // Alterna entre pt-BR e es-ES
+      currentLangCode = currentLangCode === 'pt-BR' ? 'es-ES' : 'pt-BR';
+      currentLang = languages[currentLangCode];
 
-        currentLang = { code: langCode, flag, speakText, name: langName };
-
-        recognition.stop();
-        recognition.lang = langCode;
-        textDisplay.textContent = `${flag} ${speakText}...`;
-
-        setTimeout(() => recognition.start(), 300);
-      });
+      recognition.stop();
+      recognition.lang = currentLangCode;
+      updateCurrentLangBubble();
+      setTimeout(() => recognition.start(), 300);
     });
 
     recognition.onresult = (event) => {
