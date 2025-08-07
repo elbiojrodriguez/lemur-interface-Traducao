@@ -63,14 +63,15 @@ window.onload = () => {
 
     // 2. Criação do container dos controles (agora independente)
     const langControls = document.createElement('div');
-    langControls.style.position = 'fixed'; // Fixo na tela
-    langControls.style.bottom = '20px';
-    langControls.style.right = '20px';
-    langControls.style.zIndex = '100';
-    langControls.style.display = 'flex';
-    langControls.style.alignItems = 'center';
-    langControls.style.gap = '10px';
-    document.body.appendChild(langControls); // Anexa ao body, não ao .controls
+langControls.style.position = 'absolute'; // Mudamos para absolute
+langControls.style.bottom = '10px'; // Ajuste fino de posição
+langControls.style.left = '50%'; // Centraliza horizontalmente
+langControls.style.transform = 'translateX(-50%)'; // Ajuste fino de centralização
+langControls.style.display = 'flex';
+langControls.style.alignItems = 'center';
+langControls.style.gap = '10px';
+langControls.style.zIndex = '100';
+document.querySelector('.controls').appendChild(langControls); // Agora colocamos dentro de .controls
 
     // 3. Balão do idioma detectado (mesmo estilo original)
     const detectedLangBubble = document.createElement('div');
