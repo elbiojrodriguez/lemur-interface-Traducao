@@ -23,18 +23,25 @@ window.onload = () => {
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   let recognition = null;
 
-  const languages = {
-    'pt-BR': { flag: '🇧🇷', speakText: 'Fale agora', name: 'Português' },
-    'es-ES': { flag: '🇪🇸', speakText: 'Habla ahora', name: 'Español' }
-  };
+  const languages = [
+    { code: 'en-US', flag: '🇺🇸', speakText: 'Speak now', name: 'English' },
+    { code: 'pt-BR', flag: '🇧🇷', speakText: 'Fale agora', name: 'Português' },
+    { code: 'es-ES', flag: '🇪🇸', speakText: 'Habla ahora', name: 'Español' },
+    { code: 'fr-FR', flag: '🇫🇷', speakText: 'Parlez maintenant', name: 'Français' },
+    { code: 'de-DE', flag: '🇩🇪', speakText: 'Sprechen Sie jetzt', name: 'Deutsch' },
+    { code: 'ja-JP', flag: '🇯🇵', speakText: '話してください', name: '日本語' },
+    { code: 'zh-CN', flag: '🇨🇳', speakText: '现在说话', name: '中文' },
+    { code: 'ru-RU', flag: '🇷🇺', speakText: 'Говорите сейчас', name: 'Русский' },
+    { code: 'ar-SA', flag: '🇸🇦', speakText: 'تحدث الآن', name: 'العربية' }
+  ];
 
-  let currentLangCode = 'pt-BR';
-  let currentLang = languages[currentLangCode];
+  let currentLang = languages.find(lang => navigator.language.startsWith(lang.code.split('-')[0])) || languages[1];
 
   const currentLangBubble = document.getElementById('currentLangBubble');
   const langSelectorBtn = document.getElementById('langSelectorBtn');
+  const languageMenu = document.getElementById('languageMenu');
 
-  function updateCurrentLangBubble() {
+  function updateCurrentLangDisplay() {
     currentLangBubble.textContent = currentLang.flag;
     currentLangBubble.title = `Idioma atual: ${currentLang.name}`;
     textDisplay.textContent = `${currentLang.flag} ${currentLang.speakText}...`;
@@ -44,19 +51,40 @@ window.onload = () => {
     recognition = new SpeechRecognition();
     recognition.continuous = true;
     recognition.interimResults = true;
-    recognition.lang = currentLangCode;
+    recognition.lang = currentLang.code;
 
-    updateCurrentLangBubble();
+    updateCurrentLangDisplay();
 
-    langSelectorBtn.addEventListener('click', () => {
-      // Alterna entre pt-BR e es-ES
-      currentLangCode = currentLangCode === 'pt-BR' ? 'es-ES' : 'pt-BR';
-      currentLang = languages[currentLangCode];
+    // Preenche o menu com os idiomas
+    languages.forEach(lang => {
+      const langBtn = document.createElement('button');
+      langBtn.className = 'lang-option';
+      langBtn.innerHTML = `${lang.flag}`;
+      langBtn.dataset.langCode = lang.code;
+      langBtn.dataset.speakText = lang.speakText;
+      langBtn.title = lang.name;
 
-      recognition.stop();
-      recognition.lang = currentLangCode;
-      updateCurrentLangBubble();
-      setTimeout(() => recognition.start(), 300);
+      langBtn.addEventListener('click', () => {
+        currentLang = lang;
+        recognition.stop();
+        recognition.lang = lang.code;
+        updateCurrentLangDisplay();
+        setTimeout(() => recognition.start(), 300);
+        languageMenu.style.display = 'none';
+      });
+
+      languageMenu.appendChild(langBtn);
+    });
+
+    // Abre o menu ao clicar no 🌐
+    langSelectorBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      languageMenu.style.display = 'block';
+    });
+
+    // Fecha o menu ao clicar fora
+    document.addEventListener('click', () => {
+      languageMenu.style.display = 'none';
     });
 
     recognition.onresult = (event) => {
