@@ -7,29 +7,86 @@
   <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="responsivo.css" />
   <style>
-    /* 🔵 Estilo do box azul */
+    /* Estilo do box azul */
     .chat-input-box {
       position: absolute;
-      bottom: 350px; /* Ajuste conforme necessário */
+      bottom: 350px;
       left: 50%;
       transform: translateX(-50%);
       width: 80%;
-      height: 200px; /* Altura aproximada do PIP */
+      height: 200px;
       border: 2px solid #007BFF;
       border-radius: 12px;
       background-color: rgba(255, 255, 255, 0.1);
       z-index: 20;
     }
+    
+    /* Estilos para os controles de idioma */
+    .lang-controls-container {
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+      z-index: 100;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    
+    .lang-bubble {
+      width: 50px;
+      height: 50px;
+      background-color: white;
+      border-radius: 50%;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      cursor: pointer;
+    }
+    
+    .lang-select-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 40px;
+    }
+    
+    .language-menu {
+      display: none;
+      position: absolute;
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+      padding: 10px;
+      z-index: 1000;
+      min-width: 60px;
+    }
+    
+    .lang-option {
+      display: block;
+      width: 100%;
+      padding: 8px 12px;
+      text-align: center;
+      border: none;
+      background: none;
+      cursor: pointer;
+      border-radius: 4px;
+      margin: 2px 0;
+      font-size: 24px;
+    }
+    
+    .lang-option:hover {
+      background-color: #f0f0f0;
+    }
   </style>
 </head>
 <body>
-
- <!-- 🔹 Box azul centralizado -->
-    <div class="chat-input-box"></div>
+  <!-- Box azul centralizado -->
+  <div class="chat-input-box"></div>
   
   <div class="container">
-  
-        <div class="video-wrapper">
+    <div class="video-wrapper">
       <video id="remoteVideo" autoplay playsinline></video>
     </div>
 
@@ -38,11 +95,9 @@
     </div>
 
     <div class="controls">
-      <!-- 🔵 Botão de scanner removido -->
       <button id="callActionBtn" style="display:none;">Call</button>
-
-      <!-- 🔻 Mantemos esta div vazia para o JavaScript adicionar os controles -->
-      <div class="language-controls-container"></div>
+      <!-- Container para controles de idioma -->
+      <div class="lang-controls-container"></div>
     </div>
 
     <div class="info-overlay" style="display: none;">
