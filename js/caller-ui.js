@@ -7,43 +7,8 @@ window.onload = () => {
   rtcCore.initialize(myId);
   rtcCore.setupSocketHandlers();
 
-  const localVideo = document.getElementById('localVideo');
-  const remoteVideo = document.getElementById('remoteVideo');
-  let targetId = null;
-  let localStream = null;
-
-  // Solicita acesso à câmera
-  navigator.mediaDevices.getUserMedia({ video: true, audio: false })
-    .then(stream => {
-      localStream = stream;
-      remoteVideo.srcObject = stream;
-    })
-    .catch(error => {
-      console.error("Erro ao acessar a câmera:", error);
-    });
-
-  // Verifica ID na URL
-  const urlParams = new URLSearchParams(window.location.search);
-  const targetIdFromUrl = urlParams.get('targetId');
-  
-  if (targetIdFromUrl) {
-    targetId = targetIdFromUrl;
-    document.getElementById('callActionBtn').style.display = 'block';
-  }
-
-  // Configura o botão de chamada
-  document.getElementById('callActionBtn').onclick = () => {
-    if (!targetId || !localStream) return;
-    rtcCore.startCall(targetId, localStream);
-  };
-
-  // Silencia áudio recebido
-  rtcCore.setRemoteStreamCallback(stream => {
-    stream.getAudioTracks().forEach(track => track.enabled = false);
-    localVideo.srcObject = stream;
-  });
-// #############################################
-  // IMPLEMENTAÇÃO DO RECONHECIMENTO DE VOZ
+  // #############################################
+  // IMPLEMENTAÇÃO COMPLETA DO RECONHECIMENTO DE VOZ
   // #############################################
 
   const chatBox = document.querySelector('.chat-input-box');
@@ -59,19 +24,18 @@ window.onload = () => {
   textDisplay.style.overflowY = 'auto';
   chatBox.appendChild(textDisplay);
 
-  // Container para os 3 balões de idioma
+  // Container para os controles de idioma
   const langControls = document.createElement('div');
   langControls.style.display = 'flex';
   langControls.style.alignItems = 'center';
-  langControls.style.gap = '15px';
+  langControls.style.gap = '10px';
   langControls.style.position = 'absolute';
   langControls.style.bottom = '20px';
-  langControls.style.left = '50%';
-  langControls.style.transform = 'translateX(-50%)';
+  langControls.style.right = '20px';
   langControls.style.zIndex = '100';
   document.querySelector('.controls').appendChild(langControls);
 
-  // 1. BALÃO ESQUERDO - IDIOMA NATIVO (FIXO)
+  // 1. BALÃO DO IDIOMA NATIVO (NUNCA MUDA)
   const nativeLangBubble = document.createElement('div');
   nativeLangBubble.className = 'native-lang-bubble';
   nativeLangBubble.style.display = 'flex';
@@ -85,24 +49,7 @@ window.onload = () => {
   nativeLangBubble.style.fontSize = '24px';
   langControls.appendChild(nativeLangBubble);
 
-  // 2. BALÃO CENTRAL - SELETOR DE IDIOMAS (SEMPRE 🌐)
-  const langSelectorBubble = document.createElement('div');
-  langSelectorBubble.className = 'lang-selector-bubble';
-  langSelectorBubble.style.display = 'flex';
-  langSelectorBubble.style.alignItems = 'center';
-  langSelectorBubble.style.justifyContent = 'center';
-  langSelectorBubble.style.width = '50px';
-  langSelectorBubble.style.height = '50px';
-  langSelectorBubble.style.backgroundColor = 'white';
-  langSelectorBubble.style.borderRadius = '50%';
-  langSelectorBubble.style.boxShadow = '0 2px 5px rgba(0,0,0,0.2)';
-  langSelectorBubble.style.cursor = 'pointer';
-  langSelectorBubble.style.fontSize = '24px';
-  langSelectorBubble.textContent = '🌐';
-  langSelectorBubble.title = 'Selecionar idioma';
-  langControls.appendChild(langSelectorBubble);
-
-  // 3. BALÃO DIREITO - IDIOMA SELECIONADO (INICIA VAZIO)
+  // 2. BALÃO DO IDIOMA SELECIONADO (INICIA COM 🌐)
   const selectedLangBubble = document.createElement('div');
   selectedLangBubble.className = 'selected-lang-bubble';
   selectedLangBubble.style.display = 'flex';
@@ -113,11 +60,11 @@ window.onload = () => {
   selectedLangBubble.style.backgroundColor = 'white';
   selectedLangBubble.style.borderRadius = '50%';
   selectedLangBubble.style.boxShadow = '0 2px 5px rgba(0,0,0,0.2)';
+  selectedLangBubble.style.cursor = 'pointer';
   selectedLangBubble.style.fontSize = '24px';
-  selectedLangBubble.style.visibility = 'hidden'; // Inicia oculto
   langControls.appendChild(selectedLangBubble);
 
-  // Idiomas disponíveis
+  // Idiomas disponíveis com mensagens localizadas
   const languages = [
     { code: 'en-US', flag: '🇺🇸', speakText: 'Speak now', name: 'English' },
     { code: 'pt-BR', flag: '🇧🇷', speakText: 'Fale agora', name: 'Português' },
@@ -138,9 +85,11 @@ window.onload = () => {
   nativeLangBubble.textContent = nativeLang.flag;
   nativeLangBubble.title = `Idioma nativo: ${nativeLang.name}`;
   
-  // Inicia sem idioma selecionado (apenas o nativo)
+  // Inicia com o idioma nativo selecionado
   let currentLang = nativeLang;
-  
+  selectedLangBubble.textContent = '🌐';
+  selectedLangBubble.title = 'Selecionar idioma';
+
   // Menu de seleção de idiomas
   const languageMenu = document.createElement('div');
   languageMenu.className = 'language-menu';
@@ -186,10 +135,10 @@ window.onload = () => {
     }
   });
 
-  // Abre o menu ao clicar no balão central (🌐)
-  langSelectorBubble.addEventListener('click', (e) => {
+  // Controle do menu - abre ao clicar no balão selecionado
+  selectedLangBubble.addEventListener('click', (e) => {
     e.stopPropagation();
-    const rect = langSelectorBubble.getBoundingClientRect();
+    const rect = selectedLangBubble.getBoundingClientRect();
     languageMenu.style.display = 'block';
     languageMenu.style.top = `${rect.top - languageMenu.offsetHeight - 10}px`;
     languageMenu.style.left = `${rect.left}px`;
@@ -210,7 +159,7 @@ window.onload = () => {
     recognition.interimResults = true;
     recognition.lang = nativeLang.code;
 
-    // Exibe mensagem inicial no idioma nativo
+    // Exibe mensagem inicial
     textDisplay.textContent = `${nativeLang.flag} ${nativeLang.speakText}...`;
 
     // Seleção de idioma
@@ -219,10 +168,9 @@ window.onload = () => {
         const langCode = e.target.dataset.langCode;
         const selectedLang = languages.find(l => l.code === langCode);
         
-        // Atualiza o balão direito com o idioma selecionado
+        // Atualiza o balão selecionado (substitui o 🌐)
         selectedLangBubble.textContent = selectedLang.flag;
         selectedLangBubble.title = `Idioma selecionado: ${selectedLang.name}`;
-        selectedLangBubble.style.visibility = 'visible';
         
         // Atualiza o idioma atual
         currentLang = selectedLang;
@@ -235,6 +183,19 @@ window.onload = () => {
         setTimeout(() => recognition.start(), 300);
         languageMenu.style.display = 'none';
       }
+    });
+
+    // Botão para resetar ao idioma nativo
+    nativeLangBubble.addEventListener('dblclick', () => {
+      currentLang = nativeLang;
+      selectedLangBubble.textContent = '🌐';
+      selectedLangBubble.title = 'Selecionar idioma';
+      
+      recognition.stop();
+      recognition.lang = nativeLang.code;
+      textDisplay.textContent = `${nativeLang.flag} ${nativeLang.speakText}...`;
+      
+      setTimeout(() => recognition.start(), 300);
     });
 
     recognition.onresult = (event) => {
