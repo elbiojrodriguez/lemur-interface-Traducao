@@ -50,7 +50,7 @@ window.onload = () => {
   const chatBox = document.querySelector('.chat-input-box');
   const textDisplay = document.createElement('div');
   textDisplay.style.padding = '10px';
-  textDisplay.style.color = 'white';
+  textDisplay.style.color = 'blak';
   textDisplay.style.textAlign = 'center';
   textDisplay.style.height = '100%';
   textDisplay.style.display = 'flex';
@@ -80,7 +80,7 @@ window.onload = () => {
   languageMenu.className = 'language-menu';
   languageMenu.style.display = 'none';
   languageMenu.style.position = 'absolute';
-  languageMenu.style.backgroundColor = 'white';
+  languageMenu.style.backgroundColor = 'blak';
   languageMenu.style.borderRadius = '8px';
   languageMenu.style.boxShadow = '0 2px 10px rgba(0,0,0,0.2)';
   languageMenu.style.padding = '10px';
