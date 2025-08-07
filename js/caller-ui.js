@@ -78,9 +78,12 @@ window.onload = () => {
 
     // Abre o menu ao clicar no 🌐
     langSelectorBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      languageMenu.style.display = 'block';
-    });
+  e.stopPropagation();
+  const rect = langSelectorBtn.getBoundingClientRect();
+  languageMenu.style.display = 'block';
+  languageMenu.style.left = `${rect.left}px`;
+  languageMenu.style.top = `${rect.top - languageMenu.offsetHeight - 10}px`;
+});
 
     // Fecha o menu ao clicar fora
     document.addEventListener('click', () => {
