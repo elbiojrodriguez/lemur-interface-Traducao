@@ -1,13 +1,28 @@
 import WebRTCCore from '../core/webrtc-core.js';
 
 window.onload = () => {
-  // [Configurações iniciais permanecem iguais...]
+  const rtcCore = new WebRTCCore();
+  const myId = crypto.randomUUID().substr(0, 8);
+  document.getElementById('myId').textContent = myId;
+  rtcCore.initialize(myId);
+  rtcCore.setupSocketHandlers();
 
   // #############################################
-  // IMPLEMENTAÇÃO DO RECONHECIMENTO DE VOZ
+  // IMPLEMENTAÇÃO COMPLETA DO RECONHECIMENTO DE VOZ
   // #############################################
 
-  // [Configuração do chatBox e textDisplay permanecem iguais...]
+  const chatBox = document.querySelector('.chat-input-box');
+  const textDisplay = document.createElement('div');
+  textDisplay.style.padding = '10px';
+  textDisplay.style.color = 'black';
+  textDisplay.style.textAlign = 'center';
+  textDisplay.style.height = '100%';
+  textDisplay.style.display = 'flex';
+  textDisplay.style.alignItems = 'center';
+  textDisplay.style.justifyContent = 'center';
+  textDisplay.style.wordBreak = 'break-word';
+  textDisplay.style.overflowY = 'auto';
+  chatBox.appendChild(textDisplay);
 
   // Container para os controles de idioma
   const langControls = document.createElement('div');
@@ -49,11 +64,17 @@ window.onload = () => {
   selectedLangBubble.style.fontSize = '24px';
   langControls.appendChild(selectedLangBubble);
 
-  // Idiomas disponíveis
+  // Idiomas disponíveis com mensagens localizadas
   const languages = [
     { code: 'en-US', flag: '🇺🇸', speakText: 'Speak now', name: 'English' },
     { code: 'pt-BR', flag: '🇧🇷', speakText: 'Fale agora', name: 'Português' },
-    // [...outros idiomas permanecem iguais...]
+    { code: 'es-ES', flag: '🇪🇸', speakText: 'Habla ahora', name: 'Español' },
+    { code: 'fr-FR', flag: '🇫🇷', speakText: 'Parlez maintenant', name: 'Français' },
+    { code: 'de-DE', flag: '🇩🇪', speakText: 'Sprechen Sie jetzt', name: 'Deutsch' },
+    { code: 'ja-JP', flag: '🇯🇵', speakText: '話してください', name: '日本語' },
+    { code: 'zh-CN', flag: '🇨🇳', speakText: '现在说话', name: '中文' },
+    { code: 'ru-RU', flag: '🇷🇺', speakText: 'Говорите сейчас', name: 'Русский' },
+    { code: 'ar-SA', flag: '🇸🇦', speakText: 'تحدث الآن', name: 'العربية' }
   ];
 
   // Detecta o idioma NATIVO do navegador
@@ -71,13 +92,45 @@ window.onload = () => {
 
   // Menu de seleção de idiomas
   const languageMenu = document.createElement('div');
-  // [Configuração do menu permanece igual...]
+  languageMenu.className = 'language-menu';
+  languageMenu.style.display = 'none';
+  languageMenu.style.position = 'absolute';
+  languageMenu.style.backgroundColor = 'white';
+  languageMenu.style.borderRadius = '8px';
+  languageMenu.style.boxShadow = '0 2px 10px rgba(0,0,0,0.2)';
+  languageMenu.style.padding = '10px';
+  languageMenu.style.zIndex = '1000';
+  languageMenu.style.minWidth = '60px';
+  document.body.appendChild(languageMenu);
 
   // Adiciona os idiomas ao menu (exceto o nativo)
   languages.forEach(lang => {
     if (lang.code !== nativeLang.code) {
       const langBtn = document.createElement('button');
-      // [Configuração do botão permanece igual...]
+      langBtn.className = 'lang-option';
+      langBtn.innerHTML = `${lang.flag}`;
+      langBtn.dataset.langCode = lang.code;
+      langBtn.dataset.speakText = lang.speakText;
+      langBtn.title = lang.name;
+      langBtn.style.display = 'block';
+      langBtn.style.width = '100%';
+      langBtn.style.padding = '8px 12px';
+      langBtn.style.textAlign = 'center';
+      langBtn.style.border = 'none';
+      langBtn.style.background = 'none';
+      langBtn.style.cursor = 'pointer';
+      langBtn.style.borderRadius = '4px';
+      langBtn.style.margin = '2px 0';
+      langBtn.style.fontSize = '24px';
+      
+      langBtn.addEventListener('mouseover', () => {
+        langBtn.style.backgroundColor = '#f0f0f0';
+      });
+      
+      langBtn.addEventListener('mouseout', () => {
+        langBtn.style.backgroundColor = 'transparent';
+      });
+      
       languageMenu.appendChild(langBtn);
     }
   });
@@ -91,41 +144,101 @@ window.onload = () => {
     languageMenu.style.left = `${rect.left}px`;
   });
 
-  // Seleção de idioma
-  languageMenu.addEventListener('click', (e) => {
-    if (e.target.classList.contains('lang-option')) {
-      const langCode = e.target.dataset.langCode;
-      const selectedLang = languages.find(l => l.code === langCode);
+  // Fecha o menu ao clicar fora
+  document.addEventListener('click', () => {
+    languageMenu.style.display = 'none';
+  });
+
+  // Configuração do reconhecimento de voz
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  let recognition = null;
+
+  if (SpeechRecognition) {
+    recognition = new SpeechRecognition();
+    recognition.continuous = true;
+    recognition.interimResults = true;
+    recognition.lang = nativeLang.code;
+
+    // Exibe mensagem inicial
+    textDisplay.textContent = `${nativeLang.flag} ${nativeLang.speakText}...`;
+
+    // Seleção de idioma
+    languageMenu.addEventListener('click', (e) => {
+      if (e.target.classList.contains('lang-option')) {
+        const langCode = e.target.dataset.langCode;
+        const selectedLang = languages.find(l => l.code === langCode);
+        
+        // Atualiza o balão selecionado (substitui o 🌐)
+        selectedLangBubble.textContent = selectedLang.flag;
+        selectedLangBubble.title = `Idioma selecionado: ${selectedLang.name}`;
+        
+        // Atualiza o idioma atual
+        currentLang = selectedLang;
+        
+        // Configura o reconhecimento de voz
+        recognition.stop();
+        recognition.lang = langCode;
+        textDisplay.textContent = `${selectedLang.flag} ${selectedLang.speakText}...`;
+        
+        setTimeout(() => recognition.start(), 300);
+        languageMenu.style.display = 'none';
+      }
+    });
+
+    // Botão para resetar ao idioma nativo
+    nativeLangBubble.addEventListener('dblclick', () => {
+      currentLang = nativeLang;
+      selectedLangBubble.textContent = '🌐';
+      selectedLangBubble.title = 'Selecionar idioma';
       
-      // Atualiza o balão selecionado (substitui o 🌐)
-      selectedLangBubble.textContent = selectedLang.flag;
-      selectedLangBubble.title = `Idioma selecionado: ${selectedLang.name}`;
-      
-      // Atualiza o idioma atual
-      currentLang = selectedLang;
-      
-      // Configura o reconhecimento de voz
       recognition.stop();
-      recognition.lang = langCode;
-      textDisplay.textContent = `${selectedLang.flag} ${selectedLang.speakText}...`;
+      recognition.lang = nativeLang.code;
+      textDisplay.textContent = `${nativeLang.flag} ${nativeLang.speakText}...`;
       
       setTimeout(() => recognition.start(), 300);
-      languageMenu.style.display = 'none';
-    }
-  });
+    });
 
-  // Botão para resetar ao idioma nativo (opcional)
-  nativeLangBubble.addEventListener('dblclick', () => {
-    currentLang = nativeLang;
-    selectedLangBubble.textContent = '🌐';
-    selectedLangBubble.title = 'Selecionar idioma';
-    
-    recognition.stop();
-    recognition.lang = nativeLang.code;
-    textDisplay.textContent = `${nativeLang.flag} ${nativeLang.speakText}...`;
-    
-    setTimeout(() => recognition.start(), 300);
-  });
+    recognition.onresult = (event) => {
+      let interimTranscript = '';
+      let finalTranscript = '';
 
-  // [Restante do código permanece igual...]
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        const transcript = event.results[i][0].transcript;
+        if (event.results[i].isFinal) {
+          finalTranscript += transcript + ' ';
+        } else {
+          interimTranscript += transcript;
+        }
+      }
+
+      textDisplay.innerHTML = finalTranscript + '<i>' + interimTranscript + '</i>';
+    };
+
+    recognition.onerror = (event) => {
+      console.error('Erro no reconhecimento:', event.error);
+      textDisplay.style.color = 'black';
+      
+      if (event.error === 'no-speech') {
+        textDisplay.textContent = `${currentLang.flag} ${currentLang.speakText}...`;
+        recognition.start();
+      } else if (event.error === 'audio-capture') {
+        textDisplay.textContent = 'Microfone não detectado';
+      } else if (event.error === 'not-allowed') {
+        textDisplay.textContent = 'Permissão para microfone negada';
+      }
+    };
+
+    recognition.onend = () => {
+      if (!textDisplay.textContent.includes('Permissão')) {
+        recognition.start();
+      }
+    };
+
+    // Inicia o reconhecimento
+    setTimeout(() => recognition.start(), 1000);
+  } else {
+    textDisplay.textContent = 'Seu navegador não suporta reconhecimento de voz';
+    textDisplay.style.color = 'black';
+    console.error('API de reconhecimento de voz não suportada');
+  }
 };
