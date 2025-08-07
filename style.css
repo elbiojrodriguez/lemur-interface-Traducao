@@ -191,4 +191,11 @@ body {
   box-shadow: 0 4px 12px rgba(0,0,0,0.15);
   display: none; /* começa oculto */
 }
+  .controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative; /* Importante para o posicionamento absoluto dos filhos */
+    padding: 10px 0;
+}
 }
