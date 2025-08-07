@@ -80,7 +80,7 @@ window.onload = () => {
   const languages = [
     { code: 'en-US', flag: '🇺🇸', speakText: 'Speak now', name: 'English' },
     { code: 'pt-BR', flag: '🇧🇷', speakText: 'Fale agora', name: 'Português' },
-    { code: 'es-ES', flag: '🇪🇸', speakText: 'Habla ahora', name: 'Español' },
+    { code: 'es-ES', flag: '🇪🇸', speakText: 'Habla agora', name: 'Español' },
     { code: 'fr-FR', flag: '🇫🇷', speakText: 'Parlez maintenant', name: 'Français' },
     { code: 'de-DE', flag: '🇩🇪', speakText: 'Sprechen Sie jetzt', name: 'Deutsch' },
     { code: 'ja-JP', flag: '🇯🇵', speakText: '話してください', name: '日本語' },
@@ -217,4 +217,3 @@ window.onload = () => {
     console.error('API de reconhecimento de voz não suportada');
   }
 };
-
