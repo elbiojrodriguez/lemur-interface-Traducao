@@ -12,7 +12,6 @@ window.onload = () => {
   let targetId = null;
   let localStream = null;
 
-  // Acesso à câmera
   navigator.mediaDevices.getUserMedia({ video: true, audio: false })
     .then(stream => {
       localStream = stream;
@@ -22,7 +21,6 @@ window.onload = () => {
       console.error("Erro ao acessar a câmera:", error);
     });
 
-  // Verifica ID na URL
   const urlParams = new URLSearchParams(window.location.search);
   const targetIdFromUrl = urlParams.get('targetId');
   
@@ -31,44 +29,44 @@ window.onload = () => {
     document.getElementById('callActionBtn').style.display = 'block';
   }
 
-  // Botão de chamada
   document.getElementById('callActionBtn').onclick = () => {
     if (!targetId || !localStream) return;
     rtcCore.startCall(targetId, localStream);
   };
 
-  // Silencia áudio recebido
   rtcCore.setRemoteStreamCallback(stream => {
     stream.getAudioTracks().forEach(track => track.enabled = false);
     localVideo.srcObject = stream;
   });
 
-  // Implementação do reconhecimento de voz
+  // Configuração do chat
   const chatBox = document.querySelector('.chat-input-box');
   const textDisplay = document.createElement('div');
-  textDisplay.style.padding = '10px';
-  textDisplay.style.color = 'black';
-  textDisplay.style.textAlign = 'center';
-  textDisplay.style.height = '100%';
-  textDisplay.style.display = 'flex';
-  textDisplay.style.alignItems = 'center';
-  textDisplay.style.justifyContent = 'center';
-  textDisplay.style.wordBreak = 'break-word';
-  textDisplay.style.overflowY = 'auto';
+  textDisplay.style.cssText = `
+    padding: 10px;
+    color: black;
+    text-align: center;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    word-break: break-word;
+    overflow-y: auto;
+  `;
   chatBox.appendChild(textDisplay);
 
-  // Cria elementos de controle de idioma
+  // Controles de idioma
   const langContainer = document.querySelector('.lang-controls-container');
   
-  // Balão do idioma detectado
+  // 1. Balão do idioma detectado (SEMPRE VISÍVEL)
   const detectedLangBubble = document.createElement('div');
   detectedLangBubble.className = 'lang-bubble';
   langContainer.appendChild(detectedLangBubble);
 
-  // Botão de seleção de idiomas
+  // 2. Botão seletor de idiomas (SEMPRE VISÍVEL)
   const langSelectButton = document.createElement('button');
   langSelectButton.className = 'lang-select-btn';
-  langSelectButton.textContent = '🌐';
+  langSelectButton.innerHTML = '🌐';
   langSelectButton.title = 'Selecionar idioma';
   langContainer.appendChild(langSelectButton);
 
@@ -92,18 +90,18 @@ window.onload = () => {
   detectedLangBubble.textContent = currentLang.flag;
   detectedLangBubble.title = `Idioma atual: ${currentLang.name}`;
 
-  // Adiciona idiomas ao menu
+  // Popula menu de idiomas
   languages.forEach(lang => {
-    const langBtn = document.createElement('button');
-    langBtn.className = 'lang-option';
-    langBtn.innerHTML = `${lang.flag}`;
-    langBtn.dataset.langCode = lang.code;
-    langBtn.dataset.speakText = lang.speakText;
-    langBtn.title = lang.name;
-    languageMenu.appendChild(langBtn);
+    const btn = document.createElement('button');
+    btn.className = 'lang-option';
+    btn.innerHTML = `${lang.flag}`;
+    btn.dataset.langCode = lang.code;
+    btn.dataset.speakText = lang.speakText;
+    btn.title = lang.name;
+    languageMenu.appendChild(btn);
   });
 
-  // Abre menu ao clicar no botão 🌐
+  // Eventos do menu
   langSelectButton.addEventListener('click', (e) => {
     e.stopPropagation();
     const rect = langSelectButton.getBoundingClientRect();
@@ -112,39 +110,31 @@ window.onload = () => {
     languageMenu.style.left = `${rect.left}px`;
   });
 
-  // Fecha menu ao clicar fora
   document.addEventListener('click', () => {
     languageMenu.style.display = 'none';
   });
 
   // Configura reconhecimento de voz
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-  let recognition = null;
-
   if (SpeechRecognition) {
-    recognition = new SpeechRecognition();
+    const recognition = new SpeechRecognition();
     recognition.continuous = true;
     recognition.interimResults = true;
     recognition.lang = currentLang.code;
 
-    // Mensagem inicial
     textDisplay.textContent = `${currentLang.flag} ${currentLang.speakText}...`;
 
-    // Seleção de idioma
     languageMenu.addEventListener('click', (e) => {
       if (e.target.classList.contains('lang-option')) {
         const langCode = e.target.dataset.langCode;
-        const flag = e.target.textContent;
-        const speakText = e.target.dataset.speakText;
-        const langName = e.target.title;
-        
         currentLang = languages.find(l => l.code === langCode);
+        
         detectedLangBubble.textContent = currentLang.flag;
         detectedLangBubble.title = `Idioma atual: ${currentLang.name}`;
         
         recognition.stop();
         recognition.lang = langCode;
-        textDisplay.textContent = `${flag} ${speakText}...`;
+        textDisplay.textContent = `${currentLang.flag} ${currentLang.speakText}...`;
         
         setTimeout(() => recognition.start(), 300);
         languageMenu.style.display = 'none';
@@ -152,31 +142,21 @@ window.onload = () => {
     });
 
     recognition.onresult = (event) => {
-      let interimTranscript = '';
-      let finalTranscript = '';
-
+      let final = '';
+      let interim = '';
       for (let i = event.resultIndex; i < event.results.length; i++) {
         const transcript = event.results[i][0].transcript;
-        if (event.results[i].isFinal) {
-          finalTranscript += transcript + ' ';
-        } else {
-          interimTranscript += transcript;
-        }
+        event.results[i].isFinal ? (final += transcript + ' ') : (interim += transcript);
       }
-
-      textDisplay.innerHTML = finalTranscript + '<i>' + interimTranscript + '</i>';
+      textDisplay.innerHTML = final + '<i>' + interim + '</i>';
     };
 
     recognition.onerror = (event) => {
       console.error('Erro no reconhecimento:', event.error);
-      textDisplay.style.color = 'black';
     };
 
-    // Inicia reconhecimento
     setTimeout(() => recognition.start(), 1000);
   } else {
     textDisplay.textContent = 'Seu navegador não suporta reconhecimento de voz';
-    textDisplay.style.color = 'black';
-    console.error('API de reconhecimento de voz não suportada');
   }
 };
