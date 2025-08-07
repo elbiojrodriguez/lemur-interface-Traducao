@@ -30,7 +30,7 @@ body {
 /* Vídeo local em PIP com moldura verde */
 .local-pip {
   position: absolute;
-  bottom: calc(80px + 60px);
+  bottom: 40px; /* antes era calc(80px + 60px) = 140px */
   right: 20px;
   width: 34.5%;
   max-width: 138px;
