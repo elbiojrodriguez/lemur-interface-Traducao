@@ -79,10 +79,16 @@ window.onload = () => {
     // Abre o menu ao clicar no 🌐
     langSelectorBtn.addEventListener('click', (e) => {
   e.stopPropagation();
-  const rect = langSelectorBtn.getBoundingClientRect();
   languageMenu.style.display = 'block';
-  languageMenu.style.left = `${rect.left}px`;
-  languageMenu.style.top = `${rect.top - languageMenu.offsetHeight - 10}px`;
+
+  // Aguarda o menu renderizar para pegar a altura correta
+  setTimeout(() => {
+    const rect = langSelectorBtn.getBoundingClientRect();
+    const menuHeight = languageMenu.offsetHeight;
+
+    languageMenu.style.left = `${rect.left}px`;
+    languageMenu.style.top = `${rect.top - menuHeight - 8}px`; // 8px de espaço acima do botão
+  }, 0);
 });
 
     // Fecha o menu ao clicar fora
