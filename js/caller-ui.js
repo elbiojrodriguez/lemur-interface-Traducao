@@ -77,17 +77,16 @@ window.onload = () => {
     });
 
     // Abre o menu ao clicar no 🌐
-    langSelectorBtn.addEventListener('click', (e) => {
+  langSelectorBtn.addEventListener('click', (e) => {
   e.stopPropagation();
   languageMenu.style.display = 'block';
 
-  // Aguarda o menu renderizar para pegar a altura correta
   setTimeout(() => {
     const rect = langSelectorBtn.getBoundingClientRect();
     const menuHeight = languageMenu.offsetHeight;
 
     languageMenu.style.left = `${rect.left}px`;
-    languageMenu.style.top = `${rect.top - menuHeight - 8}px`; // 8px de espaço acima do botão
+    languageMenu.style.top = `${rect.top - menuHeight - 8}px`; // sobe o menu
   }, 0);
 });
 
