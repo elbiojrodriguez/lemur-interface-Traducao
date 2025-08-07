@@ -26,7 +26,7 @@ window.onload = () => {
   textDisplay.style.overflowY = 'auto';
   chatBox.appendChild(textDisplay);
 
-  // Container para os controles de idioma
+  // Container para os controles de idioma - ALTERAÇÃO AQUI
   const langControls = document.createElement('div');
   langControls.style.display = 'flex';
   langControls.style.alignItems = 'center';
@@ -35,7 +35,9 @@ window.onload = () => {
   langControls.style.bottom = '20px';
   langControls.style.right = '20px';
   langControls.style.zIndex = '100';
-  document.querySelector('.controls').appendChild(langControls);
+  
+  // Alteramos esta linha para adicionar no novo container
+  document.querySelector('.language-controls-container').appendChild(langControls);
 
   // Balão do idioma detectado
   const detectedLangBubble = document.createElement('div');
