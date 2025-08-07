@@ -181,4 +181,14 @@ body {
     height: 36px;
     font-size: 18px;
   }
+  .language-menu {
+  position: absolute;
+  z-index: 999;
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  display: none; /* começa oculto */
+}
 }
