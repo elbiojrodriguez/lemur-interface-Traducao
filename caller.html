@@ -53,8 +53,11 @@
     <div class="controls">
       <!-- 🔻 Balões funcionais -->
       <div class="language-bubbles">
-        <button class="lang-btn" data-lang-code="pt-BR" data-speak-text="Fale agora" title="Português">🇧🇷</button>
-        <button class="lang-btn" data-lang-code="es-ES" data-speak-text="Habla ahora" title="Español">🇪🇸</button>
+        <!-- Balão que mostra o idioma atual -->
+        <button id="currentLangBubble" class="lang-btn" title="Idioma atual">🇧🇷</button>
+
+        <!-- Balão seletor de idioma -->
+        <button id="langSelectorBtn" class="lang-btn" title="Selecionar idioma">🌐</button>
       </div>
     </div>
 
