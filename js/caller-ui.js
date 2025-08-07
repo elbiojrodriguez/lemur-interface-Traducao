@@ -71,37 +71,6 @@ window.onload = () => {
     recognition.continuous = true;
     recognition.interimResults = true;
 
-    // Mapeamento de idiomas
-    const languageMap = {
-      '🇬🇧': 'en-US',
-      '🇧🇷': 'pt-BR',
-      '🇪🇸': 'es-ES'
-    };
-
-    // Configura os botões de idioma
-    document.querySelectorAll('.lang-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const langCode = languageMap[btn.textContent];
-        if (langCode) {
-          // Para qualquer reconhecimento em andamento
-          recognition.stop();
-          
-          // Configura o novo idioma
-          recognition.lang = langCode;
-          
-          // Limpa o texto anterior
-          textDisplay.textContent = 'Fale agora...';
-          
-          // Inicia o reconhecimento
-          setTimeout(() => {
-            recognition.start();
-          }, 300);
-          
-          console.log(`Reconhecimento iniciado para ${langCode}`);
-        }
-      });
-    });
-
     recognition.onresult = (event) => {
       let interimTranscript = '';
       let finalTranscript = '';
@@ -132,8 +101,6 @@ window.onload = () => {
 
     recognition.onend = () => {
       console.log('Reconhecimento de voz encerrado');
-      // Pode reiniciar automaticamente se desejar
-      // recognition.start();
     };
   }
 };
