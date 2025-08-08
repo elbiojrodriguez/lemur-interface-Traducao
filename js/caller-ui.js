@@ -237,50 +237,22 @@ if (SpeechRecognition) {
     });
 
     // Manipulação dos resultados do reconhecimento
-let lastFinalTranscript = ''; // Variável NOVA (adicione no início do código, com os outros 'let')
-
-recognition.onresult = (event) => {
-    let interimTranscript = '';
-    let newFinalTranscript = '';
-    
-    // 1. Pega o texto existente (exceto itálico)
-    const existingText = textDisplay.innerHTML.replace(/<i>.*<\/i>/, '').trim();
-    
-    // 2. Processa APENAS novos resultados
-    for (let i = event.resultIndex; i < event.results.length; i++) {
-        let transcript = event.results[i][0].transcript;
+    recognition.onresult = (event) => {
+        let interimTranscript = '';
+        let finalTranscript = '';
         
-        if (event.results[i].isFinal) {
-            // Evita reprocessar o mesmo texto
-            if (!lastFinalTranscript.includes(transcript.trim())) {
-                if (!/[.!?]$/.test(transcript.trim())) {
-                    transcript = transcript.trim() + '. ';
-                }
-                newFinalTranscript += transcript;
-                lastFinalTranscript = newFinalTranscript; // Atualiza o último texto processado
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+            const transcript = event.results[i][0].transcript;
+            if (event.results[i].isFinal) {
+                finalTranscript += transcript + ' ';
+            } else {
+                interimTranscript += transcript;
             }
-        } else {
-            interimTranscript += transcript;
         }
-    }
-    
-    // 3. Atualiza apenas se houver NOVO conteúdo
-    if (newFinalTranscript || interimTranscript) {
-        textDisplay.innerHTML = 
-            (existingText ? existingText + ' ' : '') + 
-            newFinalTranscript + 
-            (interimTranscript ? '<i>' + interimTranscript + '</i>' : '');
-    }
-};
+        
+        textDisplay.innerHTML = finalTranscript + '<i>' + interimTranscript + '</i>';
+    };
 
-// Adicione este bloco para evitar repetições ao pausar
-recognition.onend = () => {
-    if (isListening) {
-        recognition.start(); // Só reativa se o usuário NÃO desligou manualmente
-    } else {
-        lastFinalTranscript = ''; // Reseta ao finalizar
-    }
-};
     // Tratamento de erros
     recognition.onerror = (event) => {
         console.error('Erro no reconhecimento:', event.error);
