@@ -237,36 +237,49 @@ if (SpeechRecognition) {
     });
 
     // Manipulação dos resultados do reconhecimento
-    recognition.onresult = (event) => {
+let lastFinalTranscript = ''; // Variável NOVA (adicione no início do código, com os outros 'let')
+
+recognition.onresult = (event) => {
     let interimTranscript = '';
-    let finalTranscript = '';
+    let newFinalTranscript = '';
     
-    // 1. Pega o texto JÁ EXISTENTE (exceto partes em itálico)
+    // 1. Pega o texto existente (exceto itálico)
     const existingText = textDisplay.innerHTML.replace(/<i>.*<\/i>/, '').trim();
     
-    // 2. Processa novos resultados
+    // 2. Processa APENAS novos resultados
     for (let i = event.resultIndex; i < event.results.length; i++) {
         let transcript = event.results[i][0].transcript;
         
-        // Se for trecho FINAL (com pausa)
         if (event.results[i].isFinal) {
-            // Mantém pontuações existentes ou adiciona ponto padrão
-            if (!/[.!?]$/.test(transcript.trim())) {
-                transcript = transcript.trim() + '. ';
+            // Evita reprocessar o mesmo texto
+            if (!lastFinalTranscript.includes(transcript.trim())) {
+                if (!/[.!?]$/.test(transcript.trim())) {
+                    transcript = transcript.trim() + '. ';
+                }
+                newFinalTranscript += transcript;
+                lastFinalTranscript = newFinalTranscript; // Atualiza o último texto processado
             }
-            finalTranscript += transcript;
-        } 
-        // Trecho INTERMEDIÁRIO (sem pausa)
-        else {
+        } else {
             interimTranscript += transcript;
         }
     }
     
-    // 3. Combina TUDO: texto existente + novo final + intermediário em itálico
-    textDisplay.innerHTML = 
-        (existingText ? existingText + ' ' : '') + 
-        finalTranscript + 
-        (interimTranscript ? '<i>' + interimTranscript + '</i>' : '');
+    // 3. Atualiza apenas se houver NOVO conteúdo
+    if (newFinalTranscript || interimTranscript) {
+        textDisplay.innerHTML = 
+            (existingText ? existingText + ' ' : '') + 
+            newFinalTranscript + 
+            (interimTranscript ? '<i>' + interimTranscript + '</i>' : '');
+    }
+};
+
+// Adicione este bloco para evitar repetições ao pausar
+recognition.onend = () => {
+    if (isListening) {
+        recognition.start(); // Só reativa se o usuário NÃO desligou manualmente
+    } else {
+        lastFinalTranscript = ''; // Reseta ao finalizar
+    }
 };
     // Tratamento de erros
     recognition.onerror = (event) => {
