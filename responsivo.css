@@ -39,7 +39,7 @@ body {
 .video-wrapper:nth-child(2) { 
 position: absolute; 
 bottom: calc(80px + 60px); 
-right: 20px; 
+right: 15px; 
 width: 34.5%; 
 max-width: 138px; 
 height: 184px; 
