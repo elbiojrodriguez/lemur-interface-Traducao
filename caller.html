@@ -1,80 +1,33 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Chamada WebRTC</title>
-  <style>
-    body {
-      margin: 0;
-      padding: 1rem;
-      font-family: sans-serif;
-      background-color: #f9f9f9;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-
-    h1 {
-      font-size: 1.5rem;
-      margin-bottom: 0.5rem;
-      text-align: center;
-    }
-
-    #myId {
-      font-weight: bold;
-      color: #333;
-      margin-bottom: 1rem;
-    }
-
-    video {
-      width: 100%;
-      max-width: 400px;
-      margin: 0.5rem 0;
-      border-radius: 10px;
-      border: 1px solid #ccc;
-    }
-
-    .btn-container {
-      width: 100%;
-      display: flex;
-      justify-content: center;
-      margin-top: 1rem;
-    }
-
-    #callActionBtn {
-      padding: 0.75rem 1.5rem;
-      font-size: 1rem;
-      background-color: #28a745;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      display: none;
-      transition: background-color 0.3s ease;
-      width: 100%;
-      max-width: 300px;
-    }
-
-    #callActionBtn:hover {
-      background-color: #218838;
-    }
-  </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Caller - Videochamada Mobile</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="responsivo.css" />
 </head>
 <body>
+  <div class="container">
+    <div class="video-wrapper">
+      <video id="remoteVideo" autoplay playsinline></video>
+    </div>
 
-  <h1>Chamada WebRTC</h1>
-  <p>Seu ID: <span id="myId">...</span></p>
+    <div class="video-wrapper">
+      <video id="localVideo" autoplay muted playsinline></video>
+    </div>
 
-  <!-- ⚠️ Ordem fiel ao seu código: câmera local aparece em remoteVideo -->
-  <video id="remoteVideo" autoplay playsinline></video>
-  <video id="localVideo" autoplay muted playsinline></video>
+    <div class="controls">
+      <!-- 🔵 Botão de scanner removido -->
+      <button id="callActionBtn" style="display:none;">Call</button>
+    </div>
 
-  <div class="btn-container">
-    <button id="callActionBtn">📞 Iniciar Chamada</button>
+    <div class="info-overlay" style="display: none;">
+      <span id="myId"></span>
+    </div>
   </div>
 
-  <script type="module" src="./main.js"></script>
-
+  <script src="https://lemur-signal.onrender.com/socket.io/socket.io.js"></script>
+  <script type="module" src="js/caller-ui.js"></script>
 </body>
 </html>
