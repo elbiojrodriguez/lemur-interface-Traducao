@@ -318,7 +318,7 @@ function getErrorMessage(langCode) {
     return messages[langCode] || messages['en-US'];
 }
 // #############################################
-// 🆕 TÓPICO 11: Versão final (anti-eco, sem alterar o original)
+// 🆕 TÓPICO 11: Versão corrigida (anti-eco sem conflito)
 // #############################################
 
 // A. Botão Stop (mesmo estilo)
@@ -337,9 +337,9 @@ chatBox.insertBefore(stopButton, textDisplay.nextSibling);
 // B. Variáveis de estado
 let accumulatedText = '';
 let isFirstPhrase = true;
-let lastFinalText = ''; // Armazena o último texto final para comparação
+let lastFinalText = '';
 
-// C. Pontuação (original)
+// C. Pontuação
 const addPunctuation = (text) => {
   const trimmed = text.trim();
   if (!trimmed.endsWith('.') && !trimmed.endsWith('!') && !trimmed.endsWith('?')) {
@@ -348,50 +348,39 @@ const addPunctuation = (text) => {
   return trimmed + ' ';
 };
 
-// D. Filtro anti-eco (nova função)
-const isDuplicate = (newText) => {
-  if (!lastFinalText) return false;
-  // Verifica se o novo texto já existe no acumulado (ignorando maiúsculas e espaços)
-  return accumulatedText.toLowerCase().includes(newText.toLowerCase().trim());
+// D. Filtro anti-eco (executado APÓS o onresult original)
+const processFinalText = (text) => {
+  const processedText = addPunctuation(text);
+  
+  if (!lastFinalText || !accumulatedText.toLowerCase().includes(processedText.toLowerCase().trim())) {
+    accumulatedText += processedText;
+    lastFinalText = processedText.trim();
+    return true;
+  }
+  return false;
 };
 
-// E. onresult (original envolto em filtro)
-const originalOnResult = recognition.onresult;
-recognition.onresult = (event) => {
-  let interimTranscript = '';
+// E. Listener adicional para o evento result (NÃO substitui o original)
+recognition.addEventListener('result', (event) => {
   let finalTranscript = '';
-
-  // Processamento original (igual ao seu código)
+  
   for (let i = event.resultIndex; i < event.results.length; i++) {
-    const transcript = event.results[i][0].transcript;
     if (event.results[i].isFinal) {
-      finalTranscript += transcript;
-    } else {
-      interimTranscript += transcript;
+      finalTranscript += event.results[i][0].transcript;
     }
   }
 
-  // Lógica original de primeira frase
-  if (isFirstPhrase && (finalTranscript || interimTranscript)) {
-    accumulatedText = '';
-    isFirstPhrase = false;
-    stopButton.style.display = 'block';
-  }
-
-  // Acumulação com verificação de eco
   if (finalTranscript) {
-    const processedText = addPunctuation(finalTranscript);
-    if (!isDuplicate(processedText)) { // Só acumula se não for repetido
-      accumulatedText += processedText;
-      lastFinalText = processedText.trim(); // Atualiza o último texto válido
+    if (isFirstPhrase) {
+      accumulatedText = '';
+      isFirstPhrase = false;
+      stopButton.style.display = 'block';
     }
+    processFinalText(finalTranscript);
   }
+});
 
-  // Exibição (original)
-  textDisplay.innerHTML = accumulatedText + (interimTranscript ? `<i>${interimTranscript}</i>` : '');
-};
-
-// F. Botão Stop (original + reset do filtro)
+// F. Botão Stop
 stopButton.onclick = () => {
   recognition.stop();
   isListening = false;
@@ -400,12 +389,11 @@ stopButton.onclick = () => {
   lastFinalText = '';
 };
 
-// G. Reset ao mudar idioma (original + reset do filtro)
+// G. Reset ao mudar idioma
 const originalLangMenuClick = languageMenu.onclick;
 languageMenu.onclick = (e) => {
   if (originalLangMenuClick) originalLangMenuClick(e);
   accumulatedText = '';
   isFirstPhrase = true;
   lastFinalText = '';
-};
 };
