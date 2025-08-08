@@ -68,7 +68,7 @@ window.onload = () => {
     langControls.style.bottom = '80px';       // 20px do fundo (ajuste conforme necessário)
     langControls.style.left = '50%';          // Base do alinhamento central
     langControls.style.transform = 'translateX(-50%)'; // Ajuste preciso do centro
-    langControls.style.marginLeft = '-40px';    // Padrão (centralizado). Ajuste para mover:
+    langControls.style.marginLeft = '-80px';    // Padrão (centralizado). Ajuste para mover:
                                          // Valores positivos → Direita | Negativos → Esquerda
    langControls.style.zIndex = '100';
    langControls.style.display = 'flex';
@@ -91,16 +91,24 @@ window.onload = () => {
     detectedLangBubble.style.fontSize = '24px';
     langControls.appendChild(detectedLangBubble);
 
-    // 4. Botão de seleção de idiomas (🌐)
-    const langSelectButton = document.createElement('button');
-    langSelectButton.className = 'lang-select-btn';
-    langSelectButton.textContent = '🌐';
-    langSelectButton.title = 'Selecionar idioma';
-    langSelectButton.style.background = 'none';
-    langSelectButton.style.border = 'none';
-    langSelectButton.style.cursor = 'pointer';
-    langSelectButton.style.fontSize = '40px';
-    langControls.appendChild(langSelectButton);
+    // 4. Botão de seleção de idiomas (🌐) - PADRÃO IGUAL AO BALÃO
+const langSelectButton = document.createElement('button');
+langSelectButton.className = 'lang-select-btn';
+langSelectButton.textContent = '🌐';
+langSelectButton.title = 'Selecionar idioma';
+// ESTILOS IDÊNTICOS AO BALÃO DE BANDEIRA:
+langSelectButton.style.display = 'flex';
+langSelectButton.style.alignItems = 'center';
+langSelectButton.style.justifyContent = 'center';
+langSelectButton.style.width = '50px'; // Mesmo tamanho
+langSelectButton.style.height = '50px'; // que o balão
+langSelectButton.style.backgroundColor = 'white'; // Fundo branco
+langSelectButton.style.borderRadius = '50%'; // Borda redonda
+langSelectButton.style.boxShadow = '0 2px 5px rgba(0,0,0,0.2)'; // Sombra suave
+langSelectButton.style.border = 'none'; // Remove borda padrão do botão
+langSelectButton.style.cursor = 'pointer';
+langSelectButton.style.fontSize = '24px'; // Reduzi de 40px para 24px (igual ao balão)
+langControls.appendChild(langSelectButton);
 
     // 5. Menu de idiomas (mesmo código original)
     const languageMenu = document.createElement('div');
@@ -161,7 +169,7 @@ window.onload = () => {
         languageMenu.appendChild(langBtn);
     });
 
-    // 9. Controle do menu (original inalterado)
+        // 9. Controle do menu (ATUALIZADO - apenas botão 🌐 abre o menu)
     langSelectButton.addEventListener('click', (e) => {
         e.stopPropagation();
         const rect = langSelectButton.getBoundingClientRect();
@@ -170,12 +178,8 @@ window.onload = () => {
         languageMenu.style.left = `${rect.left}px`;
     });
 
-    detectedLangBubble.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const rect = detectedLangBubble.getBoundingClientRect();
-        languageMenu.style.display = 'block';
-        languageMenu.style.top = `${rect.top - languageMenu.offsetHeight - 10}px`;
-        languageMenu.style.left = `${rect.left}px`;
+    document.addEventListener('click', () => {
+        languageMenu.style.display = 'none';
     });
 
     document.addEventListener('click', () => {
