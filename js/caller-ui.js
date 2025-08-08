@@ -68,7 +68,7 @@ window.onload = () => {
 langControls.style.bottom = '20px';       // 20px do fundo (ajuste conforme necessário)
 langControls.style.left = '50%';          // Base do alinhamento central
 langControls.style.transform = 'translateX(-50%)'; // Ajuste preciso do centro
-langControls.style.marginLeft = '0px';    // Padrão (centralizado). Ajuste para mover:
+langControls.style.marginLeft = '120px';    // Padrão (centralizado). Ajuste para mover:
                                          // Valores positivos → Direita | Negativos → Esquerda
 langControls.style.zIndex = '100';
 langControls.style.display = 'flex';
