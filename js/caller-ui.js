@@ -75,14 +75,17 @@ window.onload = () => {
 
     // 3. Balão do idioma detectado (mesmo estilo original)
     const detectedLangBubble = document.createElement('div');
-    langControls.style.position = 'fixed';
-langControls.style.bottom = '20px';       // Mantém 20px do fundo
-langControls.style.left = '50%';          // Centraliza horizontalmente
-langControls.style.transform = 'translateX(-50%)'; // Ajusta o centro real
-langControls.style.zIndex = '100';
-langControls.style.display = 'flex';
-langControls.style.alignItems = 'center';
-langControls.style.gap = '10px';
+    detectedLangBubble.className = 'lang-bubble';
+    detectedLangBubble.style.display = 'flex';
+    detectedLangBubble.style.alignItems = 'center';
+    detectedLangBubble.style.justifyContent = 'center';
+    detectedLangBubble.style.width = '50px';
+    detectedLangBubble.style.height = '50px';
+    detectedLangBubble.style.backgroundColor = 'white';
+    detectedLangBubble.style.borderRadius = '50%';
+    detectedLangBubble.style.boxShadow = '0 2px 5px rgba(0,0,0,0.2)';
+    detectedLangBubble.style.cursor = 'pointer';
+    detectedLangBubble.style.fontSize = '24px';
     langControls.appendChild(detectedLangBubble);
 
     // 4. Botão de seleção de idiomas (🌐)
