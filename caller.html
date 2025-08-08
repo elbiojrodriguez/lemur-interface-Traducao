@@ -1,80 +1,84 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Caller - Videochamada Mobile</title>
-    <link rel="stylesheet" href="style.css" />
-    <link rel="stylesheet" href="responsivo.css" />
-    <style>
-        /* 🔵 Estilo do box azul (mantido) */
-        .chat-input-box {
-            position: absolute;
-            bottom: 350px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 80%;
-            height: 200px;
-            border: 2px solid #007BFF;
-            border-radius: 12px;
-            background-color: rgba(255, 255, 255, 0.1);
-            z-index: 20;
-        }
-    </style>
-    
-    <script>
-  // Cria o grid com rótulos
-  function createGrid() {
-    const overlay = document.createElement('div');
-    overlay.className = 'grid-overlay';
-    document.body.appendChild(overlay);
-
-    // Adiciona letras das colunas (A a Z)
-    for (let i = 0; i < 26; i++) {
-      const col = document.createElement('div');
-      col.className = 'col-label';
-      col.style.left = `${i * 50}px`;
-      col.textContent = String.fromCharCode(65 + i); // A=65, B=66...
-      overlay.appendChild(col);
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chamada WebRTC</title>
+  <style>
+    :root {
+      --btn-color: #28a745;
+      --btn-hover: #218838;
     }
 
-    // Adiciona números das linhas (1 a 20)
-    for (let j = 0; j < 20; j++) {
-      const row = document.createElement('div');
-      row.className = 'row-label';
-      row.style.top = `${j * 50}px`;
-      row.textContent = j + 1;
-      overlay.appendChild(row);
+    body {
+      margin: 0;
+      padding: 1rem;
+      font-family: sans-serif;
+      background-color: #f9f9f9;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
-  }
 
-  window.onload = createGrid;
-</script>
-    </head>
+    h1 {
+      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
+      text-align: center;
+    }
+
+    #myId {
+      font-weight: bold;
+      color: #333;
+      margin-bottom: 1rem;
+    }
+
+    video {
+      width: 100%;
+      max-width: 400px;
+      margin: 0.5rem 0;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+    }
+
+    .btn-container {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      margin-top: 1rem;
+    }
+
+    #callActionBtn {
+      padding: 0.75rem 1.5rem;
+      font-size: 1rem;
+      background-color: var(--btn-color);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      display: none;
+      transition: background-color 0.3s ease;
+      width: 100%;
+      max-width: 300px;
+    }
+
+    #callActionBtn:hover {
+      background-color: var(--btn-hover);
+    }
+  </style>
+</head>
 <body>
-    <!-- 🔹 Box azul centralizado (mantido) -->
-    <div class="chat-input-box"></div>
-    
-    <div class="container">
-        <div class="video-wrapper">
-            <video id="remoteVideo" autoplay playsinline></video>
-        </div>
-        <div class="video-wrapper">
-            <video id="localVideo" autoplay muted playsinline></video>
-        </div>
-        
-        <!-- 🔻 Controles (agora vazios, sem os balões estáticos) -->
-        <div class="controls">
-            <!-- Botão de call (opcional, mantido) -->
-            <button id="callActionBtn" style="display:none; margin: 0 10px;">Call</button>
-        </div>
-        
-        <div class="info-overlay" style="display: none;">
-            <span id="myId"></span>
-        </div>
-    </div>
 
-    <script src="https://lemur-signal.onrender.com/socket.io/socket.io.js"></script>
-    <script type="module" src="js/caller-ui.js"></script>
+  <h1>Chamada WebRTC</h1>
+  <p>Seu ID: <span id="myId">...</span></p>
+
+  <video id="localVideo" autoplay muted playsinline></video>
+  <video id="remoteVideo" autoplay playsinline></video>
+
+  <div class="btn-container">
+    <button id="callActionBtn">📞 Iniciar Chamada</button>
+  </div>
+
+  <script type="module" src="./main.js"></script>
+
 </body>
 </html>
