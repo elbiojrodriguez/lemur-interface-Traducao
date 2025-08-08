@@ -317,14 +317,14 @@ function getErrorMessage(langCode) {
     };
     return messages[langCode] || messages['en-US'];
 }
-  // #############################################
-// 🆕 TÓPICO 11: Melhorias de transcrição (acumulação, pontuação e controle)
+ // #############################################
+// 🆕 TÓPICO 11: Versão final (anti-eco, sem alterar o original)
 // #############################################
 
-// A. Configuração do botão "Stop" dentro do chatBox
+// A. Botão Stop (mesmo estilo)
 const stopButton = document.createElement('button');
 stopButton.textContent = '⏹️ Stop';
-stopButton.style.display = 'none'; // Inicialmente oculto
+stopButton.style.display = 'none';
 stopButton.style.margin = '10px auto';
 stopButton.style.padding = '8px 16px';
 stopButton.style.backgroundColor = '#ff4444';
@@ -334,63 +334,78 @@ stopButton.style.borderRadius = '20px';
 stopButton.style.cursor = 'pointer';
 chatBox.insertBefore(stopButton, textDisplay.nextSibling);
 
-// B. Variáveis para controle do texto
+// B. Variáveis de estado
 let accumulatedText = '';
 let isFirstPhrase = true;
+let lastFinalText = ''; // Armazena o último texto final para comparação
 
-// C. Função para adicionar pontuação
+// C. Pontuação (original)
 const addPunctuation = (text) => {
-  if (!text.trim().endsWith('.') && !text.trim().endsWith('!') && !text.trim().endsWith('?')) {
-    return text + '. ';
+  const trimmed = text.trim();
+  if (!trimmed.endsWith('.') && !trimmed.endsWith('!') && !trimmed.endsWith('?')) {
+    return trimmed + '. ';
   }
-  return text + ' ';
+  return trimmed + ' ';
 };
 
-// D. Atualização do onresult (com tratamento de repetição)
+// D. Filtro anti-eco (nova função)
+const isDuplicate = (newText) => {
+  if (!lastFinalText) return false;
+  // Verifica se o novo texto já existe no acumulado (ignorando maiúsculas e espaços)
+  return accumulatedText.toLowerCase().includes(newText.toLowerCase().trim());
+};
+
+// E. onresult (original envolto em filtro)
 const originalOnResult = recognition.onresult;
 recognition.onresult = (event) => {
   let interimTranscript = '';
   let finalTranscript = '';
-  let hasNewFinalResult = false; // 🔴 Flag para controlar repetições
 
+  // Processamento original (igual ao seu código)
   for (let i = event.resultIndex; i < event.results.length; i++) {
+    const transcript = event.results[i][0].transcript;
     if (event.results[i].isFinal) {
-      finalTranscript += event.results[i][0].transcript;
-      hasNewFinalResult = true; // 🟢 Só processa se for novo resultado
+      finalTranscript += transcript;
     } else {
-      interimTranscript += event.results[i][0].transcript;
+      interimTranscript += transcript;
     }
   }
 
-  // Remove mensagem inicial na primeira frase detectada
+  // Lógica original de primeira frase
   if (isFirstPhrase && (finalTranscript || interimTranscript)) {
     accumulatedText = '';
     isFirstPhrase = false;
     stopButton.style.display = 'block';
   }
 
-  // 🔴 Evita acumular texto repetido
-  if (hasNewFinalResult && finalTranscript) {
-    accumulatedText += addPunctuation(finalTranscript);
+  // Acumulação com verificação de eco
+  if (finalTranscript) {
+    const processedText = addPunctuation(finalTranscript);
+    if (!isDuplicate(processedText)) { // Só acumula se não for repetido
+      accumulatedText += processedText;
+      lastFinalText = processedText.trim(); // Atualiza o último texto válido
+    }
   }
 
-  // Exibe texto acumulado + interim (sem repetições)
+  // Exibição (original)
   textDisplay.innerHTML = accumulatedText + (interimTranscript ? `<i>${interimTranscript}</i>` : '');
 };
 
-// E. Controle do botão Stop
+// F. Botão Stop (original + reset do filtro)
 stopButton.onclick = () => {
   recognition.stop();
   isListening = false;
   stopButton.style.display = 'none';
-  isFirstPhrase = true; // Reseta para próxima vez
+  isFirstPhrase = true;
+  lastFinalText = '';
 };
 
-// F. Reseta acumulação quando muda idioma
+// G. Reset ao mudar idioma (original + reset do filtro)
 const originalLangMenuClick = languageMenu.onclick;
 languageMenu.onclick = (e) => {
   if (originalLangMenuClick) originalLangMenuClick(e);
   accumulatedText = '';
   isFirstPhrase = true;
+  lastFinalText = '';
 };
 };
