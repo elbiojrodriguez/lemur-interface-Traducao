@@ -34,7 +34,14 @@ body {
   height: 100%;
   object-fit: cover;
 }
-
+.phrase-box {
+  margin: 4px 0;
+  padding: 0;
+  font-size: 18px;
+  color: #000;
+  background: transparent;
+  border: none;
+}
 /* Vídeo local em PIP */
 .video-wrapper:nth-child(2) { 
 position: absolute; 
