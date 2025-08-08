@@ -1,4 +1,4 @@
-/* 🔄 Reset geral para mobile */
+/* Reset mobile */
 * {
   margin: 0;
   padding: 0;
@@ -30,7 +30,7 @@ body {
 /* Vídeo local em PIP com moldura verde */
 .local-pip {
   position: absolute;
-  bottom: 40px; /* antes era calc(80px + 60px) = 140px */
+  bottom: calc(80px + 60px);
   right: 20px;
   width: 34.5%;
   max-width: 138px;
@@ -53,7 +53,7 @@ body {
 /* Controles principais: botão verde */
 .controls {
   position: absolute;
-  bottom: calc(80px + 60px);
+  bottom: 40px; /* antes era calc(80px + 60px) = 140px */
   left: 20px;
   display: flex;
   flex-direction: column;
@@ -182,4 +182,3 @@ body {
     font-size: 18px;
   }
 }
-
