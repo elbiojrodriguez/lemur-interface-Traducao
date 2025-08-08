@@ -40,10 +40,8 @@ window.onload = () => {
   });
 
   const chatBox = document.getElementById('chatBox');
-  let stopRequested = false;
-  let recognition = null;
 
-  // Language buttons
+  // 🔻 Botões de bandeiras
   const langButtons = document.querySelectorAll('.lang-btn');
   langButtons.forEach(button => {
     button.onclick = () => {
@@ -52,14 +50,14 @@ window.onload = () => {
     };
   });
 
-  // Language selector
+  // 🔻 Seletor completo
   const languageSelector = document.getElementById('languageSelector');
   languageSelector.onchange = () => {
     const selectedLang = languageSelector.value;
     startSpeechRecognition(selectedLang);
   };
 
-  // Auto-detect language button
+  // 🔻 Botão automático com idioma do dispositivo
   const userLang = navigator.language || 'en-US';
   const flagMap = {
     'pt-BR': '🇧🇷',
@@ -82,83 +80,35 @@ window.onload = () => {
   autoBtn.onclick = () => startSpeechRecognition(userLang);
   document.getElementById('autoLangContainer').appendChild(autoBtn);
 
-  // Stop button
-  const stopBtn = document.getElementById('stopBtn');
-  stopBtn.onclick = () => {
-    stopRequested = true;
-    if (recognition) recognition.stop();
-  };
-
-  // Optimized speech recognition function for Android/Chrome
+  // 🔻 Função de reconhecimento de voz
   function startSpeechRecognition(language) {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) {
-      chatBox.textContent = "Reconhecimento não suportado";
+      chatBox.textContent = "Reconhecimento de voz não suportado neste navegador.";
       return;
     }
 
-    // Mobile-optimized configuration
-    recognition = new SpeechRecognition();
+    const recognition = new SpeechRecognition();
     recognition.lang = language;
     recognition.interimResults = true;
-    recognition.continuous = true;
-    recognition.maxAlternatives = 1; // Critical for Android!
+    recognition.continuous = false;
 
-    // State variables
-    let finalTranscript = '';
-    let lastStableResult = '';
-    let isFinalizing = false;
-    let androidDebounce = null;
-
-    stopRequested = false;
     chatBox.textContent = `🎤 Ouvindo (${language})...`;
 
     recognition.onresult = (event) => {
-      clearTimeout(androidDebounce);
-      
-      let interim = '';
-      let newFinal = '';
-
-      // Process all results
-      for (let i = event.resultIndex; i < event.results.length; i++) {
-        const result = event.results[i];
-        if (result.isFinal) {
-          newFinal += result[0].transcript.trim();
-          isFinalizing = true;
-        } else if (!isFinalizing) {
-          interim = result[0].transcript.trim();
-        }
+      let transcript = '';
+      for (let i = event.resultIndex; i < event.results.length; ++i) {
+        transcript += event.results[i][0].transcript;
       }
-
-      // Android-specific logic
-      androidDebounce = setTimeout(() => {
-        if (newFinal) {
-          // Only update if different from last stable result
-          if (newFinal !== lastStableResult) {
-            finalTranscript += newFinal + '\n🔄\n';
-            lastStableResult = newFinal;
-            chatBox.textContent = finalTranscript;
-          }
-          isFinalizing = false;
-        } else if (interim) {
-          // Interim update only occurs after 1s without finals
-          chatBox.textContent = finalTranscript + '🔄 ' + interim;
-        }
-      }, isFinalizing ? 0 : 1000); // Longer delay for interim results
+      chatBox.textContent = transcript;
     };
 
     recognition.onerror = (event) => {
-      if (event.error !== 'no-speech') { // Ignore silence errors
-        chatBox.textContent += `\n[ERRO: ${event.error}]`;
-      }
+      chatBox.textContent = "Erro: " + event.error;
     };
 
     recognition.onend = () => {
-      if (!stopRequested) {
-        recognition.start(); // Auto-restart
-      } else {
-        chatBox.textContent += "\n🛑 Fala encerrada manualmente.";
-      }
+      chatBox.textContent += "\n✅ Fala encerrada.";
     };
 
     recognition.start();
