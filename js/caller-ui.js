@@ -92,62 +92,66 @@ window.onload = () => {
   };
 
   // 🔻 Função de reconhecimento de voz (ATUALIZADA)
-  function startSpeechRecognition(language) {
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SpeechRecognition) {
-      chatBox.textContent = "Reconhecimento de voz não suportado neste navegador.";
-      return;
+function startSpeechRecognition(language) {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRecognition) {
+    chatBox.textContent = "Reconhecimento não suportado";
+    return;
+  }
+
+  // Configuração mobile-otimizada
+  recognition = new SpeechRecognition();
+  recognition.lang = language;
+  recognition.interimResults = true;
+  recognition.continuous = true;
+  recognition.maxAlternatives = 1; // Critical para Android!
+
+  // Variáveis de estado
+  let finalTranscript = '';
+  let lastStableResult = '';
+  let isFinalizing = false;
+  let androidDebounce = null;
+
+  recognition.onresult = (event) => {
+    clearTimeout(androidDebounce);
+    
+    let interim = '';
+    let newFinal = '';
+
+    // Processa todos os resultados
+    for (let i = event.resultIndex; i < event.results.length; i++) {
+      const result = event.results[i];
+      if (result.isFinal) {
+        newFinal += result[0].transcript.trim();
+        isFinalizing = true;
+      } else if (!isFinalizing) {
+        interim = result[0].transcript.trim();
+      }
     }
 
-    recognition = new SpeechRecognition();
-    recognition.lang = language;
-    recognition.interimResults = true;
-    recognition.continuous = true;
-    recognition.maxAlternatives = 1; // Adicionado para mobile
-
-    stopRequested = false;
-    let finalTranscript = '';
-    lastFinalTranscript = ''; // Reset ao iniciar
-    chatBox.textContent = `🎤 Ouvindo (${language})...`;
-
-    recognition.onresult = (event) => {
-      clearTimeout(debounceTimer); // Limpa o timer anterior
-      
-      let interimTranscript = '';
-      for (let i = event.resultIndex; i < event.results.length; ++i) {
-        const result = event.results[i];
-        const transcript = result[0].transcript.trim();
-
-        if (result.isFinal) {
-          // Filtra frases repetidas (especialmente no Android)
-          if (transcript && transcript !== lastFinalTranscript) {
-            finalTranscript += transcript + '\n🔄\n';
-            lastFinalTranscript = transcript;
-          }
-        } else {
-          interimTranscript = transcript;
+    // Lógica específica para Android
+    androidDebounce = setTimeout(() => {
+      if (newFinal) {
+        // Só atualiza se for diferente do último resultado estável
+        if (newFinal !== lastStableResult) {
+          finalTranscript += newFinal + '\n🔄\n';
+          lastStableResult = newFinal;
+          chatBox.textContent = finalTranscript;
         }
+        isFinalizing = false;
+      } else if (interim) {
+        // Atualização intermediária só ocorre após 1s sem finais
+        chatBox.textContent = finalTranscript + '🔄 ' + interim;
       }
+    }, isFinalizing ? 0 : 1000); // Delay maior para interims
+  };
 
-      // Debounce para evitar atualizações rápidas no mobile
-      debounceTimer = setTimeout(() => {
-        chatBox.textContent = finalTranscript + (interimTranscript ? '🔄 ' + interimTranscript : '');
-      }, 300);
-    };
+  recognition.onerror = (event) => {
+    if (event.error !== 'no-speech') { // Ignora erros de silêncio
+      chatBox.textContent += `\n[ERRO: ${event.error}]`;
+    }
+  };
 
-    recognition.onerror = (event) => {
-      chatBox.textContent += "\n❌ Erro: " + event.error;
-      console.error('Erro no reconhecimento:', event.error);
-    };
-
-    recognition.onend = () => {
-      if (!stopRequested) {
-        recognition.start(); // reinicia automaticamente
-      } else {
-        chatBox.textContent += "\n🛑 Fala encerrada manualmente.";
-      }
-    };
-
-    recognition.start();
-  }
-};
+  recognition.onend = () => !stopRequested && recognition.start();
+  recognition.start();
+}
