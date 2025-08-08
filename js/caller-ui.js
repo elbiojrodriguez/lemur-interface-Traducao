@@ -42,8 +42,9 @@ window.onload = () => {
   const chatBox = document.getElementById('chatBox');
   let stopRequested = false;
   let recognition = null;
-  let lastFinalTranscript = '';
-  let debounceTimer;
+  let lastStableResult = '';
+  let isFinalizing = false;
+  let androidDebounce = null;
 
   // 🔻 Botões de bandeiras
   const langButtons = document.querySelectorAll('.lang-btn');
@@ -92,66 +93,68 @@ window.onload = () => {
   };
 
   // 🔻 Função de reconhecimento de voz (ATUALIZADA)
-function startSpeechRecognition(language) {
-  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SpeechRecognition) {
-    chatBox.textContent = "Reconhecimento não suportado";
-    return;
-  }
-
-  // Configuração mobile-otimizada
-  recognition = new SpeechRecognition();
-  recognition.lang = language;
-  recognition.interimResults = true;
-  recognition.continuous = true;
-  recognition.maxAlternatives = 1; // Critical para Android!
-
-  // Variáveis de estado
-  let finalTranscript = '';
-  let lastStableResult = '';
-  let isFinalizing = false;
-  let androidDebounce = null;
-
-  recognition.onresult = (event) => {
-    clearTimeout(androidDebounce);
-    
-    let interim = '';
-    let newFinal = '';
-
-    // Processa todos os resultados
-    for (let i = event.resultIndex; i < event.results.length; i++) {
-      const result = event.results[i];
-      if (result.isFinal) {
-        newFinal += result[0].transcript.trim();
-        isFinalizing = true;
-      } else if (!isFinalizing) {
-        interim = result[0].transcript.trim();
-      }
+  function startSpeechRecognition(language) {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      chatBox.textContent = "Reconhecimento não suportado";
+      return;
     }
 
-    // Lógica específica para Android
-    androidDebounce = setTimeout(() => {
-      if (newFinal) {
-        // Só atualiza se for diferente do último resultado estável
-        if (newFinal !== lastStableResult) {
-          finalTranscript += newFinal + '\n🔄\n';
-          lastStableResult = newFinal;
-          chatBox.textContent = finalTranscript;
+    // Configuração mobile-otimizada
+    recognition = new SpeechRecognition();
+    recognition.lang = language;
+    recognition.interimResults = true;
+    recognition.continuous = true;
+    recognition.maxAlternatives = 1; // Critical para Android!
+
+    // Variáveis de estado
+    let finalTranscript = '';
+    lastStableResult = '';
+    isFinalizing = false;
+    stopRequested = false;
+    chatBox.textContent = `🎤 Ouvindo (${language})...`;
+
+    recognition.onresult = (event) => {
+      clearTimeout(androidDebounce);
+      
+      let interim = '';
+      let newFinal = '';
+
+      // Processa todos os resultados
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        const result = event.results[i];
+        if (result.isFinal) {
+          newFinal += result[0].transcript.trim();
+          isFinalizing = true;
+        } else if (!isFinalizing) {
+          interim = result[0].transcript.trim();
         }
-        isFinalizing = false;
-      } else if (interim) {
-        // Atualização intermediária só ocorre após 1s sem finais
-        chatBox.textContent = finalTranscript + '🔄 ' + interim;
       }
-    }, isFinalizing ? 0 : 1000); // Delay maior para interims
-  };
 
-  recognition.onerror = (event) => {
-    if (event.error !== 'no-speech') { // Ignora erros de silêncio
-      chatBox.textContent += `\n[ERRO: ${event.error}]`;
-    }
-  };
+      // Lógica específica para Android
+      androidDebounce = setTimeout(() => {
+        if (newFinal) {
+          // Só atualiza se for diferente do último resultado estável
+          if (newFinal !== lastStableResult) {
+            finalTranscript += newFinal + '\n🔄\n';
+            lastStableResult = newFinal;
+            chatBox.textContent = finalTranscript;
+          }
+          isFinalizing = false;
+        } else if (interim) {
+          // Atualização intermediária só ocorre após 1s sem finais
+          chatBox.textContent = finalTranscript + '🔄 ' + interim;
+        }
+      }, isFinalizing ? 0 : 1000); // Delay maior para interims
+    };
 
-  recognition.onend = () => !stopRequested && recognition.start();
-  recognition.start();
-}
+    recognition.onerror = (event) => {
+      if (event.error !== 'no-speech') { // Ignora erros de silêncio
+        chatBox.textContent += `\n[ERRO: ${event.error}]`;
+      }
+    };
+
+    recognition.onend = () => !stopRequested && recognition.start();
+    recognition.start();
+  }
+};
