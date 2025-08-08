@@ -40,6 +40,8 @@ window.onload = () => {
   });
 
   const chatBox = document.getElementById('chatBox');
+  let stopRequested = false;
+  let recognition = null;
 
   // 🔻 Botões de bandeiras
   const langButtons = document.querySelectorAll('.lang-btn');
@@ -50,7 +52,7 @@ window.onload = () => {
     };
   });
 
-  // 🔻 Seletor completo
+  // 🔻 Seletor de idioma
   const languageSelector = document.getElementById('languageSelector');
   languageSelector.onchange = () => {
     const selectedLang = languageSelector.value;
@@ -80,6 +82,13 @@ window.onload = () => {
   autoBtn.onclick = () => startSpeechRecognition(userLang);
   document.getElementById('autoLangContainer').appendChild(autoBtn);
 
+  // 🔻 Botão de parar
+  const stopBtn = document.getElementById('stopBtn');
+  stopBtn.onclick = () => {
+    stopRequested = true;
+    if (recognition) recognition.stop();
+  };
+
   // 🔻 Função de reconhecimento de voz
   function startSpeechRecognition(language) {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -88,29 +97,42 @@ window.onload = () => {
       return;
     }
 
-    const recognition = new SpeechRecognition();
+    recognition = new SpeechRecognition();
     recognition.lang = language;
     recognition.interimResults = true;
-    recognition.continuous = false;
+    recognition.continuous = true;
 
+    stopRequested = false;
+    let finalTranscript = '';
     chatBox.textContent = `🎤 Ouvindo (${language})...`;
 
     recognition.onresult = (event) => {
-  for (let i = event.resultIndex; i < event.results.length; ++i) {
-    const result = event.results[i];
-    if (result.isFinal) {
-      const transcript = result[0].transcript;
-      chatBox.textContent += '\n' + transcript + '\n';
-    }
-  }
-};
+      let interimTranscript = '';
+
+      for (let i = event.resultIndex; i < event.results.length; ++i) {
+        const result = event.results[i];
+        const transcript = result[0].transcript;
+
+        if (result.isFinal) {
+          finalTranscript += '\n' + transcript + '\n';
+        } else {
+          interimTranscript += transcript;
+        }
+      }
+
+      chatBox.textContent = finalTranscript + '\n🔄 ' + interimTranscript;
+    };
 
     recognition.onerror = (event) => {
-      chatBox.textContent = "Erro: " + event.error;
+      chatBox.textContent += "\n❌ Erro: " + event.error;
     };
 
     recognition.onend = () => {
-      chatBox.textContent += "\n✅ Fala encerrada.";
+      if (!stopRequested) {
+        recognition.start(); // reinicia automaticamente
+      } else {
+        chatBox.textContent += "\n🛑 Fala encerrada manualmente.";
+      }
     };
 
     recognition.start();
