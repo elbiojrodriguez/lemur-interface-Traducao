@@ -25,50 +25,40 @@
       text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
     }
 
-    .mobile-speech-controls {
-      text-align: center;
+    .language-selector {
       margin-top: 20px;
+      text-align: center;
     }
 
-    #startSpeechBtn {
-      font-size: 1.2em;
-      padding: 12px 20px;
-      border: none;
-      border-radius: 8px;
-      background-color: #007BFF;
-      color: white;
-      cursor: pointer;
+    .language-selector select {
+      padding: 8px;
+      font-size: 1em;
+      border-radius: 6px;
     }
 
-    .listening-indicator {
+    .auto-lang-button {
       margin-top: 10px;
-      width: 16px;
-      height: 16px;
-      border-radius: 50%;
-      background-color: red;
-      animation: pulse 1s infinite;
-      display: inline-block;
+      text-align: center;
     }
 
-    @keyframes pulse {
-      0% { transform: scale(1); opacity: 1; }
-      50% { transform: scale(1.5); opacity: 0.6; }
-      100% { transform: scale(1); opacity: 1; }
+    .auto-lang-button button {
+      font-size: 1.2em;
+      padding: 10px 14px;
+      border: none;
+      border-radius: 50px;
+      background-color: #e0e0e0;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
     }
   </style>
 </head>
 <body>
 
-  <!-- 🔹 Box azul centralizado para mostrar fala -->
-  <div class="chat-input-box" id="chatBox">Toque em "Falar" para começar</div>
+  <!-- 🔹 Box azul centralizado -->
+  <div class="chat-input-box" id="chatBox">Clique na bandeira para falar</div>
 
-  <!-- 🔹 Controles de fala para mobile -->
-  <div class="mobile-speech-controls">
-    <button id="startSpeechBtn">🎤 Falar</button>
-    <div id="listeningIndicator" class="listening-indicator" style="display: none;"></div>
-  </div>
-
-  <!-- 🔹 Vídeos da chamada -->
   <div class="container">
     <div class="video-wrapper">
       <video id="remoteVideo" autoplay playsinline></video>
@@ -80,12 +70,40 @@
 
     <div class="controls">
       <button id="callActionBtn" class="call-button">Call</button>
+
+      <div class="language-bubbles">
+        <button class="lang-btn" data-lang="en-US">🇺🇸</button>
+        <button class="lang-btn" data-lang="pt-BR">🇧🇷</button>
+        <button class="lang-btn" data-lang="es-ES">🇪🇸</button>
+      </div>
     </div>
 
     <div class="info-overlay" style="display: none;">
       <span id="myId"></span>
     </div>
   </div>
+
+  <!-- 🔻 Seletor completo de idiomas -->
+  <div class="language-selector">
+    <label for="languageSelector">Escolher idioma para falar:</label>
+    <select id="languageSelector">
+      <option value="pt-BR">🇧🇷 Português</option>
+      <option value="en-US">🇺🇸 Inglês (EUA)</option>
+      <option value="en-GB">🇬🇧 Inglês (UK)</option>
+      <option value="es-ES">🇪🇸 Espanhol</option>
+      <option value="fr-FR">🇫🇷 Francês</option>
+      <option value="de-DE">🇩🇪 Alemão</option>
+      <option value="it-IT">🇮🇹 Italiano</option>
+      <option value="ja-JP">🇯🇵 Japonês</option>
+      <option value="zh-CN">🇨🇳 Chinês</option>
+      <option value="ru-RU">🇷🇺 Russo</option>
+      <option value="ko-KR">🇰🇷 Coreano</option>
+      <option value="ar-SA">🇸🇦 Árabe</option>
+    </select>
+  </div>
+
+  <!-- 🔻 Botão automático com idioma detectado -->
+  <div class="auto-lang-button" id="autoLangContainer"></div>
 
   <script src="https://lemur-signal.onrender.com/socket.io/socket.io.js"></script>
   <script type="module" src="js/caller-ui.js"></script>
