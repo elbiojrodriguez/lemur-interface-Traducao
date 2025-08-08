@@ -12,33 +12,30 @@ window.onload = () => {
   let targetId = null;
   let localStream = null;
 
-  // 🔍 Verifica se há ID na URL
-  const urlParams = new URLSearchParams(window.location.search);
-  const targetIdFromUrl = urlParams.get('targetId');
-
-  if (targetIdFromUrl) {
-    targetId = targetIdFromUrl;
-    document.getElementById('callActionBtn').style.display = 'block';
-  }
-
   // 🔓 Solicita acesso à câmera logo na abertura
   navigator.mediaDevices.getUserMedia({ video: true, audio: false })
     .then(stream => {
       localStream = stream;
       remoteVideo.srcObject = stream;
-
-      // ✅ Só ativa o botão depois que o stream estiver pronto
-      document.getElementById('callActionBtn').onclick = () => {
-        if (!targetId || !localStream) {
-          console.warn("targetId ou localStream ausente.");
-          return;
-        }
-        rtcCore.startCall(targetId, localStream);
-      };
     })
     .catch(error => {
       console.error("Erro ao acessar a câmera:", error);
     });
+
+  // Verifica se há ID na URL
+  const urlParams = new URLSearchParams(window.location.search);
+  const targetIdFromUrl = urlParams.get('targetId');
+  
+  if (targetIdFromUrl) {
+    targetId = targetIdFromUrl;
+    document.getElementById('callActionBtn').style.display = 'block';
+  }
+
+  // Configura o botão de chamada
+  document.getElementById('callActionBtn').onclick = () => {
+    if (!targetId || !localStream) return;
+    rtcCore.startCall(targetId, localStream);
+  };
 
   // 🔇 Silencia qualquer áudio recebido
   rtcCore.setRemoteStreamCallback(stream => {
@@ -46,7 +43,8 @@ window.onload = () => {
     localVideo.srcObject = stream;
   });
 
-// #############################################
+
+    // #############################################
     // 🔴 PARTE MODIFICADA: Controles de idioma dinâmicos (sem depender do HTML)
     // #############################################
 
@@ -234,4 +232,3 @@ window.onload = () => {
         console.error('API de reconhecimento de voz não suportada');
     }
 };
-
