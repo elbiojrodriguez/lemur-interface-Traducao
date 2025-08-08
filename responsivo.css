@@ -57,7 +57,7 @@ border: 2px solid #4CAF50; z-index: 10;
 .controls {
   position: absolute;
   bottom: calc(215px + 60px);
-  left: 500px;
+  left: 60px;
   display: flex;
   flex-direction: column;
   gap: 16px;
