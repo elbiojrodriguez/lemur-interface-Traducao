@@ -42,6 +42,8 @@ window.onload = () => {
   const chatBox = document.getElementById('chatBox');
   let stopRequested = false;
   let recognition = null;
+  let lastFinalTranscript = '';
+  let debounceTimer;
 
   // 🔻 Botões de bandeiras
   const langButtons = document.querySelectorAll('.lang-btn');
@@ -89,7 +91,7 @@ window.onload = () => {
     if (recognition) recognition.stop();
   };
 
-  // 🔻 Função de reconhecimento de voz
+  // 🔻 Função de reconhecimento de voz (ATUALIZADA)
   function startSpeechRecognition(language) {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) {
@@ -101,30 +103,41 @@ window.onload = () => {
     recognition.lang = language;
     recognition.interimResults = true;
     recognition.continuous = true;
+    recognition.maxAlternatives = 1; // Adicionado para mobile
 
     stopRequested = false;
     let finalTranscript = '';
+    lastFinalTranscript = ''; // Reset ao iniciar
     chatBox.textContent = `🎤 Ouvindo (${language})...`;
 
     recognition.onresult = (event) => {
+      clearTimeout(debounceTimer); // Limpa o timer anterior
+      
       let interimTranscript = '';
-
       for (let i = event.resultIndex; i < event.results.length; ++i) {
         const result = event.results[i];
-        const transcript = result[0].transcript;
+        const transcript = result[0].transcript.trim();
 
         if (result.isFinal) {
-          finalTranscript += '\n' + transcript + '\n';
+          // Filtra frases repetidas (especialmente no Android)
+          if (transcript && transcript !== lastFinalTranscript) {
+            finalTranscript += transcript + '\n🔄\n';
+            lastFinalTranscript = transcript;
+          }
         } else {
-          interimTranscript += transcript;
+          interimTranscript = transcript;
         }
       }
 
-      chatBox.textContent = finalTranscript + '\n🔄 ' + interimTranscript;
+      // Debounce para evitar atualizações rápidas no mobile
+      debounceTimer = setTimeout(() => {
+        chatBox.textContent = finalTranscript + (interimTranscript ? '🔄 ' + interimTranscript : '');
+      }, 300);
     };
 
     recognition.onerror = (event) => {
       chatBox.textContent += "\n❌ Erro: " + event.error;
+      console.error('Erro no reconhecimento:', event.error);
     };
 
     recognition.onend = () => {
