@@ -134,12 +134,12 @@ langControls.appendChild(langSelectButton);
         { code: 'ar-SA', flag: '🇸🇦', speakText: 'تحدث الآن', name: 'العربية' }
     ];
 
-    // 7. Lógica de detecção de idioma (ATUALIZADO)
+        // 7. Lógica de detecção de idioma (MODIFICADA)
     const browserLanguage = navigator.language;
     let currentLang = languages.find(lang => browserLanguage.startsWith(lang.code.split('-')[0])) || languages[0];
     detectedLangBubble.textContent = currentLang.flag;
     detectedLangBubble.title = `Idioma atual: ${currentLang.name}`;
-    textDisplay.textContent = ''; // ✅ Box azul inicia VAZIO (sem "Fale agora")
+    // Removido: textDisplay.textContent = `${currentLang.flag} ${currentLang.speakText}...`;
 
     // 8. Popula o menu de idiomas (original inalterado)
     languages.forEach(lang => {
@@ -185,7 +185,7 @@ langControls.appendChild(langSelectButton);
         languageMenu.style.display = 'none';
     });
 
-    // 10. Configuração do reconhecimento de voz (ATUALIZADO)
+    // 10. Configuração do reconhecimento de voz (MODIFICADA)
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     let recognition = null;
     if (SpeechRecognition) {
@@ -194,30 +194,55 @@ langControls.appendChild(langSelectButton);
         recognition.interimResults = true;
         recognition.lang = currentLang.code;
 
-        // ✅ Ativação MANUAL ao clicar na bandeira
+        // ✅ Nova lógica: ativação manual ao clicar na bandeira
         detectedLangBubble.addEventListener('click', () => {
-            if (recognition && recognition.state !== 'recording') {
-                textDisplay.textContent = `${currentLang.flag} ${currentLang.speakText}...`; // Instrução só aqui
-                recognition.start(); // Inicia gravação
+            if (!recognition || recognition.state === 'recording') return;
+            textDisplay.textContent = `${currentLang.flag} ${currentLang.speakText}...`;
+            recognition.start();
+        });
+
+        languageMenu.addEventListener('click', (e) => {
+            if (e.target.classList.contains('lang-option')) {
+                const langCode = e.target.dataset.langCode;
+                const flag = e.target.textContent;
+                const speakText = e.target.dataset.speakText;
+                const langName = e.target.title;
+                currentLang = languages.find(l => l.code === langCode);
+                detectedLangBubble.textContent = currentLang.flag;
+                detectedLangBubble.title = `Idioma atual: ${currentLang.name}`;
+                recognition.stop();
+                recognition.lang = langCode;
+                // Removido: textDisplay.textContent = `${flag} ${speakText}...`;
+                // Removido: setTimeout(() => recognition.start(), 300);
+                languageMenu.style.display = 'none';
             }
         });
 
         recognition.onresult = (event) => {
-            let transcript = '';
+            let interimTranscript = '';
+            let finalTranscript = '';
             for (let i = event.resultIndex; i < event.results.length; i++) {
-                transcript += event.results[i][0].transcript;
+                const transcript = event.results[i][0].transcript;
+                if (event.results[i].isFinal) {
+                    finalTranscript += transcript + ' ';
+                } else {
+                    interimTranscript += transcript;
+                }
             }
-            textDisplay.innerHTML = transcript; // Mostra apenas o texto falado
+            textDisplay.innerHTML = finalTranscript + '<i>' + interimTranscript + '</i>';
         };
 
         recognition.onerror = (event) => {
             console.error('Erro no reconhecimento:', event.error);
-            textDisplay.textContent = ''; // Limpa em caso de erro
+            textDisplay.style.color = 'black';
         };
 
+        // Removido: setTimeout(() => recognition.start(), 1000);
     } else {
         textDisplay.textContent = 'Seu navegador não suporta reconhecimento de voz';
+        textDisplay.style.color = 'black';
         console.error('API de reconhecimento de voz não suportada');
     }
 };
+
 
