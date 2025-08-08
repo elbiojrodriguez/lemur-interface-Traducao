@@ -53,25 +53,30 @@ body {
 /* Controles principais: botão verde */
 .controls {
   position: absolute;
-  bottom: calc(80px + 60px);
-  left: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
+  bottom: calc(215px + 60px);
+  left: 50%;
+  transform: translateX(-50%);
   z-index: 20;
 }
 
 .controls button {
-  width: 100px;         /* Largura maior */
-  height: 40px;         /* Altura menor */
-  border-radius: 20px;  /* Metade da altura = forma oval */
+  width: 120px;            /* Largura fixa */
+  height: 40px;            /* Altura fixa */
+  border-radius: 999px;    /* Cápsula garantida */
   border: none;
-  font-size: 18px;
+  font-size: 16px;
   font-weight: bold;
   cursor: pointer;
   backdrop-filter: blur(6px);
   color: white;
+  background: #4CAF50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;              /* Remove espaçamento extra */
+  box-sizing: border-box; /* Garante que padding não afete tamanho */
 }
+
 
 #callActionBtn {
   background: #4CAF50;
