@@ -238,21 +238,36 @@ if (SpeechRecognition) {
 
     // Manipulação dos resultados do reconhecimento
     recognition.onresult = (event) => {
-        let interimTranscript = '';
-        let finalTranscript = '';
+    let interimTranscript = '';
+    let finalTranscript = '';
+    
+    // 1. Pega o texto JÁ EXISTENTE (exceto partes em itálico)
+    const existingText = textDisplay.innerHTML.replace(/<i>.*<\/i>/, '').trim();
+    
+    // 2. Processa novos resultados
+    for (let i = event.resultIndex; i < event.results.length; i++) {
+        let transcript = event.results[i][0].transcript;
         
-        for (let i = event.resultIndex; i < event.results.length; i++) {
-            const transcript = event.results[i][0].transcript;
-            if (event.results[i].isFinal) {
-                finalTranscript += transcript + ' ';
-            } else {
-                interimTranscript += transcript;
+        // Se for trecho FINAL (com pausa)
+        if (event.results[i].isFinal) {
+            // Mantém pontuações existentes ou adiciona ponto padrão
+            if (!/[.!?]$/.test(transcript.trim())) {
+                transcript = transcript.trim() + '. ';
             }
+            finalTranscript += transcript;
+        } 
+        // Trecho INTERMEDIÁRIO (sem pausa)
+        else {
+            interimTranscript += transcript;
         }
-        
-        textDisplay.innerHTML = finalTranscript + '<i>' + interimTranscript + '</i>';
-    };
-
+    }
+    
+    // 3. Combina TUDO: texto existente + novo final + intermediário em itálico
+    textDisplay.innerHTML = 
+        (existingText ? existingText + ' ' : '') + 
+        finalTranscript + 
+        (interimTranscript ? '<i>' + interimTranscript + '</i>' : '');
+};
     // Tratamento de erros
     recognition.onerror = (event) => {
         console.error('Erro no reconhecimento:', event.error);
