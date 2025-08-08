@@ -1,3 +1,4 @@
+
 import WebRTCCore from '../core/webrtc-core.js';
 
 window.onload = () => {
@@ -318,10 +319,10 @@ function getErrorMessage(langCode) {
     return messages[langCode] || messages['en-US'];
 }
 // #############################################
-// 🆕 TÓPICO 11: Versão corrigida (anti-eco sem conflito)
+// 🆕 TÓPICO 11: Versão otimizada (anti-eco sem conflitos)
 // #############################################
 
-// A. Botão Stop (mesmo estilo)
+// A. Botão Stop (mantido igual)
 const stopButton = document.createElement('button');
 stopButton.textContent = '⏹️ Stop';
 stopButton.style.display = 'none';
@@ -334,12 +335,13 @@ stopButton.style.borderRadius = '20px';
 stopButton.style.cursor = 'pointer';
 chatBox.insertBefore(stopButton, textDisplay.nextSibling);
 
-// B. Variáveis de estado
+// B. Variáveis de estado (com timestamp para controle de eco)
 let accumulatedText = '';
 let isFirstPhrase = true;
 let lastFinalText = '';
+let lastResultTime = 0;
 
-// C. Pontuação
+// C. Pontuação (original inalterada)
 const addPunctuation = (text) => {
   const trimmed = text.trim();
   if (!trimmed.endsWith('.') && !trimmed.endsWith('!') && !trimmed.endsWith('?')) {
@@ -348,52 +350,58 @@ const addPunctuation = (text) => {
   return trimmed + ' ';
 };
 
-// D. Filtro anti-eco (executado APÓS o onresult original)
-const processFinalText = (text) => {
-  const processedText = addPunctuation(text);
+// D. Filtro anti-eco aprimorado
+const shouldAddText = (newText) => {
+  const now = Date.now();
+  const isDuplicate = lastFinalText && 
+                     accumulatedText.toLowerCase().includes(newText.toLowerCase().trim());
   
-  if (!lastFinalText || !accumulatedText.toLowerCase().includes(processedText.toLowerCase().trim())) {
-    accumulatedText += processedText;
-    lastFinalText = processedText.trim();
+  // Só adiciona se: não for duplicado OU tiver passado mais de 1s desde o último resultado
+  if (!isDuplicate || (now - lastResultTime > 1000)) {
+    lastResultTime = now;
     return true;
   }
   return false;
 };
 
-// E. Listener adicional para o evento result (NÃO substitui o original)
+// E. Listener independente (não substitui o onresult original)
 recognition.addEventListener('result', (event) => {
-  let finalTranscript = '';
-  
-  for (let i = event.resultIndex; i < event.results.length; i++) {
-    if (event.results[i].isFinal) {
-      finalTranscript += event.results[i][0].transcript;
-    }
-  }
+  const finalResults = Array.from(event.results)
+    .filter(result => result.isFinal)
+    .map(result => result[0].transcript)
+    .join(' ');
 
-  if (finalTranscript) {
+  if (finalResults) {
     if (isFirstPhrase) {
       accumulatedText = '';
       isFirstPhrase = false;
       stopButton.style.display = 'block';
     }
-    processFinalText(finalTranscript);
+
+    if (shouldAddText(finalResults)) {
+      accumulatedText += addPunctuation(finalResults);
+      lastFinalText = finalResults.trim();
+      textDisplay.innerHTML = accumulatedText;
+    }
   }
 });
 
-// F. Botão Stop
+// F. Botão Stop (original + reset otimizado)
 stopButton.onclick = () => {
   recognition.stop();
   isListening = false;
   stopButton.style.display = 'none';
   isFirstPhrase = true;
   lastFinalText = '';
+  lastResultTime = 0;
 };
 
-// G. Reset ao mudar idioma
+// G. Reset ao mudar idioma (original + reset completo)
 const originalLangMenuClick = languageMenu.onclick;
 languageMenu.onclick = (e) => {
   if (originalLangMenuClick) originalLangMenuClick(e);
   accumulatedText = '';
   isFirstPhrase = true;
   lastFinalText = '';
+  lastResultTime = 0;
 };
