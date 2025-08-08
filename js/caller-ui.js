@@ -408,4 +408,4 @@ languageMenu.onclick = (e) => {
   isFirstPhrase = true;
   lastFinalText = '';
 };
-
+};
