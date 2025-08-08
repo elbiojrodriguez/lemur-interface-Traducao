@@ -197,37 +197,59 @@ if (SpeechRecognition) {
     recognition.interimResults = true;
     recognition.lang = currentLang.code;
     
-    // Variável para acumular texto (ADICIONADO)
+    // Variáveis para acumular texto e controle de transcrição
     let accumulatedText = '';
+    let lastFinalTranscript = '';
 
-    // Função de pontuação automática (ADICIONADO)
+    // Função de pontuação melhorada
     function autoPontuar(texto) {
-      if (!texto.trim()) return texto;
-      const ultimoChar = texto[texto.length - 1];
-      if (!['.', '!', '?'].includes(ultimoChar)) {
-        return texto + (texto.toLowerCase().includes('?') ? '?' : '.');
-      }
-      return texto;
+        if (!texto.trim()) return texto;
+        const ultimoChar = texto[texto.length - 1];
+        const pontuacoes = ['.', '!', '?', '。', '！', '？'];
+        
+        if (!pontuacoes.includes(ultimoChar)) {
+            // Detecta perguntas em múltiplos idiomas
+            const isPergunta = /^(?:how|what|when|where|who|why|como|quando|onde|por que|porque|¿|¿|か|吗|\?)/i.test(texto);
+            return texto + (isPergunta ? '?' : '.');
+        }
+        return texto;
     }
 
-    // Mensagem inicial no idioma correto (usando speakText como base)
-    textDisplay.textContent = `${currentLang.flag} ${getClickToSpeakMessage(currentLang.code)}`;
+    // Adiciona estilos CSS para melhor exibição
+    const style = document.createElement('style');
+    style.textContent = `
+        .final-text {
+            white-space: pre-wrap;
+            margin-top: 10px;
+        }
+        .interim-text {
+            color: #666;
+            font-style: italic;
+            margin-top: 5px;
+        }
+    `;
+    document.head.appendChild(style);
 
-    // Configura o clique na bandeira para ativar/desativar o microfone (MODIFICADO para manter histórico)
-    detectedLangBubble.style.cursor = 'pointer';
+    // Mensagem inicial no idioma correto
+    textDisplay.innerHTML = `
+        ${currentLang.flag} ${getClickToSpeakMessage(currentLang.code)}
+        ${accumulatedText ? `<div class="final-text">${accumulatedText}</div>` : ''}
+    `;
+
+    // Configura o clique na bandeira para ativar/desativar o microfone
     detectedLangBubble.addEventListener('click', () => {
         if (!isListening) {
             recognition.start();
             textDisplay.innerHTML = `
-              ${currentLang.flag} ${currentLang.speakText}...
-              ${accumulatedText ? '<br>' + accumulatedText : ''}
+                ${currentLang.flag} ${currentLang.speakText}...
+                ${accumulatedText ? `<div class="final-text">${accumulatedText}</div>` : ''}
             `;
             isListening = true;
         } else {
             recognition.stop();
             textDisplay.innerHTML = `
-              ${currentLang.flag} ${getMicOffMessage(currentLang.code)}
-              ${accumulatedText ? '<br>' + accumulatedText : ''}
+                ${currentLang.flag} ${getMicOffMessage(currentLang.code)}
+                ${accumulatedText ? `<div class="final-text">${accumulatedText}</div>` : ''}
             `;
             isListening = false;
         }
@@ -250,12 +272,15 @@ if (SpeechRecognition) {
             }
             
             recognition.lang = langCode;
-            textDisplay.innerHTML = `${flag} ${getClickToSpeakMessage(langCode)}${accumulatedText ? '<br>' + accumulatedText : ''}`;
+            textDisplay.innerHTML = `
+                ${flag} ${getClickToSpeakMessage(langCode)}
+                ${accumulatedText ? `<div class="final-text">${accumulatedText}</div>` : ''}
+            `;
             languageMenu.style.display = 'none';
         }
     });
 
-    // Manipulação dos resultados do reconhecimento (MODIFICADO - Google Docs Style)
+    // Manipulação dos resultados do reconhecimento
     recognition.onresult = (event) => {
         let interimTranscript = '';
         let finalTranscript = '';
@@ -263,22 +288,23 @@ if (SpeechRecognition) {
         for (let i = event.resultIndex; i < event.results.length; i++) {
             const transcript = event.results[i][0].transcript;
             if (event.results[i].isFinal) {
-                finalTranscript += autoPontuar(transcript); // Pontuação automática
+                finalTranscript += transcript;
             } else {
                 interimTranscript += transcript;
             }
         }
         
-        // Acumula o texto FINAL
-        if (finalTranscript) {
-            accumulatedText += (accumulatedText ? '<br>' : '') + finalTranscript;
+        // Processa apenas transcrições finais novas
+        if (finalTranscript && finalTranscript !== lastFinalTranscript) {
+            lastFinalTranscript = finalTranscript;
+            accumulatedText += (accumulatedText ? ' ' : '') + autoPontuar(finalTranscript);
         }
         
-        // Exibe tudo (histórico + interino)
+        // Exibição otimizada
         textDisplay.innerHTML = `
-          ${currentLang.flag} ${isListening ? currentLang.speakText + '...' : getMicOffMessage(currentLang.code)}
-          ${accumulatedText ? '<br>' + accumulatedText : ''}
-          ${interimTranscript ? '<br><i>' + interimTranscript + '</i>' : ''}
+            ${currentLang.flag} ${isListening ? currentLang.speakText + '...' : getMicOffMessage(currentLang.code)}
+            <div class="final-text">${accumulatedText}</div>
+            ${interimTranscript ? `<div class="interim-text"><i>${interimTranscript}</i></div>` : ''}
         `;
     };
 
@@ -286,8 +312,8 @@ if (SpeechRecognition) {
     recognition.onerror = (event) => {
         console.error('Erro no reconhecimento:', event.error);
         textDisplay.innerHTML = `
-          ${currentLang.flag} ${getErrorMessage(currentLang.code)}
-          ${accumulatedText ? '<br>' + accumulatedText : ''}
+            ${currentLang.flag} ${getErrorMessage(currentLang.code)}
+            <div class="final-text">${accumulatedText}</div>
         `;
         isListening = false;
     };
@@ -299,20 +325,20 @@ if (SpeechRecognition) {
         }
     };
 
-    // BOTÃO STOP (ADICIONADO)
+    // BOTÃO STOP
     const stopButton = document.createElement('button');
     stopButton.textContent = '⏹️';
     stopButton.title = 'Parar captura';
-    Object.assign(stopButton.style, langSelectButton.style); // Mesmo estilo
+    Object.assign(stopButton.style, langSelectButton.style);
     stopButton.onclick = () => {
-      if (isListening) {
-        recognition.stop();
-        isListening = false;
-        textDisplay.innerHTML = `
-          ${currentLang.flag} ${getMicOffMessage(currentLang.code)}
-          ${accumulatedText ? '<br>' + accumulatedText : ''}
-        `;
-      }
+        if (isListening) {
+            recognition.stop();
+            isListening = false;
+            textDisplay.innerHTML = `
+                ${currentLang.flag} ${getMicOffMessage(currentLang.code)}
+                <div class="final-text">${accumulatedText}</div>
+            `;
+        }
     };
     langControls.appendChild(stopButton);
 
