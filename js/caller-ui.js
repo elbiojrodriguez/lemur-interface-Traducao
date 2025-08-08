@@ -317,4 +317,79 @@ function getErrorMessage(langCode) {
     };
     return messages[langCode] || messages['en-US'];
 }
+  // #############################################
+// 🆕 TÓPICO 11: Melhorias de transcrição (acumulação, pontuação e controle)
+// #############################################
+
+// A. Configuração do botão "Stop" dentro do chatBox
+const stopButton = document.createElement('button');
+stopButton.textContent = '⏹️ Stop';
+stopButton.style.display = 'none'; // Inicialmente oculto
+stopButton.style.margin = '10px auto';
+stopButton.style.padding = '8px 16px';
+stopButton.style.backgroundColor = '#ff4444';
+stopButton.style.color = 'white';
+stopButton.style.border = 'none';
+stopButton.style.borderRadius = '20px';
+stopButton.style.cursor = 'pointer';
+chatBox.insertBefore(stopButton, textDisplay.nextSibling);
+
+// B. Variáveis para controle do texto
+let accumulatedText = '';
+let isFirstPhrase = true;
+
+// C. Função para adicionar pontuação
+const addPunctuation = (text) => {
+  if (!text.trim().endsWith('.') && !text.trim().endsWith('!') && !text.trim().endsWith('?')) {
+    return text + '. ';
+  }
+  return text + ' ';
+};
+
+// D. Atualização do onresult (sem alterar o original - complementa)
+const originalOnResult = recognition.onresult;
+recognition.onresult = (event) => {
+  let interimTranscript = '';
+  let finalTranscript = '';
+
+  for (let i = event.resultIndex; i < event.results.length; i++) {
+    const transcript = event.results[i][0].transcript;
+    if (event.results[i].isFinal) {
+      finalTranscript += transcript;
+    } else {
+      interimTranscript += transcript;
+    }
+  }
+
+  // Remove mensagem inicial na primeira frase detectada
+  if (isFirstPhrase && (finalTranscript || interimTranscript)) {
+    accumulatedText = '';
+    isFirstPhrase = false;
+    stopButton.style.display = 'block';
+  }
+
+  // Acumula texto com pontuação
+  if (finalTranscript) {
+    accumulatedText += addPunctuation(finalTranscript);
+  }
+
+  // Exibe texto acumulado + interim
+  textDisplay.innerHTML = accumulatedText + (interimTranscript ? `<i>${interimTranscript}</i>` : '');
+};
+
+// E. Controle do botão Stop
+stopButton.onclick = () => {
+  recognition.stop();
+  isListening = false;
+  stopButton.style.display = 'none';
+  isFirstPhrase = true; // Reseta para próxima vez
+};
+
+// F. Reseta acumulação quando muda idioma
+const originalLangMenuClick = languageMenu.onclick;
+languageMenu.onclick = (e) => {
+  if (originalLangMenuClick) originalLangMenuClick(e);
+  accumulatedText = '';
+  isFirstPhrase = true;
+};
 };
