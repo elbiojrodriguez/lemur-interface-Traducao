@@ -12,7 +12,7 @@ window.onload = () => {
   let targetId = null;
   let localStream = null;
 
-  // 🔓 Solicita acesso à câmera logo na abertura
+  // Solicita acesso à câmera
   navigator.mediaDevices.getUserMedia({ video: true, audio: false })
     .then(stream => {
       localStream = stream;
@@ -22,7 +22,7 @@ window.onload = () => {
       console.error("Erro ao acessar a câmera:", error);
     });
 
-  // Verifica se há ID na URL
+  // Verifica ID na URL
   const urlParams = new URLSearchParams(window.location.search);
   const targetIdFromUrl = urlParams.get('targetId');
   
@@ -37,9 +37,8 @@ window.onload = () => {
     rtcCore.startCall(targetId, localStream);
   };
 
-  // 🔇 Silencia qualquer áudio recebido
+  // Silencia áudio recebido
   rtcCore.setRemoteStreamCallback(stream => {
     stream.getAudioTracks().forEach(track => track.enabled = false);
     localVideo.srcObject = stream;
   });
-
