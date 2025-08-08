@@ -64,13 +64,16 @@ window.onload = () => {
 
     // 2. Criação do container dos controles (agora independente)
     const langControls = document.createElement('div');
-    langControls.style.position = 'fixed'; // Fixo na tela
-    langControls.style.bottom = '20px';
-    langControls.style.right = '20px';
-    langControls.style.zIndex = '100';
-    langControls.style.display = 'flex';
-    langControls.style.alignItems = 'center';
-    langControls.style.gap = '10px';
+    langControls.style.position = 'fixed';
+    langControls.style.bottom = '20px';       // 20px do fundo (ajuste conforme necessário)
+    langControls.style.left = '50%';          // Base do alinhamento central
+    langControls.style.transform = 'translateX(-50%)'; // Ajuste preciso do centro
+    langControls.style.marginLeft = '0px';    // Padrão (centralizado). Ajuste para mover:
+                                         // Valores positivos → Direita | Negativos → Esquerda
+   langControls.style.zIndex = '100';
+   langControls.style.display = 'flex';
+   langControls.style.alignItems = 'center';
+   langControls.style.gap = '10px';
     document.body.appendChild(langControls); // Anexa ao body, não ao .controls
 
     // 3. Balão do idioma detectado (mesmo estilo original)
