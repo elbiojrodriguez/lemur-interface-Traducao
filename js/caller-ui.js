@@ -96,12 +96,14 @@ window.onload = () => {
     chatBox.textContent = `🎤 Ouvindo (${language})...`;
 
     recognition.onresult = (event) => {
-      let transcript = '';
-      for (let i = event.resultIndex; i < event.results.length; ++i) {
-        transcript += event.results[i][0].transcript;
-      }
-      chatBox.textContent += '\n' + transcript;
-    };
+  for (let i = event.resultIndex; i < event.results.length; ++i) {
+    const result = event.results[i];
+    if (result.isFinal) {
+      const transcript = result[0].transcript;
+      chatBox.textContent += '\n' + transcript + '\n';
+    }
+  }
+};
 
     recognition.onerror = (event) => {
       chatBox.textContent = "Erro: " + event.error;
