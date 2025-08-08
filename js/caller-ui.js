@@ -186,56 +186,88 @@ langControls.appendChild(langSelectButton);
         languageMenu.style.display = 'none';
     });
 
-    // 10. Configuração do reconhecimento de voz (original inalterado)
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    let recognition = null;
-    if (SpeechRecognition) {
-        recognition = new SpeechRecognition();
-        recognition.continuous = true;
-        recognition.interimResults = true;
-        recognition.lang = currentLang.code;
-        textDisplay.textContent = `${currentLang.flag} ${currentLang.speakText}...`;
+    // 10. Configuração do reconhecimento de voz (modificado para controle manual)
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+let recognition = null;
+let isListening = false; // Controla o estado do microfone
 
-        languageMenu.addEventListener('click', (e) => {
-            if (e.target.classList.contains('lang-option')) {
-                const langCode = e.target.dataset.langCode;
-                const flag = e.target.textContent;
-                const speakText = e.target.dataset.speakText;
-                const langName = e.target.title;
-                currentLang = languages.find(l => l.code === langCode);
-                detectedLangBubble.textContent = currentLang.flag;
-                detectedLangBubble.title = `Idioma atual: ${currentLang.name}`;
+if (SpeechRecognition) {
+    recognition = new SpeechRecognition();
+    recognition.continuous = true;
+    recognition.interimResults = true;
+    recognition.lang = currentLang.code;
+    textDisplay.textContent = `${currentLang.flag} Clique na bandeira para falar`;
+
+    // Configura o clique na bandeira para ativar/desativar o microfone
+    detectedLangBubble.style.cursor = 'pointer';
+    detectedLangBubble.addEventListener('click', () => {
+        if (!isListening) {
+            recognition.start();
+            textDisplay.textContent = `${currentLang.flag} ${currentLang.speakText}...`;
+            isListening = true;
+        } else {
+            recognition.stop();
+            textDisplay.textContent = `${currentLang.flag} Microfone desativado`;
+            isListening = false;
+        }
+    });
+
+    // Configuração do menu de idiomas
+    languageMenu.addEventListener('click', (e) => {
+        if (e.target.classList.contains('lang-option')) {
+            const langCode = e.target.dataset.langCode;
+            const flag = e.target.textContent;
+            const langName = e.target.title;
+            
+            currentLang = languages.find(l => l.code === langCode);
+            detectedLangBubble.textContent = currentLang.flag;
+            detectedLangBubble.title = `Idioma atual: ${currentLang.name}`;
+            
+            if (isListening) {
                 recognition.stop();
-                recognition.lang = langCode;
-                textDisplay.textContent = `${flag} ${speakText}...`;
-                setTimeout(() => recognition.start(), 300);
-                languageMenu.style.display = 'none';
+                isListening = false;
             }
-        });
+            
+            recognition.lang = langCode;
+            textDisplay.textContent = `${flag} Clique na bandeira para falar`;
+            languageMenu.style.display = 'none';
+        }
+    });
 
-        recognition.onresult = (event) => {
-            let interimTranscript = '';
-            let finalTranscript = '';
-            for (let i = event.resultIndex; i < event.results.length; i++) {
-                const transcript = event.results[i][0].transcript;
-                if (event.results[i].isFinal) {
-                    finalTranscript += transcript + ' ';
-                } else {
-                    interimTranscript += transcript;
-                }
+    // Manipulação dos resultados do reconhecimento
+    recognition.onresult = (event) => {
+        let interimTranscript = '';
+        let finalTranscript = '';
+        
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+            const transcript = event.results[i][0].transcript;
+            if (event.results[i].isFinal) {
+                finalTranscript += transcript + ' ';
+            } else {
+                interimTranscript += transcript;
             }
-            textDisplay.innerHTML = finalTranscript + '<i>' + interimTranscript + '</i>';
-        };
+        }
+        
+        textDisplay.innerHTML = finalTranscript + '<i>' + interimTranscript + '</i>';
+    };
 
-        recognition.onerror = (event) => {
-            console.error('Erro no reconhecimento:', event.error);
-            textDisplay.style.color = 'black';
-        };
+    // Tratamento de erros
+    recognition.onerror = (event) => {
+        console.error('Erro no reconhecimento:', event.error);
+        textDisplay.textContent = `${currentLang.flag} Erro no microfone`;
+        isListening = false;
+    };
 
-        setTimeout(() => recognition.start(), 1000);
-    } else {
-        textDisplay.textContent = 'Seu navegador não suporta reconhecimento de voz';
-        textDisplay.style.color = 'black';
-        console.error('API de reconhecimento de voz não suportada');
-    }
+    // Quando o reconhecimento termina naturalmente
+    recognition.onend = () => {
+        if (isListening) {
+            // Se estava ouvindo, tenta reiniciar (para continuous: true)
+            recognition.start();
+        }
+    };
+} else {
+    textDisplay.textContent = 'Seu navegador não suporta reconhecimento de voz';
+    textDisplay.style.color = 'black';
+    console.error('API de reconhecimento de voz não suportada');
+}
 };
