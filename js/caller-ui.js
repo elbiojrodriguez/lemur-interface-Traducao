@@ -380,7 +380,8 @@ recognition.onresult = (event) => {
 
   // Acumulação com verificação de eco
   if (finalTranscript) {
-    const processedText = addPunctuation(finalTranscript);
+    const cleanedText = removeInternalRepeats(finalTranscript.trim());
+const processedText = addPunctuation(cleanedText);
     if (!isDuplicate(processedText)) { // Só acumula se não for repetido
       accumulatedText += processedText;
       lastFinalText = processedText.trim(); // Atualiza o último texto válido
