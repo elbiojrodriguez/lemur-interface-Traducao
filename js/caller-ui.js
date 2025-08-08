@@ -100,7 +100,7 @@ window.onload = () => {
       for (let i = event.resultIndex; i < event.results.length; ++i) {
         transcript += event.results[i][0].transcript;
       }
-      chatBox.textContent = transcript;
+      chatBox.textContent += '\n' + transcript;
     };
 
     recognition.onerror = (event) => {
