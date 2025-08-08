@@ -65,10 +65,10 @@ window.onload = () => {
     // 2. Criação do container dos controles (agora independente)
     const langControls = document.createElement('div');
     langControls.style.position = 'fixed';
-    langControls.style.bottom = '20px';       // 20px do fundo (ajuste conforme necessário)
+    langControls.style.bottom = '60px';       // 20px do fundo (ajuste conforme necessário)
     langControls.style.left = '50%';          // Base do alinhamento central
     langControls.style.transform = 'translateX(-50%)'; // Ajuste preciso do centro
-    langControls.style.marginLeft = '0px';    // Padrão (centralizado). Ajuste para mover:
+    langControls.style.marginLeft = '40px';    // Padrão (centralizado). Ajuste para mover:
                                          // Valores positivos → Direita | Negativos → Esquerda
    langControls.style.zIndex = '100';
    langControls.style.display = 'flex';
