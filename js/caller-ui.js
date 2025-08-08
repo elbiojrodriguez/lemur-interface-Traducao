@@ -1,3 +1,5 @@
+import WebRTCCore from '../core/webrtc-core.js';
+
 window.onload = () => {
   const rtcCore = new WebRTCCore();
   const myId = crypto.randomUUID().substr(0, 8);
@@ -186,63 +188,77 @@ langControls.appendChild(langSelectButton);
     });
 
     // 10. Configuração do reconhecimento de voz (MODIFICADA)
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    let recognition = null;
-    if (SpeechRecognition) {
-        recognition = new SpeechRecognition();
-        recognition.continuous = true;
-        recognition.interimResults = true;
-        recognition.lang = currentLang.code;
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+let recognition = null;
+let isManualStart = false; // Flag para controle manual
 
-        // ✅ Nova lógica: ativação manual ao clicar na bandeira
-        detectedLangBubble.addEventListener('click', () => {
-            if (!recognition || recognition.state === 'recording') return;
+if (SpeechRecognition) {
+    recognition = new SpeechRecognition();
+    recognition.continuous = true;
+    recognition.interimResults = true;
+    recognition.lang = currentLang.code;
+
+    // Função para iniciar reconhecimento
+    const startRecognition = () => {
+        if (recognition && recognition.state !== 'recording') {
             textDisplay.textContent = `${currentLang.flag} ${currentLang.speakText}...`;
             recognition.start();
-        });
+        }
+    };
 
-        languageMenu.addEventListener('click', (e) => {
-            if (e.target.classList.contains('lang-option')) {
-                const langCode = e.target.dataset.langCode;
-                const flag = e.target.textContent;
-                const speakText = e.target.dataset.speakText;
-                const langName = e.target.title;
-                currentLang = languages.find(l => l.code === langCode);
-                detectedLangBubble.textContent = currentLang.flag;
-                detectedLangBubble.title = `Idioma atual: ${currentLang.name}`;
-                recognition.stop();
-                recognition.lang = langCode;
-                // Removido: textDisplay.textContent = `${flag} ${speakText}...`;
-                // Removido: setTimeout(() => recognition.start(), 300);
-                languageMenu.style.display = 'none';
+    // Ativação manual ao clicar na bandeira
+    detectedLangBubble.addEventListener('click', () => {
+        isManualStart = true;
+        startRecognition();
+    });
+
+    languageMenu.addEventListener('click', (e) => {
+        if (e.target.classList.contains('lang-option')) {
+            const langCode = e.target.dataset.langCode;
+            currentLang = languages.find(l => l.code === langCode);
+            detectedLangBubble.textContent = currentLang.flag;
+            detectedLangBubble.title = `Idioma atual: ${currentLang.name}`;
+            recognition.stop();
+            recognition.lang = langCode;
+            languageMenu.style.display = 'none';
+            
+            // Reinicia apenas se foi iniciado manualmente antes
+            if (isManualStart) {
+                setTimeout(startRecognition, 300);
             }
-        });
+        }
+    });
 
-        recognition.onresult = (event) => {
-            let interimTranscript = '';
-            let finalTranscript = '';
-            for (let i = event.resultIndex; i < event.results.length; i++) {
-                const transcript = event.results[i][0].transcript;
-                if (event.results[i].isFinal) {
-                    finalTranscript += transcript + ' ';
-                } else {
-                    interimTranscript += transcript;
-                }
+    recognition.onresult = (event) => {
+        let interimTranscript = '';
+        let finalTranscript = '';
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+            const transcript = event.results[i][0].transcript;
+            if (event.results[i].isFinal) {
+                finalTranscript += transcript + ' ';
+            } else {
+                interimTranscript += transcript;
             }
-            textDisplay.innerHTML = finalTranscript + '<i>' + interimTranscript + '</i>';
-        };
+        }
+        textDisplay.innerHTML = finalTranscript + '<i>' + interimTranscript + '</i>';
+    };
 
-        recognition.onerror = (event) => {
-            console.error('Erro no reconhecimento:', event.error);
+    recognition.onerror = (event) => {
+        console.error('Erro no reconhecimento:', event.error);
+        if (event.error !== 'no-speech') { // Ignora erros de "sem fala"
             textDisplay.style.color = 'black';
-        };
+        }
+    };
 
-        // Removido: setTimeout(() => recognition.start(), 1000);
-    } else {
-        textDisplay.textContent = 'Seu navegador não suporta reconhecimento de voz';
-        textDisplay.style.color = 'black';
-        console.error('API de reconhecimento de voz não suportada');
-    }
+    recognition.onend = () => {
+        if (isManualStart) {
+            // Reinicia automaticamente se foi parado inesperadamente
+            setTimeout(startRecognition, 500);
+        }
+    };
+} else {
+    textDisplay.textContent = 'Seu navegador não suporta reconhecimento de voz';
+    textDisplay.style.color = 'black';
+    console.error('API de reconhecimento de voz não suportada');
+}
 };
-
-
