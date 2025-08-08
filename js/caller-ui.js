@@ -40,13 +40,57 @@ window.onload = () => {
   });
 
   const chatBox = document.getElementById('chatBox');
-  const startSpeechBtn = document.getElementById('startSpeechBtn');
-  const indicator = document.getElementById('listeningIndicator');
-
+  let stopRequested = false;
   let recognition = null;
 
-  // 🔻 Botão “Falar” para mobile
-  startSpeechBtn.onclick = () => {
+  // 🔻 Botões de bandeiras
+  const langButtons = document.querySelectorAll('.lang-btn');
+  langButtons.forEach(button => {
+    button.onclick = () => {
+      const lang = button.dataset.lang;
+      startSpeechRecognition(lang);
+    };
+  });
+
+  // 🔻 Seletor de idioma
+  const languageSelector = document.getElementById('languageSelector');
+  languageSelector.onchange = () => {
+    const selectedLang = languageSelector.value;
+    startSpeechRecognition(selectedLang);
+  };
+
+  // 🔻 Botão automático com idioma do dispositivo
+  const userLang = navigator.language || 'en-US';
+  const flagMap = {
+    'pt-BR': '🇧🇷',
+    'en-US': '🇺🇸',
+    'en-GB': '🇬🇧',
+    'es-ES': '🇪🇸',
+    'fr-FR': '🇫🇷',
+    'de-DE': '🇩🇪',
+    'it-IT': '🇮🇹',
+    'ja-JP': '🇯🇵',
+    'zh-CN': '🇨🇳',
+    'ru-RU': '🇷🇺',
+    'ko-KR': '🇰🇷',
+    'ar-SA': '🇸🇦'
+  };
+
+  const flag = flagMap[userLang] || '🌐';
+  const autoBtn = document.createElement('button');
+  autoBtn.innerHTML = `${flag} Falar (${userLang}) 🎤`;
+  autoBtn.onclick = () => startSpeechRecognition(userLang);
+  document.getElementById('autoLangContainer').appendChild(autoBtn);
+
+  // 🔻 Botão de parar
+  const stopBtn = document.getElementById('stopBtn');
+  stopBtn.onclick = () => {
+    stopRequested = true;
+    if (recognition) recognition.stop();
+  };
+
+  // 🔻 Função de reconhecimento de voz
+  function startSpeechRecognition(language) {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) {
       chatBox.textContent = "Reconhecimento de voz não suportado neste navegador.";
@@ -54,14 +98,13 @@ window.onload = () => {
     }
 
     recognition = new SpeechRecognition();
-    recognition.lang = navigator.language || 'pt-BR';
+    recognition.lang = language;
     recognition.interimResults = true;
-    recognition.continuous = false; // ✅ frase por frase
+    recognition.continuous = true;
 
-    chatBox.textContent = `🎤 Ouvindo (${recognition.lang})...`;
-    indicator.style.display = 'inline-block';
-
+    stopRequested = false;
     let finalTranscript = '';
+    chatBox.textContent = `🎤 Ouvindo (${language})...`;
 
     recognition.onresult = (event) => {
       let interimTranscript = '';
@@ -85,10 +128,13 @@ window.onload = () => {
     };
 
     recognition.onend = () => {
-      indicator.style.display = 'none';
-      chatBox.textContent += "\n⏹️ Fala encerrada.";
+      if (!stopRequested) {
+        recognition.start(); // reinicia automaticamente
+      } else {
+        chatBox.textContent += "\n🛑 Fala encerrada manualmente.";
+      }
     };
 
     recognition.start();
-  };
+  }
 };
