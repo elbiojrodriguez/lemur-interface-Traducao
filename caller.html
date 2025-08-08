@@ -21,6 +21,29 @@
             z-index: 20;
         }
     </style>
+    <div id="battleshipOverlay">
+  <div class="battleship-grid">
+    <!-- 100 células -->
+    <!-- Cada célula pode ter um ID como A1, A2... J10 -->
+    <!-- Aqui está um exemplo com todas as células -->
+    ${Array.from({ length: 10 }, (_, row) =>
+      Array.from({ length: 10 }, (_, col) =>
+        `<div class="cell" id="${String.fromCharCode(65 + row)}${col + 1}"></div>`
+      ).join('')
+    ).join('')}
+  </div>
+
+  <!-- Letras no eixo vertical central -->
+  <div class="vertical-labels">
+    ${['A','B','C','D','E','F','G','H','I','J'].map(letter => `<span>${letter}</span>`).join('')}
+  </div>
+
+  <!-- Números no eixo horizontal central -->
+  <div class="horizontal-labels">
+    ${Array.from({ length: 10 }, (_, i) => `<span>${i + 1}</span>`).join('')}
+  </div>
+</div>
+
   <script>
   // Cria o grid com rótulos
   function createGrid() {
