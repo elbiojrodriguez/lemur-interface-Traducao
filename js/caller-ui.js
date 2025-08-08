@@ -42,8 +42,6 @@ window.onload = () => {
   const chatBox = document.getElementById('chatBox');
   let stopRequested = false;
   let recognition = null;
-  let lastFinalTranscript = '';
-  let debounceTimer;
 
   // Language buttons
   const langButtons = document.querySelectorAll('.lang-btn');
@@ -91,72 +89,73 @@ window.onload = () => {
     if (recognition) recognition.stop();
   };
 
-  // Speech recognition function (updated)
+  // Optimized speech recognition function for Android/Chrome
   function startSpeechRecognition(language) {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) {
-      chatBox.textContent = "Reconhecimento de voz não suportado neste navegador.";
+      chatBox.textContent = "Reconhecimento não suportado";
       return;
     }
 
+    // Mobile-optimized configuration
     recognition = new SpeechRecognition();
     recognition.lang = language;
     recognition.interimResults = true;
     recognition.continuous = true;
-    recognition.maxAlternatives = 1;
+    recognition.maxAlternatives = 1; // Critical for Android!
+
+    // State variables
+    let finalTranscript = '';
+    let lastStableResult = '';
+    let isFinalizing = false;
+    let androidDebounce = null;
 
     stopRequested = false;
-    let finalTranscript = '';
-    let lastFinalTranscript = '';
-    let debounceTimer;
-    let lastInterim = '';
-
     chatBox.textContent = `🎤 Ouvindo (${language})...`;
 
     recognition.onresult = (event) => {
-      clearTimeout(debounceTimer);
+      clearTimeout(androidDebounce);
       
-      let interimTranscript = '';
-      let newFinalParts = [];
+      let interim = '';
+      let newFinal = '';
 
-      for (let i = event.resultIndex; i < event.results.length; ++i) {
+      // Process all results
+      for (let i = event.resultIndex; i < event.results.length; i++) {
         const result = event.results[i];
-        const transcript = result[0].transcript.trim();
-
         if (result.isFinal) {
-          newFinalParts.push(transcript);
-        } else {
-          interimTranscript = transcript;
+          newFinal += result[0].transcript.trim();
+          isFinalizing = true;
+        } else if (!isFinalizing) {
+          interim = result[0].transcript.trim();
         }
       }
 
-      if (newFinalParts.length > 0) {
-        const newFinalText = newFinalParts.join(' ');
-        if (newFinalText !== lastFinalTranscript) {
-          finalTranscript += newFinalText + '\n🔄\n';
-          lastFinalTranscript = newFinalText;
-          lastInterim = '';
+      // Android-specific logic
+      androidDebounce = setTimeout(() => {
+        if (newFinal) {
+          // Only update if different from last stable result
+          if (newFinal !== lastStableResult) {
+            finalTranscript += newFinal + '\n🔄\n';
+            lastStableResult = newFinal;
+            chatBox.textContent = finalTranscript;
+          }
+          isFinalizing = false;
+        } else if (interim) {
+          // Interim update only occurs after 1s without finals
+          chatBox.textContent = finalTranscript + '🔄 ' + interim;
         }
-      }
-
-      if (interimTranscript && interimTranscript !== lastInterim) {
-        lastInterim = interimTranscript;
-      }
-
-      debounceTimer = setTimeout(() => {
-        chatBox.textContent = finalTranscript + 
-          (lastInterim ? '🔄 ' + lastInterim : '');
-      }, 200);
+      }, isFinalizing ? 0 : 1000); // Longer delay for interim results
     };
 
     recognition.onerror = (event) => {
-      console.error('Erro no reconhecimento:', event.error);
-      chatBox.textContent += `\n❌ Erro: ${event.error}`;
+      if (event.error !== 'no-speech') { // Ignore silence errors
+        chatBox.textContent += `\n[ERRO: ${event.error}]`;
+      }
     };
 
     recognition.onend = () => {
       if (!stopRequested) {
-        recognition.start();
+        recognition.start(); // Auto-restart
       } else {
         chatBox.textContent += "\n🛑 Fala encerrada manualmente.";
       }
