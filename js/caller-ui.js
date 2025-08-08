@@ -45,7 +45,7 @@ window.onload = () => {
   let lastFinalTranscript = '';
   let debounceTimer;
 
-  // 🔻 Botões de bandeiras
+  // Language buttons
   const langButtons = document.querySelectorAll('.lang-btn');
   langButtons.forEach(button => {
     button.onclick = () => {
@@ -54,14 +54,14 @@ window.onload = () => {
     };
   });
 
-  // 🔻 Seletor de idioma
+  // Language selector
   const languageSelector = document.getElementById('languageSelector');
   languageSelector.onchange = () => {
     const selectedLang = languageSelector.value;
     startSpeechRecognition(selectedLang);
   };
 
-  // 🔻 Botão automático com idioma do dispositivo
+  // Auto-detect language button
   const userLang = navigator.language || 'en-US';
   const flagMap = {
     'pt-BR': '🇧🇷',
@@ -84,86 +84,84 @@ window.onload = () => {
   autoBtn.onclick = () => startSpeechRecognition(userLang);
   document.getElementById('autoLangContainer').appendChild(autoBtn);
 
-  // 🔻 Botão de parar
+  // Stop button
   const stopBtn = document.getElementById('stopBtn');
   stopBtn.onclick = () => {
     stopRequested = true;
     if (recognition) recognition.stop();
   };
 
-  // 🔻 Função de reconhecimento de voz (ATUALIZADA)
-function startSpeechRecognition(language) {
-  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SpeechRecognition) {
-    chatBox.textContent = "Reconhecimento de voz não suportado neste navegador.";
-    return;
-  }
+  // Speech recognition function (updated)
+  function startSpeechRecognition(language) {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      chatBox.textContent = "Reconhecimento de voz não suportado neste navegador.";
+      return;
+    }
 
-  recognition = new SpeechRecognition();
-  recognition.lang = language;
-  recognition.interimResults = true;
-  recognition.continuous = true;
-  recognition.maxAlternatives = 1;
+    recognition = new SpeechRecognition();
+    recognition.lang = language;
+    recognition.interimResults = true;
+    recognition.continuous = true;
+    recognition.maxAlternatives = 1;
 
-  stopRequested = false;
-  let finalTranscript = '';
-  let lastFinalTranscript = '';
-  let debounceTimer;
-  let lastInterim = '';
+    stopRequested = false;
+    let finalTranscript = '';
+    let lastFinalTranscript = '';
+    let debounceTimer;
+    let lastInterim = '';
 
-  chatBox.textContent = `🎤 Ouvindo (${language})...`;
+    chatBox.textContent = `🎤 Ouvindo (${language})...`;
 
-  recognition.onresult = (event) => {
-    clearTimeout(debounceTimer);
-    
-    let interimTranscript = '';
-    let newFinalParts = [];
+    recognition.onresult = (event) => {
+      clearTimeout(debounceTimer);
+      
+      let interimTranscript = '';
+      let newFinalParts = [];
 
-    for (let i = event.resultIndex; i < event.results.length; ++i) {
-      const result = event.results[i];
-      const transcript = result[0].transcript.trim();
+      for (let i = event.resultIndex; i < event.results.length; ++i) {
+        const result = event.results[i];
+        const transcript = result[0].transcript.trim();
 
-      if (result.isFinal) {
-        newFinalParts.push(transcript);
+        if (result.isFinal) {
+          newFinalParts.push(transcript);
+        } else {
+          interimTranscript = transcript;
+        }
+      }
+
+      if (newFinalParts.length > 0) {
+        const newFinalText = newFinalParts.join(' ');
+        if (newFinalText !== lastFinalTranscript) {
+          finalTranscript += newFinalText + '\n🔄\n';
+          lastFinalTranscript = newFinalText;
+          lastInterim = '';
+        }
+      }
+
+      if (interimTranscript && interimTranscript !== lastInterim) {
+        lastInterim = interimTranscript;
+      }
+
+      debounceTimer = setTimeout(() => {
+        chatBox.textContent = finalTranscript + 
+          (lastInterim ? '🔄 ' + lastInterim : '');
+      }, 200);
+    };
+
+    recognition.onerror = (event) => {
+      console.error('Erro no reconhecimento:', event.error);
+      chatBox.textContent += `\n❌ Erro: ${event.error}`;
+    };
+
+    recognition.onend = () => {
+      if (!stopRequested) {
+        recognition.start();
       } else {
-        interimTranscript = transcript;
+        chatBox.textContent += "\n🛑 Fala encerrada manualmente.";
       }
-    }
+    };
 
-    // Junta todas as partes finalizadas desde o último evento
-    if (newFinalParts.length > 0) {
-      const newFinalText = newFinalParts.join(' ');
-      if (newFinalText !== lastFinalTranscript) {
-        finalTranscript += newFinalText + '\n🔄\n';
-        lastFinalTranscript = newFinalText;
-        lastInterim = ''; // Reseta o interim quando temos novo final
-      }
-    }
-
-    // Atualiza apenas se o interim mudou significativamente
-    if (interimTranscript && interimTranscript !== lastInterim) {
-      lastInterim = interimTranscript;
-    }
-
-    // Debounce para evitar flickering
-    debounceTimer = setTimeout(() => {
-      chatBox.textContent = finalTranscript + 
-        (lastInterim ? '🔄 ' + lastInterim : '');
-    }, 200);
-  };
-
-  recognition.onerror = (event) => {
-    console.error('Erro no reconhecimento:', event.error);
-    chatBox.textContent += `\n❌ Erro: ${event.error}`;
-  };
-
-  recognition.onend = () => {
-    if (!stopRequested) {
-      recognition.start();
-    } else {
-      chatBox.textContent += "\n🛑 Fala encerrada manualmente.";
-    }
-  };
-
-  recognition.start();
-}
+    recognition.start();
+  }
+};
