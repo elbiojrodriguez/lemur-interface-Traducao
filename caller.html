@@ -5,11 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Chamada WebRTC</title>
   <style>
-    :root {
-      --btn-color: #28a745;
-      --btn-hover: #218838;
-    }
-
     body {
       margin: 0;
       padding: 1rem;
@@ -50,7 +45,7 @@
     #callActionBtn {
       padding: 0.75rem 1.5rem;
       font-size: 1rem;
-      background-color: var(--btn-color);
+      background-color: #28a745;
       color: white;
       border: none;
       border-radius: 8px;
@@ -62,7 +57,7 @@
     }
 
     #callActionBtn:hover {
-      background-color: var(--btn-hover);
+      background-color: #218838;
     }
   </style>
 </head>
@@ -71,8 +66,9 @@
   <h1>Chamada WebRTC</h1>
   <p>Seu ID: <span id="myId">...</span></p>
 
-  <video id="localVideo" autoplay muted playsinline></video>
+  <!-- ⚠️ Ordem fiel ao seu código: câmera local aparece em remoteVideo -->
   <video id="remoteVideo" autoplay playsinline></video>
+  <video id="localVideo" autoplay muted playsinline></video>
 
   <div class="btn-container">
     <button id="callActionBtn">📞 Iniciar Chamada</button>
