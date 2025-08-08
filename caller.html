@@ -1,44 +1,33 @@
-import WebRTCCore from '../core/webrtc-core.js';
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Caller - Videochamada Mobile</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="responsivo.css" />
+</head>
+<body>
+  <div class="container">
+    <div class="video-wrapper">
+      <video id="remoteVideo" autoplay playsinline></video>
+    </div>
 
-window.onload = () => {
-  const rtcCore = new WebRTCCore();
-  const myId = crypto.randomUUID().substr(0, 8);
-  document.getElementById('myId').textContent = myId;
-  rtcCore.initialize(myId);
-  rtcCore.setupSocketHandlers();
+    <div class="video-wrapper">
+      <video id="localVideo" autoplay muted playsinline></video>
+    </div>
 
-  const localVideo = document.getElementById('localVideo');
-  const remoteVideo = document.getElementById('remoteVideo');
-  let targetId = null;
-  let localStream = null;
+    <div class="controls">
+      <!-- 🔵 Botão de scanner removido -->
+      <button id="callActionBtn" style="display:none;">Call</button>
+    </div>
 
-  // 🔓 Solicita acesso à câmera logo na abertura
-  navigator.mediaDevices.getUserMedia({ video: true, audio: false })
-    .then(stream => {
-      localStream = stream;
-      remoteVideo.srcObject = stream;
-    })
-    .catch(error => {
-      console.error("Erro ao acessar a câmera:", error);
-    });
+    <div class="info-overlay" style="display: none;">
+      <span id="myId"></span>
+    </div>
+  </div>
 
-  // Verifica se há ID na URL
-  const urlParams = new URLSearchParams(window.location.search);
-  const targetIdFromUrl = urlParams.get('targetId');
-  
-  if (targetIdFromUrl) {
-    targetId = targetIdFromUrl;
-    document.getElementById('callActionBtn').style.display = 'block';
-  }
-
-  // Configura o botão de chamada
-  document.getElementById('callActionBtn').onclick = () => {
-    if (!targetId || !localStream) return;
-    rtcCore.startCall(targetId, localStream);
-  };
-
-  // 🔇 Silencia qualquer áudio recebido
-  rtcCore.setRemoteStreamCallback(stream => {
-    stream.getAudioTracks().forEach(track => track.enabled = false);
-    localVideo.srcObject = stream;
-  });
+  <script src="https://lemur-signal.onrender.com/socket.io/socket.io.js"></script>
+  <script type="module" src="js/caller-ui.js"></script>
+</body>
+</html>
