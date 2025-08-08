@@ -186,19 +186,34 @@ langControls.appendChild(langSelectButton);
         languageMenu.style.display = 'none';
     });
 
-    // 10. Configuração do reconhecimento de voz (modificado para controle manual)
+// 10. Configuração do reconhecimento de voz (com mensagens multilíngue)
 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 let recognition = null;
-let isListening = false; // Controla o estado do microfone
+let isListening = false;
+
+// Mensagens para cada idioma (adicionei "clickToSpeak" e "micOff" para cada língua)
+const languages = [
+    { code: 'en-US', flag: '🇺🇸', speakText: 'Speak now', name: 'English', clickToSpeak: 'Click flag to speak', micOff: 'Microphone off' },
+    { code: 'pt-BR', flag: '🇧🇷', speakText: 'Fale agora', name: 'Português', clickToSpeak: 'Clique na bandeira para falar', micOff: 'Microfone desativado' },
+    { code: 'es-ES', flag: '🇪🇸', speakText: 'Habla agora', name: 'Español', clickToSpeak: 'Haz clic en la bandera para hablar', micOff: 'Micrófono desactivado' },
+    { code: 'fr-FR', flag: '🇫🇷', speakText: 'Parlez maintenant', name: 'Français', clickToSpeak: 'Cliquez sur le drapeau pour parler', micOff: 'Microphone désactivé' },
+    { code: 'de-DE', flag: '🇩🇪', speakText: 'Sprechen Sie jetzt', name: 'Deutsch', clickToSpeak: 'Klicken Sie auf die Flagge zum Sprechen', micOff: 'Mikrofon ausgeschaltet' },
+    { code: 'ja-JP', flag: '🇯🇵', speakText: '話してください', name: '日本語', clickToSpeak: '旗をクリックして話す', micOff: 'マイクオフ' },
+    { code: 'zh-CN', flag: '🇨🇳', speakText: '现在说话', name: '中文', clickToSpeak: '点击旗帜说话', micOff: '麦克风关闭' },
+    { code: 'ru-RU', flag: '🇷🇺', speakText: 'Говорите сейчас', name: 'Русский', clickToSpeak: 'Нажмите на флаг, чтобы говорить', micOff: 'Микрофон выключен' },
+    { code: 'ar-SA', flag: '🇸🇦', speakText: 'تحدث الآن', name: 'العربية', clickToSpeak: 'انقر على العلم للتحدث', micOff: 'تم إيقاف الميكروفون' }
+];
 
 if (SpeechRecognition) {
     recognition = new SpeechRecognition();
     recognition.continuous = true;
     recognition.interimResults = true;
     recognition.lang = currentLang.code;
-    textDisplay.textContent = `${currentLang.flag} Clique na bandeira para falar`;
+    
+    // Mensagem inicial no idioma correto
+    textDisplay.textContent = `${currentLang.flag} ${currentLang.clickToSpeak}`;
 
-    // Configura o clique na bandeira para ativar/desativar o microfone
+    // Controle pela bandeira
     detectedLangBubble.style.cursor = 'pointer';
     detectedLangBubble.addEventListener('click', () => {
         if (!isListening) {
@@ -207,19 +222,17 @@ if (SpeechRecognition) {
             isListening = true;
         } else {
             recognition.stop();
-            textDisplay.textContent = `${currentLang.flag} Microfone desativado`;
+            textDisplay.textContent = `${currentLang.flag} ${currentLang.micOff}`;
             isListening = false;
         }
     });
 
-    // Configuração do menu de idiomas
+    // Menu de idiomas
     languageMenu.addEventListener('click', (e) => {
         if (e.target.classList.contains('lang-option')) {
             const langCode = e.target.dataset.langCode;
-            const flag = e.target.textContent;
-            const langName = e.target.title;
-            
             currentLang = languages.find(l => l.code === langCode);
+            
             detectedLangBubble.textContent = currentLang.flag;
             detectedLangBubble.title = `Idioma atual: ${currentLang.name}`;
             
@@ -229,12 +242,11 @@ if (SpeechRecognition) {
             }
             
             recognition.lang = langCode;
-            textDisplay.textContent = `${flag} Clique na bandeira para falar`;
+            textDisplay.textContent = `${currentLang.flag} ${currentLang.clickToSpeak}`;
             languageMenu.style.display = 'none';
         }
     });
 
-    // Manipulação dos resultados do reconhecimento
     recognition.onresult = (event) => {
         let interimTranscript = '';
         let finalTranscript = '';
@@ -251,23 +263,19 @@ if (SpeechRecognition) {
         textDisplay.innerHTML = finalTranscript + '<i>' + interimTranscript + '</i>';
     };
 
-    // Tratamento de erros
     recognition.onerror = (event) => {
         console.error('Erro no reconhecimento:', event.error);
-        textDisplay.textContent = `${currentLang.flag} Erro no microfone`;
+        textDisplay.textContent = `${currentLang.flag} Erro de reconhecimento`;
         isListening = false;
     };
 
-    // Quando o reconhecimento termina naturalmente
     recognition.onend = () => {
         if (isListening) {
-            // Se estava ouvindo, tenta reiniciar (para continuous: true)
             recognition.start();
         }
     };
 } else {
     textDisplay.textContent = 'Seu navegador não suporta reconhecimento de voz';
-    textDisplay.style.color = 'black';
     console.error('API de reconhecimento de voz não suportada');
 }
 };
