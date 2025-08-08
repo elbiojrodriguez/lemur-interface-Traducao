@@ -62,9 +62,9 @@ body {
 }
 
 .controls button {
-  width: 500px;
-  height: 60px;
-  border-radius: 50%;
+  width: 100px;         /* Largura maior */
+  height: 40px;         /* Altura menor */
+  border-radius: 20px;  /* Metade da altura = forma oval */
   border: none;
   font-size: 18px;
   font-weight: bold;
