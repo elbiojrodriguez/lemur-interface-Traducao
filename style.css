@@ -57,7 +57,7 @@ body {
   left: 20px;
   display: flex;
   flex-direction: column;
-  gap: 50px;
+  gap: 16px;
   z-index: 20;
 }
 
