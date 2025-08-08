@@ -56,8 +56,8 @@ border: 2px solid #4CAF50; z-index: 10;
 /* Controles */
 .controls {
   position: absolute;
-  bottom: calc(220px + 60px);
-  left: 40px;
+  bottom: calc(230px + 60px);
+  left: 100px;
   display: flex;
   flex-direction: column;
   gap: 16px;
