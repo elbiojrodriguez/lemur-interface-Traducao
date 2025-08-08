@@ -346,18 +346,19 @@ const addPunctuation = (text) => {
   return text + ' ';
 };
 
-// D. Atualização do onresult (sem alterar o original - complementa)
+// D. Atualização do onresult (com tratamento de repetição)
 const originalOnResult = recognition.onresult;
 recognition.onresult = (event) => {
   let interimTranscript = '';
   let finalTranscript = '';
+  let hasNewFinalResult = false; // 🔴 Flag para controlar repetições
 
   for (let i = event.resultIndex; i < event.results.length; i++) {
-    const transcript = event.results[i][0].transcript;
     if (event.results[i].isFinal) {
-      finalTranscript += transcript;
+      finalTranscript += event.results[i][0].transcript;
+      hasNewFinalResult = true; // 🟢 Só processa se for novo resultado
     } else {
-      interimTranscript += transcript;
+      interimTranscript += event.results[i][0].transcript;
     }
   }
 
@@ -368,12 +369,12 @@ recognition.onresult = (event) => {
     stopButton.style.display = 'block';
   }
 
-  // Acumula texto com pontuação
-  if (finalTranscript) {
+  // 🔴 Evita acumular texto repetido
+  if (hasNewFinalResult && finalTranscript) {
     accumulatedText += addPunctuation(finalTranscript);
   }
 
-  // Exibe texto acumulado + interim
+  // Exibe texto acumulado + interim (sem repetições)
   textDisplay.innerHTML = accumulatedText + (interimTranscript ? `<i>${interimTranscript}</i>` : '');
 };
 
