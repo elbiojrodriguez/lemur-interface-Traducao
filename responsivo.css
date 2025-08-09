@@ -42,30 +42,34 @@ body {
   left: 50%;
   transform: translateX(-50%);
   width: 80%;
-  max-height: 200px;               /* ← Limita a altura máxima */
+  height: auto;
+  min-height: 60px;
+  max-height: 120px;
   border: 2px solid #007BFF;
   border-radius: 12px;
   background-color: rgba(255, 255, 255, 0.1);
   z-index: 20;
   display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  align-items: stretch;            /* ← Garante que cada frase ocupe toda a largura */
+  flex-direction: row;              /* ← Agora em linha horizontal */
+  align-items: center;
   padding: 12px;
-  overflow-y: auto;                /* ← Permite rolagem vertical */
+  overflow-x: auto;                 /* ← Rolagem horizontal */
+  overflow-y: hidden;
+  white-space: nowrap;             /* ← Impede quebra de linha */
+  gap: 12px;                        /* ← Espaço entre frases */
 }
 
 /* 🗨️ Frases individuais */
 .phrase-box {
-  margin: 4px 0;
-  padding: 0;
+  display: inline-block;
   font-size: 18px;
   color: #000;
   background: transparent;
   border: none;
-  width: 100%;                     /* ← Ocupa toda a largura disponível */
-  text-align: left;                /* ← Alinha o texto à esquerda */
-  word-wrap: break-word;           /* ← Quebra linhas se o texto for longo */
+  padding: 6px 12px;
+  border-radius: 20px;
+  background-color: rgba(255,255,255,0.3);
+  white-space: nowrap;
 }
 
 /* 📹 Vídeo local em PIP */
