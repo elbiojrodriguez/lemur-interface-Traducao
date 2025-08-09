@@ -194,8 +194,8 @@ let isListening = false; // Controla o estado do microfone
 
 if (SpeechRecognition) {
     recognition = new SpeechRecognition();
-    recognition.continuous = true;
-    recognition.interimResults = true;
+    recognition.continuous = false;
+    recognition.interimResults = false;
     recognition.lang = currentLang.code;
     
     // Mensagem inicial no idioma correto (usando speakText como base)
