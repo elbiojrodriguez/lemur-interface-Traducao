@@ -1,51 +1,67 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Caller - Videochamada Mobile</title>
-    <link rel="stylesheet" href="style.css" />
-    <link rel="stylesheet" href="responsivo.css" />
-    <style>
-        /* 🔵 Estilo do box azul (mantido) */
-        .chat-input-box {
-            position: absolute;
-            bottom: 350px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 80%;
-            height: 200px;
-            border: 2px solid #007BFF;
-            border-radius: 12px;
-            background-color: rgba(255, 255, 255, 0.1);
-            z-index: 20;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Caller - Videochamada Mobile</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="responsivo.css" />
+  <style>
+    /* 🔵 Estilo do box azul */
+    .chat-input-box {
+      position: absolute;
+      bottom: 350px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80%;
+      height: 200px;
+      border: 2px solid #007BFF;
+      border-radius: 12px;
+      background-color: rgba(255, 255, 255, 0.1);
+      z-index: 20;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: flex-start;
+      padding: 12px;
+      overflow-y: auto;
+    }
+
+    .phrase-box {
+      width: 100%;
+      font-size: 18px;
+      color: #000;
+      background: transparent;
+      border: none;
+      margin: 4px 0;
+      padding: 0;
+    }
+  </style>
 </head>
 <body>
-    <!-- 🔹 Box azul centralizado (mantido) -->
-    <div class="chat-input-box"></div>
-    <div id="text-display"></div>
-    <div class="container">
-        <div class="video-wrapper">
-            <video id="remoteVideo" autoplay playsinline></video>
-        </div>
-        <div class="video-wrapper">
-            <video id="localVideo" autoplay muted playsinline></video>
-        </div>
-        
-        <!-- 🔻 Controles (agora vazios, sem os balões estáticos) -->
-        <div class="controls">
-            <!-- Botão de call (opcional, mantido) -->
-            <button id="callActionBtn" style="display:none;"> SEND 🚀</button>
-        </div>
-        
-        <div class="info-overlay" style="display: none;">
-            <span id="myId"></span>
-        </div>
+
+  <!-- 🔹 Box azul centralizado com container interno -->
+  <div class="chat-input-box" id="text-display"></div>
+
+  <div class="container">
+    <div class="video-wrapper">
+      <video id="remoteVideo" autoplay playsinline></video>
+    </div>
+    <div class="video-wrapper">
+      <video id="localVideo" autoplay muted playsinline></video>
     </div>
 
-    <script src="https://lemur-signal.onrender.com/socket.io/socket.io.js"></script>
-    <script type="module" src="js/caller-ui.js"></script>
+    <!-- 🔻 Controles -->
+    <div class="controls">
+      <button id="callActionBtn" style="display:none;">SEND 🚀</button>
+    </div>
+
+    <div class="info-overlay" style="display: none;">
+      <span id="myId"></span>
+    </div>
+  </div>
+
+  <script src="https://lemur-signal.onrender.com/socket.io/socket.io.js"></script>
+  <script type="module" src="js/caller-ui.js"></script>
 </body>
 </html>
