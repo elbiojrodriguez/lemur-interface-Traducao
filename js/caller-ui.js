@@ -64,13 +64,16 @@ window.onload = () => {
 
     // 2. Criação do container dos controles (agora independente)
     const langControls = document.createElement('div');
-    langControls.style.position = 'fixed'; // Fixo na tela
-    langControls.style.bottom = '20px';
-    langControls.style.right = '20px';
-    langControls.style.zIndex = '100';
-    langControls.style.display = 'flex';
-    langControls.style.alignItems = 'center';
-    langControls.style.gap = '10px';
+    langControls.style.position = 'fixed';
+    langControls.style.bottom = '80px';       // 20px do fundo (ajuste conforme necessário)
+    langControls.style.left = '50%';          // Base do alinhamento central
+    langControls.style.transform = 'translateX(-50%)'; // Ajuste preciso do centro
+    langControls.style.marginLeft = '-70px';    // Padrão (centralizado). Ajuste para mover:
+                                         // Valores positivos → Direita | Negativos → Esquerda
+   langControls.style.zIndex = '100';
+   langControls.style.display = 'flex';
+   langControls.style.alignItems = 'center';
+   langControls.style.gap = '10px';
     document.body.appendChild(langControls); // Anexa ao body, não ao .controls
 
     // 3. Balão do idioma detectado (mesmo estilo original)
@@ -88,16 +91,24 @@ window.onload = () => {
     detectedLangBubble.style.fontSize = '24px';
     langControls.appendChild(detectedLangBubble);
 
-    // 4. Botão de seleção de idiomas (🌐)
-    const langSelectButton = document.createElement('button');
-    langSelectButton.className = 'lang-select-btn';
-    langSelectButton.textContent = '🌐';
-    langSelectButton.title = 'Selecionar idioma';
-    langSelectButton.style.background = 'none';
-    langSelectButton.style.border = 'none';
-    langSelectButton.style.cursor = 'pointer';
-    langSelectButton.style.fontSize = '40px';
-    langControls.appendChild(langSelectButton);
+    // 4. Botão de seleção de idiomas (🌐) - PADRÃO IGUAL AO BALÃO
+const langSelectButton = document.createElement('button');
+langSelectButton.className = 'lang-select-btn';
+langSelectButton.textContent = '🌐';
+langSelectButton.title = 'Selecionar idioma';
+// ESTILOS IDÊNTICOS AO BALÃO DE BANDEIRA:
+langSelectButton.style.display = 'flex';
+langSelectButton.style.alignItems = 'center';
+langSelectButton.style.justifyContent = 'center';
+langSelectButton.style.width = '50px'; // Mesmo tamanho
+langSelectButton.style.height = '50px'; // que o balão
+langSelectButton.style.backgroundColor = 'white'; // Fundo branco
+langSelectButton.style.borderRadius = '50%'; // Borda redonda
+langSelectButton.style.boxShadow = '0 2px 5px rgba(0,0,0,0.2)'; // Sombra suave
+langSelectButton.style.border = 'none'; // Remove borda padrão do botão
+langSelectButton.style.cursor = 'pointer';
+langSelectButton.style.fontSize = '24px'; // Reduzi de 40px para 24px (igual ao balão)
+langControls.appendChild(langSelectButton);
 
     // 5. Menu de idiomas (mesmo código original)
     const languageMenu = document.createElement('div');
@@ -158,18 +169,10 @@ window.onload = () => {
         languageMenu.appendChild(langBtn);
     });
 
-    // 9. Controle do menu (original inalterado)
+        // 9. Controle do menu (ATUALIZADO - apenas botão 🌐 abre o menu)
     langSelectButton.addEventListener('click', (e) => {
         e.stopPropagation();
         const rect = langSelectButton.getBoundingClientRect();
-        languageMenu.style.display = 'block';
-        languageMenu.style.top = `${rect.top - languageMenu.offsetHeight - 10}px`;
-        languageMenu.style.left = `${rect.left}px`;
-    });
-
-    detectedLangBubble.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const rect = detectedLangBubble.getBoundingClientRect();
         languageMenu.style.display = 'block';
         languageMenu.style.top = `${rect.top - languageMenu.offsetHeight - 10}px`;
         languageMenu.style.left = `${rect.left}px`;
@@ -179,56 +182,139 @@ window.onload = () => {
         languageMenu.style.display = 'none';
     });
 
-    // 10. Configuração do reconhecimento de voz (original inalterado)
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    let recognition = null;
-    if (SpeechRecognition) {
-        recognition = new SpeechRecognition();
-        recognition.continuous = true;
-        recognition.interimResults = true;
-        recognition.lang = currentLang.code;
-        textDisplay.textContent = `${currentLang.flag} ${currentLang.speakText}...`;
+    document.addEventListener('click', () => {
+        languageMenu.style.display = 'none';
+    });
 
-        languageMenu.addEventListener('click', (e) => {
-            if (e.target.classList.contains('lang-option')) {
-                const langCode = e.target.dataset.langCode;
-                const flag = e.target.textContent;
-                const speakText = e.target.dataset.speakText;
-                const langName = e.target.title;
-                currentLang = languages.find(l => l.code === langCode);
-                detectedLangBubble.textContent = currentLang.flag;
-                detectedLangBubble.title = `Idioma atual: ${currentLang.name}`;
+// 10. Configuração do reconhecimento de voz (modificado para controle manual)
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+let recognition = null;
+let isListening = false; // Controla o estado do microfone
+
+if (SpeechRecognition) {
+    recognition = new SpeechRecognition();
+    recognition.continuous = true;
+    recognition.interimResults = true;
+    recognition.lang = currentLang.code;
+    
+    // Mensagem inicial no idioma correto (usando speakText como base)
+    textDisplay.textContent = `${currentLang.flag} ${getClickToSpeakMessage(currentLang.code)}`;
+
+    // Configura o clique na bandeira para ativar/desativar o microfone
+    detectedLangBubble.style.cursor = 'pointer';
+    detectedLangBubble.addEventListener('click', () => {
+        if (!isListening) {
+            recognition.start();
+            textDisplay.textContent = `${currentLang.flag} ${currentLang.speakText}...`;
+            isListening = true;
+        } else {
+            recognition.stop();
+            textDisplay.textContent = `${currentLang.flag} ${getMicOffMessage(currentLang.code)}`;
+            isListening = false;
+        }
+    });
+
+    // Configuração do menu de idiomas
+    languageMenu.addEventListener('click', (e) => {
+        if (e.target.classList.contains('lang-option')) {
+            const langCode = e.target.dataset.langCode;
+            const flag = e.target.textContent;
+            const langName = e.target.title;
+            
+            currentLang = languages.find(l => l.code === langCode);
+            detectedLangBubble.textContent = currentLang.flag;
+            detectedLangBubble.title = `Idioma atual: ${currentLang.name}`;
+            
+            if (isListening) {
                 recognition.stop();
-                recognition.lang = langCode;
-                textDisplay.textContent = `${flag} ${speakText}...`;
-                setTimeout(() => recognition.start(), 300);
-                languageMenu.style.display = 'none';
+                isListening = false;
             }
-        });
+            
+            recognition.lang = langCode;
+            textDisplay.textContent = `${flag} ${getClickToSpeakMessage(langCode)}`;
+            languageMenu.style.display = 'none';
+        }
+    });
 
-        recognition.onresult = (event) => {
-            let interimTranscript = '';
-            let finalTranscript = '';
-            for (let i = event.resultIndex; i < event.results.length; i++) {
-                const transcript = event.results[i][0].transcript;
-                if (event.results[i].isFinal) {
-                    finalTranscript += transcript + ' ';
-                } else {
-                    interimTranscript += transcript;
-                }
+    // Manipulação dos resultados do reconhecimento
+    recognition.onresult = (event) => {
+        let interimTranscript = '';
+        let finalTranscript = '';
+        
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+            const transcript = event.results[i][0].transcript;
+            if (event.results[i].isFinal) {
+                finalTranscript += transcript + ' ';
+            } else {
+                interimTranscript += transcript;
             }
-            textDisplay.innerHTML = finalTranscript + '<i>' + interimTranscript + '</i>';
-        };
+        }
+        
+        textDisplay.innerHTML = finalTranscript + '<i>' + interimTranscript + '</i>';
+    };
 
-        recognition.onerror = (event) => {
-            console.error('Erro no reconhecimento:', event.error);
-            textDisplay.style.color = 'black';
-        };
+    // Tratamento de erros
+    recognition.onerror = (event) => {
+        console.error('Erro no reconhecimento:', event.error);
+        textDisplay.textContent = `${currentLang.flag} ${getErrorMessage(currentLang.code)}`;
+        isListening = false;
+    };
 
-        setTimeout(() => recognition.start(), 1000);
-    } else {
-        textDisplay.textContent = 'Seu navegador não suporta reconhecimento de voz';
-        textDisplay.style.color = 'black';
-        console.error('API de reconhecimento de voz não suportada');
-    }
+    // Quando o reconhecimento termina naturalmente
+    recognition.onend = () => {
+        if (isListening) {
+            recognition.start();
+        }
+    };
+} else {
+    textDisplay.textContent = 'Seu navegador não suporta reconhecimento de voz';
+    textDisplay.style.color = 'black';
+    console.error('API de reconhecimento de voz não suportada');
+}
+
+// Funções auxiliares para traduzir mensagens (adicionar ANTES do bloco 10)
+function getClickToSpeakMessage(langCode) {
+    const messages = {
+        'en-US': 'Click flag to speak',
+        'pt-BR': 'Clique na bandeira para falar',
+        'es-ES': 'Haz clic en la bandera para hablar',
+        'fr-FR': 'Cliquez sur le drapeau pour parler',
+        'de-DE': 'Klicken Sie auf die Flagge zum Sprechen',
+        'ja-JP': '旗をクリックして話す',
+        'zh-CN': '点击旗帜说话',
+        'ru-RU': 'Нажмите на флаг, чтобы говорить',
+        'ar-SA': 'انقر على العلم للتحدث'
+    };
+    return messages[langCode] || messages['en-US'];
+}
+
+function getMicOffMessage(langCode) {
+    const messages = {
+        'en-US': 'Microphone off',
+        'pt-BR': 'Microfone desativado',
+        'es-ES': 'Micrófono desactivado',
+        'fr-FR': 'Microphone désactivé',
+        'de-DE': 'Mikrofon ausgeschaltet',
+        'ja-JP': 'マイクオフ',
+        'zh-CN': '麦克风关闭',
+        'ru-RU': 'Микрофон выключен',
+        'ar-SA': 'تم إيقاف الميكروفون'
+    };
+    return messages[langCode] || messages['en-US'];
+}
+
+function getErrorMessage(langCode) {
+    const messages = {
+        'en-US': 'Microphone error',
+        'pt-BR': 'Erro no microfone',
+        'es-ES': 'Error de micrófono',
+        'fr-FR': 'Erreur de microphone',
+        'de-DE': 'Mikrofonfehler',
+        'ja-JP': 'マイクエラー',
+        'zh-CN': '麦克风错误',
+        'ru-RU': 'Ошибка микрофона',
+        'ar-SA': 'خطأ في الميكروفون'
+    };
+    return messages[langCode] || messages['en-US'];
+}
 };
