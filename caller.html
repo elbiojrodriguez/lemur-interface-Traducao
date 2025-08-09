@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="style.css" />
     <link rel="stylesheet" href="responsivo.css" />
     <style>
-        /* 🔵 Estilo do box azul */
+        /* 🔵 Estilo do box azul (mantido) */
         .chat-input-box {
             position: absolute;
             bottom: 350px;
@@ -19,25 +19,13 @@
             border-radius: 12px;
             background-color: rgba(255, 255, 255, 0.1);
             z-index: 20;
-            overflow-y: auto;
-            padding: 10px;
-        }
-
-        /* 💬 Estilo das frases reconhecidas */
-        .phrase-box {
-            padding: 8px;
-            margin: 6px 0;
-            background-color: rgba(0, 123, 255, 0.1);
-            border-radius: 8px;
-            color: #000;
-            font-size: 16px;
         }
     </style>
 </head>
 <body>
-    <!-- 🔹 Box azul centralizado com ID para JS -->
-    <div class="chat-input-box" id="textDisplay"></div>
-
+    <!-- 🔹 Box azul centralizado (mantido) -->
+    <div class="chat-input-box"></div>
+    
     <div class="container">
         <div class="video-wrapper">
             <video id="remoteVideo" autoplay playsinline></video>
@@ -46,9 +34,10 @@
             <video id="localVideo" autoplay muted playsinline></video>
         </div>
         
-        <!-- 🔻 Controles -->
+        <!-- 🔻 Controles (agora vazios, sem os balões estáticos) -->
         <div class="controls">
-            <button id="callActionBtn" style="display:none;">SEND 🚀</button>
+            <!-- Botão de call (opcional, mantido) -->
+            <button id="callActionBtn" style="display:none;"> SEND 🚀</button>
         </div>
         
         <div class="info-overlay" style="display: none;">
@@ -56,7 +45,6 @@
         </div>
     </div>
 
-    <!-- 🔌 Scripts -->
     <script src="https://lemur-signal.onrender.com/socket.io/socket.io.js"></script>
     <script type="module" src="js/caller-ui.js"></script>
 </body>
