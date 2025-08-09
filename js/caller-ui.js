@@ -187,122 +187,125 @@ langControls.appendChild(langSelectButton);
     });
 
 // 10. Configuração do reconhecimento de voz (modificado para controle manual)
-// Configuração SIMPLIFICADA do reconhecimento de voz
-const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-recognition.continuous = false;  // Importante para Android
-recognition.interimResults = false;
+// Configuração HÍBRIDA do reconhecimento de voz (otimizada para Android)
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+const recognition = new SpeechRecognition();
+let isListening = false;
+
+// Configurações essenciais para Android
+recognition.continuous = false;  // Desativa contínuo para melhor performance
+recognition.interimResults = false;  // Só resultados finais
 recognition.lang = currentLang.code;
 
-// Controle do microfone (liga/desliga ao clicar na bandeira)
-detectedLangBubble.addEventListener('click', () => {
-  if (recognition.isListening) {
-    recognition.stop();
-    recognition.isListening = false;
-  } else {
-    recognition.start();
-    recognition.isListening = true;
-  }
-});
+// Elementos da UI
+const micButton = document.getElementById('mic-button');
+const textOutput = document.getElementById('text-output');
 
-// Quando detectar fala
+// Controle do microfone
+micButton.addEventListener('click', toggleRecognition);
+
+function toggleRecognition() {
+  if (isListening) {
+    stopRecognition();
+  } else {
+    startRecognition();
+  }
+}
+
+function startRecognition() {
+  try {
+    recognition.start();
+    isListening = true;
+    updateUI('listening');
+  } catch (e) {
+    console.error('Erro ao iniciar:', e);
+    updateUI('error');
+  }
+}
+
+function stopRecognition() {
+  recognition.stop();
+  isListening = false;
+  updateUI('ready');
+}
+
+// Processamento dos resultados
 recognition.onresult = (event) => {
   const transcript = event.results[0][0].transcript.trim();
   if (transcript) {
-    // Cria bloco com a frase
-    const phraseBox = document.createElement('div');
-    phraseBox.className = 'phrase-box';
-    phraseBox.textContent = `${currentLang.flag} ${transcript}`;
-    document.getElementById('chatContainer').appendChild(phraseBox);
-    
-    // Envia via Socket.IO (se existir)
-    if (typeof socket !== 'undefined') {
-      socket.emit('mensagem', { 
-        texto: transcript, 
-        idioma: currentLang.code 
-      });
-    }
+    displayTranscript(transcript);
+    sendToServerIfNeeded(transcript);
   }
 };
 
-// Se der erro
-recognition.onerror = (e) => {
-  console.log('Erro:', e.error);
+// Tratamento de erros
+recognition.onerror = (event) => {
+  console.error('Erro no reconhecimento:', event.error);
+  isListening = false;
+  updateUI('error');
 };
 
-// Reinicia automaticamente
+// Reinício automático (se ainda estiver ativo)
 recognition.onend = () => {
-  if (recognition.isListening) {
-    recognition.start();
+  if (isListening) {
+    startRecognition();
   }
 };
 
-// Inicia pela primeira vez
-recognition.isListening = true;
-recognition.start();
-};
-
-    // Tratamento de erros
-    recognition.onerror = (event) => {
-        console.error('Erro no reconhecimento:', event.error);
-        textDisplay.textContent = `${currentLang.flag} ${getErrorMessage(currentLang.code)}`;
-        isListening = false;
-    };
-
-    // Quando o reconhecimento termina naturalmente
-    recognition.onend = () => {
-        if (isListening) {
-            recognition.start();
-        }
-    };
-} else {
-    textDisplay.textContent = 'Seu navegador não suporta reconhecimento de voz';
-    textDisplay.style.color = 'black';
-    console.error('API de reconhecimento de voz não suportada');
+// Funções auxiliares
+function displayTranscript(text) {
+  const transcriptElement = document.createElement('div');
+  transcriptElement.className = 'transcript';
+  transcriptElement.textContent = `${currentLang.flag} ${text}`;
+  textOutput.appendChild(transcriptElement);
 }
 
-// Funções auxiliares para traduzir mensagens (adicionar ANTES do bloco 10)
-function getClickToSpeakMessage(langCode) {
-    const messages = {
-        'en-US': 'Click flag to speak',
-        'pt-BR': 'Clique na bandeira para falar',
-        'es-ES': 'Haz clic en la bandera para hablar',
-        'fr-FR': 'Cliquez sur le drapeau pour parler',
-        'de-DE': 'Klicken Sie auf die Flagge zum Sprechen',
-        'ja-JP': '旗をクリックして話す',
-        'zh-CN': '点击旗帜说话',
-        'ru-RU': 'Нажмите на флаг, чтобы говорить',
-        'ar-SA': 'انقر على العلم للتحدث'
-    };
-    return messages[langCode] || messages['en-US'];
+function sendToServerIfNeeded(text) {
+  if (typeof socket !== 'undefined') {
+    socket.emit('voice-message', {
+      text: text,
+      lang: currentLang.code
+    });
+  }
 }
 
-function getMicOffMessage(langCode) {
-    const messages = {
-        'en-US': 'Microphone off',
-        'pt-BR': 'Microfone desativado',
-        'es-ES': 'Micrófono desactivado',
-        'fr-FR': 'Microphone désactivé',
-        'de-DE': 'Mikrofon ausgeschaltet',
-        'ja-JP': 'マイクオフ',
-        'zh-CN': '麦克风关闭',
-        'ru-RU': 'Микрофон выключен',
-        'ar-SA': 'تم إيقاف الميكروفون'
-    };
-    return messages[langCode] || messages['en-US'];
+function updateUI(state) {
+  const messages = {
+    ready: `${currentLang.flag} ${getMessage('ready', currentLang.code)}`,
+    listening: `${currentLang.flag} ${getMessage('listening', currentLang.code)}`,
+    error: `${currentLang.flag} ${getMessage('error', currentLang.code)}`
+  };
+  
+  micButton.textContent = messages[state];
+  micButton.className = `mic-button ${state}`;
 }
 
-function getErrorMessage(langCode) {
-    const messages = {
-        'en-US': 'Microphone error',
-        'pt-BR': 'Erro no microfone',
-        'es-ES': 'Error de micrófono',
-        'fr-FR': 'Erreur de microphone',
-        'de-DE': 'Mikrofonfehler',
-        'ja-JP': 'マイクエラー',
-        'zh-CN': '麦克风错误',
-        'ru-RU': 'Ошибка микрофона',
-        'ar-SA': 'خطأ في الميكروفون'
-    };
-    return messages[langCode] || messages['en-US'];
+// Internacionalização simplificada
+function getMessage(type, langCode) {
+  const messages = {
+    ready: {
+      'en-US': 'Tap to speak',
+      'pt-BR': 'Toque para falar',
+      'es-ES': 'Toca para hablar',
+      // ... outros idiomas
+    },
+    listening: {
+      'en-US': 'Listening...',
+      'pt-BR': 'Ouvindo...',
+      'es-ES': 'Escuchando...',
+      // ... outros idiomas
+    },
+    error: {
+      'en-US': 'Microphone error',
+      'pt-BR': 'Erro no microfone',
+      'es-ES': 'Error de micrófono',
+      // ... outros idiomas
+    }
+  };
+  
+  return messages[type][langCode] || messages[type]['en-US'];
 }
+
+// Inicialização
+updateUI('ready');
 };
