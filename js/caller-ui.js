@@ -212,7 +212,8 @@ if (SpeechRecognition) {
             textDisplay.textContent = `${currentLang.flag} ${getMicOffMessage(currentLang.code)}`;
             isListening = false;
         }
-    });
+    }
+                                       );
 
     // Configuração do menu de idiomas
     languageMenu.addEventListener('click', (e) => {
