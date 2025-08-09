@@ -1,4 +1,4 @@
-/* 🔄 Reset básico para mobile */
+/* Reset básico para mobile */
 * {
   margin: 0;
   padding: 0;
@@ -9,13 +9,12 @@
 body {
   background: transparent;
   font-family: Arial, sans-serif;
-  min-height: 100vh;
-  height: 100%;
+  height: 100vh;
   overflow: hidden;
   position: relative;
 }
 
-/* 📦 Container principal */
+/* Container principal */
 .container {
   position: relative;
   width: 100%;
@@ -23,7 +22,7 @@ body {
   overflow: hidden;
 }
 
-/* 🎥 Vídeos principais */
+/* Vídeos principais */
 .video-wrapper {
   position: relative;
   width: 100%;
@@ -36,55 +35,46 @@ body {
   object-fit: cover;
 }
 
-/* 📹 Vídeo local em PIP */
-.video-wrapper:nth-child(2) {
-  position: absolute;
-  bottom: calc(80px + 60px);
-  right: 5px;
-  width: 34.5%;
-  max-width: 138px;
-  height: 184px;
-  transform: translateX(-17%);
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-  border: 2px solid #4CAF50;
-  z-index: 10;
+/* Vídeo local em PIP */
+.video-wrapper:nth-child(2) { 
+position: absolute; 
+bottom: calc(80px + 60px); 
+right: 5px; 
+width: 34.5%; 
+max-width: 138px; 
+height: 184px; 
+transform: translateX(-17%); 
+border-radius: 8px; overflow: hidden; 
+box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); 
+border: 2px solid #4CAF50; z-index: 10; 
 }
 
 .video-wrapper:nth-child(2) video {
   transform: scaleX(-1);
 }
 
-/* 🎛️ Controles */
+/* Controles */
 .controls {
   position: absolute;
-  bottom: calc(215px + 60px);
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 20;
+  bottom: calc(225px + 60px);
+  left: 110px;
   display: flex;
   flex-direction: column;
   gap: 16px;
+  z-index: 20;
 }
 
+
 .controls button {
-  width: 120px;
-  height: 40px;
-  border-radius: 999px;
+  width: 100px;         /* Largura maior */
+  height: 40px;         /* Altura menor */
+  border-radius: 20px;  /* Metade da altura = forma oval */
   border: none;
-  font-size: 16px;
+  font-size: 18px;
   font-weight: bold;
   cursor: pointer;
   backdrop-filter: blur(6px);
   color: white;
-  background: #4CAF50;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-  box-sizing: border-box;
-  white-space: nowrap;
 }
 
 #callActionBtn {
@@ -95,7 +85,7 @@ body {
   background: #2196F3;
 }
 
-/* 🧾 Overlay de informações */
+/* Overlay de informações */
 .info-overlay {
   position: absolute;
   top: 20px;
@@ -104,11 +94,22 @@ body {
   z-index: 30;
   color: white;
   text-align: center;
-  background: rgba(0, 0, 0, 0.5);
+  background: transparent; /* ← removido o cinza */;
   padding: 10px;
   border-radius: 0 0 10px 10px;
 }
 
+/* QR Code */
+.qrcode-container {
+  margin: 10px auto;
+  padding: 12px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  display: inline-block;
+}
+
+/* ID visual opcional */
 #myId {
   display: inline-block;
   font-size: 16px;
@@ -121,92 +122,20 @@ body {
   color: white;
 }
 
-/* 📷 QR Code */
-.qrcode-container,
-.info-overlay #qrcode {
-  margin: 10px auto;
-  padding: 12px;
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-  display: inline-block;
-}
-
-/* 🌐 Balões de idioma */
-.language-bubbles {
-  display: flex;
-  gap: 8px;
-  justify-content: center;
-}
-
-.lang-btn {
-  width: 40px;
-  height: 40px;
-  font-size: 20px;
-  border-radius: 50%;
-  border: none;
-  background-color: rgba(0, 0, 0, 0.3);
-  color: white;
-  cursor: pointer;
-  backdrop-filter: blur(4px);
-}
-
-/* 💬 Caixa de entrada */
-.chat-input-box {
-  position: absolute;
-  bottom: 100px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 60%;
-  height: 160px;
-  border: 2px solid #007BFF;
-  border-radius: 12px;
-  background-color: rgba(255, 255, 255, 0.1);
-  z-index: 20;
-}
-.phrase-box {
-  margin: 4px 0;
-  padding: 0;
-  font-size: 18px;
-  color: #000;
-  background: transparent;
-  border: none;
-}
-
-/* 📱 Responsivo para telas pequenas */
-@media (max-width: 400px) {
-  .controls button {
-    width: 100px;
-    height: 36px;
-    font-size: 14px;
-    border-radius: 999px;
-  }
 
   .video-wrapper:nth-child(2) {
-    height: 120px;
-    max-width: 100px;
-    bottom: calc(60px + 60px);
-  }
+  .video-wrapper:nth-child(2) {
+  height: 120px;
+  max-width: 100px;
+  bottom: calc(60px + 60px);
+}
 
   .info-overlay {
     padding: 8px;
   }
 
-  .qrcode-container,
-  .info-overlay #qrcode {
+  .qrcode-container {
     padding: 8px;
     max-width: 90%;
-  }
-
-  .chat-input-box {
-    width: 80%;
-    height: 120px;
-    bottom: 80px;
-  }
-
-  .lang-btn {
-    width: 36px;
-    height: 36px;
-    font-size: 18px;
   }
 }
