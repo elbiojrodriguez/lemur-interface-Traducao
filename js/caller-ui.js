@@ -122,4 +122,5 @@ window.onload = () => {
   };
 
   recognition.start();
+    }
 };
