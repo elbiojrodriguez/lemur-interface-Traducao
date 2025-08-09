@@ -218,8 +218,7 @@ if (SpeechRecognition) {
             textDisplay.textContent = `${getMicOffMessage(currentLang.code)}`;
             isListening = false;
         }
-    }
-                                       );
+    });
 
     // Menu de idiomas (mantido)
     languageMenu.addEventListener('click', (e) => {
