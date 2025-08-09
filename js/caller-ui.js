@@ -3,6 +3,8 @@ import WebRTCCore from '../core/webrtc-core.js';
 window.onload = () => {
   const rtcCore = new WebRTCCore();
   const myId = crypto.randomUUID().substr(0, 8);
+ const chatInputBox = document.querySelector('.chat-input-box');
+  const textDisplay = document.getElementById('textDisplay'); // 🔹 Adiciona esta linha
   document.getElementById('myId').textContent = myId;
   rtcCore.initialize(myId);
   rtcCore.setupSocketHandlers();
