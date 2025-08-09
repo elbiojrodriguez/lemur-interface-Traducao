@@ -1,3 +1,4 @@
+Agora com stop:
 import WebRTCCore from '../core/webrtc-core.js';
 
 window.onload = () => {
@@ -241,8 +242,9 @@ window.onload = () => {
       }
     });
 
-// Resultado do reconhecimento
+// Resultado do reconhecimento - VERSÃO OTIMIZADA
 recognition.onresult = (event) => {
+  // Mantém a lógica original de esconder placeholder
   if (textDisplay.classList.contains('text-display-placeholder')) {
     textDisplay.style.display = 'none';
   }
@@ -250,6 +252,7 @@ recognition.onresult = (event) => {
   let finalTranscript = '';
   let interimTranscript = '';
 
+  // Processamento dos resultados (original)
   for (let i = event.resultIndex; i < event.results.length; i++) {
     const transcript = event.results[i][0].transcript;
     if (event.results[i].isFinal) {
@@ -261,39 +264,39 @@ recognition.onresult = (event) => {
 
   const chatInputBox = document.querySelector('.chat-input-box');
   
-  // Novo: Feedback em tempo real enquanto fala
-  if (interimTranscript && !finalTranscript) {
-    let interimBox = document.querySelector('.interim-box');
-    
-    if (!interimBox) {
-      interimBox = document.createElement('div');
-      interimBox.className = 'phrase-box interim-box';
-      if (chatInputBox) chatInputBox.appendChild(interimBox);
-    }
-    
-    interimBox.innerHTML = `<span class="interim-text">${interimTranscript}</span>`;
-    if (chatInputBox) chatInputBox.scrollTop = chatInputBox.scrollHeight;
-  }
-
-  // Mantém o comportamento original para frases finais
+  // COMPORTAMENTO ORIGINAL (frases finais)
   if (finalTranscript.trim()) {
-    // Remove o texto interim se existir
+    // Remove texto temporário se existir
     const interimBox = document.querySelector('.interim-box');
     if (interimBox) interimBox.remove();
     
+    // Cria a mensagem final (como no original)
     const phraseBox = document.createElement('div');
     phraseBox.className = 'phrase-box';
-    phraseBox.innerHTML = `<span class="final-text">${finalTranscript}</span>`;
+    phraseBox.textContent = finalTranscript; // ← Mantém formato original
     
     if (chatInputBox) {
       chatInputBox.appendChild(phraseBox);
       chatInputBox.scrollTop = chatInputBox.scrollHeight;
-    } else {
-      console.warn('Elemento chat-input-box não encontrado');
+      
+      // Mantém o microfone ativo visualmente (sua sugestão)
+      textDisplay.textContent = `${currentLang.speakText}...`;
     }
   }
+  // NOVO: Feedback em tempo real (sua sugestão)
+  else if (interimTranscript) {
+    let interimBox = document.querySelector('.interim-box');
+    
+    if (!interimBox) {
+      interimBox = document.createElement('div');
+      interimBox.className = 'interim-box'; // Classe diferente para não conflitar
+      if (chatInputBox) chatInputBox.appendChild(interimBox);
+    }
+    
+    interimBox.textContent = interimTranscript; // ← Sem formatação extra
+    if (chatInputBox) chatInputBox.scrollTop = chatInputBox.scrollHeight;
+  }
 };
-
     // Tratamento de erros
     recognition.onerror = (event) => {
       console.error('Erro no reconhecimento:', event.error);
@@ -302,30 +305,18 @@ recognition.onresult = (event) => {
       isListening = false;
     };
 
-    // Reinício com delay para Android
+// Reinício com delay para Android - VERSÃO ORIGINAL FUNCIONAL
 recognition.onend = () => {
-  // Limpa o texto interim se não houve resultado final (NOVO)
-  const interimBox = document.querySelector('.interim-box');
-  if (interimBox && !document.querySelector('.phrase-box:not(.interim-box)')) {
-    interimBox.remove();
-  }
-
-  // Mantém a verificação original do placeholder (EXISTENTE)
+  // Mantém APENAS a verificação original do placeholder
   if (!document.querySelector('.phrase-box')) {
     textDisplay.style.display = 'flex';
   }
 
-  // Mantém a lógica de reinício original (EXISTENTE)
+  // Mantém EXATAMENTE a lógica original de reinício
   if (isListening) {
     setTimeout(() => {
       try {
         recognition.start();
-        
-        // Novo feedback visual ao reiniciar
-        if (!document.querySelector('.interim-box') && textDisplay.style.display === 'none') {
-          textDisplay.textContent = `${currentLang.speakText}...`;
-          textDisplay.style.display = 'flex';
-        }
       } catch (e) {
         console.error('Erro ao reiniciar:', e);
         isListening = false;
