@@ -186,21 +186,27 @@ langControls.appendChild(langSelectButton);
         languageMenu.style.display = 'none';
     });
 
-// 10. Configuração do reconhecimento de voz (modificado para controle manual e Android)
+// 10. Configuração do reconhecimento de voz (modificado para Android e boxes independentes)
 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 let recognition = null;
-let isListening = false; // Controla o estado do microfone
+let isListening = false;
+
+// Elementos da interface
+const chatContainer = document.getElementById('chatContainer'); // <-- NOVO (para boxes independentes)
+const textDisplay = document.getElementById('textDisplay'); // Supondo que já exista
+const detectedLangBubble = document.getElementById('detectedLangBubble'); // Supondo que já exista
+const languageMenu = document.getElementById('languageMenu'); // Supondo que já exista
 
 if (SpeechRecognition) {
     recognition = new SpeechRecognition();
-    recognition.continuous = false;  // Alterado para false (melhor para Android)
-    recognition.interimResults = false;  // Alterado para false (mais estável)
+    recognition.continuous = false;  // Melhor para Android
+    recognition.interimResults = false;  // Só resultados finais (mais estável)
     recognition.lang = currentLang.code;
     
-    // Mensagem inicial no idioma correto (usando speakText como base)
+    // Mensagem inicial
     textDisplay.textContent = `${currentLang.flag} ${getClickToSpeakMessage(currentLang.code)}`;
 
-    // Configura o clique na bandeira para ativar/desativar o microfone
+    // Controle do microfone (liga/desliga)
     detectedLangBubble.style.cursor = 'pointer';
     detectedLangBubble.addEventListener('click', () => {
         if (!isListening) {
@@ -209,7 +215,7 @@ if (SpeechRecognition) {
                 textDisplay.textContent = `${currentLang.flag} ${currentLang.speakText}...`;
                 isListening = true;
             } catch (e) {
-                console.error('Erro ao iniciar microfone:', e);
+                console.error('Erro ao iniciar:', e);
                 textDisplay.textContent = `${currentLang.flag} ${getErrorMessage(currentLang.code)}`;
             }
         } else {
@@ -219,7 +225,7 @@ if (SpeechRecognition) {
         }
     });
 
-    // Configuração do menu de idiomas (MANTIDO ORIGINAL)
+    // Menu de idiomas (original)
     languageMenu.addEventListener('click', (e) => {
         if (e.target.classList.contains('lang-option')) {
             const langCode = e.target.dataset.langCode;
@@ -241,31 +247,37 @@ if (SpeechRecognition) {
         }
     });
 
-    // Manipulação dos resultados do reconhecimento (SIMPLIFICADO para Android)
+    // Processamento da fala (AGORA COM BOXES INDEPENDENTES) <-- MUDANÇA PRINCIPAL
     recognition.onresult = (event) => {
-        const transcript = event.results[0][0].transcript;
-        if (transcript.trim()) {
-            textDisplay.textContent = transcript;
-            
-            // Opcional: cria um elemento permanente no chat
+        const transcript = event.results[0][0].transcript.trim();
+        if (transcript) {
+            // Cria um NOVO BOX para cada frase (não substitui os anteriores)
             const phraseBox = document.createElement('div');
             phraseBox.className = 'phrase-box';
             phraseBox.textContent = `${currentLang.flag} ${transcript}`;
-            document.getElementById('chatContainer').appendChild(phraseBox);
+            chatContainer.appendChild(phraseBox); // Adiciona ao chatContainer
+            
+            // Envia via Socket.IO (opcional)
+            if (typeof socket !== 'undefined') {
+                socket.emit('mensagem', { 
+                    texto: transcript, 
+                    idioma: currentLang.code 
+                });
+            }
         }
     };
 
-    // Tratamento de erros (MANTIDO ORIGINAL)
+    // Tratamento de erros (original)
     recognition.onerror = (event) => {
         console.error('Erro no reconhecimento:', event.error);
         textDisplay.textContent = `${currentLang.flag} ${getErrorMessage(currentLang.code)}`;
         isListening = false;
     };
 
-    // Quando o reconhecimento termina naturalmente (MODIFICADO para controle)
+    // Reinício automático (com delay para Android)
     recognition.onend = () => {
         if (isListening) {
-            setTimeout(() => {  // Pequeno delay para Android
+            setTimeout(() => {
                 try {
                     recognition.start();
                 } catch (e) {
@@ -282,7 +294,7 @@ if (SpeechRecognition) {
     console.error('API de reconhecimento de voz não suportada');
 }
 
-// Funções auxiliares para traduzir mensagens (MANTIDAS ORIGINAIS)
+// Funções auxiliares de tradução (MANTIDAS ORIGINAIS)
 function getClickToSpeakMessage(langCode) {
     const messages = {
         'en-US': 'Click flag to speak',
