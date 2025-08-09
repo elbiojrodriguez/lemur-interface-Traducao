@@ -1,4 +1,4 @@
-/* 🔄 Reset básico para mobile */
+/* Reset básico para mobile */
 * {
   margin: 0;
   padding: 0;
@@ -14,7 +14,7 @@ body {
   position: relative;
 }
 
-/* 🔹 Container principal */
+/* Container principal */
 .container {
   position: relative;
   width: 100%;
@@ -22,7 +22,7 @@ body {
   overflow: hidden;
 }
 
-/* 🎥 Vídeos principais */
+/* Vídeos principais */
 .video-wrapper {
   position: relative;
   width: 100%;
@@ -35,56 +35,25 @@ body {
   object-fit: cover;
 }
 
-/* 📦 Box azul com frases em linha */
-.chat-input-box {
-  position: absolute;
-  bottom: 350px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 80%;
-  max-height: 300px;
-  border: 2px solid #007BFF;
-  border-radius: 12px;
-  background-color: rgba(255, 255, 255, 0.1);
-  z-index: 20;
-  padding: 12px;
-  overflow-y: auto;
-  overflow-x: hidden;
-  display: block;
-  box-sizing: border-box;
-}
-
-/* 🗨️ Frases individuais */
-.phrase-box {
-  display: block;
-  font-size: 18px;
-  color: #000;
-  margin-bottom: 8px;
-  word-wrap: break-word;
-  white-space: normal;
-}
-
-/* 📹 Vídeo local em PIP */
-.video-wrapper:nth-child(2) {
-  position: absolute;
-  bottom: calc(80px + 60px);
-  right: 5px;
-  width: 34.5%;
-  max-width: 138px;
-  height: 184px;
-  transform: translateX(-17%);
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-  border: 2px solid #4CAF50;
-  z-index: 10;
+/* Vídeo local em PIP */
+.video-wrapper:nth-child(2) { 
+position: absolute; 
+bottom: calc(80px + 60px); 
+right: 5px; 
+width: 34.5%; 
+max-width: 138px; 
+height: 184px; 
+transform: translateX(-17%); 
+border-radius: 8px; overflow: hidden; 
+box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); 
+border: 2px solid #4CAF50; z-index: 10; 
 }
 
 .video-wrapper:nth-child(2) video {
   transform: scaleX(-1);
 }
 
-/* 🎛️ Controles */
+/* Controles */
 .controls {
   position: absolute;
   bottom: calc(225px + 60px);
@@ -95,10 +64,11 @@ body {
   z-index: 20;
 }
 
+
 .controls button {
-  width: 100px;
-  height: 40px;
-  border-radius: 20px;
+  width: 100px;         /* Largura maior */
+  height: 40px;         /* Altura menor */
+  border-radius: 20px;  /* Metade da altura = forma oval */
   border: none;
   font-size: 18px;
   font-weight: bold;
@@ -115,7 +85,7 @@ body {
   background: #2196F3;
 }
 
-/* ℹ️ Overlay de informações */
+/* Overlay de informações */
 .info-overlay {
   position: absolute;
   top: 20px;
@@ -124,23 +94,22 @@ body {
   z-index: 30;
   color: white;
   text-align: center;
-  background: transparent;
-  padding: 8px;
+  background: transparent; /* ← removido o cinza */;
+  padding: 10px;
   border-radius: 0 0 10px 10px;
 }
 
-/* 📷 QR Code */
+/* QR Code */
 .qrcode-container {
   margin: 10px auto;
-  padding: 8px;
+  padding: 12px;
   background: white;
   border-radius: 12px;
   box-shadow: 0 2px 6px rgba(0,0,0,0.2);
   display: inline-block;
-  max-width: 90%;
 }
 
-/* 🆔 ID visual */
+/* ID visual opcional */
 #myId {
   display: inline-block;
   font-size: 16px;
@@ -151,4 +120,22 @@ body {
   user-select: all;
   cursor: pointer;
   color: white;
+}
+
+
+  .video-wrapper:nth-child(2) {
+  .video-wrapper:nth-child(2) {
+  height: 120px;
+  max-width: 100px;
+  bottom: calc(60px + 60px);
+}
+
+  .info-overlay {
+    padding: 8px;
+  }
+
+  .qrcode-container {
+    padding: 8px;
+    max-width: 90%;
+  }
 }
