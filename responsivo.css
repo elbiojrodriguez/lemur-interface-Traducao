@@ -42,34 +42,26 @@ body {
   left: 50%;
   transform: translateX(-50%);
   width: 80%;
-  height: auto;
-  min-height: 60px;
-  max-height: 120px;
+  max-height: 200px;
   border: 2px solid #007BFF;
   border-radius: 12px;
   background-color: rgba(255, 255, 255, 0.1);
   z-index: 20;
-  display: flex;
-  flex-direction: row;              /* ← Agora em linha horizontal */
-  align-items: center;
+  display: block;                  /* ← volta ao fluxo normal de bloco */
   padding: 12px;
-  overflow-x: auto;                 /* ← Rolagem horizontal */
-  overflow-y: hidden;
-  white-space: nowrap;             /* ← Impede quebra de linha */
-  gap: 12px;                        /* ← Espaço entre frases */
+  overflow-y: auto;                /* ← rolagem vertical */
+  overflow-x: hidden;
 }
 
 /* 🗨️ Frases individuais */
 .phrase-box {
-  display: inline-block;
+  display: block;                  /* ← cada frase ocupa uma linha */
   font-size: 18px;
   color: #000;
   background: transparent;
   border: none;
-  padding: 6px 12px;
-  border-radius: 20px;
-  background-color: rgba(255,255,255,0.3);
-  white-space: nowrap;
+  margin-bottom: 8px;
+  word-wrap: break-word;
 }
 
 /* 📹 Vídeo local em PIP */
