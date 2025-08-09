@@ -1,6 +1,7 @@
 import WebRTCCore from '../core/webrtc-core.js';
 
 window.onload = () => {
+  const chatContainer = document.getElementById('chatContainer');
   const rtcCore = new WebRTCCore();
   const myId = crypto.randomUUID().substr(0, 8);
   document.getElementById('myId').textContent = myId;
@@ -186,38 +187,27 @@ langControls.appendChild(langSelectButton);
         languageMenu.style.display = 'none';
     });
 
-// 10. Configuração do reconhecimento de voz (modificado para Android e boxes independentes)
+// 10. Configuração do reconhecimento de voz (modificado para controle manual)
 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 let recognition = null;
-let isListening = false;
-
-// Elementos da interface
-const chatContainer = document.getElementById('chatContainer'); // <-- NOVO (para boxes independentes)
-const textDisplay = document.getElementById('textDisplay'); // Supondo que já exista
-const detectedLangBubble = document.getElementById('detectedLangBubble'); // Supondo que já exista
-const languageMenu = document.getElementById('languageMenu'); // Supondo que já exista
+let isListening = false; // Controla o estado do microfone
 
 if (SpeechRecognition) {
     recognition = new SpeechRecognition();
-    recognition.continuous = false;  // Melhor para Android
-    recognition.interimResults = false;  // Só resultados finais (mais estável)
+    recognition.continuous = true;
+    recognition.interimResults = true;
     recognition.lang = currentLang.code;
     
-    // Mensagem inicial
+    // Mensagem inicial no idioma correto (usando speakText como base)
     textDisplay.textContent = `${currentLang.flag} ${getClickToSpeakMessage(currentLang.code)}`;
 
-    // Controle do microfone (liga/desliga)
+    // Configura o clique na bandeira para ativar/desativar o microfone
     detectedLangBubble.style.cursor = 'pointer';
     detectedLangBubble.addEventListener('click', () => {
         if (!isListening) {
-            try {
-                recognition.start();
-                textDisplay.textContent = `${currentLang.flag} ${currentLang.speakText}...`;
-                isListening = true;
-            } catch (e) {
-                console.error('Erro ao iniciar:', e);
-                textDisplay.textContent = `${currentLang.flag} ${getErrorMessage(currentLang.code)}`;
-            }
+            recognition.start();
+            textDisplay.textContent = `${currentLang.flag} ${currentLang.speakText}...`;
+            isListening = true;
         } else {
             recognition.stop();
             textDisplay.textContent = `${currentLang.flag} ${getMicOffMessage(currentLang.code)}`;
@@ -225,7 +215,7 @@ if (SpeechRecognition) {
         }
     });
 
-    // Menu de idiomas (original)
+    // Configuração do menu de idiomas
     languageMenu.addEventListener('click', (e) => {
         if (e.target.classList.contains('lang-option')) {
             const langCode = e.target.dataset.langCode;
@@ -247,45 +237,34 @@ if (SpeechRecognition) {
         }
     });
 
-    // Processamento da fala (AGORA COM BOXES INDEPENDENTES) <-- MUDANÇA PRINCIPAL
+    // Manipulação dos resultados do reconhecimento
     recognition.onresult = (event) => {
-        const transcript = event.results[0][0].transcript.trim();
-        if (transcript) {
-            // Cria um NOVO BOX para cada frase (não substitui os anteriores)
-            const phraseBox = document.createElement('div');
-            phraseBox.className = 'phrase-box';
-            phraseBox.textContent = `${currentLang.flag} ${transcript}`;
-            chatContainer.appendChild(phraseBox); // Adiciona ao chatContainer
-            
-            // Envia via Socket.IO (opcional)
-            if (typeof socket !== 'undefined') {
-                socket.emit('mensagem', { 
-                    texto: transcript, 
-                    idioma: currentLang.code 
-                });
+        let interimTranscript = '';
+        let finalTranscript = '';
+        
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+            const transcript = event.results[i][0].transcript;
+            if (event.results[i].isFinal) {
+                finalTranscript += transcript + ' ';
+            } else {
+                interimTranscript += transcript;
             }
         }
+        
+        textDisplay.innerHTML = finalTranscript + '<i>' + interimTranscript + '</i>';
     };
 
-    // Tratamento de erros (original)
+    // Tratamento de erros
     recognition.onerror = (event) => {
         console.error('Erro no reconhecimento:', event.error);
         textDisplay.textContent = `${currentLang.flag} ${getErrorMessage(currentLang.code)}`;
         isListening = false;
     };
 
-    // Reinício automático (com delay para Android)
+    // Quando o reconhecimento termina naturalmente
     recognition.onend = () => {
         if (isListening) {
-            setTimeout(() => {
-                try {
-                    recognition.start();
-                } catch (e) {
-                    console.error('Erro ao reiniciar:', e);
-                    isListening = false;
-                    textDisplay.textContent = `${currentLang.flag} ${getErrorMessage(currentLang.code)}`;
-                }
-            }, 300);
+            recognition.start();
         }
     };
 } else {
@@ -294,7 +273,7 @@ if (SpeechRecognition) {
     console.error('API de reconhecimento de voz não suportada');
 }
 
-// Funções auxiliares de tradução (MANTIDAS ORIGINAIS)
+// Funções auxiliares para traduzir mensagens (adicionar ANTES do bloco 10)
 function getClickToSpeakMessage(langCode) {
     const messages = {
         'en-US': 'Click flag to speak',
@@ -340,3 +319,4 @@ function getErrorMessage(langCode) {
     return messages[langCode] || messages['en-US'];
 }
 };
+
