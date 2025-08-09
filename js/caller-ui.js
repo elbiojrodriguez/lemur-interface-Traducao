@@ -187,84 +187,110 @@ langControls.appendChild(langSelectButton);
         languageMenu.style.display = 'none';
     });
 
-// 10. Configuração do reconhecimento de voz (modificado para controle manual)
+// 10. Configuração do reconhecimento de voz (modificado para controle manual e Android)
+
 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 let recognition = null;
 let isListening = false; // Controla o estado do microfone
 
 if (SpeechRecognition) {
     recognition = new SpeechRecognition();
-    recognition.continuous = true;
-    recognition.interimResults = true;
-    recognition.lang = currentLang.code;
-    
-    // Mensagem inicial no idioma correto (usando speakText como base)
-    textDisplay.textContent = `${currentLang.flag} ${getClickToSpeakMessage(currentLang.code)}`;
+    recognition.continuous = false; // Melhor para Android
+    recognition.interimResults = false; // Mais estável
+    recognition.lang = currentLang.code; // Mensagem inicial no idioma correto
 
-    // Configura o clique na bandeira para ativar/desativar o microfone
+    textDisplay.textContent = `${getClickToSpeakMessage(currentLang.code)}`;
+
+    // Clique na bandeira ativa/desativa o microfone
     detectedLangBubble.style.cursor = 'pointer';
     detectedLangBubble.addEventListener('click', () => {
         if (!isListening) {
-            recognition.start();
-            textDisplay.textContent = `${currentLang.flag} ${currentLang.speakText}...`;
-            isListening = true;
+            try {
+                recognition.start();
+                textDisplay.textContent = `${currentLang.speakText}...`;
+                isListening = true;
+            } catch (e) {
+                console.error('Erro ao iniciar microfone:', e);
+                textDisplay.textContent = `${getErrorMessage(currentLang.code)}`;
+            }
         } else {
             recognition.stop();
-            textDisplay.textContent = `${currentLang.flag} ${getMicOffMessage(currentLang.code)}`;
+            textDisplay.textContent = `${getMicOffMessage(currentLang.code)}`;
             isListening = false;
         }
     });
 
-    // Configuração do menu de idiomas
+    // Menu de idiomas (mantido)
     languageMenu.addEventListener('click', (e) => {
         if (e.target.classList.contains('lang-option')) {
             const langCode = e.target.dataset.langCode;
             const flag = e.target.textContent;
             const langName = e.target.title;
-            
+
             currentLang = languages.find(l => l.code === langCode);
             detectedLangBubble.textContent = currentLang.flag;
             detectedLangBubble.title = `Idioma atual: ${currentLang.name}`;
-            
+
             if (isListening) {
                 recognition.stop();
                 isListening = false;
             }
-            
+
             recognition.lang = langCode;
-            textDisplay.textContent = `${flag} ${getClickToSpeakMessage(langCode)}`;
+            textDisplay.textContent = `${getClickToSpeakMessage(langCode)}`;
             languageMenu.style.display = 'none';
         }
     });
 
-    // Manipulação dos resultados do reconhecimento
+    // Resultado do reconhecimento (ajustado)
     recognition.onresult = (event) => {
-        let interimTranscript = '';
         let finalTranscript = '';
-        
+        let interimTranscript = '';
+
         for (let i = event.resultIndex; i < event.results.length; i++) {
             const transcript = event.results[i][0].transcript;
+
             if (event.results[i].isFinal) {
-                finalTranscript += transcript + ' ';
+                finalTranscript += transcript;
             } else {
                 interimTranscript += transcript;
             }
         }
-        
-        textDisplay.innerHTML = finalTranscript + '<i>' + interimTranscript + '</i>';
+
+        if (finalTranscript.trim()) {
+            const phraseBox = document.createElement('div');
+            phraseBox.className = 'phrase-box';
+            phraseBox.innerHTML = `${finalTranscript} <i>${interimTranscript}</i>`;
+
+            // Adiciona no chat-input-box em vez de chatContainer
+            const chatInputBox = document.querySelector('.chat-input-box');
+            if (chatInputBox) {
+                chatInputBox.appendChild(phraseBox);
+            } else {
+                console.warn('Elemento chat-input-box não encontrado');
+            }
+        }
     };
 
     // Tratamento de erros
     recognition.onerror = (event) => {
         console.error('Erro no reconhecimento:', event.error);
-        textDisplay.textContent = `${currentLang.flag} ${getErrorMessage(currentLang.code)}`;
+        textDisplay.textContent = `${getErrorMessage(currentLang.code)}`;
         isListening = false;
     };
 
-    // Quando o reconhecimento termina naturalmente
+    // Reinício com delay para Android
     recognition.onend = () => {
         if (isListening) {
-            recognition.start();
+            setTimeout(() => {
+                try {
+                    recognition.start();
+                } catch (e) {
+                    console.error('Erro ao reiniciar:', e);
+                    isListening = false;
+                    textDisplay.textContent = `${getErrorMessage(currentLang.code)}`;
+                }
+            }, 300);
         }
     };
 } else {
