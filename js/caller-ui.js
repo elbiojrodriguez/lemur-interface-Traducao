@@ -50,7 +50,7 @@ window.onload = () => {
 
   // 1. Configuração do chat (box azul)
   const textDisplay = document.createElement('div');
-  textDisplay.className = 'text-display-placeholder'; // MODIFICAÇÃO 1
+  textDisplay.className = 'text-display-placeholder';
   textDisplay.style.padding = '10px';
   textDisplay.style.color = 'black';
   textDisplay.style.textAlign = 'center';
@@ -200,14 +200,17 @@ window.onload = () => {
         try {
           recognition.start();
           textDisplay.textContent = `${currentLang.speakText}...`;
+          textDisplay.style.display = 'flex'; // Garante visibilidade
           isListening = true;
         } catch (e) {
           console.error('Erro ao iniciar microfone:', e);
           textDisplay.textContent = `${getErrorMessage(currentLang.code)}`;
+          textDisplay.style.display = 'flex'; // Garante visibilidade
         }
       } else {
         recognition.stop();
         textDisplay.textContent = `${getMicOffMessage(currentLang.code)}`;
+        textDisplay.style.display = 'flex'; // MODIFICAÇÃO 1 - Garante que a mensagem apareça
         isListening = false;
       }
     });
@@ -219,6 +222,11 @@ window.onload = () => {
         const flag = e.target.textContent;
         const langName = e.target.title;
 
+        // MODIFICAÇÃO 2 - Limpa mensagens antigas e reseta o display
+        document.querySelectorAll('.phrase-box').forEach(el => el.remove());
+        textDisplay.style.display = 'flex';
+        textDisplay.textContent = getClickToSpeakMessage(langCode);
+
         currentLang = languages.find(l => l.code === langCode);
         detectedLangBubble.textContent = currentLang.flag;
         detectedLangBubble.title = `Idioma atual: ${currentLang.name}`;
@@ -229,14 +237,12 @@ window.onload = () => {
         }
 
         recognition.lang = langCode;
-        textDisplay.textContent = `${getClickToSpeakMessage(langCode)}`;
         languageMenu.style.display = 'none';
       }
     });
 
     // Resultado do reconhecimento
     recognition.onresult = (event) => {
-      // MODIFICAÇÃO 2 - Esconde placeholder ao detectar fala
       if (textDisplay.classList.contains('text-display-placeholder')) {
         textDisplay.style.display = 'none';
       }
@@ -271,12 +277,12 @@ window.onload = () => {
     recognition.onerror = (event) => {
       console.error('Erro no reconhecimento:', event.error);
       textDisplay.textContent = `${getErrorMessage(currentLang.code)}`;
+      textDisplay.style.display = 'flex'; // Garante visibilidade
       isListening = false;
     };
 
     // Reinício com delay para Android
     recognition.onend = () => {
-      // MODIFICAÇÃO 3 - Resetar ao parar reconhecimento
       if (!document.querySelector('.phrase-box')) {
         textDisplay.style.display = 'flex';
       }
@@ -289,6 +295,7 @@ window.onload = () => {
             console.error('Erro ao reiniciar:', e);
             isListening = false;
             textDisplay.textContent = `${getErrorMessage(currentLang.code)}`;
+            textDisplay.style.display = 'flex';
           }
         }, 300);
       }
