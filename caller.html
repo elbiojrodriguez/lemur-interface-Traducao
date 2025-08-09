@@ -25,6 +25,8 @@
       align-items: flex-start;
       padding: 12px;
       overflow-y: auto;
+      overflow-x: hidden; /* ← evita rolagem lateral */
+      box-sizing: border-box;
     }
 
     .phrase-box {
@@ -35,13 +37,21 @@
       border: none;
       margin: 4px 0;
       padding: 0;
+      word-wrap: break-word;
+      white-space: normal; /* ← permite quebra de linha */
+      display: block;       /* ← garante que cada frase fique em linha separada */
     }
   </style>
 </head>
 <body>
 
-  <!-- 🔹 Box azul centralizado com container interno -->
-  <div class="chat-input-box" id="text-display"></div>
+  <!-- 🔹 Box azul centralizado com frases em linha separada -->
+  <div class="chat-input-box" id="text-display">
+    <div class="phrase-box">Olá, tudo bem?</div>
+    <div class="phrase-box">Essa é a segunda frase.</div>
+    <div class="phrase-box">E aqui vai a terceira, em uma nova linha.</div>
+    <div class="phrase-box">Nada de coluna estreita ou linha infinita!</div>
+  </div>
 
   <div class="container">
     <div class="video-wrapper">
