@@ -238,37 +238,28 @@ if (SpeechRecognition) {
     });
 
     // Manipulação dos resultados do reconhecimento
-    recognition.onresult = (event) => {
-    let interimTranscript = '';
+   recognition.onresult = (event) => {
     let finalTranscript = '';
 
     for (let i = event.resultIndex; i < event.results.length; i++) {
-        const transcript = event.results[i][0].transcript;
-        if (event.results[i].isFinal) {
-            finalTranscript += transcript;
-        } else {
-            interimTranscript += transcript;
+        const result = event.results[i];
+        if (result.isFinal) {
+            finalTranscript += result[0].transcript;
         }
     }
 
-    // Cria bloco invisível para frase final
     if (finalTranscript.trim()) {
         const phraseBox = document.createElement('div');
         phraseBox.textContent = finalTranscript;
         phraseBox.className = 'phrase-box';
         textDisplay.appendChild(phraseBox);
     }
+};
 
-    // Exibe texto em andamento (opcional)
-    if (interimTranscript.trim()) {
-        const interimBox = document.getElementById('interimBox') || document.createElement('div');
-        interimBox.id = 'interimBox';
-        interimBox.innerHTML = `<i>${interimTranscript}</i>`;
-        textDisplay.appendChild(interimBox);
-    } else {
-        const existingInterim = document.getElementById('interimBox');
-        if (existingInterim) existingInterim.remove();
-    }
+recognition.onend = () => {
+    // Não reinicia automaticamente
+    isListening = false;
+    textDisplay.textContent = `${currentLang.flag} ${getMicOffMessage(currentLang.code)}`;
 };
 
     // Tratamento de erros
