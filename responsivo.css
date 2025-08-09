@@ -42,17 +42,17 @@ body {
   left: 50%;
   transform: translateX(-50%);
   width: 80%;
-  height: 200px;
+  max-height: 200px;               /* ← Limita a altura máxima */
   border: 2px solid #007BFF;
   border-radius: 12px;
   background-color: rgba(255, 255, 255, 0.1);
   z-index: 20;
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;     /* Alinha no topo */
-  align-items: center;             /* ← Alinha frases ao centro horizontal */
+  justify-content: flex-start;
+  align-items: stretch;            /* ← Garante que cada frase ocupe toda a largura */
   padding: 12px;
-  overflow-y: auto;
+  overflow-y: auto;                /* ← Permite rolagem vertical */
 }
 
 /* 🗨️ Frases individuais */
@@ -63,8 +63,9 @@ body {
   color: #000;
   background: transparent;
   border: none;
-  width: 100%;
-  text-align: center;              /* ← Centraliza o texto */
+  width: 100%;                     /* ← Ocupa toda a largura disponível */
+  text-align: left;                /* ← Alinha o texto à esquerda */
+  word-wrap: break-word;           /* ← Quebra linhas se o texto for longo */
 }
 
 /* 📹 Vídeo local em PIP */
