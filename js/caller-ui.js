@@ -262,7 +262,7 @@ if (SpeechRecognition) {
             phraseBox.innerHTML = `${finalTranscript} <i>${interimTranscript}</i>`;
 
             // Adiciona no chat-input-box em vez de chatContainer
-            const chatInputBox = document.getElementById('chat-input-box');
+            const chatInputBox = document.querySelector('.chat-input-box');
             if (chatInputBox) {
                 chatInputBox.appendChild(phraseBox);
             } else {
