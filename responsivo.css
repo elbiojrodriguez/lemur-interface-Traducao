@@ -1,6 +1,6 @@
-/* styles.css - Versão Completa Integrada */
+/* responsivo.css - Versão Otimizada */
 
-/* Reset e Base */
+/* Reset e base (mantido igual) */
 * {
   margin: 0;
   padding: 0;
@@ -16,7 +16,7 @@ body {
   position: relative;
 }
 
-/* Container Principal */
+/* Container principal (mantido) */
 .container {
   position: relative;
   width: 100%;
@@ -24,7 +24,52 @@ body {
   overflow: hidden;
 }
 
-/* Elementos de Vídeo */
+/* 🔵 Box de Chat - NOVOS ESTILOS */
+.chat-input-box {
+  position: absolute;
+  bottom: 350px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80%;
+  height: 200px;
+  border: 2px solid #007BFF;
+  border-radius: 12px;
+  background-color: rgba(255, 255, 255, 0.9); /* Fundo mais legível */
+  z-index: 20;
+  overflow-y: auto;
+  padding: 10px;
+  display: flex;
+  flex-direction: column-reverse; /* Novas mensagens no topo */
+}
+
+/* Placeholder inicial */
+.text-display-placeholder {
+  margin: auto;
+  color: #666;
+  text-align: center;
+  font-size: 18px;
+  padding: 10px;
+}
+
+/* 💬 Frases reconhecidas - ESTILOS ATUALIZADOS */
+.phrase-box {
+  margin: 8px 0;
+  padding: 12px;
+  font-size: 18px;
+  color: #000;
+  background: rgba(0, 123, 255, 0.1);
+  border-radius: 8px;
+  word-break: break-word;
+  animation: fadeIn 0.3s ease;
+  border-left: 3px solid #007BFF; /* Destaque visual */
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Vídeos (mantido igual) */
 .video-wrapper {
   position: relative;
   width: 100%;
@@ -37,67 +82,27 @@ body {
   object-fit: cover;
 }
 
-/* Picture-in-Picture (Vídeo Local) */
-.video-wrapper:nth-child(2) {
-  position: absolute;
-  bottom: calc(80px + 60px);
-  right: 5px;
-  width: 34.5%;
-  max-width: 138px;
-  height: 184px;
-  transform: translateX(-17%);
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-  border: 2px solid #4CAF50;
-  z-index: 10;
+/* Vídeo local em PIP (mantido) */
+.video-wrapper:nth-child(2) { 
+  position: absolute; 
+  bottom: calc(80px + 60px); 
+  right: 5px; 
+  width: 34.5%; 
+  max-width: 138px; 
+  height: 184px; 
+  transform: translateX(-17%); 
+  border-radius: 8px; 
+  overflow: hidden; 
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); 
+  border: 2px solid #4CAF50; 
+  z-index: 10; 
 }
 
 .video-wrapper:nth-child(2) video {
   transform: scaleX(-1);
 }
 
-/* Área de Chat */
-.chat-input-box {
-  position: absolute;
-  bottom: 350px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 80%;
-  height: 200px;
-  border: 2px solid #007BFF;
-  border-radius: 12px;
-  background-color: rgba(255, 255, 255, 0.9);
-  z-index: 20;
-  overflow-y: auto;
-  padding: 10px;
-  display: flex;
-  flex-direction: column-reverse;
-}
-
-/* Placeholder do Chat */
-.chat-input-box:empty::before {
-  content: attr(data-placeholder);
-  margin: auto;
-  color: #666;
-  text-align: center;
-  font-size: 18px;
-}
-
-/* Mensagens/Frases */
-.phrase-box {
-  padding: 8px;
-  margin: 6px 0;
-  background-color: rgba(0, 123, 255, 0.1);
-  border-radius: 8px;
-  color: #000;
-  font-size: 16px;
-  border-left: 3px solid #007BFF;
-  animation: fadeIn 0.3s ease;
-  word-break: break-word;
-}
-
-/* Controles */
+/* Controles (mantido) */
 .controls {
   position: absolute;
   bottom: calc(225px + 60px);
@@ -124,7 +129,7 @@ body {
   background: #4CAF50;
 }
 
-/* Overlay de Informação */
+/* Overlay (mantido) */
 .info-overlay {
   position: absolute;
   top: 20px;
@@ -137,13 +142,7 @@ body {
   padding: 10px;
 }
 
-/* Animações */
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-/* Responsividade */
+/* Responsividade (mantido) */
 @media (max-width: 768px) {
   .video-wrapper:nth-child(2) {
     height: 120px;
