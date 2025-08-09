@@ -1,7 +1,7 @@
 import WebRTCCore from '../core/webrtc-core.js';
 
 window.onload = () => {
-  const chatContainer = document.getElementById('chatContainer');
+  const chatContainer = document.getElementById('.chat-input-box');
   const rtcCore = new WebRTCCore();
   const myId = crypto.randomUUID().substr(0, 8);
   document.getElementById('myId').textContent = myId;
