@@ -194,92 +194,100 @@ let isListening = false; // Controla o estado do microfone
 
 if (SpeechRecognition) {
     recognition = new SpeechRecognition();
-    recognition.continuous = false;  // Alterado para false (melhor para Android)
-    recognition.interimResults = false;  // Alterado para false (mais estável)
+    recognition.continuous = false;  // Melhor para Android
+    recognition.interimResults = false;  // Mais estável
     recognition.lang = currentLang.code;
-    
-    // Mensagem inicial no idioma correto (usando speakText como base)
-    textDisplay.textContent = `${currentLang.flag} ${getClickToSpeakMessage(currentLang.code)}`;
 
-    // Configura o clique na bandeira para ativar/desativar o microfone
+    // Mensagem inicial no idioma correto
+    textDisplay.textContent = `${getClickToSpeakMessage(currentLang.code)}`;
+
+    // Clique na bandeira ativa/desativa o microfone
     detectedLangBubble.style.cursor = 'pointer';
     detectedLangBubble.addEventListener('click', () => {
         if (!isListening) {
             try {
                 recognition.start();
-                textDisplay.textContent = `${currentLang.flag} ${currentLang.speakText}...`;
+                textDisplay.textContent = `${currentLang.speakText}...`;
                 isListening = true;
             } catch (e) {
                 console.error('Erro ao iniciar microfone:', e);
-                textDisplay.textContent = `${currentLang.flag} ${getErrorMessage(currentLang.code)}`;
+                textDisplay.textContent = `${getErrorMessage(currentLang.code)}`;
             }
         } else {
             recognition.stop();
-            textDisplay.textContent = `${currentLang.flag} ${getMicOffMessage(currentLang.code)}`;
+            textDisplay.textContent = `${getMicOffMessage(currentLang.code)}`;
             isListening = false;
         }
     });
 
-    // Configuração do menu de idiomas (MANTIDO ORIGINAL)
+    // Menu de idiomas (mantido)
     languageMenu.addEventListener('click', (e) => {
         if (e.target.classList.contains('lang-option')) {
             const langCode = e.target.dataset.langCode;
             const flag = e.target.textContent;
             const langName = e.target.title;
-            
+
             currentLang = languages.find(l => l.code === langCode);
             detectedLangBubble.textContent = currentLang.flag;
             detectedLangBubble.title = `Idioma atual: ${currentLang.name}`;
-            
+
             if (isListening) {
                 recognition.stop();
                 isListening = false;
             }
-            
+
             recognition.lang = langCode;
-            textDisplay.textContent = `${flag} ${getClickToSpeakMessage(langCode)}`;
+            textDisplay.textContent = `${getClickToSpeakMessage(langCode)}`;
             languageMenu.style.display = 'none';
         }
     });
 
-    // Manipulação dos resultados do reconhecimento (SIMPLIFICADO para Android)
-recognition.onresult = (event) => {
-    let finalTranscript = '';
-    let interimTranscript = '';
-    
-    for (let i = event.resultIndex; i < event.results.length; i++) {
-        const transcript = event.results[i][0].transcript;
-        if (event.results[i].isFinal) {
-            finalTranscript += transcript;
-        } else {
-            interimTranscript += transcript;
-        }
-    }
+    // Resultado do reconhecimento (ajustado)
+    recognition.onresult = (event) => {
+        let finalTranscript = '';
+        let interimTranscript = '';
 
-    if (finalTranscript.trim()) {
-        const phraseBox = document.createElement('div');
-        phraseBox.className = 'phrase-box';
-        phraseBox.innerHTML = `${currentLang.flag} ${finalTranscript} <i>${interimTranscript}</i>`;
-        chatContainer.appendChild(phraseBox); // Adiciona SEM apagar os anteriores
-    }
-};
-    // Tratamento de erros (MANTIDO ORIGINAL)
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+            const transcript = event.results[i][0].transcript;
+            if (event.results[i].isFinal) {
+                finalTranscript += transcript;
+            } else {
+                interimTranscript += transcript;
+            }
+        }
+
+        if (finalTranscript.trim()) {
+            const phraseBox = document.createElement('div');
+            phraseBox.className = 'phrase-box';
+            phraseBox.innerHTML = `${finalTranscript} <i>${interimTranscript}</i>`;
+
+            // Adiciona no chat-input-box em vez de chatContainer
+            const chatInputBox = document.getElementById('chat-input-box');
+            if (chatInputBox) {
+                chatInputBox.appendChild(phraseBox);
+            } else {
+                console.warn('Elemento chat-input-box não encontrado');
+            }
+        }
+    };
+
+    // Tratamento de erros
     recognition.onerror = (event) => {
         console.error('Erro no reconhecimento:', event.error);
-        textDisplay.textContent = `${currentLang.flag} ${getErrorMessage(currentLang.code)}`;
+        textDisplay.textContent = `${getErrorMessage(currentLang.code)}`;
         isListening = false;
     };
 
-    // Quando o reconhecimento termina naturalmente (MODIFICADO para controle)
+    // Reinício com delay para Android
     recognition.onend = () => {
         if (isListening) {
-            setTimeout(() => {  // Pequeno delay para Android
+            setTimeout(() => {
                 try {
                     recognition.start();
                 } catch (e) {
                     console.error('Erro ao reiniciar:', e);
                     isListening = false;
-                    textDisplay.textContent = `${currentLang.flag} ${getErrorMessage(currentLang.code)}`;
+                    textDisplay.textContent = `${getErrorMessage(currentLang.code)}`;
                 }
             }, 300);
         }
@@ -290,7 +298,7 @@ recognition.onresult = (event) => {
     console.error('API de reconhecimento de voz não suportada');
 }
 
-// Funções auxiliares para traduzir mensagens (MANTIDAS ORIGINAIS)
+// Funções auxiliares para mensagens
 function getClickToSpeakMessage(langCode) {
     const messages = {
         'en-US': 'Click flag to speak',
