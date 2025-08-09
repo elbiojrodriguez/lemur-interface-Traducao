@@ -1,6 +1,7 @@
 import WebRTCCore from '../core/webrtc-core.js';
 
 window.onload = () => {
+  const chatInputBox = document.querySelector('.chat-input-box');
   const textDisplay = document.getElementById('textDisplay'); // 🔹 Adiciona esta linha
   const rtcCore = new WebRTCCore();
   const myId = crypto.randomUUID().substr(0, 8);
@@ -12,7 +13,6 @@ window.onload = () => {
   const remoteVideo = document.getElementById('remoteVideo');
   let targetId = null;
   let localStream = null;
-
 
   // 🔓 Solicita acesso à câmera logo na abertura
   navigator.mediaDevices.getUserMedia({ video: true, audio: false })
@@ -44,7 +44,6 @@ window.onload = () => {
     stream.getAudioTracks().forEach(track => track.enabled = false);
     localVideo.srcObject = stream;
   });
-
 
     // #############################################
     // 🔴 PARTE MODIFICADA: Controles de idioma dinâmicos (sem depender do HTML)
@@ -219,7 +218,8 @@ if (SpeechRecognition) {
             textDisplay.textContent = `${getMicOffMessage(currentLang.code)}`;
             isListening = false;
         }
-    });
+    }
+                                       );
 
     // Menu de idiomas (mantido)
     languageMenu.addEventListener('click', (e) => {
