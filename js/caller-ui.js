@@ -241,37 +241,58 @@ window.onload = () => {
       }
     });
 
-    // Resultado do reconhecimento
-    recognition.onresult = (event) => {
-      if (textDisplay.classList.contains('text-display-placeholder')) {
-        textDisplay.style.display = 'none';
-      }
+// Resultado do reconhecimento
+recognition.onresult = (event) => {
+  if (textDisplay.classList.contains('text-display-placeholder')) {
+    textDisplay.style.display = 'none';
+  }
 
-      let finalTranscript = '';
-      let interimTranscript = '';
+  let finalTranscript = '';
+  let interimTranscript = '';
 
-      for (let i = event.resultIndex; i < event.results.length; i++) {
-        const transcript = event.results[i][0].transcript;
-        if (event.results[i].isFinal) {
-          finalTranscript += transcript;
-        } else {
-          interimTranscript += transcript;
-        }
-      }
+  for (let i = event.resultIndex; i < event.results.length; i++) {
+    const transcript = event.results[i][0].transcript;
+    if (event.results[i].isFinal) {
+      finalTranscript += transcript;
+    } else {
+      interimTranscript += transcript;
+    }
+  }
 
-      if (finalTranscript.trim()) {
-        const phraseBox = document.createElement('div');
-        phraseBox.className = 'phrase-box';
-        phraseBox.innerHTML = `${finalTranscript} <i>${interimTranscript}</i>`;
+  const chatInputBox = document.querySelector('.chat-input-box');
+  
+  // Novo: Feedback em tempo real enquanto fala
+  if (interimTranscript && !finalTranscript) {
+    let interimBox = document.querySelector('.interim-box');
+    
+    if (!interimBox) {
+      interimBox = document.createElement('div');
+      interimBox.className = 'phrase-box interim-box';
+      if (chatInputBox) chatInputBox.appendChild(interimBox);
+    }
+    
+    interimBox.innerHTML = `<span class="interim-text">${interimTranscript}</span>`;
+    if (chatInputBox) chatInputBox.scrollTop = chatInputBox.scrollHeight;
+  }
 
-        const chatInputBox = document.querySelector('.chat-input-box');
-        if (chatInputBox) {
-          chatInputBox.appendChild(phraseBox);
-        } else {
-          console.warn('Elemento chat-input-box não encontrado');
-        }
-      }
-    };
+  // Mantém o comportamento original para frases finais
+  if (finalTranscript.trim()) {
+    // Remove o texto interim se existir
+    const interimBox = document.querySelector('.interim-box');
+    if (interimBox) interimBox.remove();
+    
+    const phraseBox = document.createElement('div');
+    phraseBox.className = 'phrase-box';
+    phraseBox.innerHTML = `<span class="final-text">${finalTranscript}</span>`;
+    
+    if (chatInputBox) {
+      chatInputBox.appendChild(phraseBox);
+      chatInputBox.scrollTop = chatInputBox.scrollHeight;
+    } else {
+      console.warn('Elemento chat-input-box não encontrado');
+    }
+  }
+};
 
     // Tratamento de erros
     recognition.onerror = (event) => {
@@ -282,24 +303,38 @@ window.onload = () => {
     };
 
     // Reinício com delay para Android
-    recognition.onend = () => {
-      if (!document.querySelector('.phrase-box')) {
+recognition.onend = () => {
+  // Limpa o texto interim se não houve resultado final (NOVO)
+  const interimBox = document.querySelector('.interim-box');
+  if (interimBox && !document.querySelector('.phrase-box:not(.interim-box)')) {
+    interimBox.remove();
+  }
+
+  // Mantém a verificação original do placeholder (EXISTENTE)
+  if (!document.querySelector('.phrase-box')) {
+    textDisplay.style.display = 'flex';
+  }
+
+  // Mantém a lógica de reinício original (EXISTENTE)
+  if (isListening) {
+    setTimeout(() => {
+      try {
+        recognition.start();
+        
+        // Novo feedback visual ao reiniciar
+        if (!document.querySelector('.interim-box') && textDisplay.style.display === 'none') {
+          textDisplay.textContent = `${currentLang.speakText}...`;
+          textDisplay.style.display = 'flex';
+        }
+      } catch (e) {
+        console.error('Erro ao reiniciar:', e);
+        isListening = false;
+        textDisplay.textContent = `${getErrorMessage(currentLang.code)}`;
         textDisplay.style.display = 'flex';
       }
-
-      if (isListening) {
-        setTimeout(() => {
-          try {
-            recognition.start();
-          } catch (e) {
-            console.error('Erro ao reiniciar:', e);
-            isListening = false;
-            textDisplay.textContent = `${getErrorMessage(currentLang.code)}`;
-            textDisplay.style.display = 'flex';
-          }
-        }, 300);
-      }
-    };
+    }, 300);
+  }
+};
   } else {
     textDisplay.textContent = 'Seu navegador não suporta reconhecimento de voz';
     textDisplay.style.color = 'black';
