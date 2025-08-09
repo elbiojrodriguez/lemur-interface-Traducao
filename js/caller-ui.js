@@ -1,8 +1,6 @@
 import WebRTCCore from '../core/webrtc-core.js';
 
 window.onload = () => {
-  const chatInputBox = document.querySelector('.chat-input-box');
-  const textDisplay = document.getElementById('textDisplay'); // 🔹 Adiciona esta linha
   const rtcCore = new WebRTCCore();
   const myId = crypto.randomUUID().substr(0, 8);
   document.getElementById('myId').textContent = myId;
@@ -44,6 +42,7 @@ window.onload = () => {
     stream.getAudioTracks().forEach(track => track.enabled = false);
     localVideo.srcObject = stream;
   });
+
 
     // #############################################
     // 🔴 PARTE MODIFICADA: Controles de idioma dinâmicos (sem depender do HTML)
@@ -187,40 +186,35 @@ langControls.appendChild(langSelectButton);
         languageMenu.style.display = 'none';
     });
 
-// 10. Configuração do reconhecimento de voz (modificado para controle manual e Android)
+// 10. Configuração do reconhecimento de voz (modificado para controle manual)
 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 let recognition = null;
 let isListening = false; // Controla o estado do microfone
 
 if (SpeechRecognition) {
     recognition = new SpeechRecognition();
-    recognition.continuous = false; // Melhor para Android
-    recognition.interimResults = false; // Mais estável
+    recognition.continuous = true;
+    recognition.interimResults = true;
     recognition.lang = currentLang.code;
     
-    // Mensagem inicial no idioma correto
-    textDisplay.textContent = `${getClickToSpeakMessage(currentLang.code)}`;
-    
-    // Clique na bandeira ativa/desativa o microfone
+    // Mensagem inicial no idioma correto (usando speakText como base)
+    textDisplay.textContent = `${currentLang.flag} ${getClickToSpeakMessage(currentLang.code)}`;
+
+    // Configura o clique na bandeira para ativar/desativar o microfone
     detectedLangBubble.style.cursor = 'pointer';
     detectedLangBubble.addEventListener('click', () => {
         if (!isListening) {
-            try {
-                recognition.start();
-                textDisplay.textContent = `${currentLang.speakText}...`;
-                isListening = true;
-            } catch (e) {
-                console.error('Erro ao iniciar microfone:', e);
-                textDisplay.textContent = `${getErrorMessage(currentLang.code)}`;
-            }
+            recognition.start();
+            textDisplay.textContent = `${currentLang.flag} ${currentLang.speakText}...`;
+            isListening = true;
         } else {
             recognition.stop();
-            textDisplay.textContent = `${getMicOffMessage(currentLang.code)}`;
+            textDisplay.textContent = `${currentLang.flag} ${getMicOffMessage(currentLang.code)}`;
             isListening = false;
         }
     });
-    
-    // Menu de idiomas (mantido)
+
+    // Configuração do menu de idiomas
     languageMenu.addEventListener('click', (e) => {
         if (e.target.classList.contains('lang-option')) {
             const langCode = e.target.dataset.langCode;
@@ -237,59 +231,39 @@ if (SpeechRecognition) {
             }
             
             recognition.lang = langCode;
-            textDisplay.textContent = `${getClickToSpeakMessage(langCode)}`;
+            textDisplay.textContent = `${flag} ${getClickToSpeakMessage(langCode)}`;
             languageMenu.style.display = 'none';
         }
     });
-    
-    // Resultado do reconhecimento (ajustado)
+
+    // Manipulação dos resultados do reconhecimento
     recognition.onresult = (event) => {
-        let finalTranscript = '';
         let interimTranscript = '';
+        let finalTranscript = '';
         
         for (let i = event.resultIndex; i < event.results.length; i++) {
             const transcript = event.results[i][0].transcript;
             if (event.results[i].isFinal) {
-                finalTranscript += transcript;
+                finalTranscript += transcript + ' ';
             } else {
                 interimTranscript += transcript;
             }
         }
         
-        if (finalTranscript.trim()) {
-            const phraseBox = document.createElement('div');
-            phraseBox.className = 'phrase-box';
-            phraseBox.innerHTML = `${finalTranscript} <i>${interimTranscript}</i>`;
-            
-            // Adiciona no chat-input-box em vez de chatContainer
-            const chatInputBox = document.getElementById('chat-input-box');
-            if (chatInputBox) {
-                chatInputBox.appendChild(phraseBox);
-            } else {
-                console.warn('Elemento chat-input-box não encontrado');
-            }
-        }
+        textDisplay.innerHTML = finalTranscript + '<i>' + interimTranscript + '</i>';
     };
-    
+
     // Tratamento de erros
     recognition.onerror = (event) => {
         console.error('Erro no reconhecimento:', event.error);
-        textDisplay.textContent = `${getErrorMessage(currentLang.code)}`;
+        textDisplay.textContent = `${currentLang.flag} ${getErrorMessage(currentLang.code)}`;
         isListening = false;
     };
-    
-    // Reinício com delay para Android
+
+    // Quando o reconhecimento termina naturalmente
     recognition.onend = () => {
         if (isListening) {
-            setTimeout(() => {
-                try {
-                    recognition.start();
-                } catch (e) {
-                    console.error('Erro ao reiniciar:', e);
-                    isListening = false;
-                    textDisplay.textContent = `${getErrorMessage(currentLang.code)}`;
-                }
-            }, 300);
+            recognition.start();
         }
     };
 } else {
@@ -298,7 +272,7 @@ if (SpeechRecognition) {
     console.error('API de reconhecimento de voz não suportada');
 }
 
-// Funções auxiliares para mensagens
+// Funções auxiliares para traduzir mensagens (adicionar ANTES do bloco 10)
 function getClickToSpeakMessage(langCode) {
     const messages = {
         'en-US': 'Click flag to speak',
@@ -343,4 +317,4 @@ function getErrorMessage(langCode) {
     };
     return messages[langCode] || messages['en-US'];
 }
-  };
+};
