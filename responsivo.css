@@ -1,4 +1,6 @@
-/* Reset básico para mobile */
+/* styles.css - Versão Completa Integrada */
+
+/* Reset e Base */
 * {
   margin: 0;
   padding: 0;
@@ -14,7 +16,7 @@ body {
   position: relative;
 }
 
-/* Container principal */
+/* Container Principal */
 .container {
   position: relative;
   width: 100%;
@@ -22,17 +24,7 @@ body {
   overflow: hidden;
 }
 
-.phrase-box {
-  margin: 4px 0;
-  padding: 0;
-  font-size: 18px;
-  color: blak;
-  background: transparent;
-  border: none;
-  word-break: break-word;
-}
-
-/* Vídeos principais */
+/* Elementos de Vídeo */
 .video-wrapper {
   position: relative;
   width: 100%;
@@ -45,22 +37,64 @@ body {
   object-fit: cover;
 }
 
-/* Vídeo local em PIP */
-.video-wrapper:nth-child(2) { 
-position: absolute; 
-bottom: calc(80px + 60px); 
-right: 5px; 
-width: 34.5%; 
-max-width: 138px; 
-height: 184px; 
-transform: translateX(-17%); 
-border-radius: 8px; overflow: hidden; 
-box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); 
-border: 2px solid #4CAF50; z-index: 10; 
+/* Picture-in-Picture (Vídeo Local) */
+.video-wrapper:nth-child(2) {
+  position: absolute;
+  bottom: calc(80px + 60px);
+  right: 5px;
+  width: 34.5%;
+  max-width: 138px;
+  height: 184px;
+  transform: translateX(-17%);
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+  border: 2px solid #4CAF50;
+  z-index: 10;
 }
 
 .video-wrapper:nth-child(2) video {
   transform: scaleX(-1);
+}
+
+/* Área de Chat */
+.chat-input-box {
+  position: absolute;
+  bottom: 350px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80%;
+  height: 200px;
+  border: 2px solid #007BFF;
+  border-radius: 12px;
+  background-color: rgba(255, 255, 255, 0.9);
+  z-index: 20;
+  overflow-y: auto;
+  padding: 10px;
+  display: flex;
+  flex-direction: column-reverse;
+}
+
+/* Placeholder do Chat */
+.chat-input-box:empty::before {
+  content: attr(data-placeholder);
+  margin: auto;
+  color: #666;
+  text-align: center;
+  font-size: 18px;
+}
+
+/* Mensagens/Frases */
+.phrase-box {
+  padding: 8px;
+  margin: 6px 0;
+  background-color: rgba(0, 123, 255, 0.1);
+  border-radius: 8px;
+  color: #000;
+  font-size: 16px;
+  border-left: 3px solid #007BFF;
+  animation: fadeIn 0.3s ease;
+  word-break: break-word;
 }
 
 /* Controles */
@@ -74,11 +108,10 @@ border: 2px solid #4CAF50; z-index: 10;
   z-index: 20;
 }
 
-
 .controls button {
-  width: 100px;         /* Largura maior */
-  height: 40px;         /* Altura menor */
-  border-radius: 20px;  /* Metade da altura = forma oval */
+  width: 100px;
+  height: 40px;
+  border-radius: 20px;
   border: none;
   font-size: 18px;
   font-weight: bold;
@@ -91,11 +124,7 @@ border: 2px solid #4CAF50; z-index: 10;
   background: #4CAF50;
 }
 
-#scanBtn {
-  background: #2196F3;
-}
-
-/* Overlay de informações */
+/* Overlay de Informação */
 .info-overlay {
   position: absolute;
   top: 20px;
@@ -104,48 +133,25 @@ border: 2px solid #4CAF50; z-index: 10;
   z-index: 30;
   color: white;
   text-align: center;
-  background: transparent; /* ← removido o cinza */;
+  background: transparent;
   padding: 10px;
-  border-radius: 0 0 10px 10px;
 }
 
-/* QR Code */
-.qrcode-container {
-  margin: 10px auto;
-  padding: 12px;
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-  display: inline-block;
+/* Animações */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-/* ID visual opcional */
-#myId {
-  display: inline-block;
-  font-size: 16px;
-  font-weight: bold;
-  background: rgba(255, 255, 255, 0.1);
-  padding: 6px 12px;
-  border-radius: 20px;
-  user-select: all;
-  cursor: pointer;
-  color: white;
-}
-
-
+/* Responsividade */
+@media (max-width: 768px) {
   .video-wrapper:nth-child(2) {
-  .video-wrapper:nth-child(2) {
-  height: 120px;
-  max-width: 100px;
-  bottom: calc(60px + 60px);
-}
-
+    height: 120px;
+    max-width: 100px;
+    bottom: calc(60px + 60px);
+  }
+  
   .info-overlay {
     padding: 8px;
-  }
-
-  .qrcode-container {
-    padding: 8px;
-    max-width: 90%;
   }
 }
