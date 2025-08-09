@@ -238,20 +238,26 @@ if (SpeechRecognition) {
 
     // Manipulação dos resultados do reconhecimento
     recognition.onresult = (event) => {
-        let interimTranscript = '';
-        let finalTranscript = '';
-        
-        for (let i = event.resultIndex; i < event.results.length; i++) {
-            const transcript = event.results[i][0].transcript;
-            if (event.results[i].isFinal) {
-                finalTranscript += transcript + ' ';
-            } else {
-                interimTranscript += transcript;
-            }
-        }
-        
-        textDisplay.innerHTML = finalTranscript + '<i>' + interimTranscript + '</i>';
-    };
+  const transcript = event.results[0][0].transcript.trim();
+  if (transcript) {
+    // Cria um bloco INVISÍVEL para a nova frase
+    const phraseBox = document.createElement('div');
+    phraseBox.className = 'phrase-box';
+    phraseBox.textContent = `${currentLang.flag} ${transcript}`;
+    chatContainer.appendChild(phraseBox);
+    
+    // Mantém o scroll mostrando a última frase
+    chatContainer.scrollTop = chatContainer.scrollHeight;
+    
+    // Envia via Socket.IO (já existente no seu código)
+    if (socket) {
+      socket.emit('mensagem-traducao', {
+        texto: transcript,
+        idioma: currentLang.code
+      });
+    }
+  }
+};
 
     // Tratamento de erros
     recognition.onerror = (event) => {
