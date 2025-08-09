@@ -82,35 +82,44 @@ window.onload = () => {
 
   // 🔻 Função de reconhecimento de voz
   function startSpeechRecognition(language) {
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SpeechRecognition) {
-      chatBox.textContent = "Reconhecimento de voz não suportado neste navegador.";
-      return;
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRecognition) {
+    chatBox.textContent = "Reconhecimento de voz não suportado neste navegador.";
+    return;
+  }
+
+  const recognition = new SpeechRecognition();
+  recognition.lang = language;
+  recognition.interimResults = false;
+  recognition.continuous = false;
+
+  recognition.onresult = (event) => {
+    let transcript = '';
+    for (let i = event.resultIndex; i < event.results.length; ++i) {
+      const result = event.results[i];
+      if (result.isFinal) {
+        transcript += result[0].transcript;
+      }
     }
 
-    const recognition = new SpeechRecognition();
-    recognition.lang = language;
-    recognition.interimResults = true;
-    recognition.continuous = false;
+    if (transcript.trim()) {
+      const phraseBox = document.createElement('div');
+      phraseBox.textContent = transcript;
+      phraseBox.className = 'phrase-box';
+      chatBox.appendChild(phraseBox);
+    }
+  };
 
-    chatBox.textContent = `🎤 Ouvindo (${language})...`;
+  recognition.onerror = (event) => {
+    const errorBox = document.createElement('div');
+    errorBox.textContent = "Erro: " + event.error;
+    errorBox.className = 'phrase-box';
+    chatBox.appendChild(errorBox);
+  };
 
-    recognition.onresult = (event) => {
-      let transcript = '';
-      for (let i = event.resultIndex; i < event.results.length; ++i) {
-        transcript += event.results[i][0].transcript;
-      }
-      chatBox.textContent = transcript;
-    };
+  recognition.onend = () => {
+    recognition.start(); // Reinicia automaticamente após pausa
+  };
 
-    recognition.onerror = (event) => {
-      chatBox.textContent = "Erro: " + event.error;
-    };
-
-    recognition.onend = () => {
-      chatBox.textContent += "\n✅ Fala encerrada.";
-    };
-
-    recognition.start();
-  }
+  recognition.start();
 };
