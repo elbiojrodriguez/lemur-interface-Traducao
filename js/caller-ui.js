@@ -187,77 +187,58 @@ langControls.appendChild(langSelectButton);
     });
 
 // 10. Configuração do reconhecimento de voz (modificado para controle manual)
-const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-let recognition = null;
-let isListening = false; // Controla o estado do microfone
+// Configuração SIMPLIFICADA do reconhecimento de voz
+const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+recognition.continuous = false;  // Importante para Android
+recognition.interimResults = false;
+recognition.lang = currentLang.code;
 
-if (SpeechRecognition) {
-    recognition = new SpeechRecognition();
-    recognition.continuous = true;
-    recognition.interimResults = true;
-    recognition.lang = currentLang.code;
-    
-    // Mensagem inicial no idioma correto (usando speakText como base)
-    textDisplay.textContent = `${currentLang.flag} ${getClickToSpeakMessage(currentLang.code)}`;
+// Controle do microfone (liga/desliga ao clicar na bandeira)
+detectedLangBubble.addEventListener('click', () => {
+  if (recognition.isListening) {
+    recognition.stop();
+    recognition.isListening = false;
+  } else {
+    recognition.start();
+    recognition.isListening = true;
+  }
+});
 
-    // Configura o clique na bandeira para ativar/desativar o microfone
-    detectedLangBubble.style.cursor = 'pointer';
-    detectedLangBubble.addEventListener('click', () => {
-        if (!isListening) {
-            recognition.start();
-            textDisplay.textContent = `${currentLang.flag} ${currentLang.speakText}...`;
-            isListening = true;
-        } else {
-            recognition.stop();
-            textDisplay.textContent = `${currentLang.flag} ${getMicOffMessage(currentLang.code)}`;
-            isListening = false;
-        }
-    }
-                                       );
-
-    // Configuração do menu de idiomas
-    languageMenu.addEventListener('click', (e) => {
-        if (e.target.classList.contains('lang-option')) {
-            const langCode = e.target.dataset.langCode;
-            const flag = e.target.textContent;
-            const langName = e.target.title;
-            
-            currentLang = languages.find(l => l.code === langCode);
-            detectedLangBubble.textContent = currentLang.flag;
-            detectedLangBubble.title = `Idioma atual: ${currentLang.name}`;
-            
-            if (isListening) {
-                recognition.stop();
-                isListening = false;
-            }
-            
-            recognition.lang = langCode;
-            textDisplay.textContent = `${flag} ${getClickToSpeakMessage(langCode)}`;
-            languageMenu.style.display = 'none';
-        }
-    });
-
-    // Manipulação dos resultados do reconhecimento
-    recognition.onresult = (event) => {
+// Quando detectar fala
+recognition.onresult = (event) => {
   const transcript = event.results[0][0].transcript.trim();
   if (transcript) {
-    // Cria um bloco INVISÍVEL para a nova frase
+    // Cria bloco com a frase
     const phraseBox = document.createElement('div');
     phraseBox.className = 'phrase-box';
     phraseBox.textContent = `${currentLang.flag} ${transcript}`;
-    chatContainer.appendChild(phraseBox);
+    document.getElementById('chatContainer').appendChild(phraseBox);
     
-    // Mantém o scroll mostrando a última frase
-    chatContainer.scrollTop = chatContainer.scrollHeight;
-    
-    // Envia via Socket.IO (já existente no seu código)
-    if (socket) {
-      socket.emit('mensagem-traducao', {
-        texto: transcript,
-        idioma: currentLang.code
+    // Envia via Socket.IO (se existir)
+    if (typeof socket !== 'undefined') {
+      socket.emit('mensagem', { 
+        texto: transcript, 
+        idioma: currentLang.code 
       });
     }
   }
+};
+
+// Se der erro
+recognition.onerror = (e) => {
+  console.log('Erro:', e.error);
+};
+
+// Reinicia automaticamente
+recognition.onend = () => {
+  if (recognition.isListening) {
+    recognition.start();
+  }
+};
+
+// Inicia pela primeira vez
+recognition.isListening = true;
+recognition.start();
 };
 
     // Tratamento de erros
