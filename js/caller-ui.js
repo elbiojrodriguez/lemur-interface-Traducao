@@ -50,6 +50,7 @@ window.onload = () => {
 
   // 1. Configuração do chat (box azul)
   const textDisplay = document.createElement('div');
+  textDisplay.className = 'text-display-placeholder'; // MODIFICAÇÃO 1
   textDisplay.style.padding = '10px';
   textDisplay.style.color = 'black';
   textDisplay.style.textAlign = 'center';
@@ -235,6 +236,11 @@ window.onload = () => {
 
     // Resultado do reconhecimento
     recognition.onresult = (event) => {
+      // MODIFICAÇÃO 2 - Esconde placeholder ao detectar fala
+      if (textDisplay.classList.contains('text-display-placeholder')) {
+        textDisplay.style.display = 'none';
+      }
+
       let finalTranscript = '';
       let interimTranscript = '';
 
@@ -270,6 +276,11 @@ window.onload = () => {
 
     // Reinício com delay para Android
     recognition.onend = () => {
+      // MODIFICAÇÃO 3 - Resetar ao parar reconhecimento
+      if (!document.querySelector('.phrase-box')) {
+        textDisplay.style.display = 'flex';
+      }
+
       if (isListening) {
         setTimeout(() => {
           try {
