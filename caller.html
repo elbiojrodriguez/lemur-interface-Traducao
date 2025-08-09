@@ -61,7 +61,16 @@
     from { opacity: 0; transform: translateY(2px); }
     to { opacity: 1; transform: translateY(0); }
 }
+/* Estilo para quando o microfone está ativo continuamente */
+.listening-mode .text-display-placeholder {
+    animation: pulseOpacity 2s infinite;
+}
 
+@keyframes pulseOpacity {
+    0% { opacity: 0.8; }
+    50% { opacity: 0.4; }
+    100% { opacity: 0.8; }
+}
 @keyframes textFinalized {
     from { opacity: 0.5; }
     to { opacity: 1; }
