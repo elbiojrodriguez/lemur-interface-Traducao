@@ -2,44 +2,44 @@ import WebRTCCore from '../core/webrtc-core.js';
 import { QRCodeGenerator } from './qr-code-utils.js';
 
 window.onload = () => {
-  // 1. Geração do QR Code
-  const myId = crypto.randomUUID().substring(0, 8);
+  const rtcCore = new WebRTCCore();
+  const myId = crypto.randomUUID().substr(0, 8);
+  let localStream = null;
+
+  // Solicita acesso à câmera
+  navigator.mediaDevices.getUserMedia({ video: true, audio: false })
+    .then(stream => {
+      localStream = stream;
+    })
+    .catch(error => {
+      console.error("Erro ao acessar a câmera:", error);
+    });
+
+  // Gera QR Code com link para caller
   const callerUrl = `${window.location.origin}/caller.html?targetId=${myId}`;
   QRCodeGenerator.generate("qrcode", callerUrl);
 
-  // 2. Configuração do Chat
-  const textDisplay = document.querySelector('.text-display-placeholder');
-  
-  // 3. WebRTC (SEM acesso à câmera local)
-  const rtcCore = new WebRTCCore();
   rtcCore.initialize(myId);
-  
+  rtcCore.setupSocketHandlers();
+
+  const localVideo = document.getElementById('localVideo');
+
   rtcCore.onIncomingCall = (offer) => {
-    rtcCore.handleIncomingCall(offer, null, (remoteStream) => { // null = sem stream local
-      const remoteVideo = document.getElementById('remoteVideo');
-      
-      // Configurações à prova de falhas
-      remoteVideo.srcObject = remoteStream;
-      remoteVideo.style.display = 'block';
-      remoteVideo.muted = true; // Silencia mesmo sem áudio
-      
-      // Desativa qualquer track de áudio
-      remoteStream.getAudioTracks().forEach(track => {
-        track.enabled = false;
-        track.stop();
-      });
-      
-      // Oculta QR Code
-      document.getElementById('qrcode').style.display = 'none';
-      
-      // Atualiza chat
-      textDisplay.textContent = 'Conectado | Digite sua mensagem';
-      
-      // Bloqueio extra para Safari iOS
-      if (navigator.userAgent.match(/iPhone|iPad|iPod/i)) {
-        remoteVideo.setAttribute('playsinline', 'true');
-        remoteVideo.setAttribute('webkit-playsinline', 'true');
-      }
+    if (!localStream) {
+      console.warn("Stream local não disponível");
+      return;
+    }
+
+    rtcCore.handleIncomingCall(offer, localStream, (remoteStream) => {
+      // 🔇 Silencia áudio recebido
+      remoteStream.getAudioTracks().forEach(track => track.enabled = false);
+
+      // 🔥 Oculta o QR Code (sem alterar mais nada)
+      const qrElement = document.getElementById('qrcode');
+      if (qrElement) qrElement.style.display = 'none';
+
+      // Exibe vídeo remoto no PIP
+      localVideo.srcObject = remoteStream;
     });
   };
 };
