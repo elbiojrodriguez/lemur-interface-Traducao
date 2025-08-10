@@ -4,9 +4,17 @@ import { QRCodeGenerator } from './qr-code-utils.js';
 window.onload = () => {
   const rtcCore = new WebRTCCore();
   const myId = crypto.randomUUID().substr(0, 8);
-  let localStream = null;
+  
+  // ====================
+  // 1. GERAR QR CODE (PRIMEIRO PASSO)
+  // ====================
+  const callerUrl = `${window.location.origin}/caller.html?targetId=${myId}`;
+  QRCodeGenerator.generate("qrcode", callerUrl);
+  document.getElementById('qrcode').style.display = 'block'; // Garante visibilidade
 
-  // ▼▼▼ ADICIONE ISSO AQUI ▼▼▼ (Configuração básica do chat)
+  // ====================
+  // 2. CONFIGURAÇÃO DO CHAT
+  // ====================
   const chatInputBox = document.querySelector('.chat-input-box');
   const textDisplay = document.createElement('div');
   textDisplay.className = 'text-display-placeholder';
@@ -20,10 +28,13 @@ window.onload = () => {
   textDisplay.style.wordBreak = 'break-word';
   textDisplay.style.overflowY = 'auto';
   chatInputBox.appendChild(textDisplay);
-  textDisplay.textContent = 'Chat pronto para uso'; // Mensagem inicial
-  // ▲▲▲ FIM DO CÓDIGO A ADICIONAR ▲▲▲
+  textDisplay.textContent = 'Aguardando conexão...';
 
-  // Solicita acesso à câmera
+  // ====================
+  // 3. WEBCAM E WEBRTC
+  // ====================
+  let localStream = null;
+
   navigator.mediaDevices.getUserMedia({ video: true, audio: false })
     .then(stream => {
       localStream = stream;
@@ -31,10 +42,6 @@ window.onload = () => {
     .catch(error => {
       console.error("Erro ao acessar a câmera:", error);
     });
-
-  // Gera QR Code com link para caller
-  const callerUrl = `${window.location.origin}/caller.html?targetId=${myId}`;
-  QRCodeGenerator.generate("qrcode", callerUrl);
 
   rtcCore.initialize(myId);
   rtcCore.setupSocketHandlers();
@@ -48,10 +55,18 @@ window.onload = () => {
     }
 
     rtcCore.handleIncomingCall(offer, localStream, (remoteStream) => {
-      remoteStream.getAudioTracks().forEach(track => track.enabled = false;
-      const qrElement = document.getElementById('qrcode');
-      if (qrElement) qrElement.style.display = 'none';
+      // Silencia áudio recebido
+      remoteStream.getAudioTracks().forEach(track => track.enabled = false);
+
+      // Oculta o QR Code quando a chamada começar
+      document.getElementById('qrcode').style.display = 'none';
+
+      // Exibe vídeo remoto no PIP
       localVideo.srcObject = remoteStream;
+      localVideo.style.display = 'block'; // Mostra o PIP
+      
+      // Atualiza status do chat
+      textDisplay.textContent = 'Conectado - Digite sua mensagem';
     });
   };
 };
