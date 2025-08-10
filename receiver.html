@@ -8,7 +8,7 @@
   <link rel="stylesheet" href="responsivo.css">
   <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
   <style>
-    /* 🔵 Estilo do box azul (mesmo do Caller) */
+    /* Estilos do chat (mesmo do caller) */
     .chat-input-box {
       position: absolute;
       bottom: 350px;
@@ -26,25 +26,23 @@
   </style>
 </head>
 <body>
-  <!-- Container principal -->
   <div class="container">
-    <!-- Box do chat (visível) -->
+    <!-- Box do Chat -->
     <div class="chat-input-box" id="textDisplay"></div>
 
-    <!-- Vídeo remoto (fullscreen) -->
+    <!-- Vídeo Principal -->
     <div class="video-wrapper">
       <video id="remoteVideo" autoplay playsinline></video>
     </div>
 
-    <!-- Vídeo local (PIP - escondido inicialmente) -->
+    <!-- Vídeo PIP (oculto inicialmente) -->
     <div class="video-wrapper">
       <video id="localVideo" autoplay muted playsinline style="display:none;"></video>
     </div>
 
-    <!-- Overlay com QR Code -->
+    <!-- QR Code (container vazio que será preenchido pelo JS) -->
     <div class="info-overlay">
       <div id="qrcode" class="qrcode-container"></div>
-      <span id="myId" style="display:none;"></span>
     </div>
   </div>
 
