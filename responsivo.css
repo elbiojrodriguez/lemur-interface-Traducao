@@ -22,6 +22,16 @@ body {
   overflow: hidden;
 }
 
+.phrase-box {
+  margin: 4px 0;
+  padding: 0;
+  font-size: 18px;
+  color: blak;
+  background: transparent;
+  border: none;
+  word-break: break-word;
+}
+
 /* Vídeos principais */
 .video-wrapper {
   position: relative;
@@ -37,18 +47,16 @@ body {
 
 /* Vídeo local em PIP */
 .video-wrapper:nth-child(2) { 
-  position: absolute; 
-  bottom: calc(80px + 60px); 
-  right: 5px; 
-  width: 34.5%; 
-  max-width: 138px; 
-  height: 184px; 
-  transform: translateX(-17%); 
-  border-radius: 8px; 
-  overflow: hidden; 
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); 
-  border: 2px solid #4CAF50; 
-  z-index: 10; 
+position: absolute; 
+bottom: calc(80px + 60px); 
+right: 5px; 
+width: 34.5%; 
+max-width: 138px; 
+height: 184px; 
+transform: translateX(-17%); 
+border-radius: 8px; overflow: hidden; 
+box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); 
+border: 2px solid #4CAF50; z-index: 10; 
 }
 
 .video-wrapper:nth-child(2) video {
@@ -59,18 +67,18 @@ body {
 .controls {
   position: absolute;
   bottom: calc(225px + 60px);
-  left: 50%;
-  transform: translateX(-50%);
+  left: 110px;
   display: flex;
   flex-direction: column;
   gap: 16px;
   z-index: 20;
 }
 
+
 .controls button {
-  width: 100px;
-  height: 40px;
-  border-radius: 20px;
+  width: 100px;         /* Largura maior */
+  height: 40px;         /* Altura menor */
+  border-radius: 20px;  /* Metade da altura = forma oval */
   border: none;
   font-size: 18px;
   font-weight: bold;
@@ -81,7 +89,10 @@ body {
 
 #callActionBtn {
   background: #4CAF50;
-  display: none; /* Oculto por padrão (será mostrado via JS quando necessário) */
+}
+
+#scanBtn {
+  background: #2196F3;
 }
 
 /* Overlay de informações */
@@ -93,7 +104,7 @@ body {
   z-index: 30;
   color: white;
   text-align: center;
-  background: transparent;
+  background: transparent; /* ← removido o cinza */;
   padding: 10px;
   border-radius: 0 0 10px 10px;
 }
@@ -108,7 +119,7 @@ body {
   display: inline-block;
 }
 
-/* ID visual */
+/* ID visual opcional */
 #myId {
   display: inline-block;
   font-size: 16px;
@@ -121,34 +132,13 @@ body {
   color: white;
 }
 
-/* Mensagens de texto */
-.phrase-box {
-  margin: 4px 0;
-  padding: 0;
-  font-size: 18px;
-  color: black;
-  background: transparent;
-  border: none;
-  word-break: break-word;
-}
 
-/* Ajustes para telas pequenas */
-@media (max-width: 768px) {
   .video-wrapper:nth-child(2) {
-    height: 120px;
-    max-width: 100px;
-    bottom: calc(60px + 60px);
-  }
-
-  .controls {
-    bottom: calc(215px + 40px);
-  }
-
-  .controls button {
-    width: 90px;
-    height: 36px;
-    font-size: 16px;
-  }
+  .video-wrapper:nth-child(2) {
+  height: 120px;
+  max-width: 100px;
+  bottom: calc(60px + 60px);
+}
 
   .info-overlay {
     padding: 8px;
@@ -157,20 +147,5 @@ body {
   .qrcode-container {
     padding: 8px;
     max-width: 90%;
-  }
-
-  .phrase-box {
-    font-size: 16px;
-  }
-}
-
-@media (max-width: 400px) {
-  .video-wrapper:nth-child(2) {
-    bottom: calc(50px + 60px);
-    right: 2px;
-  }
-  
-  .controls {
-    bottom: calc(200px + 40px);
   }
 }
