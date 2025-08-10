@@ -1,61 +1,51 @@
 import WebRTCCore from '../core/webrtc-core.js';
 import { QRCodeGenerator } from './qr-code-utils.js';
 
-// 🚀 Inicialização (compartilhada para caller/receiver)
 window.onload = () => {
   const rtcCore = new WebRTCCore();
   const myId = crypto.randomUUID().substring(0, 8);
   let localStream = null;
   const isCallerPage = window.location.pathname.includes('caller.html');
 
-  // 📷 Acesso à câmera (comum para ambos)
+  // 1️⃣ Inicializa elementos
+  const qrElement = document.getElementById('qrcode');
+  const localVideo = document.getElementById('localVideo');
+  const remoteVideo = document.getElementById('remoteVideo');
+
+  // 2️⃣ Acesso à câmera (PIP)
   navigator.mediaDevices.getUserMedia({ video: true, audio: false })
     .then(stream => {
       localStream = stream;
-      document.getElementById('localVideo').srcObject = stream;
-      if (isCallerPage) {
-        document.getElementById('remoteVideo').srcObject = stream;
+      localVideo.srcObject = stream;
+      if (isCallerPage && remoteVideo) {
+        remoteVideo.srcObject = stream; // Caller mostra self-view
       }
     })
     .catch(error => console.error("Erro na câmera:", error));
 
-  // 🔘 Modo Receiver (QR Code)
+  // 3️⃣ Modo RECEIVER (QR Code + Conexão)
   if (!isCallerPage) {
+    // Gera QR Code imediatamente
     const callerUrl = `${window.location.origin}/caller.html?targetId=${myId}`;
     QRCodeGenerator.generate("qrcode", callerUrl);
     
-    // ✅ Mantém função original de chamada
+    // Configura tratamento de chamada
     rtcCore.onIncomingCall = (offer) => {
-      if (!localStream) return;
+      if (!localStream) {
+        console.warn("Aguardando acesso à câmera...");
+        return;
+      }
       
       rtcCore.handleIncomingCall(offer, localStream, (remoteStream) => {
-        document.getElementById('qrcode').style.display = 'none';
-        document.getElementById('localVideo').srcObject = remoteStream;
+        // ✅ Oculta QR Code APENAS quando a conexão é estabelecida
+        if (qrElement) qrElement.style.display = 'none';
+        
+        // Exibe vídeo remoto no PIP
+        if (localVideo) localVideo.srcObject = remoteStream;
       });
     };
   }
   
-  // 💬 Modo Caller (Chat - 100% original do caller.js)
-  else {
-    document.getElementById('myId').textContent = myId;
-    document.getElementById('callActionBtn').style.display = 'block';
-    document.getElementById('textDisplay').style.display = 'block';
-    document.getElementById('callActionBtn').onclick = () => {
-      if (localStream) rtcCore.startCall(
-        new URLSearchParams(window.location.search).get('targetId'),
-        localStream
-      );
-    };
-  }
-
-  rtcCore.initialize(myId);
-  rtcCore.setupSocketHandlers();
-
-  // 🔇 Silencia áudio remotamente (para ambos)
-  rtcCore.setRemoteStreamCallback(stream => {
-    stream.getAudioTracks().forEach(track => track.enabled = false);
-  });
-
   // #############################################
   // Controles de idioma dinâmicos
   // #############################################
@@ -388,5 +378,8 @@ recognition.onend = () => {
     };
     return messages[langCode] || messages['en-US'];
   }
-};
+
+  // 5️⃣ Inicializa WebRTC
+  rtcCore.initialize(myId);
+  rtcCore.setupSocketHandlers();
 };
