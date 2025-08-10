@@ -1,4 +1,4 @@
-interpreta: import WebRTCCore from '../core/webrtc-core.js';
+import WebRTCCore from '../core/webrtc-core.js';
 import { QRCodeGenerator } from './qr-code-utils.js';
 
 window.onload = () => {
@@ -9,15 +9,17 @@ window.onload = () => {
 
   // 1️⃣ Inicializa elementos
   const qrElement = document.getElementById('qrcode');
+  const localVideo = document.getElementById('localVideo');
   const remoteVideo = document.getElementById('remoteVideo');
 
   // 2️⃣ Acesso à câmera (PIP)
   navigator.mediaDevices.getUserMedia({ video: true, audio: false })
     .then(stream => {
       localStream = stream;
+      localVideo.srcObject = stream;
       if (isCallerPage && remoteVideo) {
         remoteVideo.srcObject = stream; // Caller mostra self-view
-        }
+      }
     })
     .catch(error => console.error("Erro na câmera:", error));
 
@@ -39,7 +41,7 @@ window.onload = () => {
         if (qrElement) qrElement.style.display = 'none';
         
         // Exibe vídeo remoto no PIP
-  if (remoteVideo) remoteVideo.srcObject = remoteStream;
+        if (localVideo) localVideo.srcObject = remoteStream;
       });
     };
   }
