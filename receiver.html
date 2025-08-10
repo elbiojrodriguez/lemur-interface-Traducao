@@ -3,13 +3,17 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Receiver - Videochamada Mobile</title>
+  <title>Receiver + Caller - Videochamada Mobile</title>
+
+  <!-- Estilos compartilhados -->
   <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="responsivo.css" />
+
+  <!-- Biblioteca de QR Code -->
   <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
 
+  <!-- Estilos exclusivos do caller -->
   <style>
-    /* 🔵 Estilo do box azul */
     .chat-input-box {
       position: absolute;
       bottom: 350px;
@@ -25,7 +29,6 @@
       padding: 10px;
     }
 
-    /* 💬 Estilo BASE para todas as mensagens */
     .phrase-box {
       background-color: transparent;
       padding: 1px 0;
@@ -85,10 +88,11 @@
   </style>
 </head>
 <body>
-  <!-- 🔹 Box azul centralizado com ID para JS -->
+  <!-- 🔹 Box azul do caller -->
   <div class="chat-input-box" id="textDisplay"></div>
 
   <div class="container">
+    <!-- 🔸 Vídeos -->
     <div class="video-wrapper">
       <video id="remoteVideo" autoplay playsinline></video>
     </div>
@@ -102,6 +106,7 @@
       <button id="callActionBtn" style="display:none;">SEND 🚀</button>
     </div>
 
+    <!-- 🔹 QR Code e ID -->
     <div class="info-overlay">
       <div id="qrcode" class="qrcode-container"></div>
       <span id="myId" style="display:none;"></span>
