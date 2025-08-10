@@ -4,31 +4,25 @@ import { QRCodeGenerator } from './qr-code-utils.js';
 window.onload = () => {
   const rtcCore = new WebRTCCore();
   const myId = crypto.randomUUID().substring(0, 8);
-  const isCallerPage = window.location.pathname.includes('caller.html');
-
-  // 1️⃣ Inicializa elementos
+  
+  // 1️⃣ Elementos necessários
   const qrElement = document.getElementById('qrcode');
   const remoteVideo = document.getElementById('remoteVideo');
 
-  // 3️⃣ Modo RECEIVER (QR Code + Conexão)
-  if (!isCallerPage) {
-    // Gera QR Code imediatamente
-    const callerUrl = `${window.location.origin}/caller.html?targetId=${myId}`;
-    QRCodeGenerator.generate("qrcode", callerUrl);
-    
-    // Configura tratamento de chamada
-    rtcCore.onIncomingCall = (offer) => {      
-      rtcCore.handleIncomingCall(offer, null, (remoteStream) => {
-        // ✅ Oculta QR Code quando a conexão é estabelecida
-        if (qrElement) qrElement.style.display = 'none';
-        
-        // Exibe APENAS vídeo remoto
-        if (remoteVideo) remoteVideo.srcObject = remoteStream;
-      });
-    };
-  }
+  // 2️⃣ Geração do QR Code (PRIORIDADE MÁXIMA)
+  const callerUrl = `${window.location.origin}/caller.html?targetId=${myId}`;
+  QRCodeGenerator.generate("qrcode", callerUrl); // ✅ QR Code gerado imediatamente
 
-  // 5️⃣ Inicializa WebRTC
+  // 3️⃣ Configuração da chamada WebRTC (sem câmera local)
+  rtcCore.onIncomingCall = (offer) => {
+    rtcCore.handleIncomingCall(offer, null, (remoteStream) => {
+      // ✅ Conexão estabelecida:
+      qrElement.style.display = 'none'; // Oculta QR Code
+      remoteVideo.srcObject = remoteStream; // Mostra APENAS vídeo do caller
+    });
+  };
+
+  // 4️⃣ Inicialização
   rtcCore.initialize(myId);
   rtcCore.setupSocketHandlers();
 };  
