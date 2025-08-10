@@ -3,13 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Receiver - Tradutor PIP</title>
-  <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="responsivo.css">
-  <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
+  <title>Receiver - Câmeras Cruzadas</title>
   <style>
-    /* PIP Fixo (120x160px) - Vídeo do Caller */
-    .pip-video {
+    /* PIP do Caller (canto inferior direito) */
+    #remoteVideo {
       position: fixed;
       bottom: 20px;
       right: 20px;
@@ -17,41 +14,46 @@
       height: 160px;
       border: 2px solid #fff;
       border-radius: 8px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.5);
       z-index: 90;
-      display: none; /* Oculto inicialmente */
+      display: none;
+      object-fit: cover;
     }
 
-    /* Chat (posição fixa) */
-    .chat-input-box {
+    /* PIP da própria câmera (canto superior esquerdo) */
+    #localVideo {
       position: fixed;
-      bottom: 120px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 90%;
-      max-width: 500px;
-      height: 180px;
-      background-color: rgba(255, 255, 255, 0.9);
+      top: 20px;
+      left: 20px;
+      width: 80px;
+      height: 120px;
       border: 2px solid #007BFF;
-      border-radius: 12px;
-      padding: 10px;
-      overflow-y: auto;
+      border-radius: 8px;
+      z-index: 90;
+      display: none;
+      object-fit: cover;
+    }
+
+    /* QR Code centralizado */
+    #qrcode {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
       z-index: 100;
     }
   </style>
 </head>
 <body>
-  <!-- QR Code (sempre visível inicialmente) -->
-  <div id="qrcode" class="qrcode-container"></div>
-
   <!-- Vídeo do Caller (PIP) -->
-  <video id="remoteVideo" class="pip-video" autoplay playsinline></video>
+  <video id="remoteVideo" autoplay playsinline></video>
+  
+  <!-- Vídeo da própria câmera (PIP pequeno) -->
+  <video id="localVideo" autoplay muted playsinline></video>
 
-  <!-- Chat (sem vídeo local) -->
-  <div class="chat-input-box" id="textDisplay">
-    <div class="text-display-placeholder">Escaneie o QR Code para iniciar</div>
-  </div>
+  <!-- QR Code -->
+  <div id="qrcode"></div>
 
+  <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
   <script src="https://lemur-signal.onrender.com/socket.io/socket.io.js"></script>
   <script type="module" src="js/receiver-ui.js"></script>
 </body>
