@@ -1,189 +1,130 @@
-/* Reset mobile */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  -webkit-tap-highlight-color: transparent;
-}
-
-body {
-  background: transparent;
-  min-height: 100vh;
-  height: 100%;
-  overflow: hidden;
-  position: relative;
-  font-family: Arial, sans-serif;
-}
-
-/* Containers de vídeo */
-.remote-container {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-}
-
-/* Oculta o vídeo remoto */
-#remoteVideo {
-  display: none;
-}
-
-/* Vídeo local em PIP com moldura verde */
-.local-pip {
-  position: absolute;
-  bottom: calc(80px + 60px);
-  right: 20px;
-  width: 34.5%;
-  max-width: 138px;
-  height: 184px;
-  transform: translateX(-17%);
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-  border: 2px solid #4CAF50;
-  z-index: 10;
-}
-
-#localVideo {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transform: scaleX(-1);
-}
-
-/* Controles principais: botão verde */
-.controls {
-  position: absolute;
-  bottom: calc(215px + 60px);
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 20;
-}
-
-.controls button {
-  width: 120px;            /* Largura fixa */
-  height: 40px;            /* Altura fixa */
-  border-radius: 999px;    /* Cápsula garantida */
-  border: none;
-  font-size: 16px;
-  font-weight: bold;
-  cursor: pointer;
-  backdrop-filter: blur(6px);
-  color: white;
-  background: #4CAF50;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;              /* Remove espaçamento extra */
-  box-sizing: border-box; /* Garante que padding não afete tamanho */
-}
-
-
-#callActionBtn {
-  background: #4CAF50;
-}
-
-/* 🔻 Balões com bandeiras */
-.language-bubbles {
-  display: flex;
-  gap: 8px;
-  justify-content: center;
-}
-
-.lang-btn {
-  width: 40px;
-  height: 40px;
-  font-size: 20px;
-  border-radius: 50%;
-  border: none;
-  background-color: rgba(0, 0, 0, 0.3);
-  color: white;
-  cursor: pointer;
-  backdrop-filter: blur(4px);
-}
-
-/* 🔵 Box azul centralizado */
+/* 🔵 Box azul centralizado (caller) */
 .chat-input-box {
   position: absolute;
-  bottom: 100px; /* Ajuste conforme a altura do PIP */
+  bottom: 100px;
   left: 50%;
   transform: translateX(-50%);
   width: 60%;
-  height: 160px; /* Altura aproximada do PIP */
+  height: 160px;
   border: 2px solid #007BFF;
   border-radius: 12px;
   background-color: rgba(255, 255, 255, 0.1);
   z-index: 20;
-}
-
-/* Overlay de informações */
-.info-overlay {
-  position: absolute;
-  top: 20px;
-  left: 0;
-  right: 0;
-  z-index: 30;
-  color: white;
-  text-align: center;
-  background: rgba(0, 0, 0, 0.5);
+  overflow-y: auto;
   padding: 10px;
-  border-radius: 0 0 10px 10px;
+  display: none; /* Oculto por padrão */
 }
 
-/* Container do QR Code */
-.info-overlay #qrcode {
-  margin: 10px auto;
-  padding: 12px;
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-  display: inline-block;
+/* Placeholder de texto */
+.text-display-placeholder {
+  padding: 10px;
+  color: black;
+  text-align: center;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  word-break: break-word;
+  overflow-y: auto;
 }
 
-/* Destaque visual para ID */
-.id-display {
-  display: inline-block;
-  font-size: 16px;
-  font-weight: bold;
-  background: rgba(255, 255, 255, 0.1);
-  padding: 6px 12px;
-  border-radius: 20px;
-  user-select: all;
+/* Estilos para mensagens temporárias */
+.interim-box {
+  color: #666;
+  opacity: 0.8;
+  border-bottom: 1px dotted #aaa;
+  transition: all 0.2s;
+}
+
+/* Controles de idioma */
+.language-bubbles {
+  position: fixed;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-left: -70px;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.lang-bubble, .lang-select-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 50px;
+  height: 50px;
+  background-color: white;
+  border-radius: 50%;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
   cursor: pointer;
-  color: white;
+  font-size: 24px;
+  border: none;
 }
 
-/* Responsivo para telas pequenas */
-@media (max-width: 400px) {
-  .controls button {
-    width: 50px;
-    height: 50px;
-    font-size: 16px;
-  }
+.language-menu {
+  display: none;
+  position: absolute;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+  padding: 10px;
+  z-index: 1000;
+  min-width: 60px;
+}
 
-  .local-pip {
-    height: 120px;
-    max-width: 100px;
-    bottom: calc(60px + 60px);
-  }
+.lang-option {
+  display: block;
+  width: 100%;
+  padding: 8px 12px;
+  text-align: center;
+  border: none;
+  background: none;
+  cursor: pointer;
+  border-radius: 4px;
+  margin: 2px 0;
+  font-size: 24px;
+}
 
-  .info-overlay {
-    padding: 8px;
-  }
+.lang-option:hover {
+  background-color: #f0f0f0;
+}
 
-  .info-overlay #qrcode {
-    padding: 8px;
-    max-width: 90%;
-  }
+/* Animações */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(2px); }
+  to { opacity: 1; transform: translateY(0); }
+}
 
+@keyframes textFinalized {
+  from { opacity: 0.5; }
+  to { opacity: 1; }
+}
+
+/* Ajustes responsivos específicos */
+@media (max-width: 768px) {
   .chat-input-box {
     width: 80%;
-    height: 120px;
-    bottom: 80px;
+    height: 140px;
+    bottom: 90px;
   }
 
-  .lang-btn {
-    width: 36px;
-    height: 36px;
-    font-size: 18px;
+  .language-bubbles {
+    bottom: 60px;
+  }
+
+  .lang-bubble, .lang-select-btn {
+    width: 44px;
+    height: 44px;
+    font-size: 20px;
+  }
+}
+
+@media (max-width: 400px) {
+  .chat-input-box {
+    width: 85%;
+    height: 120px;
+    bottom: 80px;
   }
 }
