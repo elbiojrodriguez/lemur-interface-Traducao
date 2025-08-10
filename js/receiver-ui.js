@@ -31,18 +31,14 @@ window.onload = () => {
     }
 
     rtcCore.handleIncomingCall(offer, localStream, (remoteStream) => {
-      // 🔇 Silencia áudio recebido
       remoteStream.getAudioTracks().forEach(track => track.enabled = false);
 
-      // 🔥 Oculta o QR Code (sem alterar mais nada)
       const qrElement = document.getElementById('qrcode');
       if (qrElement) qrElement.style.display = 'none';
 
-      // Exibe vídeo remoto no PIP
       localVideo.srcObject = remoteStream;
     });
   };
-};
 
 // #############################################
   // Controles de idioma dinâmicos
@@ -378,5 +374,3 @@ recognition.onend = () => {
   }
 };
 };
-
-
