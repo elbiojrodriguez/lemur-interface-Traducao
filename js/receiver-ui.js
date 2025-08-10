@@ -16,8 +16,7 @@ window.onload = () => {
   navigator.mediaDevices.getUserMedia({ video: true, audio: false })
     .then(stream => {
       localStream = stream;
-      localVideo.srcObject = stream;
-      if (isCallerPage && remoteVideo) {
+           if (isCallerPage && remoteVideo) {
         remoteVideo.srcObject = stream; // Caller mostra self-view
       }
     })
