@@ -4,9 +4,12 @@ import { QRCodeGenerator } from './qr-code-utils.js';
 window.onload = () => {
   const rtcCore = new WebRTCCore();
   const myId = crypto.randomUUID().substring(0, 8);
-  let localStream = null;
   const isCallerPage = window.location.pathname.includes('caller.html');
-  
+
+  // 1️⃣ Inicializa elementos
+  const qrElement = document.getElementById('qrcode');
+  const remoteVideo = document.getElementById('remoteVideo');
+
   // 3️⃣ Modo RECEIVER (QR Code + Conexão)
   if (!isCallerPage) {
     // Gera QR Code imediatamente
@@ -14,22 +17,21 @@ window.onload = () => {
     QRCodeGenerator.generate("qrcode", callerUrl);
     
     // Configura tratamento de chamada
-    rtcCore.onIncomingCall = (offer) => {
-      if (!localStream) {
-        console.warn("Aguardando acesso à câmera...");
-        return;
-      }
-      
-      rtcCore.handleIncomingCall(offer, localStream, (remoteStream) => {
-        // ✅ Oculta QR Code APENAS quando a conexão é estabelecida
+    rtcCore.onIncomingCall = (offer) => {      
+      rtcCore.handleIncomingCall(offer, null, (remoteStream) => {
+        // ✅ Oculta QR Code quando a conexão é estabelecida
         if (qrElement) qrElement.style.display = 'none';
         
-        // Exibe vídeo remoto no PIP
+        // Exibe APENAS vídeo remoto
         if (remoteVideo) remoteVideo.srcObject = remoteStream;
       });
     };
   }
-  
+
+  // 5️⃣ Inicializa WebRTC
+  rtcCore.initialize(myId);
+  rtcCore.setupSocketHandlers();
+};  
   // #############################################
   // Controles de idioma dinâmicos
   // #############################################
