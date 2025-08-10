@@ -4,38 +4,51 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Receiver - Tradutor WebRTC</title>
-  <link rel="stylesheet" href="responsivo.css">
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="responsivo.css">
   <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
+  <style>
+    /* 🔵 Estilo do box azul (mesmo do Caller) */
+    .chat-input-box {
+      position: absolute;
+      bottom: 350px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80%;
+      height: 200px;
+      border: 2px solid #007BFF;
+      border-radius: 12px;
+      background-color: rgba(255, 255, 255, 0.1);
+      z-index: 20;
+      overflow-y: auto;
+      padding: 10px;
+    }
+  </style>
 </head>
 <body>
- <!-- 🔵 Box de chat (mesmo do Caller) - SEM display:none -->
-<div class="chat-input-box" id="textDisplay"></div>
+  <!-- Container principal -->
+  <div class="container">
+    <!-- Box do chat (visível) -->
+    <div class="chat-input-box" id="textDisplay"></div>
 
-<div class="container">
-  <!-- Vídeo remoto (outro participante) -->
-  <div class="video-wrapper">
-    <video id="remoteVideo" autoplay playsinline></video>
-  </div>
-</div>
-
-    <!-- Vídeo local (PIP) -->
+    <!-- Vídeo remoto (fullscreen) -->
     <div class="video-wrapper">
-      <video id="localVideo" style="display:none;"></video>
+      <video id="remoteVideo" autoplay playsinline></video>
     </div>
 
-    <!-- Controles (caller-only) -->
-    <div class="controls" style="display:none;">
-      <button id="callActionBtn">SEND 🚀</button>
+    <!-- Vídeo local (PIP - escondido inicialmente) -->
+    <div class="video-wrapper">
+      <video id="localVideo" autoplay muted playsinline style="display:none;"></video>
     </div>
 
-    <!-- Overlay (QR Code + ID) -->
+    <!-- Overlay com QR Code -->
     <div class="info-overlay">
       <div id="qrcode" class="qrcode-container"></div>
       <span id="myId" style="display:none;"></span>
     </div>
   </div>
 
+  <!-- Scripts -->
   <script src="https://lemur-signal.onrender.com/socket.io/socket.io.js"></script>
   <script type="module" src="js/receiver-ui.js"></script>
 </body>
