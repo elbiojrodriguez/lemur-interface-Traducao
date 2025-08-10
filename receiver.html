@@ -3,56 +3,114 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Receiver - Tradutor PIP</title>
-  <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="responsivo.css">
+  <title>Receiver - Videochamada Mobile</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="responsivo.css" />
   <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
-  <style>
-    /* PIP Fixo (120x160px) - Vídeo do Caller */
-    .pip-video {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      width: 120px;
-      height: 160px;
-      border: 2px solid #fff;
-      border-radius: 8px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.5);
-      z-index: 90;
-      display: none; /* Oculto inicialmente */
-    }
 
-    /* Chat (posição fixa) */
+  <style>
+    /* 🔵 Estilo do box azul */
     .chat-input-box {
-      position: fixed;
-      bottom: 120px;
+      position: absolute;
+      bottom: 350px;
       left: 50%;
       transform: translateX(-50%);
-      width: 90%;
-      max-width: 500px;
-      height: 180px;
-      background-color: rgba(255, 255, 255, 0.9);
+      width: 80%;
+      height: 200px;
       border: 2px solid #007BFF;
       border-radius: 12px;
-      padding: 10px;
+      background-color: rgba(255, 255, 255, 0.1);
+      z-index: 20;
       overflow-y: auto;
-      z-index: 100;
+      padding: 10px;
+    }
+
+    /* 💬 Estilo BASE para todas as mensagens */
+    .phrase-box {
+      background-color: transparent;
+      padding: 1px 0;
+      margin: 0.5px 0;
+      border-radius: 0;
+      font-size: 15px;
+      line-height: 1.0;
+      border: none;
+      box-shadow: none;
+      width: 100%;
+      word-break: break-word;
+    }
+
+    .phrase-box.interim-box {
+      animation: fadeIn 0.3s ease-out;
+    }
+
+    .interim-text {
+      color: #666;
+      opacity: 0.8;
+      border-bottom: 1px dotted #aaa;
+      transition: all 0.2s;
+    }
+
+    .final-text {
+      color: inherit;
+      opacity: 1;
+      animation: textFinalized 0.3s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(2px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .listening-mode .text-display-placeholder {
+      animation: pulseOpacity 2s infinite;
+    }
+
+    @keyframes pulseOpacity {
+      0% { opacity: 0.8; }
+      50% { opacity: 0.4; }
+      100% { opacity: 0.8; }
+    }
+
+    @keyframes textFinalized {
+      from { opacity: 0.5; }
+      to { opacity: 1; }
+    }
+
+    @media (max-width: 768px) {
+      .phrase-box {
+        font-size: 14px;
+        line-height: 1.3;
+      }
     }
   </style>
 </head>
 <body>
-  <!-- QR Code (sempre visível inicialmente) -->
-  <div id="qrcode" class="qrcode-container"></div>
+  <!-- 🔹 Box azul centralizado com ID para JS -->
+  <div class="chat-input-box" id="textDisplay"></div>
 
-  <!-- Vídeo do Caller (PIP) -->
-  <video id="remoteVideo" class="pip-video" autoplay playsinline></video>
+  <div class="container">
+    <div class="video-wrapper">
+      <video id="remoteVideo" autoplay playsinline></video>
+    </div>
 
-  <!-- Chat (sem vídeo local) -->
-  <div class="chat-input-box" id="textDisplay">
-    <div class="text-display-placeholder">Escaneie o QR Code para iniciar</div>
+    <div class="video-wrapper">
+      <video id="localVideo" autoplay muted playsinline></video>
+    </div>
+
+    <!-- 🔻 Controles -->
+    <div class="controls">
+      <button id="callActionBtn" style="display:none;">SEND 🚀</button>
+    </div>
+
+    <div class="info-overlay">
+      <div id="qrcode" class="qrcode-container"></div>
+      <span id="myId" style="display:none;"></span>
+    </div>
   </div>
 
+  <!-- 🔌 Scripts -->
   <script src="https://lemur-signal.onrender.com/socket.io/socket.io.js"></script>
   <script type="module" src="js/receiver-ui.js"></script>
+  <script type="module" src="js/caller-ui.js"></script>
 </body>
 </html>
