@@ -5,50 +5,59 @@ window.onload = () => {
   const rtcCore = new WebRTCCore();
   const myId = crypto.randomUUID().substr(0, 8);
   
-  // 1. Geração do QR Code (mantido do receiver-1)
+  // 1. Geração do QR Code
   const callerUrl = `${window.location.origin}/caller.html?targetId=${myId}`;
   QRCodeGenerator.generate("qrcode", callerUrl);
 
-  // 2. Configuração do Chat Visual (novo do receiver-2)
+  // 2. Configuração do Chat Visual (sem funcionalidade ainda)
+  const chatBox = document.querySelector('.chat-input-box');
   const textDisplay = document.createElement('div');
   textDisplay.className = 'text-display-placeholder';
   textDisplay.textContent = 'Escaneie o QR Code para iniciar';
-  document.querySelector('.chat-input-box').appendChild(textDisplay);
+  chatBox.appendChild(textDisplay);
 
-  // 3. WebRTC Híbrido (fusão das duas versões)
-  let localStream = null; // Mantido do receiver-1
+  // 3. WebRTC Completo (com transmissão da câmera do Receiver)
+  let localStream = null;
 
-  // Acesso à câmera (do receiver-1, mas sem usar o stream local)
+  // Solicita permissão da câmera mas NÃO exibe localmente
   navigator.mediaDevices.getUserMedia({ video: true, audio: false })
     .then(stream => {
       localStream = stream;
-      // Encerra as tracks imediatamente (não será usado)
-      stream.getTracks().forEach(track => track.stop());
     })
     .catch(error => {
-      console.error("Aviso: Câmera não acessada", error); // Apenas log, não bloqueante
+      console.error("Erro na câmera:", error);
+      textDisplay.textContent = 'Erro: câmera não acessível';
     });
 
+  // 4. Configuração do Teclado (input manual)
+  const messageInput = document.createElement('input');
+  messageInput.type = 'text';
+  messageInput.placeholder = 'Digite sua mensagem...';
+  messageInput.style.width = '100%';
+  messageInput.style.marginTop = '10px';
+  chatBox.appendChild(messageInput);
+
   rtcCore.initialize(myId);
-  rtcCore.setupSocketHandlers();
-
-  // Handler de Chamada Aprimorado (fusão)
+  
   rtcCore.onIncomingCall = (offer) => {
-    console.log('Chamada recebida - Debug:', offer.type); // Novo do receiver-2
+    if (!localStream) {
+      console.warn("Câmera do Receiver não disponível");
+      textDisplay.textContent = 'Erro: câmera necessária';
+      return;
+    }
 
-    // Usa null no lugar de localStream (do receiver-2)
-    rtcCore.handleIncomingCall(offer, null, (remoteStream) => {
-      // PIP e Áudio (ambas versões)
+    rtcCore.handleIncomingCall(offer, localStream, (remoteStream) => {
+      // PIP do Caller
       const remoteVideo = document.getElementById('remoteVideo');
       remoteVideo.srcObject = remoteStream;
       remoteVideo.style.display = 'block';
-      remoteStream.getAudioTracks().forEach(track => track.enabled = false);
-
-      // Controle do QR Code (do receiver-1)
+      
+      // Controle do QR Code
       document.getElementById('qrcode').style.display = 'none';
-
-      // Atualização do Chat (novo do receiver-2)
-      textDisplay.textContent = 'Conectado | Digite sua mensagem';
+      
+      // Atualização do Chat
+      textDisplay.textContent = 'Conectado';
+      messageInput.focus(); // Ativa o teclado automaticamente
     });
   };
 };
