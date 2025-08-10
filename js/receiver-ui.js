@@ -6,22 +6,7 @@ window.onload = () => {
   const myId = crypto.randomUUID().substring(0, 8);
   let localStream = null;
   const isCallerPage = window.location.pathname.includes('caller.html');
-
-  // 1️⃣ Inicializa elementos
-  const qrElement = document.getElementById('qrcode');
-  const localVideo = document.getElementById('localVideo');
-  const remoteVideo = document.getElementById('remoteVideo');
-
-  // 2️⃣ Acesso à câmera (PIP)
-  navigator.mediaDevices.getUserMedia({ video: true, audio: false })
-    .then(stream => {
-      localStream = stream;
-           if (isCallerPage && remoteVideo) {
-        remoteVideo.srcObject = stream; // Caller mostra self-view
-      }
-    })
-    .catch(error => console.error("Erro na câmera:", error));
-
+  
   // 3️⃣ Modo RECEIVER (QR Code + Conexão)
   if (!isCallerPage) {
     // Gera QR Code imediatamente
