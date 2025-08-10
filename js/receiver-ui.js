@@ -25,7 +25,7 @@ window.onload = () => {
         if (qrElement) qrElement.style.display = 'none';
         
         // Exibe vídeo remoto no PIP
-        if (localVideo) localVideo.srcObject = remoteStream;
+        if (remoteVideo) remoteVideo.srcObject = remoteStream;
       });
     };
   }
