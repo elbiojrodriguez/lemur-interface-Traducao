@@ -3,50 +3,56 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Receiver - Tradutor WebRTC</title>
+  <title>Receiver - Tradutor PIP</title>
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="responsivo.css">
   <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
   <style>
-    /* Estilos do chat (mesmo do caller) */
+    /* Caixa de chat IDÊNTICA ao Caller */
     .chat-input-box {
-      position: absolute;
-      bottom: 350px;
+      position: fixed;
+      bottom: 120px;
       left: 50%;
       transform: translateX(-50%);
-      width: 80%;
-      height: 200px;
+      width: 90%;
+      max-width: 500px;
+      height: 180px;
       border: 2px solid #007BFF;
       border-radius: 12px;
-      background-color: rgba(255, 255, 255, 0.1);
-      z-index: 20;
+      background-color: rgba(255, 255, 255, 0.9);
+      z-index: 100;
       overflow-y: auto;
       padding: 10px;
+    }
+    
+    /* PIP - Tamanho fixo e posição absoluta */
+    .pip-video {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 120px;
+      height: 160px;
+      border: 2px solid #fff;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.5);
+      z-index: 90;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <!-- Box do Chat -->
-    <div class="chat-input-box" id="textDisplay"></div>
-
-    <!-- Vídeo Principal -->
-    <div class="video-wrapper">
-      <video id="remoteVideo" autoplay playsinline></video>
-    </div>
-
-    <!-- Vídeo PIP (oculto inicialmente) -->
-    <div class="video-wrapper">
-      <video id="localVideo" autoplay muted playsinline style="display:none;"></video>
-    </div>
-
-    <!-- QR Code (container vazio que será preenchido pelo JS) -->
-    <div class="info-overlay">
-      <div id="qrcode" class="qrcode-container"></div>
-    </div>
+  <!-- Container do QR Code (sempre visível inicialmente) -->
+  <div class="info-overlay">
+    <div id="qrcode" class="qrcode-container"></div>
   </div>
 
-  <!-- Scripts -->
+  <!-- Vídeo do Caller (PIP - aparece DEPOIS da conexão) -->
+  <video id="remoteVideo" class="pip-video" autoplay playsinline style="display:none;"></video>
+
+  <!-- Caixa de Chat (sem vídeo local) -->
+  <div class="chat-input-box" id="textDisplay">
+    <div class="text-display-placeholder">Escaneie o QR Code para iniciar</div>
+  </div>
+
   <script src="https://lemur-signal.onrender.com/socket.io/socket.io.js"></script>
   <script type="module" src="js/receiver-ui.js"></script>
 </body>
