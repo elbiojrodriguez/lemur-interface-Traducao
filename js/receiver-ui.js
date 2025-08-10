@@ -1,31 +1,49 @@
-import WebRTCCore from '../core/webrtc-core.js';
+interpreta: import WebRTCCore from '../core/webrtc-core.js';
 import { QRCodeGenerator } from './qr-code-utils.js';
 
 window.onload = () => {
   const rtcCore = new WebRTCCore();
   const myId = crypto.randomUUID().substring(0, 8);
-  
-  // 1️⃣ Elementos necessários
+  let localStream = null;
+  const isCallerPage = window.location.pathname.includes('caller.html');
+
+  // 1️⃣ Inicializa elementos
   const qrElement = document.getElementById('qrcode');
   const remoteVideo = document.getElementById('remoteVideo');
 
-  // 2️⃣ Geração do QR Code (PRIORIDADE MÁXIMA)
-  const callerUrl = `${window.location.origin}/caller.html?targetId=${myId}`;
-  QRCodeGenerator.generate("qrcode", callerUrl); // ✅ QR Code gerado imediatamente
+  // 2️⃣ Acesso à câmera (PIP)
+  navigator.mediaDevices.getUserMedia({ video: true, audio: false })
+    .then(stream => {
+      localStream = stream;
+      if (isCallerPage && remoteVideo) {
+        remoteVideo.srcObject = stream; // Caller mostra self-view
+        }
+    })
+    .catch(error => console.error("Erro na câmera:", error));
 
-  // 3️⃣ Configuração da chamada WebRTC (sem câmera local)
-  rtcCore.onIncomingCall = (offer) => {
-    rtcCore.handleIncomingCall(offer, null, (remoteStream) => {
-      // ✅ Conexão estabelecida:
-      qrElement.style.display = 'none'; // Oculta QR Code
-      remoteVideo.srcObject = remoteStream; // Mostra APENAS vídeo do caller
-    });
-  };
-
-  // 4️⃣ Inicialização
-  rtcCore.initialize(myId);
-  rtcCore.setupSocketHandlers();
-};  
+  // 3️⃣ Modo RECEIVER (QR Code + Conexão)
+  if (!isCallerPage) {
+    // Gera QR Code imediatamente
+    const callerUrl = `${window.location.origin}/caller.html?targetId=${myId}`;
+    QRCodeGenerator.generate("qrcode", callerUrl);
+    
+    // Configura tratamento de chamada
+    rtcCore.onIncomingCall = (offer) => {
+      if (!localStream) {
+        console.warn("Aguardando acesso à câmera...");
+        return;
+      }
+      
+      rtcCore.handleIncomingCall(offer, localStream, (remoteStream) => {
+        // ✅ Oculta QR Code APENAS quando a conexão é estabelecida
+        if (qrElement) qrElement.style.display = 'none';
+        
+        // Exibe vídeo remoto no PIP
+  if (remoteVideo) remoteVideo.srcObject = remoteStream;
+      });
+    };
+  }
+  
   // #############################################
   // Controles de idioma dinâmicos
   // #############################################
