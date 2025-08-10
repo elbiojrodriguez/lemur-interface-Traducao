@@ -1,1 +1,41 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Receiver - Tradutor WebRTC</title>
+  <link rel="stylesheet" href="responsivo.css">
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
+</head>
+<body>
+  <!-- 🔵 Box de chat (oculto por padrão no receiver) -->
+  <div class="chat-input-box" id="textDisplay" style="display:none;"></div>
 
+  <div class="container">
+    <!-- Vídeo remoto (outro participante) -->
+    <div class="video-wrapper">
+      <video id="remoteVideo" autoplay playsinline></video>
+    </div>
+
+    <!-- Vídeo local (PIP) -->
+    <div class="video-wrapper">
+      <video id="localVideo" autoplay muted playsinline></video>
+    </div>
+
+    <!-- Controles (caller-only) -->
+    <div class="controls" style="display:none;">
+      <button id="callActionBtn">SEND 🚀</button>
+    </div>
+
+    <!-- Overlay (QR Code + ID) -->
+    <div class="info-overlay">
+      <div id="qrcode" class="qrcode-container"></div>
+      <span id="myId" style="display:none;"></span>
+    </div>
+  </div>
+
+  <script src="https://lemur-signal.onrender.com/socket.io/socket.io.js"></script>
+  <script type="module" src="js/receiver-ui.js"></script>
+</body>
+</html>
