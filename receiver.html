@@ -3,92 +3,35 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Receiver - Videochamada Mobile</title>
-  <link rel="stylesheet" href="style.css" />
-  <link rel="stylesheet" href="responsivo.css" />
-  <style>
-    /* 🔵 Estilo do box azul (apenas quando for caller) */
-    .chat-input-box {
-      position: absolute;
-      bottom: 350px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 80%;
-      height: 200px;
-      border: 2px solid #007BFF;
-      border-radius: 12px;
-      background-color: rgba(255, 255, 255, 0.1);
-      z-index: 20;
-      overflow-y: auto;
-      padding: 10px;
-      display: none; /* Inicialmente oculto */
-    }
-
-    /* 💬 Estilo para mensagens (compatível com ambos) */
-    .phrase-box, .interim-box {
-      background-color: transparent;
-      padding: 1px 0;
-      margin: 0.5px 0;
-      border-radius: 0;
-      font-size: 15px;
-      line-height: 1.0;
-      border: none;
-      box-shadow: none;
-      width: 100%;
-      word-break: break-word;
-    }
-
-    .interim-text {
-      color: #666;
-      opacity: 0.8;
-      border-bottom: 1px dotted #aaa;
-      transition: all 0.2s;
-    }
-
-    .final-text {
-      color: inherit;
-      opacity: 1;
-      animation: textFinalized 0.3s ease-out;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(2px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    @keyframes textFinalized {
-      from { opacity: 0.5; }
-      to { opacity: 1; }
-    }
-
-    /* Controles específicos do caller */
-    #callActionBtn {
-      display: none; /* Inicialmente oculto */
-    }
-  </style>
+  <title>Receiver - Tradutor WebRTC</title>
+  <link rel="stylesheet" href="responsivo.css">
+  <link rel="stylesheet" href="style.css">
   <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
 </head>
 <body>
-  <!-- 🔹 Box azul (será mostrado apenas no caller) -->
-  <div class="chat-input-box" id="textDisplay"></div>
+  <!-- 🔵 Box de chat (oculto por padrão no receiver) -->
+  <div class="chat-input-box" id="textDisplay" style="display:none;"></div>
 
   <div class="container">
+    <!-- Vídeo remoto (outro participante) -->
     <div class="video-wrapper">
       <video id="remoteVideo" autoplay playsinline></video>
     </div>
 
+    <!-- Vídeo local (PIP) -->
     <div class="video-wrapper">
       <video id="localVideo" autoplay muted playsinline></video>
     </div>
 
-    <!-- 🔻 Controles (aparecem apenas no caller) -->
-    <div class="controls">
+    <!-- Controles (caller-only) -->
+    <div class="controls" style="display:none;">
       <button id="callActionBtn">SEND 🚀</button>
     </div>
 
+    <!-- Overlay (QR Code + ID) -->
     <div class="info-overlay">
       <div id="qrcode" class="qrcode-container"></div>
-      <span id="myId"></span> <!-- Para o caller -->
+      <span id="myId" style="display:none;"></span>
     </div>
   </div>
 
