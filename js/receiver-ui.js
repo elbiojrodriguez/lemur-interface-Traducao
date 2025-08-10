@@ -5,59 +5,66 @@ window.onload = () => {
   const rtcCore = new WebRTCCore();
   const myId = crypto.randomUUID().substr(0, 8);
   
-  // 1. Geração do QR Code
+  // 1. Geração do QR Code (original do receiver-1)
   const callerUrl = `${window.location.origin}/caller.html?targetId=${myId}`;
   QRCodeGenerator.generate("qrcode", callerUrl);
 
-  // 2. Configuração do Chat Visual (sem funcionalidade ainda)
+  // 2. Chat Visual (adaptado do receiver-2)
   const chatBox = document.querySelector('.chat-input-box');
   const textDisplay = document.createElement('div');
   textDisplay.className = 'text-display-placeholder';
   textDisplay.textContent = 'Escaneie o QR Code para iniciar';
   chatBox.appendChild(textDisplay);
 
-  // 3. WebRTC Completo (com transmissão da câmera do Receiver)
+  // 3. Controle de Câmera (original do receiver-1)
   let localStream = null;
-
-  // Solicita permissão da câmera mas NÃO exibe localmente
   navigator.mediaDevices.getUserMedia({ video: true, audio: false })
     .then(stream => {
       localStream = stream;
+      // Encerra preview local (regra do projeto)
+      stream.getTracks().forEach(track => track.stop());
     })
     .catch(error => {
-      console.error("Erro na câmera:", error);
-      textDisplay.textContent = 'Erro: câmera não acessível';
+      console.error("Erro câmera:", error);
+      textDisplay.textContent = 'Câmera não disponível';
     });
 
-  // 4. Configuração do Teclado (input manual)
-  const messageInput = document.createElement('input');
-  messageInput.type = 'text';
-  messageInput.placeholder = 'Digite sua mensagem...';
-  messageInput.style.width = '100%';
-  messageInput.style.marginTop = '10px';
-  chatBox.appendChild(messageInput);
-
+  // 4. WebRTC Completo (fusão das versões)
   rtcCore.initialize(myId);
-  
+  rtcCore.setupSocketHandlers(); // Original do receiver-1
+
   rtcCore.onIncomingCall = (offer) => {
     if (!localStream) {
-      console.warn("Câmera do Receiver não disponível");
-      textDisplay.textContent = 'Erro: câmera necessária';
+      console.warn("Câmera não disponível");
+      textDisplay.textContent = 'Erro: ative a câmera';
       return;
     }
 
+    // Debug (do receiver-2)
+    console.log('Chamada recebida:', offer.type);
+
     rtcCore.handleIncomingCall(offer, localStream, (remoteStream) => {
-      // PIP do Caller
+      // PIP (original do receiver-1)
       const remoteVideo = document.getElementById('remoteVideo');
       remoteVideo.srcObject = remoteStream;
       remoteVideo.style.display = 'block';
-      
-      // Controle do QR Code
+
+      // Silencia áudio (ambas versões)
+      remoteStream.getAudioTracks().forEach(track => track.enabled = false);
+
+      // Controle QR Code (original do receiver-1)
       document.getElementById('qrcode').style.display = 'none';
+
+      // Chat (adaptado do receiver-2)
+      textDisplay.textContent = 'Conectado | Digite abaixo';
       
-      // Atualização do Chat
-      textDisplay.textContent = 'Conectado';
-      messageInput.focus(); // Ativa o teclado automaticamente
+      // Input manual (novo)
+      const messageInput = document.createElement('input');
+      messageInput.type = 'text';
+      messageInput.placeholder = 'Escreva sua mensagem...';
+      messageInput.style.width = '100%';
+      chatBox.appendChild(messageInput);
+      messageInput.focus();
     });
   };
 };
