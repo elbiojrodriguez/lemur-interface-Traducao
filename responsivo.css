@@ -1,5 +1,3 @@
-/* responsivo.css */
-
 @media screen and (max-width: 768px) {
   .chat-input-box {
     bottom: 250px;
@@ -15,7 +13,7 @@
     max-width: 100%;
   }
 
-  #callActionBtn {
+  .action-btn {
     font-size: 14px;
     padding: 8px 16px;
   }
