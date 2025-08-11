@@ -1,34 +1,37 @@
-<!-- caller.html -->
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Caller - Videochamada Mobile</title>
+  <title>Caller - Layout Visual</title>
   <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="responsivo.css" />
 </head>
 <body>
-  <div class="chat-input-box" id="textDisplay"></div>
-
-  <div class="container">
-    <div class="video-wrapper">
-      <video id="remoteVideo" autoplay playsinline></video>
-    </div>
-    <div class="video-wrapper">
-      <video id="localVideo" autoplay muted playsinline></video>
-    </div>
-
-    <div class="controls">
-      <button id="callActionBtn" style="display:none;">SEND 🚀</button>
-    </div>
-
-    <div class="info-overlay" style="display: none;">
-      <span id="myId"></span>
-    </div>
+  <!-- 🔵 Box azul para frases -->
+  <div class="chat-input-box">
+    <div class="phrase-box">Frase exemplo 1</div>
+    <div class="phrase-box">Frase exemplo 2</div>
   </div>
 
-  <script src="https://lemur-signal.onrender.com/socket.io/socket.io.js"></script>
-  <script type="module" src="js/caller-ui.js"></script>
+  <div class="container">
+    <!-- 🎥 Vídeos -->
+    <div class="video-wrapper">
+      <video autoplay playsinline></video>
+    </div>
+    <div class="video-wrapper">
+      <video autoplay muted playsinline></video>
+    </div>
+
+    <!-- 🔘 Botão SEND -->
+    <div class="controls">
+      <button class="action-btn">SEND 🚀</button>
+    </div>
+
+    <!-- 🧾 Overlay de ID -->
+    <div class="info-overlay">
+      <span>ID: 000000</span>
+    </div>
+  </div>
 </body>
 </html>
