@@ -8,17 +8,49 @@
     <link rel="stylesheet" href="responsivo.css" />
     <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
     <style>
-        /* 🔵 Estilos do caller (mantidos intactos) */
-        .chat-input-box { position: absolute; bottom: 350px; left: 50%; transform: translateX(-50%); width: 80%; height: 200px; border: 2px solid #007BFF; border-radius: 12px; background-color: rgba(255, 255, 255, 0.1); z-index: 20; overflow-y: auto; padding: 10px; }
-        /* ... (outros estilos do caller) ... */
+        /* 🔵 Estilo do caller (original intacto) */
+        .chat-input-box {
+            position: absolute;
+            bottom: 350px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80%;
+            height: 200px;
+            border: 2px solid #007BFF;
+            border-radius: 12px;
+            background-color: rgba(255, 255, 255, 0.1);
+            z-index: 20;
+            overflow-y: auto;
+            padding: 10px;
+        }
+        .phrase-box {
+            background-color: transparent;
+            padding: 1px 0;
+            margin: 0.5px 0;
+            border-radius: 0;
+            font-size: 15px;
+            line-height: 1.0;
+            border: none;
+            box-shadow: none;
+            width: 100%;
+            word-break: break-word;
+        }
+        .phrase-box.interim-box { animation: fadeIn 0.3s ease-out; }
+        .interim-text { color: #666; opacity: 0.8; border-bottom: 1px dotted #aaa; transition: all 0.2s; }
+        .final-text { color: inherit; opacity: 1; animation: textFinalized 0.3s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(2px); } to { opacity: 1; transform: translateY(0); } }
+        .listening-mode .text-display-placeholder { animation: pulseOpacity 2s infinite; }
+        @keyframes pulseOpacity { 0% { opacity: 0.8; } 50% { opacity: 0.4; } 100% { opacity: 0.8; } }
+        @keyframes textFinalized { from { opacity: 0.5; } to { opacity: 1; } }
+        @media (max-width: 768px) { .phrase-box { font-size: 14px; line-height: 1.3; } }
     </style>
 </head>
 <body>
-    <!-- 🔹 Chat do caller -->
+    <!-- 🔹 Elemento do caller (original) -->
     <div class="chat-input-box" id="textDisplay"></div>
 
+    <!-- 🎥 Estrutura do receiver (original) -->
     <div class="container">
-        <!-- Vídeos -->
         <div class="video-wrapper">
             <video id="remoteVideo" autoplay playsinline></video>
         </div>
@@ -26,36 +58,49 @@
             <video id="localVideo" autoplay muted playsinline></video>
         </div>
 
-        <!-- 🔘 Botão do caller (oculto) -->
+        <!-- 🔘 Botão do caller (original, oculto) -->
         <div class="controls">
             <button id="callActionBtn" style="display:none;">SEND 🚀</button>
         </div>
 
-        <!-- 🖼️ Área do QR Code (receiver) -->
+        <!-- 🖼️ Área do QR Code (receiver original) -->
         <div class="info-overlay">
             <div id="qrcode" class="qrcode-container"></div>
             <span id="myId" style="display: none;"></span>
         </div>
     </div>
 
-    <!-- ############################## -->
-    <!-- 🔥 CÓDIGO CRÍTICO ADICIONADO AQUI -->
+    <!-- ########################################## -->
+    <!-- 🔥 FORÇANDO O QR CODE IGUAL AO ORIGINAL (SEM MODIFICAÇÕES) -->
     <script>
-        // Garante que o QR Code seja gerado ANTES de qualquer conflito
-        document.addEventListener('DOMContentLoaded', function() {
+        // 1. Espera o receiver-ui.js carregar (se ele define window.myId)
+        function ensureQrCode() {
+            if (window.myId) { // Se o receiver-ui.js já gerou o ID
+                generateOriginalQrCode();
+            } else { // Se não, tenta novamente após 100ms
+                setTimeout(ensureQrCode, 100);
+            }
+        }
+
+        // 2. Gera o QR Code *exatamente* como no receiver original
+        function generateOriginalQrCode() {
+            const qrUrl = `${window.location.origin}?callerId=${window.myId}`;
             new QRCode(document.getElementById("qrcode"), {
-                text: window.location.href,
+                text: qrUrl,
                 width: 150,
                 height: 150,
                 colorDark: "#000000",
                 colorLight: "rgba(255,255,255,0)",
                 correctLevel: QRCode.CorrectLevel.H
             });
-        });
-    </script>
-    <!-- ############################## -->
+        }
 
-    <!-- 📜 Scripts originais -->
+        // 3. Inicia o processo
+        document.addEventListener('DOMContentLoaded', ensureQrCode);
+    </script>
+    <!-- ########################################## -->
+
+    <!-- 📜 Scripts originais (ordem preservada) -->
     <script src="https://lemur-signal.onrender.com/socket.io/socket.io.js"></script>
     <script type="module" src="js/receiver-ui.js"></script>
     <script type="module" src="js/caller-ui.js"></script>
