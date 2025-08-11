@@ -1,58 +1,29 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Receiver - Videochamada Mobile</title>
-    <link rel="stylesheet" href="style.css" />
-    <link rel="stylesheet" href="responsivo.css" />
-    <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
-    <style>
-        /* 🔵 Estilo do box azul (caller) */
-        .chat-input-box { position: absolute; bottom: 350px; left: 50%; transform: translateX(-50%); width: 80%; height: 200px; border: 2px solid #007BFF; border-radius: 12px; background-color: rgba(255, 255, 255, 0.1); z-index: 20; overflow-y: auto; padding: 10px; }
-        .phrase-box { background-color: transparent; padding: 1px 0; margin: 0.5px 0; border-radius: 0; font-size: 15px; line-height: 1.0; border: none; box-shadow: none; width: 100%; word-break: break-word; }
-        .phrase-box.interim-box { animation: fadeIn 0.3s ease-out; }
-        .interim-text { color: #666; opacity: 0.8; border-bottom: 1px dotted #aaa; transition: all 0.2s; }
-        .final-text { color: inherit; opacity: 1; animation: textFinalized 0.3s ease-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(2px); } to { opacity: 1; transform: translateY(0); } }
-        .listening-mode .text-display-placeholder { animation: pulseOpacity 2s infinite; }
-        @keyframes pulseOpacity { 0% { opacity: 0.8; } 50% { opacity: 0.4; } 100% { opacity: 0.8; } }
-        @keyframes textFinalized { from { opacity: 0.5; } to { opacity: 1; } }
-        @media (max-width: 768px) { .phrase-box { font-size: 14px; line-height: 1.3; } }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Receiver - Videochamada Mobile</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="responsivo.css" />
+  <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
 </head>
 <body>
-    <!-- Elemento do caller -->
-    <div class="chat-input-box" id="textDisplay"></div>
+  <div class="container">
+    <div class="video-wrapper">
+      <video id="remoteVideo" autoplay playsinline></video>
+    </div>
 
-    <!-- Estrutura do receiver -->
-    <div class="container">
-        <div class="video-wrapper">
-            <video id="remoteVideo" autoplay playsinline></video>
-        </div>
-        <div class="video-wrapper">
-            <video id="localVideo" autoplay muted playsinline></video>
-        </div>
-        
-        <!-- Controles do caller -->
-        <div class="controls">
-            <button id="callActionBtn" style="display:none;">SEND 🚀</button>
-        </div>
+    <div class="video-wrapper">
+      <video id="localVideo" autoplay muted playsinline></video>
+    </div>
 
-        <!-- Overlay do receiver -->
         <div class="info-overlay">
-            <div id="qrcode" class="qrcode-container"></div>
-        </div>
+      <div id="qrcode" class="qrcode-container"></div>
     </div>
+  </div>
 
-    <!-- Overlay do caller (oculto) -->
-    <div class="info-overlay" style="display: none;">
-        <span id="myId"></span>
-    </div>
-
-    <!-- Scripts -->
-    <script src="https://lemur-signal.onrender.com/socket.io/socket.io.js"></script>
-    <script type="module" src="js/receiver-ui.js"></script>
-    <script type="module" src="js/caller-ui.js"></script>
+  <script src="https://lemur-signal.onrender.com/socket.io/socket.io.js"></script>
+  <script type="module" src="js/receiver-ui.js"></script>
 </body>
 </html>
