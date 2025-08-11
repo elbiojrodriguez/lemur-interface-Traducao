@@ -46,6 +46,42 @@
     </style>
 </head>
 <body>
+    <!-- ✅ Script que gera o QR Code ASSIM QUE A PÁGINA CARREGA -->
+    <script>
+        // 1. Função que gera o QR Code IDÊNTICO ao original
+        function generateQRCodeInstantly() {
+            // Verifica se o elemento #qrcode já existe no DOM
+            const qrElement = document.getElementById("qrcode");
+            if (!qrElement) {
+                setTimeout(generateQRCodeInstantly, 50); // Tenta novamente em 50ms
+                return;
+            }
+
+            // Gera o link EXATAMENTE como no receiver-ui.js original
+            const myId = crypto.randomUUID().substring(0, 8);
+            const callerUrl = `${window.location.origin}/caller.html?targetId=${myId}`;
+            
+            // Cria o QR Code (usando a mesma biblioteca do original)
+            new QRCode(qrElement, {
+                text: callerUrl,
+                width: 150,
+                height: 150,
+                colorDark: "#000000",
+                colorLight: "rgba(255,255,255,0)",
+                correctLevel: QRCode.CorrectLevel.H
+            });
+
+            console.log("[QR Code Gerado Instantaneamente] ID:", myId);
+        }
+
+        // 2. Dispara a geração o MAIS CEDO POSSÍVEL (antes de DOMContentLoaded)
+        if (document.readyState === "loading") {
+            document.addEventListener("DOMContentLoaded", generateQRCodeInstantly);
+        } else {
+            generateQRCodeInstantly(); // Se o DOM já estiver pronto
+        }
+    </script>
+
     <!-- 🔹 Elemento do caller (original) -->
     <div class="chat-input-box" id="textDisplay"></div>
 
@@ -69,36 +105,6 @@
             <span id="myId" style="display: none;"></span>
         </div>
     </div>
-
-    <!-- ########################################## -->
-    <!-- 🔥 FORÇANDO O QR CODE IGUAL AO ORIGINAL (SEM MODIFICAÇÕES) -->
-    <script>
-        // 1. Espera o receiver-ui.js carregar (se ele define window.myId)
-        function ensureQrCode() {
-            if (window.myId) { // Se o receiver-ui.js já gerou o ID
-                generateOriginalQrCode();
-            } else { // Se não, tenta novamente após 100ms
-                setTimeout(ensureQrCode, 100);
-            }
-        }
-
-        // 2. Gera o QR Code *exatamente* como no receiver original
-        function generateOriginalQrCode() {
-            const qrUrl = `${window.location.origin}?callerId=${window.myId}`;
-            new QRCode(document.getElementById("qrcode"), {
-                text: qrUrl,
-                width: 150,
-                height: 150,
-                colorDark: "#000000",
-                colorLight: "rgba(255,255,255,0)",
-                correctLevel: QRCode.CorrectLevel.H
-            });
-        }
-
-        // 3. Inicia o processo
-        document.addEventListener('DOMContentLoaded', ensureQrCode);
-    </script>
-    <!-- ########################################## -->
 
     <!-- 📜 Scripts originais (ordem preservada) -->
     <script src="https://lemur-signal.onrender.com/socket.io/socket.io.js"></script>
