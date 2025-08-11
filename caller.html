@@ -1,63 +1,34 @@
+<!-- caller.html -->
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Caller - Videochamada Mobile</title>
-    <link rel="stylesheet" href="style.css" />
-    <link rel="stylesheet" href="responsivo.css" />
-    <style>
-        /* 🔵 Estilo do box azul */
-        .chat-input-box {
-            position: absolute;
-            bottom: 350px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 80%;
-            height: 200px;
-            border: 2px solid #007BFF;
-            border-radius: 12px;
-            background-color: rgba(255, 255, 255, 0.1);
-            z-index: 20;
-            overflow-y: auto;
-            padding: 10px;
-        }
-
-        /* 💬 Estilo das frases reconhecidas */
-        .phrase-box {
-            padding: 8px;
-            margin: 6px 0;
-            background-color: rgba(0, 123, 255, 0.1);
-            border-radius: 8px;
-            color: #000;
-            font-size: 16px;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Caller - Videochamada Mobile</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="responsivo.css" />
 </head>
 <body>
-    <!-- 🔹 Box azul centralizado com ID para JS -->
-    <div class="chat-input-box" id="textDisplay"></div>
+  <div class="chat-input-box" id="textDisplay"></div>
 
-    <div class="container">
-        <div class="video-wrapper">
-            <video id="remoteVideo" autoplay playsinline></video>
-        </div>
-        <div class="video-wrapper">
-            <video id="localVideo" autoplay muted playsinline></video>
-        </div>
-        
-        <!-- 🔻 Controles -->
-        <div class="controls">
-            <button id="callActionBtn" style="display:none;">SEND 🚀</button>
-        </div>
-        
-        <div class="info-overlay" style="display: none;">
-            <span id="myId"></span>
-        </div>
+  <div class="container">
+    <div class="video-wrapper">
+      <video id="remoteVideo" autoplay playsinline></video>
+    </div>
+    <div class="video-wrapper">
+      <video id="localVideo" autoplay muted playsinline></video>
     </div>
 
-    <!-- 🔌 Scripts -->
-    <script src="https://lemur-signal.onrender.com/socket.io/socket.io.js"></script>
-    <script type="module" src="js/caller-ui.js"></script>
+    <div class="controls">
+      <button id="callActionBtn" style="display:none;">SEND 🚀</button>
+    </div>
+
+    <div class="info-overlay" style="display: none;">
+      <span id="myId"></span>
+    </div>
+  </div>
+
+  <script src="https://lemur-signal.onrender.com/socket.io/socket.io.js"></script>
+  <script type="module" src="js/caller-ui.js"></script>
 </body>
 </html>
