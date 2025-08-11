@@ -40,11 +40,11 @@ window.onload = () => {
     });
   };
 
-// #############################################
+  // #############################################
   // Controles de idioma dinâmicos
   // #############################################
 
-  // 1. Configuração do chat (box azul)
+  const chatInputBox = document.getElementById('textDisplay'); // ✅ Adicionado
   const textDisplay = document.createElement('div');
   textDisplay.className = 'text-display-placeholder';
   textDisplay.style.padding = '10px';
@@ -374,3 +374,4 @@ recognition.onend = () => {
   }
 };
 };
+
