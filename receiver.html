@@ -1,103 +1,29 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Videochamada</title>
-    <link rel="stylesheet" href="style.css" />
-    <link rel="stylesheet" href="responsivo.css" />
-    <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
-    <style>
-        /* 🔵 Estilo do caller (original) */
-        .chat-input-box {
-            position: absolute;
-            bottom: 350px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 80%;
-            height: 200px;
-            border: 2px solid #007BFF;
-            border-radius: 12px;
-            background-color: rgba(255, 255, 255, 0.1);
-            z-index: 20;
-            overflow-y: auto;
-            padding: 10px;
-        }
-        .phrase-box {
-            background-color: transparent;
-            padding: 1px 0;
-            margin: 0.5px 0;
-            border-radius: 0;
-            font-size: 15px;
-            line-height: 1.0;
-            border: none;
-            box-shadow: none;
-            width: 100%;
-            word-break: break-word;
-        }
-        /* ... (outros estilos do caller) ... */
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Receiver - Videochamada Mobile</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="responsivo.css" />
+  <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
 </head>
 <body>
-    <!-- ✅ Gera o QR Code instantaneamente -->
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const myId = crypto.randomUUID().substring(0, 8); // ID do receiver
-            const qrUrl = `${window.location.origin}/caller.html?targetId=${myId}`;
-            new QRCode(document.getElementById("qrcode"), {
-                text: qrUrl,
-                width: 150,
-                height: 150,
-                colorDark: "#000000",
-                colorLight: "rgba(255,255,255,0)",
-                correctLevel: QRCode.CorrectLevel.H
-            });
-            console.log("[Receiver] ID gerado para o QR Code:", myId);
-        });
-    </script>
-
-    <!-- 🔹 Estrutura do caller (original) -->
-    <div class="chat-input-box" id="textDisplay"></div>
-
-    <!-- 🎥 Estrutura do receiver (original) -->
-    <div class="container">
-        <div class="video-wrapper">
-            <video id="remoteVideo" autoplay playsinline></video>
-        </div>
-        <div class="video-wrapper">
-            <video id="localVideo" autoplay muted playsinline></video>
-        </div>
-
-        <!-- 🔘 Botão SEND (original, oculto inicialmente) -->
-        <div class="controls">
-            <button id="callActionBtn" style="display:none;">SEND 🚀</button>
-        </div>
-
-        <!-- 🖼️ Área do QR Code (receiver) -->
-        <div class="info-overlay">
-            <div id="qrcode" class="qrcode-container"></div>
-            <span id="myId" style="display: none;"></span>
-        </div>
+  <div class="container">
+    <div class="video-wrapper">
+      <video id="remoteVideo" autoplay playsinline></video>
     </div>
 
-    <!-- 📌 Scripts (ordem crítica!) -->
-    <script src="https://lemur-signal.onrender.com/socket.io/socket.io.js"></script>
-    <script type="module" src="js/receiver-ui.js"></script>
-    
-    <!-- 🔄 Força o caller a usar o ID do QR Code -->
-    <script>
-        // 1. Pega o ID da URL (?targetId=...) quando o caller é aberto
-        const urlParams = new URLSearchParams(window.location.search);
-        const targetId = urlParams.get('targetId');
+    <div class="video-wrapper">
+      <video id="localVideo" autoplay muted playsinline></video>
+    </div>
 
-        // 2. Se estiver no caller, define uma variável global com o ID
-        if (targetId) {
-            window.TARGET_ID = targetId; // Nome padrão que muitos callers usam
-            console.log("[Caller] ID do receiver capturado:", targetId);
-        }
-    </script>
+        <div class="info-overlay">
+      <div id="qrcode" class="qrcode-container"></div>
+    </div>
+  </div>
 
-    <!-- ⚠️ Carrega o caller-ui.js POR ÚLTIMO -->
-    <script type="module" src="js/caller-ui.js"></script>
+  <script src="https://lemur-signal.onrender.com/socket.io/socket.io.js"></script>
+  <script type="module" src="js/receiver-ui.js"></script>
 </body>
 </html>
