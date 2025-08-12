@@ -5,7 +5,7 @@
   left: 50%;
   transform: translateX(-50%);
   width: 90%;
-  height: 250px;
+  height: 150px;
   overflow-y: auto;
   border: 2px solid #007BFF;
   border-radius: 12px;
@@ -32,7 +32,7 @@
 /* 🟩 Box verde amarrado ao azul */
 .viewer-window {
   position: fixed;
-  top: calc(25vh + 250px + 10px); /* altura do azul + espaço extra */
+  top: calc(25vh + 250px + 40px); /* altura do azul + espaço extra */
   left: 50%;
   transform: translateX(-50%);
   width: 40vw;                    /* aumento de 10% */
