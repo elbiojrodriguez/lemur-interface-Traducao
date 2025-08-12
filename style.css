@@ -32,10 +32,9 @@
 /* 🟩 Box verde amarrado ao azul */
 .viewer-window {
   position: fixed;
-  top: calc(25vh + 250px + 10px); /* altura do azul + espaço extra */
-  left: 50%;
-  transform: translateX(-50%);
-  width: 33vw;                    /* aumento de 10% */
+  top: calc(25vh + 250px + 20px); /* 20px abaixo do azul */
+  left: calc(50% + 45%);          /* encostado na lateral direita do azul */
+  width: 33vw;
   max-width: 154px;
   aspect-ratio: 3 / 4;
   border-radius: 8px;
@@ -54,10 +53,10 @@
 }
 
 /* 📱 Responsivo para telas menores */
-@media (max-width: 600px) {
-  .viewer-window {
+ .viewer-window {
     width: 40vw;
     max-width: 130px;
-    top: calc(25vh + 250px + 8px);
+    top: calc(25vh + 250px + 20px);
+    left: calc(50% + 45%);
   }
 }
