@@ -1,11 +1,11 @@
 .chat-input-box {
-  position: fixed;              /* Fixa na tela, mesmo com rolagem */
-  top: 30vh;                    /* Posição vertical relativa à altura da tela */
-  left: 50%;                    /* Centraliza horizontalmente */
-  transform: translateX(-50%);  /* Ajusta para o centro exato */
-  width: 90%;                   /* Largura adaptável */
-  max-height: 300px;
-  overflow-y: auto;
+  position: fixed;
+  top: 25vh;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90%;
+  height: 350px;               /* 🔒 Altura fixa */
+  overflow-y: auto;            /* 🔄 Rolagem interna */
   border: 2px solid #007BFF;
   border-radius: 12px;
   background-color: transparent;
@@ -15,11 +15,15 @@
   line-height: 1.4;
 }
 
-/* Ajuste para telas pequenas */
-@media (max-width: 600px) {
-  .chat-input-box {
-    top: 25vh;                  /* Um pouco mais baixo em celulares menores */
-    padding: 8px;
-    font-size: 0.9rem;
-  }
+/* 🔹 Estilo das frases */
+.phrase-box {
+  display: block;
+  padding: 0;
+  margin: 1px 0;
+  background-color: transparent;
+  border: none;
+  border-radius: 0;
+  color: #000;
+  font-size: 1rem;
+  line-height: 1.2;
 }
