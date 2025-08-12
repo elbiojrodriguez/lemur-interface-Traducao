@@ -29,22 +29,23 @@
   line-height: 1.2;
 }
 
-/* 🟩 Box verde amarrado ao azul */
+/* 🟩 Box verde estilo PIP */
 .viewer-window {
   position: fixed;
-  top: calc(25vh + 250px + 60px); /* 20px abaixo do azul */
-  right: calc(50% + 45%);          /* encostado na lateral direita do azul */
-  width: 33vw;
-  max-width: 154px;
+  bottom: 16px;
+  right: 16px;
+  width: 30vw;
+  max-width: 140px;
   aspect-ratio: 3 / 4;
   border-radius: 8px;
   overflow: hidden;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
   border: 2px solid #4CAF50;
   z-index: 10;
-  background-color: transparent;
+  background-color: #000;
 }
 
+/* Conteúdo invertido, se for vídeo */
 .viewer-window video {
   width: 100%;
   height: 100%;
@@ -53,10 +54,11 @@
 }
 
 /* 📱 Responsivo para telas menores */
- .viewer-window {
+@media (max-width: 600px) {
+  .viewer-window {
     width: 40vw;
-    max-width: 130px;
-    top: calc(25vh + 250px + 20px);
-    left: calc(50% + 45%);
+    max-width: 120px;
+    bottom: 12px;
+    right: 12px;
   }
 }
