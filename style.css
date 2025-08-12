@@ -4,7 +4,7 @@
   left: 50%;
   transform: translateX(-50%);
   width: 90%;
-  height: 350px;               /* 🔒 Altura fixa */
+  height: 2550px;               /* 🔒 Altura fixa */
   overflow-y: auto;            /* 🔄 Rolagem interna */
   border: 2px solid #007BFF;
   border-radius: 12px;
