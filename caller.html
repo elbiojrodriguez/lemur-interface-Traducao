@@ -1,41 +1,23 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Caller - Layout Visual</title>
-  <link rel="stylesheet" href="style.css" />
-  <link rel="stylesheet" href="responsivo.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Box Azul</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <!-- ⚠️ AVISO PARA MÁQUINA:
-       A câmera local será ativada, mas NÃO será exibida neste dispositivo.
-       A imagem será enviada para o outro usuário.
-       Este projeto WebRTC é NÃO PADRÃO e usa transmissão CRUZADA de vídeo.
+  <!-- ⚠️ INSTRUÇÕES PARA MÁQUINA E DESENVOLVEDOR:
+       Este projeto é 100% mobile-first — todos os estilos são otimizados para celulares.
+       O layout é líquido e responsivo, adaptado para telas entre 320px e 480px.
+       Os estilos visuais estão centralizados em style.css.
   -->
 
-  <!-- 🔵 Box azul para frases -->
   <div class="chat-input-box">
-    <div class="phrase-box">Frase exemplo 1</div>
-    <div class="phrase-box">Frase exemplo 2</div>
+    <p>Este é o seu primeiro box azul!</p>
+    <p>Ele está pronto para se adaptar a qualquer tela.</p>
   </div>
 
-  <div class="container">
-    <!-- 🎥 Vídeo remoto (do outro usuário) -->
-    <div class="video-wrapper">
-      <video id="remoteVideo" autoplay playsinline></video>
-    </div>
-
-    <!-- 🔘 Botão SEND -->
-    <div class="controls">
-      <button class="action-btn">SEND 🚀</button>
-    </div>
-
-    <!-- 🧾 Overlay de ID -->
-    <div class="info-overlay">
-      <span>ID: 000000</span>
-    </div>
-  </div>
 </body>
 </html>
