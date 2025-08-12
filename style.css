@@ -1,84 +1,24 @@
-body {
-  margin: 0;
-  padding: 0;
-  font-family: sans-serif;
-  background-color: #f0f0f0;
-  height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.container {
-  width: 90vw;
-  height: 90vh;
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
-
-/* 🔵 Box azul */
 .chat-input-box {
-  position: absolute;
-  bottom: 350px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 80%;
-  height: 200px;
-  border: 2px solid #007BFF;
-  border-radius: 12px;
-  background-color: rgba(255, 255, 255, 0.1);
-  overflow-y: auto;
-  padding: 10px;
+  position: fixed;            /* Fixa o box na tela, mesmo com rolagem */
+  bottom: 10vh;               /* Altura relativa à tela, mais fluida que 100px */
+  left: 5%;                   /* Espaço lateral proporcional */
+  width: 90%;                 /* Largura adaptável a qualquer tela */
+  max-height: 300px;          /* Limita a altura para evitar quebra visual */
+  overflow-y: auto;           /* Permite rolagem se o conteúdo for maior */
+  border: 2px solid #007BFF;  /* Borda azul para destaque */
+  border-radius: 12px;        /* Cantos arredondados */
+  background-color: transparent; /* Fundo transparente, pode mudar se quiser cor */
+  z-index: 20;                /* Garante que o box fique acima de outros elementos */
+  padding: 10px;              /* Espaço interno para conforto visual */
+  font-size: 1rem;            /* Tamanho de texto relativo à tela */
+  line-height: 1.4;           /* Espaçamento entre linhas para legibilidade */
 }
 
-/* 💬 Frases */
-.phrase-box {
-  padding: 8px;
-  margin: 6px 0;
-  background-color: rgba(0, 123, 255, 0.1);
-  border-radius: 8px;
-  color: #000;
-  font-size: 16px;
-}
-
-/* 🎥 Vídeos */
-.video-wrapper {
-  width: 100%;
-  max-width: 400px;
-  margin: 10px auto;
-}
-
-video {
-  width: 100%;
-  border-radius: 12px;
-  background-color: #000;
-}
-
-/* 🔘 Botão */
-.controls {
-  text-align: center;
-  margin-top: 20px;
-}
-
-.action-btn {
-  padding: 10px 20px;
-  font-size: 16px;
-  background-color: #007BFF;
-  color: white;
-  border: none;
-  border-radius: 8px;
-}
-
-/* 🧾 Overlay */
-.info-overlay {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  background-color: rgba(0,0,0,0.6);
-  color: white;
-  padding: 8px 12px;
-  border-radius: 8px;
+/* Ajustes específicos para telas pequenas (mobile) */
+@media (max-width: 600px) {
+  .chat-input-box {
+    bottom: 8vh;              /* Um pouco mais baixo para evitar o teclado virtual */
+    padding: 8px;             /* Reduz o espaço interno para caber melhor */
+    font-size: 0.9rem;        /* Texto um pouco menor para telas pequenas */
+  }
 }
