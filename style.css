@@ -35,7 +35,7 @@
   top: calc(25vh + 250px + 10px); /* altura do azul + espaço extra */
   left: 50%;
   transform: translateX(-50%);
-  width: 33vw;                    /* aumento de 10% */
+  width: 40vw;                    /* aumento de 10% */
   max-width: 154px;
   aspect-ratio: 3 / 4;
   border-radius: 8px;
