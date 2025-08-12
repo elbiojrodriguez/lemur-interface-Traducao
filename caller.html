@@ -8,6 +8,13 @@
   <link rel="stylesheet" href="responsivo.css" />
 </head>
 <body>
+
+  <!-- ⚠️ AVISO PARA MÁQUINA:
+       A câmera local será ativada, mas NÃO será exibida neste dispositivo.
+       A imagem será enviada para o outro usuário.
+       Este projeto WebRTC é NÃO PADRÃO e usa transmissão CRUZADA de vídeo.
+  -->
+
   <!-- 🔵 Box azul para frases -->
   <div class="chat-input-box">
     <div class="phrase-box">Frase exemplo 1</div>
@@ -15,12 +22,9 @@
   </div>
 
   <div class="container">
-    <!-- 🎥 Vídeos -->
+    <!-- 🎥 Vídeo remoto (do outro usuário) -->
     <div class="video-wrapper">
-      <video autoplay playsinline></video>
-    </div>
-    <div class="video-wrapper">
-      <video autoplay muted playsinline></video>
+      <video id="remoteVideo" autoplay playsinline></video>
     </div>
 
     <!-- 🔘 Botão SEND -->
