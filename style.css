@@ -1,24 +1,25 @@
 .chat-input-box {
-  position: fixed;            /* Fixa o box na tela, mesmo com rolagem */
-  bottom: 10vh;               /* Altura relativa à tela, mais fluida que 100px */
-  left: 5%;                   /* Espaço lateral proporcional */
-  width: 90%;                 /* Largura adaptável a qualquer tela */
-  max-height: 300px;          /* Limita a altura para evitar quebra visual */
-  overflow-y: auto;           /* Permite rolagem se o conteúdo for maior */
-  border: 2px solid #007BFF;  /* Borda azul para destaque */
-  border-radius: 12px;        /* Cantos arredondados */
-  background-color: transparent; /* Fundo transparente, pode mudar se quiser cor */
-  z-index: 20;                /* Garante que o box fique acima de outros elementos */
-  padding: 10px;              /* Espaço interno para conforto visual */
-  font-size: 1rem;            /* Tamanho de texto relativo à tela */
-  line-height: 1.4;           /* Espaçamento entre linhas para legibilidade */
+  position: fixed;              /* Fixa na tela, mesmo com rolagem */
+  top: 30vh;                    /* Posição vertical relativa à altura da tela */
+  left: 50%;                    /* Centraliza horizontalmente */
+  transform: translateX(-50%);  /* Ajusta para o centro exato */
+  width: 90%;                   /* Largura adaptável */
+  max-height: 300px;
+  overflow-y: auto;
+  border: 2px solid #007BFF;
+  border-radius: 12px;
+  background-color: transparent;
+  z-index: 20;
+  padding: 10px;
+  font-size: 1rem;
+  line-height: 1.4;
 }
 
-/* Ajustes específicos para telas pequenas (mobile) */
+/* Ajuste para telas pequenas */
 @media (max-width: 600px) {
   .chat-input-box {
-    bottom: 8vh;              /* Um pouco mais baixo para evitar o teclado virtual */
-    padding: 8px;             /* Reduz o espaço interno para caber melhor */
-    font-size: 0.9rem;        /* Texto um pouco menor para telas pequenas */
+    top: 25vh;                  /* Um pouco mais baixo em celulares menores */
+    padding: 8px;
+    font-size: 0.9rem;
   }
 }
