@@ -32,8 +32,8 @@
 /* 🟩 Box verde amarrado ao azul */
 .viewer-window {
   position: fixed;
-  top: calc(25vh + 250px + 20px); /* 20px abaixo do azul */
-  left: calc(50% + 45%);          /* encostado na lateral direita do azul */
+  top: calc(25vh + 250px + 60px); /* 20px abaixo do azul */
+  right: calc(50% + 45%);          /* encostado na lateral direita do azul */
   width: 33vw;
   max-width: 154px;
   aspect-ratio: 3 / 4;
