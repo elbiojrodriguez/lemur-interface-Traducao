@@ -34,7 +34,7 @@
   position: fixed;
   bottom: 16px;
   right: 16px;
-  width: 60vw;
+  width: 40vw;
   max-width:600px;
   aspect-ratio: 3 / 4;
   border-radius: 8px;
@@ -56,7 +56,7 @@
 /* 📱 Responsivo para telas menores */
 @media (max-width: 600px) {
   .viewer-window {
-    width: 60vw;
+    width: 40vw;
     max-width: 280px;
     bottom: 12px;
     right: 12px;
