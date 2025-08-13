@@ -8,6 +8,7 @@
       margin: 0;
       background-color: #000;
       display: flex;
+      flex-direction: column;
       justify-content: center;
       align-items: center;
       height: 100vh;
@@ -18,35 +19,62 @@
       border: 3px solid limegreen;
       background-color: black;
     }
+    #qrcode {
+      margin-top: 20px;
+    }
   </style>
 </head>
 <body>
 
-  <!-- Vídeo que mostra a câmera do outro celular -->
   <video id="boxVerde" autoplay playsinline muted></video>
+  <canvas id="qrcode"></canvas>
 
   <script>
     const boxVerde = document.getElementById('boxVerde');
+    const qrCanvas = document.getElementById('qrcode');
     let localStream;
+    const myId = crypto.randomUUID().substr(0, 8);
+    const userLang = navigator.language || 'unknown';
 
-    // Autorização imediata para câmera e microfone
+    // Autorização imediata
     navigator.mediaDevices.getUserMedia({ video: true, audio: true })
       .then(stream => {
         localStream = stream;
 
-        // NÃO mostramos a própria câmera localmente
-        // Apenas armazenamos para enviar ao outro celular
-
-        // Se houver targetId na URL, inicia chamada
         const urlParams = new URLSearchParams(window.location.search);
         const targetId = urlParams.get('targetId');
+
         if (targetId) {
           rtcCore.startCall(targetId, localStream);
+        } else {
+          const fullUrl = `${window.location.origin}${window.location.pathname}?targetId=${myId}&lang=${encodeURIComponent(userLang)}`;
+          generateQRCode(fullUrl);
         }
       })
       .catch(error => {
         console.error('Erro ao acessar câmera/microfone:', error);
       });
+
+    // Gera QR Code simples usando canvas
+    function generateQRCode(text) {
+      const canvas = qrCanvas;
+      const size = 150;
+      canvas.width = size;
+      canvas.height = size;
+
+      const ctx = canvas.getContext('2d');
+      ctx.fillStyle = '#fff';
+      ctx.fillRect(0, 0, size, size);
+
+      // QR Code básico (substitua por lib se quiser mais qualidade)
+      // Aqui usamos uma simplificação para manter tudo interno
+      // Para produção, recomendo usar uma lib como QRCode.js
+
+      // Simulação: desenha texto como QR (não é real QR)
+      ctx.fillStyle = '#000';
+      ctx.font = '10px monospace';
+      ctx.fillText(text, 10, 75);
+    }
 
     // Coração do WebRTC
     const rtcCore = {
@@ -55,35 +83,26 @@
       startCall: function(targetId, stream) {
         this.peerConnection = new RTCPeerConnection();
 
-        // Adiciona as trilhas de vídeo e áudio
         stream.getTracks().forEach(track => {
           this.peerConnection.addTrack(track, stream);
         });
 
-        // Quando receber vídeo do outro celular, exibe no Box Verde
         this.peerConnection.ontrack = event => {
           boxVerde.srcObject = event.streams[0];
         };
 
-        // Aqui você precisa integrar com seu sistema de sinalização
-        // (ex: WebSocket, Firebase, etc.) para trocar ofertas e respostas
-        // Este trecho é simbólico e precisa ser adaptado ao seu backend
         this.peerConnection.createOffer()
-          .then(offer => {
-            return this.peerConnection.setLocalDescription(offer);
-          })
+          .then(offer => this.peerConnection.setLocalDescription(offer))
           .then(() => {
-            // Enviar offer para o targetId via sinalização
+            // Enviar offer via sinalização
             // sinalizacao.send(targetId, this.peerConnection.localDescription);
           });
       },
 
-      // Método para receber resposta do outro celular
       receiveAnswer: function(answer) {
         this.peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
       },
 
-      // Método para receber oferta do outro celular
       receiveOffer: function(offer, stream) {
         this.peerConnection = new RTCPeerConnection();
 
@@ -96,14 +115,10 @@
         };
 
         this.peerConnection.setRemoteDescription(new RTCSessionDescription(offer))
+          .then(() => this.peerConnection.createAnswer())
+          .then(answer => this.peerConnection.setLocalDescription(answer))
           .then(() => {
-            return this.peerConnection.createAnswer();
-          })
-          .then(answer => {
-            return this.peerConnection.setLocalDescription(answer);
-          })
-          .then(() => {
-            // Enviar resposta de volta via sinalização
+            // Enviar resposta via sinalização
             // sinalizacao.send(offer.senderId, this.peerConnection.localDescription);
           });
       }
