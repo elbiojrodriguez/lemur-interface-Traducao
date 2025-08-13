@@ -1,113 +1,149 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <title>Projeto Câmeras Cruzadas</title>
-  <style>
-    body {
-      margin: 0;
-      background-color: #000;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-    }
-    #boxVerde {
-      width: 200px;
-      height: 120px;
-      border: 3px solid limegreen;
-      background-color: black;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VisualLink - Transmissão Assimétrica</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            height: 100vh;
+            background: #f0f0f0; /* Fundo claro para diferenciar */
+            position: relative;
+        }
+
+        /* Box Verde (exclusivo para vídeo recebido de B) */
+        #incomingVisualBox {
+            position: absolute;
+            bottom: 140px;
+            right: 5px;
+            width: 34.5%;
+            max-width: 138px;
+            height: 184px;
+            transform: translateX(-17%);
+            border: 2px solid #4CAF50;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+            z-index: 10;
+        }
+
+        #incomingVisualBox video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Área de tradução */
+        #translationArea {
+            position: absolute;
+            bottom: 350px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80%;
+            height: 200px;
+            border: 2px solid #007BFF;
+            background: rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 10px;
+            overflow-y: auto;
+        }
+
+        /* Overlay de permissão */
+        #permissionOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            text-align: center;
+            z-index: 100;
+        }
+
+        #permissionOverlay button {
+            margin-top: 20px;
+            padding: 12px 24px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
+    <!-- Box Verde (vídeo de B) -->
+    <div id="incomingVisualBox">
+        <video id="incomingVideo" autoplay playsinline></video>
+    </div>
 
-  <!-- Vídeo que mostra a câmera do outro celular -->
-  <video id="boxVerde" autoplay playsinline muted></video>
+    <!-- Área de tradução -->
+    <div id="translationArea"></div>
 
-  <script>
-    const boxVerde = document.getElementById('boxVerde');
-    let localStream;
+    <!-- Overlay inicial -->
+    <div id="permissionOverlay">
+        <h2>Acesso Necessário</h2>
+        <p><strong>Sua câmera será transmitida para o destinatário, mas não aparecerá nesta tela.</strong></p>
+        <p>O vídeo recebido será exibido no <span style="color: #4CAF50;">Box Verde</span>.</p>
+        <button id="grantPermissionBtn">PERMITIR CÂMERA E MICROFONE</button>
+    </div>
 
-    // Autorização imediata para câmera e microfone
-    navigator.mediaDevices.getUserMedia({ video: true, audio: true })
-      .then(stream => {
-        localStream = stream;
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const permissionOverlay = document.getElementById('permissionOverlay');
+            const grantPermissionBtn = document.getElementById('grantPermissionBtn');
+            const incomingVideo = document.getElementById('incomingVideo');
+            const translationArea = document.getElementById('translationArea');
 
-        // NÃO mostramos a própria câmera localmente
-        // Apenas armazenamos para enviar ao outro celular
+            // 1. Solicita permissões (câmera + microfone)
+            grantPermissionBtn.addEventListener('click', async () => {
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({
+                        video: true,
+                        audio: true
+                    });
 
-        // Se houver targetId na URL, inicia chamada
-        const urlParams = new URLSearchParams(window.location.search);
-        const targetId = urlParams.get('targetId');
-        if (targetId) {
-          rtcCore.startCall(targetId, localStream);
-        }
-      })
-      .catch(error => {
-        console.error('Erro ao acessar câmera/microfone:', error);
-      });
+                    permissionOverlay.style.display = 'none';
+                    
+                    // 2. Inicia conexão (seu stream é enviado para B)
+                    startConnection(stream);
 
-    // Coração do WebRTC
-    const rtcCore = {
-      peerConnection: null,
+                    // 3. Simula recebimento do vídeo de B (substitua pelo real)
+                    incomingVideo.srcObject = await simulateIncomingStream();
 
-      startCall: function(targetId, stream) {
-        this.peerConnection = new RTCPeerConnection();
+                } catch (error) {
+                    console.error("Erro:", error);
+                    permissionOverlay.innerHTML = `
+                        <h2 style="color: #ff4444;">Permissão Negada</h2>
+                        <p>O recurso não funciona sem acesso à câmera.</p>
+                    `;
+                }
+            });
 
-        // Adiciona as trilhas de vídeo e áudio
-        stream.getTracks().forEach(track => {
-          this.peerConnection.addTrack(track, stream);
+            // Funções de exemplo (substitua pela sua lógica real)
+            function startConnection(localStream) {
+                translationArea.innerHTML = '<p>✔ Conexão estabelecida</p>';
+            }
+
+            async function simulateIncomingStream() {
+                return await navigator.mediaDevices.getUserMedia({
+                    video: { width: 640, height: 480 }
+                });
+            }
         });
-
-        // Quando receber vídeo do outro celular, exibe no Box Verde
-        this.peerConnection.ontrack = event => {
-          boxVerde.srcObject = event.streams[0];
-        };
-
-        // Aqui você precisa integrar com seu sistema de sinalização
-        // (ex: WebSocket, Firebase, etc.) para trocar ofertas e respostas
-        // Este trecho é simbólico e precisa ser adaptado ao seu backend
-        this.peerConnection.createOffer()
-          .then(offer => {
-            return this.peerConnection.setLocalDescription(offer);
-          })
-          .then(() => {
-            // Enviar offer para o targetId via sinalização
-            // sinalizacao.send(targetId, this.peerConnection.localDescription);
-          });
-      },
-
-      // Método para receber resposta do outro celular
-      receiveAnswer: function(answer) {
-        this.peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
-      },
-
-      // Método para receber oferta do outro celular
-      receiveOffer: function(offer, stream) {
-        this.peerConnection = new RTCPeerConnection();
-
-        stream.getTracks().forEach(track => {
-          this.peerConnection.addTrack(track, stream);
-        });
-
-        this.peerConnection.ontrack = event => {
-          boxVerde.srcObject = event.streams[0];
-        };
-
-        this.peerConnection.setRemoteDescription(new RTCSessionDescription(offer))
-          .then(() => {
-            return this.peerConnection.createAnswer();
-          })
-          .then(answer => {
-            return this.peerConnection.setLocalDescription(answer);
-          })
-          .then(() => {
-            // Enviar resposta de volta via sinalização
-            // sinalizacao.send(offer.senderId, this.peerConnection.localDescription);
-          });
-      }
-    };
-  </script>
+    </script>
 </body>
 </html>
