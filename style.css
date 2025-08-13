@@ -56,8 +56,8 @@
 /* 📱 Responsivo para telas menores */
 @media (max-width: 600px) {
   .viewer-window {
-    width: 40vw;
-    max-width: 120px;
+    width: 600vw;
+    max-width: 280px;
     bottom: 12px;
     right: 12px;
   }
