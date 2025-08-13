@@ -1,12 +1,47 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Videochat Simplificado</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VisualLink - Transmissão Assimétrica</title>
     <style>
-        /* 🔵 Estilo do box azul */
-        .chat-input-box {
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            height: 100vh;
+            background: #f0f0f0; /* Fundo claro para diferenciar */
+            position: relative;
+        }
+
+        /* Box Verde (exclusivo para vídeo recebido de B) */
+        #incomingVisualBox {
+            position: absolute;
+            bottom: 140px;
+            right: 5px;
+            width: 34.5%;
+            max-width: 138px;
+            height: 184px;
+            transform: translateX(-17%);
+            border: 2px solid #4CAF50;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+            z-index: 10;
+        }
+
+        #incomingVisualBox video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Área de tradução */
+        #translationArea {
             position: absolute;
             bottom: 350px;
             left: 50%;
@@ -14,67 +49,101 @@
             width: 80%;
             height: 200px;
             border: 2px solid #007BFF;
+            background: rgba(255,255,255,0.1);
             border-radius: 12px;
-            background-color: rgba(255, 255, 255, 0.1);
-            z-index: 20;
-            overflow-y: auto;
             padding: 10px;
+            overflow-y: auto;
         }
 
-        /* 💬 Estilo das frases reconhecidas */
-        .phrase-box {
-            padding: 8px;
-            margin: 6px 0;
-            background-color: rgba(0, 123, 255, 0.1);
-            border-radius: 8px;
-            color: #000;
+        /* Overlay de permissão */
+        #permissionOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            text-align: center;
+            z-index: 100;
+        }
+
+        #permissionOverlay button {
+            margin-top: 20px;
+            padding: 12px 24px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 20px;
             font-size: 16px;
-        }
-
-        /* Vídeo principal */
-        .main-video {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            background: #000;
-        }
-
-        /* Container PIP */
-        .pip-container {
-            position: absolute;
-            bottom: calc(80px + 60px);
-            right: 5px;
-            width: 34.5%;
-            max-width: 138px;
-            height: 184px;
-            transform: translateX(-17%);
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-            border: 2px solid #4CAF50;
-            z-index: 10;
-        }
-
-        /* Vídeo PIP */
-        .pip-video {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transform: scaleX(-1);
+            cursor: pointer;
         }
     </style>
 </head>
 <body>
-    <!-- Vídeo principal -->
-    <video class="main-video" id="remoteVideo" autoplay playsinline></video>
-
-    <!-- Container PIP -->
-    <div class="pip-container">
-        <video class="pip-video" id="localVideo" autoplay muted playsinline></video>
+    <!-- Box Verde (vídeo de B) -->
+    <div id="incomingVisualBox">
+        <video id="incomingVideo" autoplay playsinline></video>
     </div>
 
-    <!-- Box azul de chat -->
-    <div class="chat-input-box" id="textDisplay"></div>
+    <!-- Área de tradução -->
+    <div id="translationArea"></div>
+
+    <!-- Overlay inicial -->
+    <div id="permissionOverlay">
+        <h2>Acesso Necessário</h2>
+        <p><strong>Sua câmera será transmitida para o destinatário, mas não aparecerá nesta tela.</strong></p>
+        <p>O vídeo recebido será exibido no <span style="color: #4CAF50;">Box Verde</span>.</p>
+        <button id="grantPermissionBtn">PERMITIR CÂMERA E MICROFONE</button>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const permissionOverlay = document.getElementById('permissionOverlay');
+            const grantPermissionBtn = document.getElementById('grantPermissionBtn');
+            const incomingVideo = document.getElementById('incomingVideo');
+            const translationArea = document.getElementById('translationArea');
+
+            // 1. Solicita permissões (câmera + microfone)
+            grantPermissionBtn.addEventListener('click', async () => {
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({
+                        video: true,
+                        audio: true
+                    });
+
+                    permissionOverlay.style.display = 'none';
+                    
+                    // 2. Inicia conexão (seu stream é enviado para B)
+                    startConnection(stream);
+
+                    // 3. Simula recebimento do vídeo de B (substitua pelo real)
+                    incomingVideo.srcObject = await simulateIncomingStream();
+
+                } catch (error) {
+                    console.error("Erro:", error);
+                    permissionOverlay.innerHTML = `
+                        <h2 style="color: #ff4444;">Permissão Negada</h2>
+                        <p>O recurso não funciona sem acesso à câmera.</p>
+                    `;
+                }
+            });
+
+            // Funções de exemplo (substitua pela sua lógica real)
+            function startConnection(localStream) {
+                translationArea.innerHTML = '<p>✔ Conexão estabelecida</p>';
+            }
+
+            async function simulateIncomingStream() {
+                return await navigator.mediaDevices.getUserMedia({
+                    video: { width: 640, height: 480 }
+                });
+            }
+        });
+    </script>
 </body>
 </html>
