@@ -3,9 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Caller - Videochamada Mobile</title>
-    <link rel="stylesheet" href="style.css" />
-    <link rel="stylesheet" href="responsivo.css" />
+    <title>Videochat Simplificado</title>
     <style>
         /* 🔵 Estilo do box azul */
         .chat-input-box {
@@ -13,7 +11,7 @@
             bottom: 350px;
             left: 50%;
             transform: translateX(-50%);
-            width: 90%;
+            width: 80%;
             height: 200px;
             border: 2px solid #007BFF;
             border-radius: 12px;
@@ -23,45 +21,60 @@
             padding: 10px;
         }
 
-/* Vídeo local em PIP */
-.video-wrapper:nth-child(2) { 
-position: absolute; 
-bottom: calc(80px + 60px); 
-right: 5px; 
-width: 34.5%; 
-max-width: 138px; 
-height: 184px; 
-transform: translateX(-17%); 
-border-radius: 8px; overflow: hidden; 
-box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); 
-border: 2px solid #4CAF50; z-index: 10; 
-}
+        /* 💬 Estilo das frases reconhecidas */
+        .phrase-box {
+            padding: 8px;
+            margin: 6px 0;
+            background-color: rgba(0, 123, 255, 0.1);
+            border-radius: 8px;
+            color: #000;
+            font-size: 16px;
+        }
+
+        /* Vídeo principal */
+        .main-video {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            background: #000;
+        }
+
+        /* Container PIP */
+        .pip-container {
+            position: absolute;
+            bottom: calc(80px + 60px);
+            right: 5px;
+            width: 34.5%;
+            max-width: 138px;
+            height: 184px;
+            transform: translateX(-17%);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            border: 2px solid #4CAF50;
+            z-index: 10;
+        }
+
+        /* Vídeo PIP */
+        .pip-video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transform: scaleX(-1);
+        }
     </style>
 </head>
 <body>
-    <!-- 🔹 Box azul centralizado com ID para JS -->
-    <div class="chat-input-box" id="textDisplay"></div>
+    <!-- Vídeo principal -->
+    <video class="main-video" id="remoteVideo" autoplay playsinline></video>
 
-    <div class="container">
-        <div class="video-wrapper">
-            <video id="remoteVideo" autoplay playsinline></video>
-        </div>
-        <div class="video-wrapper">
-            <video id="localVideo" autoplay muted playsinline></video>
-        </div>
-        
-        <!-- 🔻 Controles -->
-        <div class="controls">
-            <button id="callActionBtn" style="display:none;">SEND 🚀</button>
-        </div>
-        
-        <div class="info-overlay" style="display: none;">
-            <span id="myId"></span>
-        </div>
+    <!-- Container PIP -->
+    <div class="pip-container">
+        <video class="pip-video" id="localVideo" autoplay muted playsinline></video>
     </div>
 
-    <!-- 🔌 Scripts -->
-    <script src="https://lemur-signal.onrender.com/socket.io/socket.io.js"></script>
-    <script type="module" src="js/caller-ui.js"></script>
+    <!-- Box azul de chat -->
+    <div class="chat-input-box" id="textDisplay"></div>
 </body>
 </html>
