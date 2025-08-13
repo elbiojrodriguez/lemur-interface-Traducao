@@ -35,7 +35,7 @@
   bottom: 16px;
   right: 16px;
   width: 40vw;
-  max-width:600px;
+  max-width:280px;
   aspect-ratio: 3 / 4;
   border-radius: 8px;
   overflow: hidden;
@@ -57,7 +57,7 @@
 @media (max-width: 600px) {
   .viewer-window {
     width: 40vw;
-    max-width: 280px;
+    max-width: 240px;
     bottom: 12px;
     right: 12px;
   }
