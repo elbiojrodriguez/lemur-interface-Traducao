@@ -23,15 +23,19 @@
             padding: 10px;
         }
 
-        /* 💬 Estilo das frases reconhecidas */
-        .phrase-box {
-            padding: 8px;
-            margin: 6px 0;
-            background-color: rgba(0, 123, 255, 0.1);
-            border-radius: 8px;
-            color: #000;
-            font-size: 16px;
-        }
+/* Vídeo local em PIP */
+.video-wrapper:nth-child(2) { 
+position: absolute; 
+bottom: calc(80px + 60px); 
+right: 5px; 
+width: 34.5%; 
+max-width: 138px; 
+height: 184px; 
+transform: translateX(-17%); 
+border-radius: 8px; overflow: hidden; 
+box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); 
+border: 2px solid #4CAF50; z-index: 10; 
+}
     </style>
 </head>
 <body>
