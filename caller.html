@@ -14,7 +14,7 @@
         body {
             font-family: Arial, sans-serif;
             height: 100vh;
-            background: #f0f0f0; /* Fundo claro para diferenciar */
+            background: #f0f0f0;
             position: relative;
         }
 
@@ -102,7 +102,7 @@
     </div>
 
     <script>
-        // instant-qr-generator.js - Versão Final
+        // instant-qr-generator.js - Versão Final (modificado para remover o QR após permissão)
         class InstantQRGenerator {
           constructor(options = {}) {
             // Configurações padrão
@@ -216,10 +216,20 @@
               container.appendChild(infoDiv);
             }
           }
+
+          // Novo método para remover o QR Code
+          removeQRCode() {
+            const container = document.getElementById(this.settings.containerId);
+            if (container) {
+              container.style.display = 'none';
+              // Ou se preferir remover completamente:
+              // container.remove();
+            }
+          }
         }
 
-        // Inicia automaticamente quando o script é carregado
-        new InstantQRGenerator({
+        // Cria uma instância acessível globalmente
+        const qrGenerator = new InstantQRGenerator({
           // showInfo: true // Descomente para mostrar informações abaixo do QR Code
         }); 
 
@@ -238,6 +248,9 @@
                     });
 
                     permissionOverlay.style.display = 'none';
+                    
+                    // Remove o QR Code quando as permissões são concedidas
+                    qrGenerator.removeQRCode();
                     
                     // 2. Inicia conexão (seu stream é enviado para B)
                     startConnection(stream);
