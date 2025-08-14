@@ -1,97 +1,29 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <!-- [MANTIDO IGUAL] Todo o CSS original -->
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        body {
-            font-family: Arial, sans-serif;
-            height: 100vh;
-            background: #f0f0f0;
-            position: relative;
-        }
-        #incomingVisualBox {
-            position: absolute;
-            bottom: 140px;
-            right: 5px;
-            width: 34.5%;
-            max-width: 138px;
-            height: 184px;
-            transform: translateX(-17%);
-            border: 2px solid #4CAF50;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 0 10px rgba(0,0,0,0.5);
-            z-index: 10;
-        }
-        /* [MANTIDO] Todo o resto do CSS original */
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Receiver - Videochamada Mobile</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="responsivo.css" />
+  <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
 </head>
 <body>
-    <!-- [MANTIDO IGUAL] Estrutura HTML original -->
-    <div id="incomingVisualBox">
-        <video id="incomingVideo" autoplay playsinline></video>
-    </div>
-    <div id="translationArea"></div>
-    <div id="permissionOverlay">
-        <h2>Acesso Necessário</h2>
-        <p><strong>Sua câmera será transmitida para o destinatário...</strong></p>
-        <button id="grantPermissionBtn">PERMITIR CÂMERA E MICROFONE</button>
+  <div class="container">
+    <div class="video-wrapper">
+      <video id="remoteVideo" autoplay playsinline></video>
     </div>
 
-    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
-    
-    <script>
-        // [MANTIDA] Classe WebRTCCore original completa
-        class WebRTCCore {
-            constructor(socketUrl = window.location.origin) {
-                // ... código original completo ...
-            }
-            // ... todos os métodos originais ...
-        }
+    <div class="video-wrapper">
+      <video id="localVideo" autoplay muted playsinline></video>
+    </div>
 
-        // Única mudança REAL (automático sem controles manuais):
-        document.addEventListener('DOMContentLoaded', async () => {
-            const params = new URLSearchParams(window.location.search);
-            const targetId = params.get('id'); // Pega ID do QR Code
-            
-            const webrtc = new WebRTCCore();
-            webrtc.initialize('auto_' + Math.random().toString(36).substr(2, 5));
-            
-            webrtc.setRemoteStreamCallback(stream => {
-                document.getElementById('incomingVideo').srcObject = stream;
-                document.getElementById('translationArea').innerHTML += '<p>✔ Conectado</p>';
-            });
+        <div class="info-overlay">
+      <div id="qrcode" class="qrcode-container"></div>
+    </div>
+  </div>
 
-            document.getElementById('grantPermissionBtn').onclick = async () => {
-                try {
-                    const stream = await navigator.mediaDevices.getUserMedia({ 
-                        video: true, 
-                        audio: true 
-                    });
-                    document.getElementById('permissionOverlay').style.display = 'none';
-                    webrtc.startCall(targetId, stream);
-                } catch (error) {
-                    console.error("Erro:", error);
-                }
-            };
-
-            // Tenta automático (sem precisar clicar)
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ 
-                    video: true, 
-                    audio: true 
-                });
-                document.getElementById('permissionOverlay').style.display = 'none';
-                webrtc.startCall(targetId, stream);
-            } catch (error) {
-                console.log("Aguardando permissão manual...");
-            }
-        });
-    </script>
+  <script src="https://lemur-signal.onrender.com/socket.io/socket.io.js"></script>
+  <script type="module" src="js/receiver-ui.js"></script>
 </body>
 </html>
