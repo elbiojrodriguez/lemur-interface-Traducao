@@ -15,9 +15,21 @@ window.onload = () => {
       console.error("Erro ao acessar a câmera:", error);
     });
 
-  // Gera QR Code com link para caller
-  const callerUrl = `${window.location.origin}/caller.html?targetId=${myId}`;
-  QRCodeGenerator.generate("qrcode", callerUrl);
+  // 🧑 Captura nome e sobrenome para incluir no QR code
+  const nomeInput = document.getElementById('nome');
+  const sobrenomeInput = document.getElementById('sobrenome');
+
+  // Aguarda pequeno tempo para garantir que os inputs estejam disponíveis
+  setTimeout(() => {
+    const nome = nomeInput?.value.trim() || "Anônimo";
+    const sobrenome = sobrenomeInput?.value.trim() || "";
+
+    const identidade = `Eu sou ${nome} ${sobrenome} e falo 🇧🇷`;
+    const callerUrl = `${window.location.origin}/caller.html?targetId=${myId}&identidade=${encodeURIComponent(identidade)}`;
+
+    // Gera QR Code com a frase personalizada
+    QRCodeGenerator.generate("qrcode", callerUrl);
+  }, 500);
 
   rtcCore.initialize(myId);
   rtcCore.setupSocketHandlers();
