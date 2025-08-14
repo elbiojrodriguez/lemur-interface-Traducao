@@ -22,6 +22,7 @@ window.onload = () => {
     .catch(error => {
       console.error("Erro ao acessar a câmera:", error);
     });
+
   // 📥 Detecta parâmetros da URL
   const urlParams = new URLSearchParams(window.location.search);
   const lang = urlParams.get('lang') || 'pt-BR';
@@ -46,7 +47,7 @@ window.onload = () => {
   // 🖼️ Exibe frase traduzida com bandeira
   document.getElementById('languageInfo').textContent = `${selectedLang.speakText} ${selectedLang.flag}`;
 
-  // Verifica se há ID na URL
+// Verifica se há ID na URL
   const urlParams = new URLSearchParams(window.location.search);
   const targetIdFromUrl = urlParams.get('targetId');
   
