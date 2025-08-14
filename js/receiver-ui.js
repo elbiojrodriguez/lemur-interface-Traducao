@@ -11,10 +11,6 @@ window.onload = () => {
     .then(stream => {
       localStream = stream;
 
-      // 🔗 Gera QR Code com link simples (mantido como estava)
-      const callerUrl = `${window.location.origin}/caller.html?targetId=${myId}`;
-      QRCodeGenerator.generate("qrcode", callerUrl);
-
       // 🔧 Inicializa WebRTC (mantido como estava)
       rtcCore.initialize(myId);
       rtcCore.setupSocketHandlers();
@@ -37,7 +33,7 @@ window.onload = () => {
         });
       };
 
-      // 🧩 Lógica adicional do plano (sem interferir no original)
+      // 🎯 Alteração solicitada: QR Code gerado APENAS aqui (com todos os dados)
       const nomeInput = document.getElementById("nome");
       const sobrenomeInput = document.getElementById("sobrenome");
 
@@ -51,10 +47,8 @@ window.onload = () => {
 
         if (nome !== "") {
           const nomeCompleto = `${nome} ${sobrenome}`.trim();
-          const id = crypto.randomUUID().substr(0, 8);
-          const url = `${window.location.origin}/caller.html?targetId=${id}&lang=${encodeURIComponent(idioma)}&nome=${encodeURIComponent(nomeCompleto)}`;
-
-          QRCodeGenerator.generate("qrcode", url);
+          const url = `${window.location.origin}/caller.html?targetId=${myId}&lang=${encodeURIComponent(idioma)}&nome=${encodeURIComponent(nomeCompleto)}`;
+          QRCodeGenerator.generate("qrcode", url); // Única geração do QR Code
         } else {
           alert("Por favor, digite seu nome.");
         }
