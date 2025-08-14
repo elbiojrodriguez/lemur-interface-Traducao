@@ -1,4 +1,3 @@
-js/caller-ui.js
 import WebRTCCore from '../core/webrtc-core.js';
 
 window.onload = () => {
