@@ -1,7 +1,6 @@
 import WebRTCCore from '../core/webrtc-core.js';
 
 window.onload = () => {
-  const chatInputBox = document.querySelector('.chat-input-box');
   const rtcCore = new WebRTCCore();
   const myId = crypto.randomUUID().substr(0, 8);
   document.getElementById('myId').textContent = myId;
@@ -13,7 +12,7 @@ window.onload = () => {
   let targetId = null;
   let localStream = null;
 
-  // Solicita acesso à câmera logo na abertura
+  // 🔓 Solicita acesso à câmera logo na abertura
   navigator.mediaDevices.getUserMedia({ video: true, audio: false })
     .then(stream => {
       localStream = stream;
@@ -38,7 +37,7 @@ window.onload = () => {
     rtcCore.startCall(targetId, localStream);
   };
 
-  // Silencia qualquer áudio recebido
+  // 🔇 Silencia qualquer áudio recebido
   rtcCore.setRemoteStreamCallback(stream => {
     stream.getAudioTracks().forEach(track => track.enabled = false);
     localVideo.srcObject = stream;
