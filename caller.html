@@ -44,9 +44,26 @@
       color: #007BFF;
       z-index: 30;
     }
+    
+    /* ✨ Novo estilo para a frase personalizada */
+    #userGreeting {
+      position: absolute;
+      bottom: 590px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 18px;
+      font-weight: bold;
+      color: #007BFF;
+      z-index: 30;
+      text-align: center;
+      width: 100%;
+    }
   </style>
 </head>
 <body>
+  <!-- ✨ Nova frase personalizada -->
+  <div id="userGreeting"></div>
+  
   <!-- 🌍 Frase com idioma detectado -->
   <div id="languageInfo"></div>
 
