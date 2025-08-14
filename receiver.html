@@ -63,7 +63,7 @@
             width: 100%;
             height: 100%;
             background: rgba(0,0,0,0.9);
-            display: flex;
+            display: none; /* Alterado para não aparecer inicialmente */
             flex-direction: column;
             justify-content: center;
             align-items: center;
@@ -82,6 +82,26 @@
             font-size: 16px;
             cursor: pointer;
         }
+
+        /* Estilo para o container do QR Code */
+        #qrContainer {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            z-index: 50;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.3);
+        }
+
+        #qrInfo {
+            margin-top: 15px;
+            font-size: 16px;
+            color: #333;
+        }
     </style>
 </head>
 <body>
@@ -93,51 +113,81 @@
     <!-- Área de tradução -->
     <div id="translationArea"></div>
 
-    <!-- Overlay inicial -->
+    <!-- Overlay de permissão (oculto inicialmente) -->
     <div id="permissionOverlay">
         <h2>Acesso Necessário</h2>
         <p><strong>Sua câmera será transmitida para o destinatário, mas não aparecerá nesta tela.</strong></p>
         <p>O vídeo recebido será exibido no <span style="color: #4CAF50;">Box Verde</span>.</p>
         <button id="grantPermissionBtn">PERMITIR CÂMERA E MICROFONE</button>
     </div>
-<script>
-  // 1. Gera as informações necessárias
-  const tempId = 'id_' + Math.random().toString(36).substr(2, 8); // ID temporário
-  const userLanguage = navigator.language.substring(0, 2); // Idioma (ex: 'pt')
-  
-  // 2. Cria a URL com os parâmetros
-  const url = `https://lemur-interface-traducao.netlify.app/caller.html?id=${tempId}&lang=${userLanguage}`;
-  
-  // 3. Mostra o QR Code grande no centro da tela
-  const container = document.createElement('div');
-  container.style.position = 'fixed';
-  container.style.top = '50%';
-  container.style.left = '50%';
-  container.style.transform = 'translate(-50%, -50%)';
-  container.style.textAlign = 'center';
-  document.body.appendChild(container);
-  
-  // 4. Carrega a biblioteca QR Code e gera
-  const script = document.createElement('script');
-  script.src = 'https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js';
-  script.onload = function() {
-    new QRCode(container, {
-      text: url,
-      width: 250,
-      height: 250,
-      colorDark: "#000000",
-      colorLight: "#ffffff"
-    });
-    
-    // Mostra as informações abaixo do QR Code (opcional)
-    const info = document.createElement('div');
-    info.innerHTML = `
-      <p><strong>ID:</strong> ${tempId}</p>
-      <p><strong>Idioma:</strong> ${userLanguage}</p>
-    `;
-    container.appendChild(info);
-  };
-  document.head.appendChild(script);
-</script>
+
+    <!-- Container do QR Code -->
+    <div id="qrContainer">
+        <h3>Escaneie para conectar</h3>
+        <div id="qrcode"></div>
+        <div id="qrInfo"></div>
+    </div>
+
+    <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
+    <script>
+        // 1. Gera as informações necessárias
+        const tempId = 'id_' + Math.random().toString(36).substr(2, 8); // ID temporário
+        const userLanguage = navigator.language.substring(0, 2); // Idioma (ex: 'pt')
+        
+        // 2. Cria a URL com os parâmetros
+        const url = `https://lemur-interface-traducao.netlify.app/caller.html?id=${tempId}&lang=${userLanguage}`;
+        
+        // 3. Gera o QR Code
+        new QRCode(document.getElementById("qrcode"), {
+            text: url,
+            width: 200,
+            height: 200,
+            colorDark: "#000000",
+            colorLight: "#ffffff"
+        });
+        
+        // 4. Mostra as informações
+        document.getElementById("qrInfo").innerHTML = `
+            <p><strong>ID:</strong> ${tempId}</p>
+            <p><strong>Idioma:</strong> ${userLanguage}</p>
+        `;
+        
+        // 5. Tenta acessar a câmera automaticamente
+        async function setupCamera() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    video: true,
+                    audio: true
+                });
+                
+                // Se conseguir, esconde o overlay (se estiver visível)
+                document.getElementById('permissionOverlay').style.display = 'none';
+                
+                // Aqui você pode adicionar o código para iniciar a conexão WebRTC
+                document.getElementById('translationArea').innerHTML = '<p>✔ Dispositivos prontos para transmissão</p>';
+                
+            } catch (error) {
+                // Se der erro, MOSTRA o overlay com o botão
+                document.getElementById('permissionOverlay').style.display = 'flex';
+                
+                // Configura o botão para tentar novamente
+                document.getElementById('grantPermissionBtn').onclick = async () => {
+                    try {
+                        const stream = await navigator.mediaDevices.getUserMedia({
+                            video: true,
+                            audio: true
+                        });
+                        document.getElementById('permissionOverlay').style.display = 'none';
+                        document.getElementById('translationArea').innerHTML = '<p>✔ Permissão concedida</p>';
+                    } catch (e) {
+                        alert("Não foi possível acessar a câmera. Por favor, permita o acesso.");
+                    }
+                };
+            }
+        }
+        
+        // Inicia o processo quando a página carregar
+        document.addEventListener('DOMContentLoaded', setupCamera);
+    </script>
 </body>
 </html>
