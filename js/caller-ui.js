@@ -22,6 +22,29 @@ window.onload = () => {
     .catch(error => {
       console.error("Erro ao acessar a câmera:", error);
     });
+  // 📥 Detecta parâmetros da URL
+  const urlParams = new URLSearchParams(window.location.search);
+  const lang = urlParams.get('lang') || 'pt-BR';
+  const targetIdFromUrl = urlParams.get('targetId');
+
+  // 🌐 Idiomas disponíveis com "Eu falo" traduzido
+  const languages = [
+    { code: 'en-US', flag: '🇺🇸', speakText: 'I speak', name: 'English' },
+    { code: 'pt-BR', flag: '🇧🇷', speakText: 'Eu falo', name: 'Português' },
+    { code: 'es-ES', flag: '🇪🇸', speakText: 'Yo hablo', name: 'Español' },
+    { code: 'fr-FR', flag: '🇫🇷', speakText: 'Je parle', name: 'Français' },
+    { code: 'de-DE', flag: '🇩🇪', speakText: 'Ich spreche', name: 'Deutsch' },
+    { code: 'ja-JP', flag: '🇯🇵', speakText: '私は話します', name: '日本語' },
+    { code: 'zh-CN', flag: '🇨🇳', speakText: '我说', name: '中文' },
+    { code: 'ru-RU', flag: '🇷🇺', speakText: 'Я говорю', name: 'Русский' },
+    { code: 'ar-SA', flag: '🇸🇦', speakText: 'أنا أتكلم', name: 'العربية' }
+  ];
+
+  // 🔍 Busca idioma correspondente
+  const selectedLang = languages.find(l => l.code === lang) || languages[1]; // padrão pt-BR
+
+  // 🖼️ Exibe frase traduzida com bandeira
+  document.getElementById('languageInfo').textContent = `${selectedLang.speakText} ${selectedLang.flag}`;
 
   // Verifica se há ID na URL
   const urlParams = new URLSearchParams(window.location.search);
@@ -45,4 +68,3 @@ window.onload = () => {
   });
   
 };
-
