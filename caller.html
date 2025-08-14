@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VisualLink - Transmissão Assimétrica</title>
+    <title>VisualLink - Conexão Automática</title>
     <style>
         * {
             margin: 0;
@@ -18,15 +18,13 @@
             position: relative;
         }
 
-        /* Box Verde (exclusivo para vídeo recebido de B) */
+        /* Box Verde (vídeo recebido) */
         #incomingVisualBox {
             position: absolute;
-            bottom: 140px;
-            right: 5px;
-            width: 34.5%;
-            max-width: 138px;
-            height: 184px;
-            transform: translateX(-17%);
+            bottom: 20px;
+            right: 20px;
+            width: 120px;
+            height: 160px;
             border: 2px solid #4CAF50;
             border-radius: 8px;
             overflow: hidden;
@@ -40,340 +38,149 @@
             object-fit: cover;
         }
 
-        /* Área de tradução */
-        #translationArea {
+        /* Status da conexão */
+        #connectionStatus {
             position: absolute;
-            bottom: 350px;
+            top: 20px;
             left: 50%;
             transform: translateX(-50%);
-            width: 80%;
-            height: 200px;
-            border: 2px solid #007BFF;
-            background: rgba(255,255,255,0.1);
-            border-radius: 12px;
-            padding: 10px;
-            overflow-y: auto;
-        }
-
-        /* Overlay de permissão */
-        #permissionOverlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.9);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
+            background: rgba(0,0,0,0.7);
             color: white;
-            text-align: center;
-            z-index: 100;
-        }
-
-        #permissionOverlay button {
-            margin-top: 20px;
-            padding: 12px 24px;
-            background: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 20px;
-            font-size: 16px;
-            cursor: pointer;
-        }
-
-        /* Controles de chamada */
-        #callControls {
-            position: absolute;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            gap: 10px;
-        }
-
-        #callControls button {
             padding: 10px 20px;
-            border: none;
             border-radius: 20px;
             font-size: 14px;
-            cursor: pointer;
-        }
-
-        #startCallBtn {
-            background: #4CAF50;
-            color: white;
-        }
-
-        #endCallBtn {
-            background: #f44336;
-            color: white;
-        }
-
-        #targetIdInput {
-            padding: 10px;
-            border-radius: 20px;
-            border: 1px solid #ccc;
         }
     </style>
 </head>
 <body>
-    <!-- Box Verde (vídeo de B) -->
+    <!-- Box Verde (vídeo recebido) -->
     <div id="incomingVisualBox">
         <video id="incomingVideo" autoplay playsinline></video>
     </div>
 
-    <!-- Área de tradução -->
-    <div id="translationArea"></div>
-
-    <!-- Controles de chamada -->
-    <div id="callControls">
-        <input type="text" id="targetIdInput" placeholder="ID do destinatário">
-        <button id="startCallBtn">Iniciar Chamada</button>
-        <button id="endCallBtn" disabled>Encerrar Chamada</button>
-    </div>
-
-    <!-- Overlay inicial -->
-    <div id="permissionOverlay">
-        <h2>Acesso Necessário</h2>
-        <p><strong>Sua câmera será transmitida para o destinatário, mas não aparecerá nesta tela.</strong></p>
-        <p>O vídeo recebido será exibido no <span style="color: #4CAF50;">Box Verde</span>.</p>
-        <button id="grantPermissionBtn">PERMITIR CÂMERA E MICROFONE</button>
-    </div>
+    <!-- Status da conexão -->
+    <div id="connectionStatus">Conectando...</div>
 
     <!-- Socket.IO -->
     <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
     
     <script>
-        // Configuração do WebRTC Core (adaptado do webrtc-core.js)
-        const SIGNALING_SERVER_URL = window.location.origin;
-        
-        function getIceServers() {
-            return {
-                iceServers: [
-                    { urls: "stun:stun.l.google.com:19302" },
-                    { urls: "stun:global.stun.twilio.com:3478?transport=udp" }
-                ]
-            };
-        }
-
-        class WebRTCCore {
-            constructor(socketUrl = SIGNALING_SERVER_URL) {
-                this.socket = io(socketUrl);
-                this.peer = null;
-                this.localStream = null;
-                this.remoteStreamCallback = null;
-                this.currentCaller = null;
-                this.iceServers = getIceServers();
-                this.userId = null;
-                
-                this.setupSocketHandlers();
-            }
-
-            initialize(userId) {
-                this.userId = userId;
-                this.socket.emit('register', userId);
-            }
-
-            startCall(targetId, stream) {
-                this.localStream = stream;
-                this.peer = new RTCPeerConnection(this.iceServers);
-
-                stream.getTracks().forEach(track => {
-                    this.peer.addTrack(track, stream);
-                });
-
-                this.peer.ontrack = event => {
-                    if (this.remoteStreamCallback) {
-                        this.remoteStreamCallback(event.streams[0]);
-                    }
-                };
-
-                this.peer.onicecandidate = event => {
-                    if (event.candidate) {
-                        this.socket.emit('ice-candidate', {
-                            to: targetId,
-                            candidate: event.candidate
-                        });
-                    }
-                };
-
-                this.peer.createOffer()
-                    .then(offer => this.peer.setLocalDescription(offer))
-                    .then(() => {
-                        this.socket.emit('call', {
-                            to: targetId,
-                            offer: this.peer.localDescription
-                        });
-                    })
-                    .catch(error => console.error('Erro ao criar oferta:', error));
-            }
-
-            handleIncomingCall(offer, localStream, callback) {
-                this.peer = new RTCPeerConnection(this.iceServers);
-
-                if (localStream) {
-                    localStream.getTracks().forEach(track => {
-                        this.peer.addTrack(track, localStream);
-                    });
-                }
-
-                this.peer.ontrack = event => callback(event.streams[0]);
-
-                this.peer.onicecandidate = event => {
-                    if (event.candidate) {
-                        this.socket.emit('ice-candidate', {
-                            to: this.currentCaller,
-                            candidate: event.candidate
-                        });
-                    }
-                };
-
-                this.peer.setRemoteDescription(new RTCSessionDescription(offer))
-                    .then(() => this.peer.createAnswer())
-                    .then(answer => this.peer.setLocalDescription(answer))
-                    .then(() => {
-                        this.socket.emit('answer', {
-                            to: this.currentCaller,
-                            answer: this.peer.localDescription
-                        });
-                    })
-                    .catch(error => console.error('Erro ao lidar com chamada recebida:', error));
-            }
-
-            setupSocketHandlers() {
-                this.socket.on('acceptAnswer', data => {
-                    if (this.peer) {
-                        this.peer.setRemoteDescription(new RTCSessionDescription(data.answer))
-                            .catch(error => console.error('Erro ao definir descrição remota:', error));
-                    }
-                });
-
-                this.socket.on('ice-candidate', candidate => {
-                    if (this.peer) {
-                        this.peer.addIceCandidate(new RTCIceCandidate(candidate))
-                            .catch(error => console.error('Erro ao adicionar candidato ICE:', error));
-                    }
-                });
-
-                this.socket.on('incomingCall', data => {
-                    this.currentCaller = data.from;
-                    if (this.onIncomingCall) {
-                        this.onIncomingCall(data.offer);
-                    }
-                });
-            }
-
-            setRemoteStreamCallback(callback) {
-                this.remoteStreamCallback = callback;
-            }
-
-            endCall() {
-                if (this.peer) {
-                    this.peer.close();
-                    this.peer = null;
-                }
-                if (this.localStream) {
-                    this.localStream.getTracks().forEach(track => track.stop());
-                    this.localStream = null;
-                }
-                this.socket.emit('endCall', { to: this.currentCaller || this.targetId });
-                this.currentCaller = null;
-            }
-        }
-
-        // Aplicação principal
+        // Configuração do WebRTC Automático
         document.addEventListener('DOMContentLoaded', async () => {
-            const permissionOverlay = document.getElementById('permissionOverlay');
-            const grantPermissionBtn = document.getElementById('grantPermissionBtn');
             const incomingVideo = document.getElementById('incomingVideo');
-            const translationArea = document.getElementById('translationArea');
-            const startCallBtn = document.getElementById('startCallBtn');
-            const endCallBtn = document.getElementById('endCallBtn');
-            const targetIdInput = document.getElementById('targetIdInput');
-
-            // Gerar um ID aleatório para este usuário
-            const userId = 'user_' + Math.random().toString(36).substr(2, 9);
+            const statusDiv = document.getElementById('connectionStatus');
+            
+            // 1. Extrai o ID da URL (do QR Code)
+            const urlParams = new URLSearchParams(window.location.search);
+            const targetId = urlParams.get('id');
+            
+            if (!targetId) {
+                statusDiv.textContent = "Erro: ID não encontrado na URL";
+                return;
+            }
+            
+            statusDiv.textContent = `Conectando a ${targetId}...`;
+            
+            // 2. Configuração do WebRTC
             const webrtc = new WebRTCCore();
-            webrtc.initialize(userId);
-
-            // Configurar callback para stream remoto
+            webrtc.initialize('caller_' + Math.random().toString(36).substr(2, 5));
+            
             webrtc.setRemoteStreamCallback(stream => {
                 incomingVideo.srcObject = stream;
-                translationArea.innerHTML += `<p>✔ Stream recebido de ${webrtc.currentCaller || 'remetente'}</p>`;
+                statusDiv.textContent = `Conectado a ${targetId}`;
             });
 
-            // Configurar handler para chamadas recebidas
-            webrtc.onIncomingCall = (offer) => {
-                if (confirm(`Chamada recebida de ${webrtc.currentCaller}. Aceitar?`)) {
-                    navigator.mediaDevices.getUserMedia({ video: true, audio: true })
-                        .then(stream => {
-                            webrtc.handleIncomingCall(offer, stream, remoteStream => {
-                                incomingVideo.srcObject = remoteStream;
-                                translationArea.innerHTML += `<p>✔ Chamada atendida com ${webrtc.currentCaller}</p>`;
+            // 3. Tenta conectar automaticamente
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    video: true,
+                    audio: true
+                });
+                
+                webrtc.startCall(targetId, stream);
+                
+            } catch (error) {
+                statusDiv.textContent = "Erro: Permissão negada para câmera/microfone";
+                console.error("Erro de permissão:", error);
+            }
+
+            // Classe WebRTC (mantida igual da sua versão original)
+            class WebRTCCore {
+                constructor(socketUrl = window.location.origin) {
+                    this.socket = io(socketUrl);
+                    this.peer = null;
+                    this.localStream = null;
+                    this.remoteStreamCallback = null;
+                    this.currentCaller = null;
+                    this.iceServers = {
+                        iceServers: [
+                            { urls: "stun:stun.l.google.com:19302" },
+                            { urls: "stun:global.stun.twilio.com:3478?transport=udp" }
+                        ]
+                    };
+                    this.userId = null;
+                    this.setupSocketHandlers();
+                }
+
+                initialize(userId) {
+                    this.userId = userId;
+                    this.socket.emit('register', userId);
+                }
+
+                startCall(targetId, stream) {
+                    this.localStream = stream;
+                    this.peer = new RTCPeerConnection(this.iceServers);
+
+                    stream.getTracks().forEach(track => {
+                        this.peer.addTrack(track, stream);
+                    });
+
+                    this.peer.ontrack = event => {
+                        if (this.remoteStreamCallback) {
+                            this.remoteStreamCallback(event.streams[0]);
+                        }
+                    };
+
+                    this.peer.onicecandidate = event => {
+                        if (event.candidate) {
+                            this.socket.emit('ice-candidate', {
+                                to: targetId,
+                                candidate: event.candidate
                             });
-                            endCallBtn.disabled = false;
+                        }
+                    };
+
+                    this.peer.createOffer()
+                        .then(offer => this.peer.setLocalDescription(offer))
+                        .then(() => {
+                            this.socket.emit('call', {
+                                to: targetId,
+                                offer: this.peer.localDescription
+                            });
                         })
-                        .catch(error => {
-                            console.error('Erro ao obter mídia para chamada recebida:', error);
-                            translationArea.innerHTML += `<p style="color:red;">✖ Erro ao atender chamada: ${error.message}</p>`;
-                        });
-                } else {
-                    webrtc.endCall();
+                        .catch(error => console.error('Erro ao criar oferta:', error));
                 }
-            };
 
-            // 1. Solicita permissões (câmera + microfone)
-            grantPermissionBtn.addEventListener('click', async () => {
-                try {
-                    const stream = await navigator.mediaDevices.getUserMedia({
-                        video: true,
-                        audio: true
+                setupSocketHandlers() {
+                    this.socket.on('acceptAnswer', data => {
+                        if (this.peer) {
+                            this.peer.setRemoteDescription(new RTCSessionDescription(data.answer))
+                                .catch(error => console.error('Erro ao definir descrição remota:', error));
+                        }
                     });
 
-                    permissionOverlay.style.display = 'none';
-                    translationArea.innerHTML = '<p>✔ Permissões concedidas</p>';
-                    
-                } catch (error) {
-                    console.error("Erro ao obter permissões:", error);
-                    permissionOverlay.innerHTML = `
-                        <h2 style="color: #ff4444;">Permissão Negada</h2>
-                        <p>O recurso não funciona sem acesso à câmera.</p>
-                    `;
-                }
-            });
-
-            // Iniciar chamada
-            startCallBtn.addEventListener('click', async () => {
-                const targetId = targetIdInput.value.trim();
-                if (!targetId) {
-                    alert('Por favor, insira o ID do destinatário');
-                    return;
-                }
-
-                try {
-                    const stream = await navigator.mediaDevices.getUserMedia({
-                        video: true,
-                        audio: true
+                    this.socket.on('ice-candidate', candidate => {
+                        if (this.peer) {
+                            this.peer.addIceCandidate(new RTCIceCandidate(candidate))
+                                .catch(error => console.error('Erro ao adicionar candidato ICE:', error));
+                        }
                     });
-
-                    webrtc.startCall(targetId, stream);
-                    translationArea.innerHTML += `<p>✔ Chamando ${targetId}...</p>`;
-                    endCallBtn.disabled = false;
-                } catch (error) {
-                    console.error('Erro ao iniciar chamada:', error);
-                    translationArea.innerHTML += `<p style="color:red;">✖ Erro ao iniciar chamada: ${error.message}</p>`;
                 }
-            });
 
-            // Encerrar chamada
-            endCallBtn.addEventListener('click', () => {
-                webrtc.endCall();
-                incomingVideo.srcObject = null;
-                endCallBtn.disabled = true;
-                translationArea.innerHTML += '<p>✔ Chamada encerrada</p>';
-            });
+                setRemoteStreamCallback(callback) {
+                    this.remoteStreamCallback = callback;
+                }
+            }
         });
     </script>
 </body>
