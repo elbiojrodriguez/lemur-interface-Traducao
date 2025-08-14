@@ -13,6 +13,18 @@ window.onload = () => {
   let targetId = null;
   let localStream = null;
 
+  // ✨ Captura o nome da URL
+  const urlParams = new URLSearchParams(window.location.search);
+  const userName = urlParams.get('nome');
+  
+  // Exibe a frase personalizada se existir nome
+  if (userName) {
+    const greetingElement = document.getElementById('userGreeting');
+    if (greetingElement) {
+      greetingElement.textContent = `Eu sou ${decodeURIComponent(userName)}`;
+    }
+  }
+
   // Solicita acesso à câmera logo na abertura
   navigator.mediaDevices.getUserMedia({ video: true, audio: false })
     .then(stream => {
@@ -24,7 +36,6 @@ window.onload = () => {
     });
 
   // Verifica se há ID na URL
-  const urlParams = new URLSearchParams(window.location.search);
   const targetIdFromUrl = urlParams.get('targetId');
 
   if (targetIdFromUrl) {
