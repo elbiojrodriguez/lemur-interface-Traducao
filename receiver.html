@@ -7,8 +7,36 @@
   <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="responsivo.css" />
   <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
+  <style>
+    /* ✍️ Estilo dos campos de nome e sobrenome */
+    .user-inputs {
+      position: absolute;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 50;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .user-inputs input {
+      padding: 6px 10px;
+      border-radius: 6px;
+      border: 1px solid #007BFF;
+      font-size: 16px;
+      width: 200px;
+    }
+  </style>
 </head>
 <body>
+  <!-- ✍️ Campos de nome e sobrenome -->
+  <div class="user-inputs">
+    <input type="text" id="nome" placeholder="Seu nome">
+    <input type="text" id="sobrenome" placeholder="Seu sobrenome">
+  </div>
+
   <div class="container">
     <div class="video-wrapper">
       <video id="remoteVideo" autoplay playsinline></video>
@@ -18,7 +46,7 @@
       <video id="localVideo" autoplay muted playsinline></video>
     </div>
 
-        <div class="info-overlay">
+    <div class="info-overlay">
       <div id="qrcode" class="qrcode-container"></div>
     </div>
   </div>
