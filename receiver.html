@@ -100,184 +100,44 @@
         <p>O vídeo recebido será exibido no <span style="color: #4CAF50;">Box Verde</span>.</p>
         <button id="grantPermissionBtn">PERMITIR CÂMERA E MICROFONE</button>
     </div>
-
-    <script>
-        // instant-qr-generator.js - Versão Final (modificado para remover o QR após permissão)
-        class InstantQRGenerator {
-          constructor(options = {}) {
-            // Configurações padrão
-            this.settings = {
-              containerId: 'instant-qr-container',
-              qrSize: 200,
-              baseUrl: 'https://lemur-interface-traducao.netlify.app/caller.html',
-              showInfo: false,
-              ...options
-            };
-
-            // Cria container imediatamente
-            this.createContainer();
-            
-            // Gera dados dinâmicos
-            const { tempId, userLanguage, deviceType } = this.generateDynamicData();
-            
-            // Carrega biblioteca e gera QR Code
-            this.loadQRLibrary().then(() => {
-              this.generateQRCode(tempId, userLanguage, deviceType);
-              
-              // Opcional: exibe informações no console
-              if (this.settings.showInfo) {
-                console.log('QR Code gerado com:', { 
-                  id: tempId, 
-                  language: userLanguage, 
-                  device: deviceType,
-                  url: this.buildUrl(tempId, userLanguage, deviceType)
-                });
-              }
-            });
-          }
-
-          createContainer() {
-            // Cria container mínimo antes do DOM estar pronto
-            if (!document.getElementById(this.settings.containerId)) {
-              const container = document.createElement('div');
-              container.id = this.settings.containerId;
-              container.style.position = 'fixed';
-              container.style.top = '0';
-              container.style.left = '0';
-              container.style.width = '100%';
-              container.style.height = '100%';
-              container.style.backgroundColor = 'white';
-              container.style.display = 'flex';
-              container.style.flexDirection = 'column';
-              container.style.justifyContent = 'center';
-              container.style.alignItems = 'center';
-              container.style.zIndex = '9999';
-              document.body.prepend(container);
-            }
-          }
-
-          generateDynamicData() {
-            // Gera ID temporário (8 caracteres alfanuméricos)
-            const tempId = Math.random().toString(36).substring(2, 10);
-            
-            // Detecta idioma do navegador (primeiras 2 letras)
-            const userLanguage = (navigator.language || 'pt').substring(0, 2);
-            
-            // Detecta tipo de dispositivo simplificado
-            const deviceType = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) ? 'mobile' : 'desktop';
-            
-            return { tempId, userLanguage, deviceType };
-          }
-
-          buildUrl(id, lang, device) {
-            return `${this.settings.baseUrl}?id=${encodeURIComponent(id)}&lang=${lang}&device=${device}`;
-          }
-
-          loadQRLibrary() {
-            return new Promise((resolve, reject) => {
-              if (typeof QRCode !== 'undefined') {
-                resolve();
-                return;
-              }
-
-              const script = document.createElement('script');
-              script.src = 'https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js';
-              script.onload = resolve;
-              script.onerror = reject;
-              document.head.appendChild(script);
-            });
-          }
-
-          generateQRCode(id, lang, device) {
-            const container = document.getElementById(this.settings.containerId);
-            if (!container) return;
-
-            // Limpa container e gera novo QR Code
-            container.innerHTML = '';
-            new QRCode(container, {
-              text: this.buildUrl(id, lang, device),
-              width: this.settings.qrSize,
-              height: this.settings.qrSize,
-              colorDark: "#000000",
-              colorLight: "#ffffff",
-              correctLevel: QRCode.CorrectLevel.H
-            });
-
-            // Adiciona informações abaixo do QR Code (opcional)
-            if (this.settings.showInfo) {
-              const infoDiv = document.createElement('div');
-              infoDiv.style.marginTop = '20px';
-              infoDiv.style.fontFamily = 'Arial, sans-serif';
-              infoDiv.innerHTML = `
-                <p>ID: ${id}</p>
-                <p>Idioma: ${lang}</p>
-                <p>Dispositivo: ${device}</p>
-              `;
-              container.appendChild(infoDiv);
-            }
-          }
-
-          // Novo método para remover o QR Code
-          removeQRCode() {
-            const container = document.getElementById(this.settings.containerId);
-            if (container) {
-              container.style.display = 'none';
-              // Ou se preferir remover completamente:
-              // container.remove();
-            }
-          }
-        }
-
-        // Cria uma instância acessível globalmente
-        const qrGenerator = new InstantQRGenerator({
-          // showInfo: true // Descomente para mostrar informações abaixo do QR Code
-        }); 
-
-        document.addEventListener('DOMContentLoaded', async () => {
-            const permissionOverlay = document.getElementById('permissionOverlay');
-            const grantPermissionBtn = document.getElementById('grantPermissionBtn');
-            const incomingVideo = document.getElementById('incomingVideo');
-            const translationArea = document.getElementById('translationArea');
-
-            // 1. Solicita permissões (câmera + microfone)
-            grantPermissionBtn.addEventListener('click', async () => {
-                try {
-                    const stream = await navigator.mediaDevices.getUserMedia({
-                        video: true,
-                        audio: true
-                    });
-
-                    permissionOverlay.style.display = 'none';
-                    
-                    // Remove o QR Code quando as permissões são concedidas
-                    qrGenerator.removeQRCode();
-                    
-                    // 2. Inicia conexão (seu stream é enviado para B)
-                    startConnection(stream);
-
-                    // 3. Simula recebimento do vídeo de B (substitua pelo real)
-                    incomingVideo.srcObject = await simulateIncomingStream();
-
-                } catch (error) {
-                    console.error("Erro:", error);
-                    permissionOverlay.innerHTML = `
-                        <h2 style="color: #ff4444;">Permissão Negada</h2>
-                        <p>O recurso não funciona sem acesso à câmera.</p>
-                    `;
-                }
-            });
-
-            // Funções de exemplo (substitua pela sua lógica real)
-            function startConnection(localStream) {
-                translationArea.innerHTML = '<p>✔ Conexão estabelecida</p>';
-            }
-
-            async function simulateIncomingStream() {
-                return await navigator.mediaDevices.getUserMedia({
-                    video: { width: 640, height: 480 }
-                });
-            }
-        });
-    </script>
+<script>
+  // 1. Gera as informações necessárias
+  const tempId = 'id_' + Math.random().toString(36).substr(2, 8); // ID temporário
+  const userLanguage = navigator.language.substring(0, 2); // Idioma (ex: 'pt')
+  
+  // 2. Cria a URL com os parâmetros
+  const url = `https://lemur-interface-traducao.netlify.app/caller.html?id=${tempId}&lang=${userLanguage}`;
+  
+  // 3. Mostra o QR Code grande no centro da tela
+  const container = document.createElement('div');
+  container.style.position = 'fixed';
+  container.style.top = '50%';
+  container.style.left = '50%';
+  container.style.transform = 'translate(-50%, -50%)';
+  container.style.textAlign = 'center';
+  document.body.appendChild(container);
+  
+  // 4. Carrega a biblioteca QR Code e gera
+  const script = document.createElement('script');
+  script.src = 'https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js';
+  script.onload = function() {
+    new QRCode(container, {
+      text: url,
+      width: 250,
+      height: 250,
+      colorDark: "#000000",
+      colorLight: "#ffffff"
+    });
+    
+    // Mostra as informações abaixo do QR Code (opcional)
+    const info = document.createElement('div');
+    info.innerHTML = `
+      <p><strong>ID:</strong> ${tempId}</p>
+      <p><strong>Idioma:</strong> ${userLanguage}</p>
+    `;
+    container.appendChild(info);
+  };
+  document.head.appendChild(script);
+</script>
 </body>
 </html>
