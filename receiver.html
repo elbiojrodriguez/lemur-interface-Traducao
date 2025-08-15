@@ -19,24 +19,20 @@
             text-align: center;
             transition: background-color 0.5s;
         }
-
         .logo {
             width: 150px;
             height: auto;
             margin-bottom: 20px;
         }
-
         h1 {
             color: #333;
             margin-bottom: 30px;
         }
-
         .translator-label {
             font-size: 1.5rem;
             color: #2c3e50;
             margin-bottom: 40px;
         }
-
         .name-input {
             width: 80%;
             max-width: 300px;
@@ -49,7 +45,6 @@
             text-align: center;
             outline: none;
         }
-
         .next-button {
             background-color: #3498db;
             color: white;
@@ -61,12 +56,10 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             transition: all 0.3s;
         }
-
         .next-button:hover {
             background-color: #2980b9;
             transform: translateY(-2px);
         }
-
         .welcome-screen {
             position: fixed;
             top: 0;
@@ -83,7 +76,6 @@
             z-index: 1000;
             display: none;
         }
-        
         .error-state {
             background-color: #e74c3c;
         }
@@ -94,18 +86,15 @@
     <img src="assets/images/solemur.png" alt="Lemur Logo" class="logo" id="logo">
     <h1 id="welcome-title">Welcome!</h1>
     <div class="translator-label" id="translator-label">Real-Time Translator</div>
-    
     <input type="text" class="name-input" id="name-input" placeholder="Type your name">
     <button class="next-button" id="next-button">Next</button>
-
     <div class="welcome-screen" id="welcome-screen">
         <h1 id="welcome-message"></h1>
         <p id="chat-description">This would be the chat screen</p>
     </div>
-
     <script>
         // === CONFIGURAÇÕES DE TRADUÇÃO ===
-        const AZURE_ENDPOINT = "https://api.cognitive.microsofttranslator.com/translate?api-version=3.0";
+        const TRANSLATE_ENDPOINT = 'https://chat-tradutor.onrender.com/translate';
         
         // Textos originais em inglês (serão traduzidos)
         const textElements = {
@@ -119,43 +108,41 @@
         // === DETECÇÃO DE IDIOMA ===
         async function detectLanguage() {
             const browserLanguage = navigator.language || 'en';
-            
             // Tenta primeiro a variante regional (ex: pt-BR)
             let targetLanguage = browserLanguage;
-            
             // Fallback hierárquico se a tradução falhar
             const fallbackChain = [
-                browserLanguage,    // Tentativa 1: idioma completo (pt-BR)
-                browserLanguage.split('-')[0], // Tentativa 2: idioma base (pt)
-                'en'              // Tentativa 3: inglês (fallback final)
+                browserLanguage,       // Tentativa 1: idioma completo (pt-BR)
+                browserLanguage.split('-')[0],  // Tentativa 2: idioma base (pt)
+                'en'                  // Tentativa 3: inglês (fallback final)
             ];
-            
             return fallbackChain;
         }
 
         // === TRADUÇÃO DOS TEXTOS ===
         async function translateContent(targetLanguages) {
-            const textsToTranslate = Object.values(textElements);
+            const keys = Object.keys(textElements);
+            const texts = Object.values(textElements);
             
             try {
                 for (const lang of targetLanguages) {
                     try {
-                        const response = await fetch(AZURE_ENDPOINT, {
+                        // Novo formato de requisição para seu servidor
+                        const response = await fetch(TRANSLATE_ENDPOINT, {
                             method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'Ocp-Apim-Subscription-Key': '/etc/secrets/AZURE_TRANSLATOR_KEY',
-                                'Ocp-Apim-Subscription-Region': 'eastus'
+                            headers: { 
+                                'Content-Type': 'application/json'
                             },
-                            body: JSON.stringify([
-                                {
-                                    "text": textsToTranslate.join('|||') // Separa textos para tradução em lote
-                                }
-                            ])
+                            body: JSON.stringify({
+                                text: texts,
+                                targetLang: lang
+                            })
                         });
                         
-                        const translated = await response.json();
-                        applyTranslations(translated[0].translations[0].text.split('|||'), lang);
+                        if (!response.ok) throw new Error('Translation failed');
+                        
+                        const translatedTexts = await response.json();
+                        applyTranslations(translatedTexts, lang);
                         break; // Sai do loop se a tradução for bem-sucedida
                     } catch (error) {
                         console.log(`Falha na tradução para ${lang}, tentando próximo fallback...`);
@@ -169,7 +156,6 @@
         // === APLICA TRADUÇÕES NA PÁGINA ===
         function applyTranslations(translatedTexts, lang) {
             const keys = Object.keys(textElements);
-            
             keys.forEach((key, index) => {
                 const element = document.getElementById(key);
                 if (element) {
@@ -181,7 +167,6 @@
                     }
                 }
             });
-            
             console.log(`Página traduzida para: ${lang}`);
         }
 
@@ -189,11 +174,10 @@
         document.addEventListener('DOMContentLoaded', async () => {
             const fallbackChain = await detectLanguage();
             await translateContent(fallbackChain);
-            
+
             // === LÓGICA DO BOTÃO ===
             document.getElementById('next-button').addEventListener('click', function() {
                 const nameInput = document.getElementById('name-input');
-                
                 if (!nameInput.value.trim()) {
                     document.body.classList.add('error-state');
                     setTimeout(() => {
