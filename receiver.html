@@ -105,8 +105,8 @@
 
     <script>
         // === CONFIGURAÇÕES DE TRADUÇÃO ===
-        const TRANSLATION_ENDPOINT = "https://chat-tradutor.onrender.com/translate";
-
+        const AZURE_ENDPOINT = "https://api.cognitive.microsofttranslator.com/translate?api-version=3.0";
+        
         // Textos originais em inglês (serão traduzidos)
         const textElements = {
             "welcome-title": "Welcome!",
@@ -119,40 +119,43 @@
         // === DETECÇÃO DE IDIOMA ===
         async function detectLanguage() {
             const browserLanguage = navigator.language || 'en';
-
+            
             // Tenta primeiro a variante regional (ex: pt-BR)
             let targetLanguage = browserLanguage;
-
+            
             // Fallback hierárquico se a tradução falhar
             const fallbackChain = [
                 browserLanguage,    // Tentativa 1: idioma completo (pt-BR)
                 browserLanguage.split('-')[0], // Tentativa 2: idioma base (pt)
                 'en'              // Tentativa 3: inglês (fallback final)
             ];
-
+            
             return fallbackChain;
         }
 
         // === TRADUÇÃO DOS TEXTOS ===
         async function translateContent(targetLanguages) {
             const textsToTranslate = Object.values(textElements);
-
+            
             try {
                 for (const lang of targetLanguages) {
                     try {
-                        const response = await fetch(TRANSLATION_ENDPOINT, {
+                        const response = await fetch(AZURE_ENDPOINT, {
                             method: 'POST',
                             headers: {
-                                'Content-Type': 'application/json'
+                                'Content-Type': 'application/json',
+                                'Ocp-Apim-Subscription-Key': '/etc/secrets/AZURE_TRANSLATOR_KEY',
+                                'Ocp-Apim-Subscription-Region': 'eastus'
                             },
-                            body: JSON.stringify({
-                                text: textsToTranslate,
-                                targetLang: lang
-                            })
+                            body: JSON.stringify([
+                                {
+                                    "text": textsToTranslate.join('|||') // Separa textos para tradução em lote
+                                }
+                            ])
                         });
-
+                        
                         const translated = await response.json();
-                        applyTranslations(translated.translations, lang);
+                        applyTranslations(translated[0].translations[0].text.split('|||'), lang);
                         break; // Sai do loop se a tradução for bem-sucedida
                     } catch (error) {
                         console.log(`Falha na tradução para ${lang}, tentando próximo fallback...`);
@@ -166,10 +169,11 @@
         // === APLICA TRADUÇÕES NA PÁGINA ===
         function applyTranslations(translatedTexts, lang) {
             const keys = Object.keys(textElements);
-
+            
             keys.forEach((key, index) => {
                 const element = document.getElementById(key);
                 if (element) {
+                    // Aplica a tradução mantendo a tipografia original
                     if (key === 'name-input') {
                         element.placeholder = translatedTexts[index];
                     } else if (element.textContent) {
@@ -177,7 +181,7 @@
                     }
                 }
             });
-
+            
             console.log(`Página traduzida para: ${lang}`);
         }
 
@@ -185,11 +189,11 @@
         document.addEventListener('DOMContentLoaded', async () => {
             const fallbackChain = await detectLanguage();
             await translateContent(fallbackChain);
-
+            
             // === LÓGICA DO BOTÃO ===
-            document.getElementById('next-button').addEventListener('click', function () {
+            document.getElementById('next-button').addEventListener('click', function() {
                 const nameInput = document.getElementById('name-input');
-
+                
                 if (!nameInput.value.trim()) {
                     document.body.classList.add('error-state');
                     setTimeout(() => {
