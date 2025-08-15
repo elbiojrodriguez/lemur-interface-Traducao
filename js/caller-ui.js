@@ -68,15 +68,25 @@ window.onload = () => {
   {code:'ar-SA',flag:'🇸🇦',speakText:'أنا أتكلم',greetingText:'أنا',name:'العربية'}
 ];
 
-  // 📥 Detecta idioma da URL
-  const lang = urlParams.get('lang') || 'pt-BR';
+ // 📥 Detecta idioma (URL > navegador > padrão)
+const lang = urlParams.get('lang') || navigator.language || 'pt-BR';
 
-  // 🔍 Busca idioma correspondente
-  const selectedLang = languages.find(l => l.code === lang) || languages[1]; // padrão pt-BR
+// 🔍 Busca idioma correspondente (com fallback inteligente)
+const selectedLang = languages.find(l => l.code === lang) || 
+                    languages.find(l => l.code.startsWith(lang.split('-')[0])) || // Ex: "es" para "es-ES"
+                    languages[1]; // Fallback para pt-BR
 
-  // 🖼️ Exibe frase traduzida com bandeira
-  const languageInfoElement = document.getElementById('languageInfo');
-  if (languageInfoElement) {
-    languageInfoElement.textContent = `${selectedLang.speakText} ${selectedLang.flag}`;
+// 🖼️ Exibe frases traduzidas
+const languageInfoElement = document.getElementById('languageInfo');
+if (languageInfoElement) {
+  languageInfoElement.textContent = `${selectedLang.speakText} ${selectedLang.flag}`;
+}
+
+// ✨ Exibe "Eu sou [nome]" no idioma correto (se houver nome)
+if (userName) {
+  const greetingElement = document.getElementById('userGreeting');
+  if (greetingElement) {
+    greetingElement.textContent = `${selectedLang.greetingText} ${decodeURIComponent(userName)}`;
   }
+}
 };
