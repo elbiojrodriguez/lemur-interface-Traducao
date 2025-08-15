@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lemur Translator - Receiver</title>
+    <title>Lemur Translator</title>
     <style>
+        /* ==== ESTILOS PRINCIPAIS ==== */
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: #87CEEB; /* Celeste */
@@ -66,37 +67,64 @@
             transform: translateY(-2px);
         }
 
+        /* ==== NOVOS ESTILOS ==== */
+        .welcome-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #2ecc71; /* Verde */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2rem;
+            z-index: 1000;
+            display: none;
+        }
+        
         .error-state {
             background-color: #e74c3c; /* Vermelho */
         }
     </style>
 </head>
 <body>
-    <img src="assets/images/solemur.png" alt="Lemur Translator Logo" class="logo">
+    <!-- ==== TELA INICIAL ==== -->
+    <img src="assets/images/solemur.png" alt="Lemur Logo" class="logo">
     <h1>Welcome!</h1>
-    <div class="translator-label">Real-time Translator</div>
+    <div class="translator-label">Real-Time Translator</div>
     
-    <input type="text" class="name-input" placeholder="Enter your name">
+    <input type="text" class="name-input" placeholder="Type your name">
     <button class="next-button">Next</button>
 
+    <!-- ==== TELA DE BOAS-VINDAS ==== -->
+    <div class="welcome-screen">
+        <h1 id="welcome-message"></h1>
+        <p>This would be the chat screen</p>
+    </div>
+
     <script>
-        document.querySelector('.next-button').addEventListener('click', function() {
-            const nameInput = document.querySelector('.name-input');
+        // ==== LÓGICA PRINCIPAL ====
+        const nextButton = document.querySelector('.next-button');
+        const nameInput = document.querySelector('.name-input');
+        const welcomeScreen = document.querySelector('.welcome-screen');
+        const welcomeMessage = document.getElementById('welcome-message');
+
+        nextButton.addEventListener('click', function() {
             
-            if (!nameInput.value.trim()) {
-                // Turn page red if no name is entered
+            // Se nome estiver vazio: efeito vermelho
+            if (nameInput.value.trim() === "") {
                 document.body.classList.add('error-state');
-                
-                // Return to normal after 1 second
                 setTimeout(() => {
                     document.body.classList.remove('error-state');
                 }, 1000);
-            } else {
-                // Proceed to the next page (to be implemented)
-                // window.location.href = 'chat.html';
-                
-                // For now, just show an alert
-                alert('Proceeding to chat...');
+            } 
+            // Se nome preenchido: mostra tela verde
+            else {
+                welcomeMessage.textContent = `Welcome, ${nameInput.value}!`;
+                welcomeScreen.style.display = 'flex';
             }
         });
     </script>
