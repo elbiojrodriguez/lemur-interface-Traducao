@@ -3,13 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Testador de Tradução</title>
+    <title>Testador de Tradução Azure - Debug</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            max-width: 600px;
+            max-width: 800px;
             margin: 0 auto;
             padding: 20px;
+            line-height: 1.6;
         }
         .container {
             display: flex;
@@ -20,56 +21,84 @@
             width: 100%;
             height: 100px;
             padding: 10px;
+            border: 1px solid #ddd;
         }
         .controls {
             display: flex;
-            gap: 10px;
+            gap: 15px;
             flex-wrap: wrap;
+            align-items: center;
         }
         select, button {
-            padding: 8px 12px;
+            padding: 10px 15px;
+            font-size: 16px;
         }
         button {
-            background-color: #4CAF50;
+            background-color: #0078d4;
             color: white;
             border: none;
             cursor: pointer;
+            border-radius: 4px;
         }
         button:hover {
-            background-color: #45a049;
+            background-color: #106ebe;
+        }
+        #responseDetails {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 20px;
+            white-space: pre-wrap;
+            font-family: monospace;
+        }
+        .error {
+            color: #e81123;
+        }
+        .success {
+            color: #107c10;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h2>Testador de Tradução Azure</h2>
+        <h1>Debug de Tradução Azure</h1>
         
         <div class="controls">
             <div>
-                <label for="sourceLang">Idioma de Origem:</label>
+                <label for="sourceLang">De:</label>
                 <select id="sourceLang">
                     <option value="pt">Português</option>
                     <option value="es">Espanhol</option>
                     <option value="en">Inglês</option>
+                    <option value="fr">Francês</option>
                 </select>
             </div>
             
             <div>
-                <label for="targetLang">Idioma de Destino:</label>
+                <label for="targetLang">Para:</label>
                 <select id="targetLang">
                     <option value="en">Inglês</option>
                     <option value="es">Espanhol</option>
                     <option value="pt">Português</option>
+                    <option value="fr">Francês</option>
                 </select>
             </div>
             
             <button id="translateBtn">Traduzir</button>
         </div>
         
-        <textarea id="sourceText" placeholder="Digite o texto a ser traduzido"></textarea>
-        <textarea id="targetText" placeholder="Texto traduzido aparecerá aqui" readonly></textarea>
+        <textarea id="sourceText" placeholder="Digite o texto a ser traduzido">Olá, mundo!</textarea>
+        <textarea id="targetText" placeholder="Resultado da tradução" readonly></textarea>
+        
+        <div>
+            <label for="apiKey">Chave da API:</label>
+            <input type="text" id="apiKey" style="width: 300px; padding: 8px;" placeholder="Cole sua chave do Azure Translator aqui">
+        </div>
         
         <div id="status"></div>
+        
+        <h3>Detalhes da Resposta:</h3>
+        <div id="responseDetails">Aguardando requisição...</div>
     </div>
 
     <script>
@@ -77,51 +106,77 @@
             const sourceText = document.getElementById('sourceText').value;
             const sourceLang = document.getElementById('sourceLang').value;
             const targetLang = document.getElementById('targetLang').value;
+            const apiKey = document.getElementById('apiKey').value.trim();
             const statusDiv = document.getElementById('status');
+            const responseDiv = document.getElementById('responseDetails');
             
-            if (!sourceText.trim()) {
-                statusDiv.textContent = "Por favor, digite algum texto para traduzir";
+            if (!apiKey) {
+                statusDiv.innerHTML = '<span class="error">Por favor, insira sua chave da API</span>';
                 return;
             }
             
-            statusDiv.textContent = "Traduzindo...";
+            if (!sourceText.trim()) {
+                statusDiv.innerHTML = '<span class="error">Por favor, digite algum texto para traduzir</span>';
+                return;
+            }
+            
+            statusDiv.innerHTML = 'Enviando requisição...';
+            responseDiv.textContent = 'Aguardando resposta...';
             
             try {
-                // Substitua pela sua chave de API real
-                const subscriptionKey = "721rAC2PP9hALUKuRGbGyw7W8vafnyYJcIMqE6GZFqreV3jFUNYUJQQJ99BHACYeBjFXJ3w3AAAbACOGfAHE"; 
-                const region = "eastus";
-                const endpoint = "https://api.cognitive.microsofttranslator.com/translate?api-version=3.0";
+                const endpoint = `https://api.cognitive.microsofttranslator.com/translate?api-version=3.0&from=${sourceLang}&to=${targetLang}`;
                 
                 const response = await fetch(endpoint, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Ocp-Apim-Subscription-Key': subscriptionKey,
-                        'Ocp-Apim-Subscription-Region': region
+                        'Ocp-Apim-Subscription-Key': apiKey,
+                        'Ocp-Apim-Subscription-Region': 'eastus'
                     },
                     body: JSON.stringify([{
                         'text': sourceText
-                    }]),
-                    params: {
-                        'from': sourceLang,
-                        'to': targetLang
-                    }
+                    }])
                 });
                 
+                const responseData = {
+                    status: response.status,
+                    statusText: response.statusText,
+                    headers: Array.from(response.headers.entries()),
+                    url: response.url,
+                    timestamp: new Date().toISOString()
+                };
+                
                 if (!response.ok) {
-                    throw new Error(`Erro HTTP: ${response.status}`);
+                    let errorDetails = await response.text();
+                    try {
+                        errorDetails = JSON.parse(errorDetails);
+                    } catch (e) {
+                        // Mantém como texto se não for JSON
+                    }
+                    
+                    responseData.error = errorDetails;
+                    responseDiv.textContent = JSON.stringify(responseData, null, 2);
+                    throw new Error(`Erro HTTP ${response.status}: ${response.statusText}`);
                 }
                 
                 const result = await response.json();
-                const translatedText = result[0].translations[0].text;
+                responseData.body = result;
                 
-                document.getElementById('targetText').value = translatedText;
-                statusDiv.textContent = "Tradução concluída com sucesso!";
+                document.getElementById('targetText').value = result[0].translations[0].text;
+                statusDiv.innerHTML = '<span class="success">Tradução concluída com sucesso!</span>';
+                responseDiv.textContent = JSON.stringify(responseData, null, 2);
                 
             } catch (error) {
-                console.error("Erro na tradução:", error);
-                statusDiv.textContent = `Erro: ${error.message}`;
+                console.error("Erro completo:", error);
+                statusDiv.innerHTML = `<span class="error">Erro: ${error.message}</span>`;
                 document.getElementById('targetText').value = "";
+                
+                if (error.response) {
+                    responseDiv.textContent = JSON.stringify({
+                        error: error.response,
+                        stack: error.stack
+                    }, null, 2);
+                }
             }
         });
     </script>
