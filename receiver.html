@@ -1,77 +1,104 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Receiver - Videochamada Mobile</title>
-  <link rel="stylesheet" href="style.css" />
-  <link rel="stylesheet" href="responsivo.css" />
-  <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
-  <style>
-    /* ✍️ Estilo original dos campos de nome e sobrenome (MANTIDO) */
-    .user-inputs {
-      position: absolute;
-      top: 250px;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 50;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 8px;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lemur Translator - Receiver</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #87CEEB; /* Celeste */
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            text-align: center;
+            transition: background-color 0.5s;
+        }
 
-    .user-inputs input {
-      padding: 6px 10px;
-      border-radius: 6px;
-      border: 1px solid #007BFF;
-      font-size: 16px;
-      width: 200px;
-    }
+        .logo {
+            width: 150px;
+            height: auto;
+            margin-bottom: 20px;
+        }
 
-    /* ✨ NOVO: Estilo da frase de boas-vindas (ADICIONADO) */
-    #welcomeMessage {
-      position: absolute;
-      top: 200px;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 18px;
-      font-weight: bold;
-      color: #007BFF;
-      z-index: 60;
-      text-align: center;
-      width: 100%;
-      background-color: rgba(255, 255, 255, 0.7);
-      padding: 8px;
-      border-radius: 8px;
-    }
-  </style>
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+        }
+
+        .translator-label {
+            font-size: 1.5rem;
+            color: #2c3e50;
+            margin-bottom: 40px;
+        }
+
+        .name-input {
+            width: 80%;
+            max-width: 300px;
+            padding: 15px;
+            border-radius: 25px;
+            border: none;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            font-size: 1rem;
+            margin-bottom: 20px;
+            text-align: center;
+            outline: none;
+        }
+
+        .next-button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 1rem;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s;
+        }
+
+        .next-button:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        .error-state {
+            background-color: #e74c3c; /* Vermelho */
+        }
+    </style>
 </head>
 <body>
-  <!-- ✨ NOVA FRASE (ADICIONADA) -->
-  <div id="welcomeMessage"></div>
+    <img src="assets/images/solemur.png" alt="Lemur Translator Logo" class="logo">
+    <h1>Welcome!</h1>
+    <div class="translator-label">Real-time Translator</div>
+    
+    <input type="text" class="name-input" placeholder="Enter your name">
+    <button class="next-button">Next</button>
 
-  <!-- ✍️ Campos originais (MANTIDOS) -->
-  <div class="user-inputs">
-    <input type="text" id="nome" placeholder="Seu nome">
-    <input type="text" id="sobrenome" placeholder="Seu sobrenome">
-  </div>
-
-  <!-- Estrutura original (MANTIDA) -->
-  <div class="container">
-    <div class="video-wrapper">
-      <video id="remoteVideo" autoplay playsinline></video>
-    </div>
-    <div class="video-wrapper">
-      <video id="localVideo" autoplay muted playsinline></video>
-    </div>
-    <div class="info-overlay">
-      <div id="qrcode" class="qrcode-container"></div>
-    </div>
-  </div>
-
-  <!-- Scripts originais (MANTIDOS) -->
-  <script src="https://lemur-signal.onrender.com/socket.io/socket.io.js"></script>
-  <script type="module" src="js/receiver-ui.js"></script>
+    <script>
+        document.querySelector('.next-button').addEventListener('click', function() {
+            const nameInput = document.querySelector('.name-input');
+            
+            if (!nameInput.value.trim()) {
+                // Turn page red if no name is entered
+                document.body.classList.add('error-state');
+                
+                // Return to normal after 1 second
+                setTimeout(() => {
+                    document.body.classList.remove('error-state');
+                }, 1000);
+            } else {
+                // Proceed to the next page (to be implemented)
+                // window.location.href = 'chat.html';
+                
+                // For now, just show an alert
+                alert('Proceeding to chat...');
+            }
+        });
+    </script>
 </body>
 </html>
