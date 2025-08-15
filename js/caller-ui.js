@@ -55,18 +55,18 @@ window.onload = () => {
     localVideo.srcObject = stream;
   });
 
-  // 🌐 Idiomas disponíveis com "Eu falo" traduzido
+  // 🌐 Idiomas disponíveis com "Eu falo e Eu sou" traduzido
   const languages = [
-    { code: 'en-US', flag: '🇺🇸', speakText: 'I speak', name: 'English' },
-    { code: 'pt-BR', flag: '🇧🇷', speakText: 'Eu falo', name: 'Português' },
-    { code: 'es-ES', flag: '🇪🇸', speakText: 'Yo hablo', name: 'Español' },
-    { code: 'fr-FR', flag: '🇫🇷', speakText: 'Je parle', name: 'Français' },
-    { code: 'de-DE', flag: '🇩🇪', speakText: 'Ich spreche', name: 'Deutsch' },
-    { code: 'ja-JP', flag: '🇯🇵', speakText: '私は話します', name: '日本語' },
-    { code: 'zh-CN', flag: '🇨🇳', speakText: '我说', name: '中文' },
-    { code: 'ru-RU', flag: '🇷🇺', speakText: 'Я говорю', name: 'Русский' },
-    { code: 'ar-SA', flag: '🇸🇦', speakText: 'أنا أتكلم', name: 'العربية' }
-  ];
+  {code:'en-US',flag:'🇺🇸',speakText:'I speak',greetingText:'I am',name:'English'},
+  {code:'pt-BR',flag:'🇧🇷',speakText:'Eu falo',greetingText:'Eu sou',name:'Português'},
+  {code:'es-ES',flag:'🇪🇸',speakText:'Yo hablo',greetingText:'Yo soy',name:'Español'},
+  {code:'fr-FR',flag:'🇫🇷',speakText:'Je parle',greetingText:'Je suis',name:'Français'},
+  {code:'de-DE',flag:'🇩🇪',speakText:'Ich spreche',greetingText:'Ich bin',name:'Deutsch'},
+  {code:'ja-JP',flag:'🇯🇵',speakText:'私は話します',greetingText:'私は',name:'日本語'},
+  {code:'zh-CN',flag:'🇨🇳',speakText:'我说',greetingText:'我是',name:'中文'},
+  {code:'ru-RU',flag:'🇷🇺',speakText:'Я говорю',greetingText:'Я',name:'Русский'},
+  {code:'ar-SA',flag:'🇸🇦',speakText:'أنا أتكلم',greetingText:'أنا',name:'العربية'}
+];
 
   // 📥 Detecta idioma da URL
   const lang = urlParams.get('lang') || 'pt-BR';
