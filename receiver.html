@@ -67,6 +67,7 @@
             transform: translateY(-2px);
         }
 
+        /* ==== TELA VERDE ==== */
         .welcome-screen {
             position: fixed;
             top: 0;
@@ -84,6 +85,24 @@
             display: none;
         }
         
+        /* SEPARAÇÃO DO WELCOME E NOME */
+        .welcome-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .welcome-text {
+            font-size: 2.5rem;
+            font-weight: bold;
+        }
+        
+        .user-name {
+            font-size: 3rem;
+            color: #f1c40f;
+        }
+        
         .error-state {
             background-color: #e74c3c;
         }
@@ -98,96 +117,83 @@
     <input type="text" class="name-input" id="name-input" placeholder="Type your name">
     <button class="next-button" id="next-button">Next</button>
 
-    <!-- ==== TELA DE BOAS-VINDAS ==== -->
+    <!-- ==== TELA VERDE ==== -->
     <div class="welcome-screen" id="welcome-screen">
-        <h1 id="welcome-message"></h1>
+        <div class="welcome-container">
+            <div class="welcome-text" id="welcome-text">Welcome</div>
+            <div class="user-name" id="user-name"></div>
+        </div>
         <p id="chat-description">This would be the chat screen</p>
     </div>
 
     <script>
-        // ==== TRADUÇÃO COMPLETA ====
-        async function translateText(text, lang) {
+        // ==== CONFIGURAÇÕES ====
+        const TRANSLATE_ENDPOINT = 'https://chat-tradutor.onrender.com/translate';
+        
+        // Textos para traduzir
+        const textsToTranslate = {
+            "welcome-title": "Welcome!",
+            "translator-label": "Real-Time Translator",
+            "name-input": "Type your name",
+            "next-button": "Next",
+            "welcome-text": "Welcome", // SEPARADO AGORA
+            "chat-description": "This would be the chat screen"
+        };
+
+        // ==== TRADUZ TEXTO ====
+        async function translateText(text, targetLang) {
             try {
-                // Ignora se já estiver em inglês
-                if (lang === 'en') return text;
-                
-                const response = await fetch('https://chat-tradutor.onrender.com/translate', {
+                if (targetLang === 'en') return text;
+                const response = await fetch(TRANSLATE_ENDPOINT, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        text: text,
-                        targetLang: lang 
-                    })
+                    body: JSON.stringify({ text, targetLang })
                 });
-                
                 const result = await response.json();
                 return result.translatedText || text;
-                
             } catch (error) {
                 console.error('Erro na tradução:', error);
-                return text; // Mantém o original se falhar
+                return text;
             }
         }
 
-        async function translateAllElements(lang) {
-            // Lista de todos os textos para traduzir
-            const elements = {
-                "welcome-title": "Welcome!",
-                "translator-label": "Real-Time Translator",
-                "name-input": "Type your name",
-                "next-button": "Next",
-                "chat-description": "This would be the chat screen",
-                // Mensagem especial da tela verde:
-                "welcome-message-template": "Welcome, {name}!"
-            };
-
-            // Traduz cada elemento
-            for (const [id, text] of Object.entries(elements)) {
+        // ==== TRADUZ TODA A PÁGINA ====
+        async function translatePage() {
+            const browserLang = (navigator.language || 'en').split('-')[0];
+            
+            for (const [elementId, text] of Object.entries(textsToTranslate)) {
                 try {
-                    const translated = await translateText(text, lang);
-                    const element = document.getElementById(id);
-                    
+                    const translated = await translateText(text, browserLang);
+                    const element = document.getElementById(elementId);
                     if (element) {
-                        if (id === 'name-input') {
+                        if (elementId === 'name-input') {
                             element.placeholder = translated;
-                        } else if (id === 'welcome-message-template') {
-                            // Guarda o template traduzido para usar depois
-                            window.translatedWelcomeTemplate = translated;
                         } else {
                             element.textContent = translated;
                         }
                     }
                 } catch (error) {
-                    console.error(`Erro ao traduzir ${id}:`, error);
+                    console.error(`Erro ao traduzir ${elementId}:`, error);
                 }
             }
         }
 
-        // ==== LÓGICA PRINCIPAL ====
+        // ==== INICIALIZAÇÃO ====
         document.addEventListener('DOMContentLoaded', async () => {
-            // Detecta o idioma do navegador (ex: 'pt-BR' → 'pt')
-            const browserLang = (navigator.language || 'en').split('-')[0];
-            
-            // Traduz toda a página
-            await translateAllElements(browserLang);
+            await translatePage();
 
-            // Configura o botão Next
+            // ==== BOTÃO NEXT ====
             document.getElementById('next-button').addEventListener('click', function() {
-                const nameInput = document.getElementById('name-input');
+                const name = document.getElementById('name-input').value.trim();
                 
-                if (!nameInput.value.trim()) {
-                    // Efeito de erro se estiver vazio
+                if (!name) {
                     document.body.classList.add('error-state');
-                    setTimeout(() => {
-                        document.body.classList.remove('error-state');
-                    }, 1000);
+                    setTimeout(() => document.body.classList.remove('error-state'), 1000);
                 } else {
-                    // Mensagem personalizada na tela verde
-                    const welcomeMsg = document.getElementById('welcome-message');
-                    const template = window.translatedWelcomeTemplate || "Welcome, {name}!";
-                    welcomeMsg.textContent = template.replace('{name}', nameInput.value);
+                    // MOSTRA O NOME DO USUÁRIO (SEM TRADUZIR)
+                    document.getElementById('user-name').textContent = name;
                     
-                    // Mostra a tela verde
+                    // MOSTRA A TELA VERDE
                     document.getElementById('welcome-screen').style.display = 'flex';
                 }
             });
