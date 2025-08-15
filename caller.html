@@ -44,19 +44,23 @@
       color: #007BFF;
       z-index: 30;
     }
-    
-    /* ✨ Novo estilo para a frase personalizada */
-    #userGreeting {
+
+    /* ✨ Novo estilo para os campos (igual ao receiver) */
+    .user-info {
       position: absolute;
-      bottom: 590px;
+      bottom: 250px;
       left: 50%;
       transform: translateX(-50%);
-      font-size: 18px;
-      font-weight: bold;
-      color: #007BFF;
-      z-index: 30;
+      width: 80%;
       text-align: center;
-      width: 100%;
+    }
+    .user-info input {
+      display: block;
+      margin: 10px auto;
+      padding: 8px;
+      width: 80%;
+      border-radius: 8px;
+      border: 1px solid #007BFF;
     }
   </style>
 </head>
@@ -69,6 +73,12 @@
 
   <!-- 🔹 Box azul centralizado com ID para JS -->
   <div class="chat-input-box" id="textDisplay"></div>
+
+  <!-- ✨ Campos nome/sobrenome (novos) -->
+  <div class="user-info">
+    <input type="text" id="nome" placeholder="Nome">
+    <input type="text" id="sobrenome" placeholder="Sobrenome">
+  </div>
 
   <div class="container">
     <div class="video-wrapper">
