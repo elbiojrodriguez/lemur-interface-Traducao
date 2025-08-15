@@ -8,7 +8,7 @@
   <link rel="stylesheet" href="responsivo.css" />
   <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
   <style>
-    /* ✍️ Estilo dos campos de nome e sobrenome */
+    /* ✍️ Estilo original dos campos de nome e sobrenome (MANTIDO) */
     .user-inputs {
       position: absolute;
       top: 250px;
@@ -28,29 +28,49 @@
       font-size: 16px;
       width: 200px;
     }
+
+    /* ✨ NOVO: Estilo da frase de boas-vindas (ADICIONADO) */
+    #welcomeMessage {
+      position: absolute;
+      top: 200px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 18px;
+      font-weight: bold;
+      color: #007BFF;
+      z-index: 60;
+      text-align: center;
+      width: 100%;
+      background-color: rgba(255, 255, 255, 0.7);
+      padding: 8px;
+      border-radius: 8px;
+    }
   </style>
 </head>
 <body>
-  <!-- ✍️ Campos de nome e sobrenome -->
+  <!-- ✨ NOVA FRASE (ADICIONADA) -->
+  <div id="welcomeMessage"></div>
+
+  <!-- ✍️ Campos originais (MANTIDOS) -->
   <div class="user-inputs">
     <input type="text" id="nome" placeholder="Seu nome">
     <input type="text" id="sobrenome" placeholder="Seu sobrenome">
   </div>
 
+  <!-- Estrutura original (MANTIDA) -->
   <div class="container">
     <div class="video-wrapper">
       <video id="remoteVideo" autoplay playsinline></video>
     </div>
-
     <div class="video-wrapper">
       <video id="localVideo" autoplay muted playsinline></video>
     </div>
-
     <div class="info-overlay">
       <div id="qrcode" class="qrcode-container"></div>
     </div>
   </div>
 
+  <!-- Scripts originais (MANTIDOS) -->
   <script src="https://lemur-signal.onrender.com/socket.io/socket.io.js"></script>
   <script type="module" src="js/receiver-ui.js"></script>
 </body>
