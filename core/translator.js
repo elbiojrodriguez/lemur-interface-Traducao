@@ -1,23 +1,17 @@
-// code/translator.js
+export async function translate(text, targetLang) {
+    try {
+        if (!text || targetLang === 'en') return text;
 
-export async function translateText(text, targetLang) {
-  if (!text.trim()) {
-    throw new Error('Texto vazio. Nada para traduzir.');
-  }
+        const response = await fetch(TRANSLATE_ENDPOINT, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ text, targetLang })
+        });
 
-  const response = await fetch('https://chat-tradutor.onrender.com/translate', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({ text, targetLang })
-  });
-
-  const data = await response.json();
-
-  if (!data.success) {
-    throw new Error(data.error || 'Erro desconhecido na tradução');
-  }
-
-  return data.translatedText;
+        const result = await response.json();
+        return result.translatedText || text;
+    } catch (error) {
+        console.error('Erro na tradução:', error);
+        return text;
+    }
 }
