@@ -1,3 +1,6 @@
+import WebRTCCore from '../core/webrtc-core.js';
+import { QRCodeGenerator } from './qr-code-utils.js';
+
 window.onload = () => {
   const rtcCore = new WebRTCCore();
   const myId = crypto.randomUUID().substr(0, 8);
@@ -12,11 +15,8 @@ window.onload = () => {
       console.error("Erro ao acessar a câmera:", error);
     });
 
-  // 🆕 Obtém o idioma do navegador
-  const userLang = navigator.language || navigator.userLanguage;
-
-  // Gera QR Code com link para caller, incluindo idioma
-  const callerUrl = `${window.location.origin}/caller.html?targetId=${myId}&lang=${encodeURIComponent(userLang)}`;
+  // Gera QR Code com link para caller
+  const callerUrl = `${window.location.origin}/caller.html?targetId=${myId}`;
   QRCodeGenerator.generate("qrcode", callerUrl);
 
   rtcCore.initialize(myId);
