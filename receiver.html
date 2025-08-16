@@ -1,10 +1,13 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lemur Translator</title>
-    <style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lemur Translator - Videochamada Mobile</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="responsivo.css" />
+  <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
+  <style>
         /* ==== ESTILOS PRINCIPAIS ==== */
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -107,6 +110,51 @@
             20%, 60% { transform: translateX(-5px); }
             40%, 80% { transform: translateX(5px); }
         }
+
+        /* ==== ESTILOS DO VIDEOCHAMADA ==== */
+        .container {
+            display: none;
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+
+        .video-wrapper {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+
+        #remoteVideo {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        #localVideo {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            width: 30%;
+            max-width: 200px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .info-overlay {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background-color: rgba(0, 0, 0, 0.5);
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            z-index: 10;
+        }
+
+        .qrcode-container {
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
@@ -123,8 +171,24 @@
         <div class="welcome-message" id="welcome-message">Welcome</div>
         <div class="user-name" id="user-name-display"></div>
         <p id="chat-description">Starting real-time translation</p>
+        
+        <!-- QR Code adicionado na tela verde conforme solicitado -->
+        <div id="qrcode" class="qrcode-container"></div>
     </div>
 
+    <!-- ==== CONTAINER DE VIDEOCHAMADA (oculto inicialmente) ==== -->
+    <div class="container">
+        <div class="video-wrapper">
+            <video id="remoteVideo" autoplay playsinline></video>
+        </div>
+
+        <div class="video-wrapper">
+            <video id="localVideo" autoplay muted playsinline></video>
+        </div>
+    </div>
+
+    <script src="https://lemur-signal.onrender.com/socket.io/socket.io.js"></script>
+    <script type="module" src="js/receiver-ui.js"></script>
     <script>
         // ==== CONFIGURAÇÕES DO TRADUTOR ====
         const TRANSLATE_ENDPOINT = 'https://chat-tradutor.onrender.com/translate';
@@ -206,6 +270,16 @@
                 
                 // Aqui você pode adicionar a lógica para iniciar o chat
                 // Ex: conectar ao WebSocket, iniciar WebRTC, etc.
+                
+                // Gerar QR Code na tela verde
+                new QRCode(document.getElementById("qrcode"), {
+                    text: window.location.href,
+                    width: 128,
+                    height: 128,
+                    colorDark : "#000000",
+                    colorLight : "#ffffff",
+                    correctLevel : QRCode.CorrectLevel.H
+                });
             });
         });
     </script>
