@@ -218,6 +218,18 @@
     // ==== CONFIGURAÇÕES DO TRADUTOR ====
     const TRANSLATE_ENDPOINT = 'https://chat-tradutor.onrender.com/translate';
     
+    // Variáveis globais para armazenar os dados
+    let userData = {
+      name: '',
+      language: 'en',
+      sessionId: generateSessionId()
+    };
+
+    // Função para gerar um ID de sessão aleatório
+    function generateSessionId() {
+      return 'lemur-' + Math.random().toString(36).substr(2, 9);
+    }
+
     // Textos que serão traduzidos
     const textsToTranslate = {
       "welcome-title": "Welcome!",
@@ -252,6 +264,7 @@
     // ==== TRADUZ TODA A PÁGINA ====
     async function translatePage() {
       const browserLang = (navigator.language || 'en').split('-')[0];
+      userData.language = browserLang; // Armazena o idioma detectado
       
       for (const [elementId, text] of Object.entries(textsToTranslate)) {
         try {
@@ -269,6 +282,12 @@
           console.error(`Erro ao traduzir ${elementId}:`, error);
         }
       }
+    }
+
+    // Função para gerar o link da chamada
+    function generateCallLink() {
+      const baseUrl = 'https://lemur-interface-traducao.netlify.app/caller.html';
+      return `${baseUrl}?sessionId=${encodeURIComponent(userData.sessionId)}&lang=${encodeURIComponent(userData.language)}&name=${encodeURIComponent(userData.name)}`;
     }
 
     // ==== INICIALIZAÇÃO ====
@@ -290,6 +309,9 @@
           return;
         }
         
+        // Armazena o nome do usuário
+        userData.name = name;
+        
         // Mostra a tela verde (receiver)
         document.getElementById('initial-page').style.display = 'none';
         document.getElementById('user-name-display').textContent = name;
@@ -302,15 +324,20 @@
         document.getElementById('welcome-screen').style.display = 'none';
         document.getElementById('videochat-page').style.display = 'block';
         
-        // Inicializa o QR Code (código original do receiver-ui.js)
+        // Gera o link completo com todos os parâmetros
+        const callLink = generateCallLink();
+        
+        // Inicializa o QR Code com o link gerado
         const qrcode = new QRCode(document.getElementById("qrcode"), {
-          text: window.location.href,
+          text: callLink,
           width: 100,
           height: 100,
           colorDark: "#000000",
           colorLight: "#ffffff",
           correctLevel: QRCode.CorrectLevel.H
         });
+
+        console.log('Link gerado para o QR Code:', callLink);
 
         // Aqui você pode adicionar o restante da lógica de videochamada
         // que estava no receiver-ui.js original
