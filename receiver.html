@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Lemur Translator</title>
   <style>
     body {
@@ -103,14 +103,17 @@
       background-color: #e74c3c;
     }
   </style>
-  <script src="assets/js/qrcode.min.js"></script>
+
+  <!-- Biblioteca QRCode.js necessária para QRCodeGenerator -->
+  <script src="./assets/js/lib/qrcode.min.js"></script>
 </head>
 <body>
   <!-- ==== TELA INICIAL ==== -->
-  <img src="assets/images/solemur.png" alt="Lemur Logo" class="logo" id="logo">
+  <img src="assets/images/solemur.png" alt="Lemur Logo" class="logo" id="logo" />
   <h1 id="welcome-title">Welcome!</h1>
   <div class="translator-label" id="translator-label">Real-Time Translator</div>
-  <input type="text" class="name-input" id="name-input" placeholder="Type your name">
+
+  <input type="text" class="name-input" id="name-input" placeholder="Type your name" />
   <button class="next-button" id="next-button">Next</button>
 
   <!-- ==== TELA VERDE ==== -->
@@ -137,18 +140,19 @@
   <div class="welcome-screen" id="final-screen" style="background-color: #ffffff; flex-direction: column;">
     <div id="qr-container" style="margin-bottom: 30px;"></div>
     <div style="font-size: 1.5rem; color: #333; max-width: 80%; text-align: center;">
-      Este é seu portal de entrada para o chat em tempo real.<br>
+      Este é seu portal de entrada para o chat em tempo real.<br />
       Peça para escanear, imprimir ou salvar como foto.
     </div>
   </div>
 
   <script type="module">
     import { translatePage } from './assets/js/core/translator.js';
+    import { QRCodeGenerator } from './assets/js/core/qr-code-utils.js';
 
     document.addEventListener('DOMContentLoaded', async () => {
       await translatePage();
 
-      document.getElementById('next-button').addEventListener('click', function () {
+      document.getElementById('next-button').addEventListener('click', () => {
         const name = document.getElementById('name-input').value.trim();
         if (!name) {
           document.body.classList.add('error-state');
@@ -164,7 +168,7 @@
         }
       });
 
-      document.getElementById('permission-button').addEventListener('click', async function () {
+      document.getElementById('permission-button').addEventListener('click', async () => {
         try {
           await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
 
@@ -172,22 +176,12 @@
           document.getElementById('final-screen').style.display = 'flex';
 
           const name = document.getElementById('name-input').value.trim();
-          generateQRCode(name);
+          QRCodeGenerator.generateUserQRCode("qr-container", name);
         } catch (err) {
           alert('Permissão negada. Não será possível continuar.');
           console.error('Erro ao obter permissão:', err);
         }
       });
-
-      function generateQRCode(name) {
-        const container = document.getElementById('qr-container');
-        container.innerHTML = '';
-        new QRCode(container, {
-          text: `https://chat-tradutor.onrender.com/user?name=${encodeURIComponent(name)}`,
-          width: 200,
-          height: 200
-        });
-      }
     });
   </script>
 </body>
