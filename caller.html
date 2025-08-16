@@ -1,13 +1,13 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Caller - Videochamada Mobile</title>
+  <title>Caller - Mobile Video Call</title>
   <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="responsivo.css" />
   <style>
-    /* 🔵 Estilo do box azul */
+    /* 🔵 Blue box style */
     .chat-input-box {
       position: absolute;
       bottom: 350px;
@@ -23,7 +23,7 @@
       padding: 10px;
     }
 
-    /* 💬 Estilo das frases reconhecidas */
+    /* 💬 Recognized phrases style */
     .phrase-box {
       padding: 8px;
       margin: 6px 0;
@@ -33,7 +33,7 @@
       font-size: 16px;
     }
 
-    /* 🌍 Estilo da frase de idioma */
+    /* 🌍 Language phrase style */
     #languageInfo {
       position: absolute;
       bottom: 560px;
@@ -44,41 +44,31 @@
       color: #007BFF;
       z-index: 30;
     }
-
-    /* ✨ Novo estilo para os campos (igual ao receiver) */
-    .user-info {
+    
+    /* ✨ Personalized greeting style */
+    #userGreeting {
       position: absolute;
-      bottom: 250px;
+      bottom: 590px;
       left: 50%;
       transform: translateX(-50%);
-      width: 80%;
+      font-size: 18px;
+      font-weight: bold;
+      color: #007BFF;
+      z-index: 30;
       text-align: center;
-    }
-    .user-info input {
-      display: block;
-      margin: 10px auto;
-      padding: 8px;
-      width: 80%;
-      border-radius: 8px;
-      border: 1px solid #007BFF;
+      width: 100%;
     }
   </style>
 </head>
 <body>
-  <!-- ✨ Nova frase personalizada -->
+  <!-- ✨ Personalized greeting -->
   <div id="userGreeting"></div>
   
-  <!-- 🌍 Frase com idioma detectado -->
+  <!-- 🌍 Detected language phrase -->
   <div id="languageInfo"></div>
 
-  <!-- 🔹 Box azul centralizado com ID para JS -->
+  <!-- 🔹 Centered blue box with ID for JS -->
   <div class="chat-input-box" id="textDisplay"></div>
-
-  <!-- ✨ Campos nome/sobrenome (novos) -->
-  <div class="user-info">
-    <input type="text" id="nome" placeholder="Nome">
-    <input type="text" id="sobrenome" placeholder="Sobrenome">
-  </div>
 
   <div class="container">
     <div class="video-wrapper">
@@ -88,7 +78,7 @@
       <video id="localVideo" autoplay muted playsinline></video>
     </div>
 
-    <!-- 🔻 Controles -->
+    <!-- 🔻 Controls -->
     <div class="controls">
       <button id="callActionBtn" style="display:none;">SEND 🚀</button>
     </div>
