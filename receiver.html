@@ -1,42 +1,14 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Receiver - Mobile Video Call</title>
+  <title>Receiver - Videochamada Mobile</title>
   <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="responsivo.css" />
   <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
-  <style>
-    /* ✍️ Name and surname fields style */
-    .user-inputs {
-      position: absolute;
-      top: 250px;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 50;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .user-inputs input {
-      padding: 6px 10px;
-      border-radius: 6px;
-      border: 1px solid #007BFF;
-      font-size: 16px;
-      width: 200px;
-    }
-  </style>
 </head>
 <body>
-  <!-- ✍️ Name and surname fields -->
-  <div class="user-inputs">
-    <input type="text" id="nome" placeholder="Your name">
-    <input type="text" id="sobrenome" placeholder="Your surname">
-  </div>
-
   <div class="container">
     <div class="video-wrapper">
       <video id="remoteVideo" autoplay playsinline></video>
@@ -46,7 +18,7 @@
       <video id="localVideo" autoplay muted playsinline></video>
     </div>
 
-    <div class="info-overlay">
+        <div class="info-overlay">
       <div id="qrcode" class="qrcode-container"></div>
     </div>
   </div>
