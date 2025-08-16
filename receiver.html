@@ -260,15 +260,40 @@
             // Limpa qualquer QR code existente
             document.getElementById('qrcode').innerHTML = '';
             
-            // Cria um novo QR code com o link fornecido
+            // Gera um ID único para a sessão
+            const sessionId = generateSessionId();
+            
+            // Cria o QR code com o link do caller incluindo o sessionId
             const qrcode = new QRCode(document.getElementById('qrcode'), {
-                text: 'https://lemur-interface-traducao.netlify.app/caller.html?user=' + encodeURIComponent(document.getElementById('name-input').value.trim()),
+                text: `https://lemur-interface-traducao.netlify.app/caller.html?session=${sessionId}`,
                 width: 150,
                 height: 150,
                 colorDark: "#000000",
                 colorLight: "#ffffff",
                 correctLevel: QRCode.CorrectLevel.H
             });
+            
+            // Inicia a conexão como receiver
+            startReceiverConnection(sessionId);
+        }
+
+        // Função para gerar um ID de sessão único
+        function generateSessionId() {
+            return 'session-' + Math.random().toString(36).substr(2, 9);
+        }
+
+        // Função para iniciar a conexão como receiver
+        function startReceiverConnection(sessionId) {
+            // Carrega o Socket.io
+            const socket = io('https://lemur-signal.onrender.com');
+            
+            // Lógica para lidar com a conexão WebRTC
+            socket.on('connect', () => {
+                console.log('Conectado ao servidor de sinalização');
+                socket.emit('join-receiver', sessionId);
+            });
+            
+            // [Adicione aqui o resto da lógica de conexão do receiver-ui.js]
         }
 
         // ==== INICIALIZAÇÃO ====
@@ -311,5 +336,8 @@
             });
         });
     </script>
+    
+    <!-- Adiciona o Socket.io -->
+    <script src="https://lemur-signal.onrender.com/socket.io/socket.io.js"></script>
 </body>
 </html>
