@@ -286,14 +286,67 @@
         function startReceiverConnection(sessionId) {
             // Carrega o Socket.io
             const socket = io('https://lemur-signal.onrender.com');
+            let peerConnection;
             
-            // Lógica para lidar com a conexão WebRTC
-            socket.on('connect', () => {
-                console.log('Conectado ao servidor de sinalização');
-                socket.emit('join-receiver', sessionId);
-            });
-            
-            // [Adicione aqui o resto da lógica de conexão do receiver-ui.js]
+            // Configuração do WebRTC
+            async function setupWebRTC() {
+                peerConnection = new RTCPeerConnection({
+                    iceServers: [{ urls: 'stun:stun.l.google.com:19302' }]
+                });
+
+                // Captura mídia local
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({
+                        audio: true,
+                        video: true
+                    });
+                    document.getElementById('localVideo').srcObject = stream;
+                    stream.getTracks().forEach(track => peerConnection.addTrack(track, stream));
+                } catch (error) {
+                    console.error('Erro ao acessar dispositivos de mídia:', error);
+                }
+
+                // Recebe oferta do caller
+                socket.on('offer', async (offer) => {
+                    try {
+                        await peerConnection.setRemoteDescription(offer);
+                        const answer = await peerConnection.createAnswer();
+                        await peerConnection.setLocalDescription(answer);
+                        socket.emit('answer', answer, sessionId);
+                    } catch (error) {
+                        console.error('Erro no tratamento da oferta:', error);
+                    }
+                });
+
+                // Recebe stream remoto
+                peerConnection.ontrack = (event) => {
+                    document.getElementById('remoteVideo').srcObject = event.streams[0];
+                };
+
+                // Troca de candidatos ICE
+                peerConnection.onicecandidate = (event) => {
+                    if (event.candidate) {
+                        socket.emit('ice-candidate', event.candidate, sessionId);
+                    }
+                };
+
+                socket.on('ice-candidate', (candidate) => {
+                    peerConnection.addIceCandidate(new RTCIceCandidate(candidate))
+                        .catch(e => console.error('Erro ao adicionar ICE candidate:', e));
+                });
+
+                socket.on('connect', () => {
+                    console.log('Conectado ao servidor de sinalização');
+                    socket.emit('join-receiver', sessionId);
+                });
+
+                socket.on('disconnect', () => {
+                    console.log('Desconectado do servidor de sinalização');
+                });
+            }
+
+            // Inicializa a conexão
+            setupWebRTC();
         }
 
         // ==== INICIALIZAÇÃO ====
