@@ -3,38 +3,33 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Lemur Translator</title>
+  <title>Lemur Video Translator</title>
+  <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
+  <script src="https://lemur-signal.onrender.com/socket.io/socket.io.js"></script>
   <style>
-    /* ==== ESTILOS PRINCIPAIS ==== */
+    /* ==== ESTILOS GERAIS ==== */
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #87CEEB;
       margin: 0;
       padding: 0;
+      transition: background-color 0.5s;
+    }
+
+    /* ==== TELA INICIAL ==== */
+    #initial-page {
+      background-color: #87CEEB;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       height: 100vh;
       text-align: center;
-      transition: background-color 0.5s;
     }
 
     .logo {
       width: 150px;
       height: auto;
       margin-bottom: 20px;
-    }
-
-    h1 {
-      color: #333;
-      margin-bottom: 30px;
-    }
-
-    .translator-label {
-      font-size: 1.5rem;
-      color: #2c3e50;
-      margin-bottom: 40px;
     }
 
     .name-input {
@@ -47,7 +42,6 @@
       font-size: 1rem;
       margin-bottom: 20px;
       text-align: center;
-      outline: none;
     }
 
     .next-button {
@@ -68,63 +62,33 @@
     }
 
     /* ==== TELA VERDE ==== */
-    .welcome-screen {
+    #welcome-screen {
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
       background-color: #2ecc71;
-      display: flex;
+      display: none;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       color: white;
-      font-size: 2rem;
       z-index: 1000;
-      display: none;
     }
-    
-    /* ESTILOS DA MENSAGEM DE BOAS-VINDAS */
-    .welcome-message {
-      font-size: 2.5rem;
-      margin-bottom: 20px;
-    }
-    
+
     .user-name {
       font-size: 3rem;
       color: #f1c40f;
-      margin-bottom: 30px;
-    }
-    
-    .error-state {
-      background-color: #e74c3c;
-      animation: shake 0.5s;
+      margin: 20px 0;
     }
 
-    @keyframes shake {
-      0%, 100% { transform: translateX(0); }
-      20%, 60% { transform: translateX(-5px); }
-      40%, 80% { transform: translateX(5px); }
-    }
-
-    /* ==== ESTILOS DA PÁGINA DE VIDEOCHAMADA (oculta inicialmente) ==== */
+    /* ==== TELA DE VIDEOCHAMADA ==== */
     #videochat-page {
       display: none;
       width: 100%;
       height: 100vh;
-    }
-
-    .container {
       position: relative;
-      width: 100%;
-      height: 100%;
-    }
-
-    .video-wrapper {
-      position: absolute;
-      width: 100%;
-      height: 100%;
     }
 
     #remoteVideo {
@@ -143,211 +107,145 @@
       border: 2px solid white;
     }
 
-    .info-overlay {
+    .qrcode-container {
       position: absolute;
       top: 20px;
       left: 20px;
-      background-color: rgba(0, 0, 0, 0.5);
-      padding: 10px;
-      border-radius: 10px;
-    }
-
-    .qrcode-container {
-      width: 100px;
-      height: 100px;
       background-color: white;
       padding: 5px;
+      border-radius: 5px;
     }
 
-    .start-call-button {
-      position: absolute;
-      bottom: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      background-color: #3498db;
-      color: white;
-      border: none;
-      padding: 15px 30px;
-      border-radius: 25px;
-      font-size: 1rem;
-      cursor: pointer;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-      z-index: 100;
+    /* EFEITOS */
+    .error-state {
+      background-color: #e74c3c;
+      animation: shake 0.5s;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-5px); }
+      40%, 80% { transform: translateX(5px); }
     }
   </style>
-  <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
 </head>
 <body>
-  <!-- ==== PÁGINA 1: TELA INICIAL ==== -->
+  <!-- PÁGINA 1: TELA INICIAL -->
   <div id="initial-page">
-    <img src="assets/images/solemur.png" alt="Lemur Logo" class="logo" id="logo">
+    <img src="assets/images/solemur.png" alt="Lemur Logo" class="logo">
     <h1 id="welcome-title">Welcome!</h1>
-    <div class="translator-label" id="translator-label">Real-Time Translator</div>
-    
-    <input type="text" class="name-input" id="name-input" placeholder="Type your name">
-    <button class="next-button" id="next-button">Next</button>
+    <div id="translator-label">Real-Time Translator</div>
+    <input type="text" id="name-input" class="name-input" placeholder="Type your name">
+    <button id="next-button" class="next-button">Next</button>
   </div>
 
-  <!-- ==== PÁGINA 2: TELA VERDE (RECEIVER) ==== -->
-  <div class="welcome-screen" id="welcome-screen">
-    <div class="welcome-message" id="welcome-message">Welcome</div>
-    <div class="user-name" id="user-name-display"></div>
-    <p id="chat-description">Starting real-time translation</p>
-    <button class="next-button" id="start-call-button" style="margin-top: 30px;">Start Video Call</button>
+  <!-- PÁGINA 2: TELA VERDE -->
+  <div id="welcome-screen">
+    <div id="welcome-message">Welcome</div>
+    <div id="user-name-display" class="user-name"></div>
+    <p id="chat-description">Starting video call...</p>
+    <button id="start-call-button" class="next-button">Start Call</button>
   </div>
 
-  <!-- ==== PÁGINA 3: VIDEOCHAMADA ==== -->
+  <!-- PÁGINA 3: VIDEOCHAMADA -->
   <div id="videochat-page">
-    <div class="container">
-      <div class="video-wrapper">
-        <video id="remoteVideo" autoplay playsinline></video>
-      </div>
-
-      <div class="video-wrapper">
-        <video id="localVideo" autoplay muted playsinline></video>
-      </div>
-
-      <div class="info-overlay">
-        <div id="qrcode" class="qrcode-container"></div>
-      </div>
-    </div>
+    <video id="remoteVideo" autoplay playsinline></video>
+    <video id="localVideo" autoplay muted playsinline></video>
+    <div id="qrcode" class="qrcode-container"></div>
   </div>
 
-  <script src="https://lemur-signal.onrender.com/socket.io/socket.io.js"></script>
   <script>
-    // ==== CONFIGURAÇÕES DO TRADUTOR ====
-    const TRANSLATE_ENDPOINT = 'https://chat-tradutor.onrender.com/translate';
-    
-    // Variáveis globais para armazenar os dados
-    let userData = {
+    // ==== DADOS GLOBAIS ====
+    const userData = {
       name: '',
-      language: 'en',
-      sessionId: generateSessionId()
+      language: navigator.language.split('-')[0] || 'en',
+      sessionId: 'lemur-' + Math.random().toString(36).substr(2, 9)
     };
 
-    // Função para gerar um ID de sessão aleatório
-    function generateSessionId() {
-      return 'lemur-' + Math.random().toString(36).substr(2, 9);
-    }
-
-    // Textos que serão traduzidos
-    const textsToTranslate = {
-      "welcome-title": "Welcome!",
-      "translator-label": "Real-Time Translator",
-      "name-input": "Type your name",
-      "next-button": "Next",
-      "welcome-message": "Welcome",
-      "chat-description": "Starting real-time translation",
-      "start-call-button": "Start Video Call"
-    };
-
-    // ==== FUNÇÃO DE TRADUÇÃO ====
-    async function translateText(text, targetLang) {
-      try {
-        if (targetLang === 'en') return text;
-        
-        const response = await fetch(TRANSLATE_ENDPOINT, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ text, targetLang })
-        });
-        
-        const result = await response.json();
-        return result.translatedText || text;
-        
-      } catch (error) {
-        console.error('Erro na tradução:', error);
-        return text;
+    // ==== TRADUÇÃO AUTOMÁTICA ====
+    const texts = {
+      "en": {
+        "welcome-title": "Welcome!",
+        "translator-label": "Real-Time Translator",
+        "name-input": "Type your name",
+        "next-button": "Next",
+        "welcome-message": "Welcome",
+        "chat-description": "Starting video call...",
+        "start-call-button": "Start Call"
+      },
+      "pt": {
+        "welcome-title": "Bem-vindo!",
+        "translator-label": "Tradutor em Tempo Real",
+        "name-input": "Digite seu nome",
+        "next-button": "Próximo",
+        "welcome-message": "Bem-vindo",
+        "chat-description": "Iniciando chamada de vídeo...",
+        "start-call-button": "Iniciar Chamada"
+      },
+      "es": {
+        "welcome-title": "¡Bienvenido!",
+        "translator-label": "Traductor en Tiempo Real",
+        "name-input": "Escribe tu nombre",
+        "next-button": "Siguiente",
+        "welcome-message": "Bienvenido",
+        "chat-description": "Iniciando videollamada...",
+        "start-call-button": "Iniciar Llamada"
       }
-    }
+    };
 
-    // ==== TRADUZ TODA A PÁGINA ====
-    async function translatePage() {
-      const browserLang = (navigator.language || 'en').split('-')[0];
-      userData.language = browserLang; // Armazena o idioma detectado
-      
-      for (const [elementId, text] of Object.entries(textsToTranslate)) {
-        try {
-          const translated = await translateText(text, browserLang);
-          const element = document.getElementById(elementId);
-          
-          if (element) {
-            if (elementId === 'name-input') {
-              element.placeholder = translated;
-            } else {
-              element.textContent = translated;
-            }
-          }
-        } catch (error) {
-          console.error(`Erro ao traduzir ${elementId}:`, error);
+    function translatePage() {
+      const lang = userData.language in texts ? userData.language : 'en';
+      Object.keys(texts[lang]).forEach(id => {
+        const element = document.getElementById(id);
+        if (element) {
+          element[element.tagName === 'INPUT' ? 'placeholder' : 'textContent'] = texts[lang][id];
         }
-      }
+      });
     }
 
-    // Função para gerar o link da chamada
+    // ==== GERADOR DE LINK ====
     function generateCallLink() {
-      const baseUrl = 'https://lemur-interface-traducao.netlify.app/caller.html';
-      return `${baseUrl}?sessionId=${encodeURIComponent(userData.sessionId)}&lang=${encodeURIComponent(userData.language)}&name=${encodeURIComponent(userData.name)}`;
+      return `https://lemur-interface-traducao.netlify.app/caller.html?session=${userData.sessionId}&lang=${userData.language}&name=${encodeURIComponent(userData.name)}`;
     }
 
-    // ==== INICIALIZAÇÃO ====
-    document.addEventListener('DOMContentLoaded', async () => {
-      // Traduz a página automaticamente
-      await translatePage();
-
-      // ==== LÓGICA DO BOTÃO NEXT ====
-      document.getElementById('next-button').addEventListener('click', function() {
-        const nameInput = document.getElementById('name-input');
-        const name = nameInput.value.trim();
-        
-        // Validação do nome
-        if (!name) {
-          document.body.classList.add('error-state');
-          setTimeout(() => {
-            document.body.classList.remove('error-state');
-          }, 1000);
-          return;
-        }
-        
-        // Armazena o nome do usuário
-        userData.name = name;
-        
-        // Mostra a tela verde (receiver)
-        document.getElementById('initial-page').style.display = 'none';
-        document.getElementById('user-name-display').textContent = name;
-        document.getElementById('welcome-screen').style.display = 'flex';
-      });
-
-      // ==== LÓGICA DO BOTÃO START CALL ====
-      document.getElementById('start-call-button').addEventListener('click', function() {
-        // Mostra a página de videochamada
-        document.getElementById('welcome-screen').style.display = 'none';
-        document.getElementById('videochat-page').style.display = 'block';
-        
-        // Gera o link completo com todos os parâmetros
-        const callLink = generateCallLink();
-        
-        // Inicializa o QR Code com o link gerado
-        const qrcode = new QRCode(document.getElementById("qrcode"), {
-          text: callLink,
-          width: 100,
-          height: 100,
-          colorDark: "#000000",
-          colorLight: "#ffffff",
-          correctLevel: QRCode.CorrectLevel.H
-        });
-
-        console.log('Link gerado para o QR Code:', callLink);
-
-        // Aqui você pode adicionar o restante da lógica de videochamada
-        // que estava no receiver-ui.js original
-      });
+    // ==== CONTROLE DE FLUXO ====
+    document.getElementById('next-button').addEventListener('click', () => {
+      const name = document.getElementById('name-input').value.trim();
+      if (!name) {
+        document.body.classList.add('error-state');
+        setTimeout(() => document.body.classList.remove('error-state'), 1000);
+        return;
+      }
+      userData.name = name;
+      document.getElementById('initial-page').style.display = 'none';
+      document.getElementById('user-name-display').textContent = name;
+      document.getElementById('welcome-screen').style.display = 'flex';
     });
-  </script>
-  <script type="module">
-    // Aqui você pode incluir o conteúdo original do receiver-ui.js
-    // ou mantê-lo em um arquivo separado como estava originalmente
-    // importe suas funções necessárias para a videochamada aqui
+
+    document.getElementById('start-call-button').addEventListener('click', () => {
+      document.getElementById('welcome-screen').style.display = 'none';
+      document.getElementById('videochat-page').style.display = 'block';
+      
+      // Gerar QR Code
+      new QRCode(document.getElementById("qrcode"), {
+        text: generateCallLink(),
+        width: 100,
+        height: 100
+      });
+
+      // Iniciar WebRTC (código original simplificado)
+      const socket = io('https://lemur-signal.onrender.com');
+      const peerConnection = new RTCPeerConnection({
+        iceServers: [{ urls: 'stun:stun.l.google.com:19302' }]
+      });
+
+      // ... (adicione aqui o resto da lógica do receiver-ui.js)
+    });
+
+    // Inicialização
+    document.addEventListener('DOMContentLoaded', () => {
+      translatePage();
+    });
   </script>
 </body>
 </html>
