@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Lemur Translator - Videochamada</title>
-  <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lemur Translator</title>
   <style>
-    /* ==== ESTILOS GLOBAIS ==== */
+    /* ==== ESTILOS PRINCIPAIS ==== */
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #87CEEB;
       margin: 0;
       padding: 0;
       display: flex;
@@ -18,19 +18,6 @@
       height: 100vh;
       text-align: center;
       transition: background-color 0.5s;
-      overflow: hidden;
-    }
-
-    /* ==== PRIMEIRA PÁGINA (AZUL) ==== */
-    .initial-page {
-      background-color: #87CEEB;
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
     }
 
     .logo {
@@ -63,7 +50,7 @@
       outline: none;
     }
 
-    .action-button {
+    .next-button {
       background-color: #3498db;
       color: white;
       border: none;
@@ -75,11 +62,41 @@
       transition: all 0.3s;
     }
 
-    .action-button:hover {
+    .next-button:hover {
       background-color: #2980b9;
       transform: translateY(-2px);
     }
 
+    /* ==== TELA VERDE ==== */
+    .welcome-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: #2ecc71;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 2rem;
+      z-index: 1000;
+      display: none;
+    }
+    
+    /* ESTILOS DA MENSAGEM DE BOAS-VINDAS */
+    .welcome-message {
+      font-size: 2.5rem;
+      margin-bottom: 20px;
+    }
+    
+    .user-name {
+      font-size: 3rem;
+      color: #f1c40f;
+      margin-bottom: 30px;
+    }
+    
     .error-state {
       background-color: #e74c3c;
       animation: shake 0.5s;
@@ -91,44 +108,11 @@
       40%, 80% { transform: translateX(5px); }
     }
 
-    /* ==== SEGUNDA PÁGINA (VERDE) ==== */
-    .welcome-page {
-      background-color: #2ecc71;
-      position: absolute;
-      width: 100%;
-      height: 100%;
+    /* ==== ESTILOS DA PÁGINA DE VIDEOCHAMADA (oculta inicialmente) ==== */
+    #videochat-page {
       display: none;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      color: white;
-    }
-
-    .welcome-message {
-      font-size: 2.5rem;
-      margin-bottom: 20px;
-    }
-
-    .user-name {
-      font-size: 3rem;
-      color: #f1c40f;
-      margin-bottom: 30px;
-    }
-
-    .chat-description {
-      margin-bottom: 30px;
-    }
-
-    .qrcode-container {
-      margin: 20px 0;
-    }
-
-    /* ==== TERCEIRA PÁGINA (VIDEOCHAMADA) ==== */
-    .video-page {
-      position: absolute;
       width: 100%;
-      height: 100%;
-      display: none;
+      height: 100vh;
     }
 
     .container {
@@ -138,7 +122,7 @@
     }
 
     .video-wrapper {
-      position: relative;
+      position: absolute;
       width: 100%;
       height: 100%;
     }
@@ -156,7 +140,7 @@
       width: 30%;
       max-width: 200px;
       border-radius: 10px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+      border: 2px solid white;
     }
 
     .info-overlay {
@@ -164,39 +148,56 @@
       top: 20px;
       left: 20px;
       background-color: rgba(0, 0, 0, 0.5);
-      color: white;
       padding: 10px;
-      border-radius: 5px;
-      z-index: 10;
+      border-radius: 10px;
+    }
+
+    .qrcode-container {
+      width: 100px;
+      height: 100px;
+      background-color: white;
+      padding: 5px;
+    }
+
+    .start-call-button {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: #3498db;
+      color: white;
+      border: none;
+      padding: 15px 30px;
+      border-radius: 25px;
+      font-size: 1rem;
+      cursor: pointer;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      z-index: 100;
     }
   </style>
+  <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
 </head>
 <body>
-  <!-- PRIMEIRA PÁGINA (INICIAL) -->
-  <div class="initial-page" id="initial-page">
+  <!-- ==== PÁGINA 1: TELA INICIAL ==== -->
+  <div id="initial-page">
     <img src="assets/images/solemur.png" alt="Lemur Logo" class="logo" id="logo">
     <h1 id="welcome-title">Welcome!</h1>
     <div class="translator-label" id="translator-label">Real-Time Translator</div>
     
     <input type="text" class="name-input" id="name-input" placeholder="Type your name">
-    <button class="action-button" id="next-button">Next</button>
+    <button class="next-button" id="next-button">Next</button>
   </div>
 
-  <!-- SEGUNDA PÁGINA (VERDE) -->
-  <div class="welcome-page" id="welcome-page">
+  <!-- ==== PÁGINA 2: TELA VERDE (RECEIVER) ==== -->
+  <div class="welcome-screen" id="welcome-screen">
     <div class="welcome-message" id="welcome-message">Welcome</div>
     <div class="user-name" id="user-name-display"></div>
-    <p class="chat-description" id="chat-description">Starting real-time translation</p>
-    
-    <!-- QR Code -->
-    <div id="qrcode" class="qrcode-container"></div>
-    
-    <!-- Botão para próxima página -->
-    <button class="action-button" id="continue-button">Continue to Call</button>
+    <p id="chat-description">Starting real-time translation</p>
+    <button class="next-button" id="start-call-button" style="margin-top: 30px;">Start Video Call</button>
   </div>
 
-  <!-- TERCEIRA PÁGINA (VIDEOCHAMADA) -->
-  <div class="video-page" id="video-page">
+  <!-- ==== PÁGINA 3: VIDEOCHAMADA ==== -->
+  <div id="videochat-page">
     <div class="container">
       <div class="video-wrapper">
         <video id="remoteVideo" autoplay playsinline></video>
@@ -207,13 +208,12 @@
       </div>
 
       <div class="info-overlay">
-        <div id="connection-info"></div>
+        <div id="qrcode" class="qrcode-container"></div>
       </div>
     </div>
   </div>
 
   <script src="https://lemur-signal.onrender.com/socket.io/socket.io.js"></script>
-  <script type="module" src="js/receiver-ui.js"></script>
   <script>
     // ==== CONFIGURAÇÕES DO TRADUTOR ====
     const TRANSLATE_ENDPOINT = 'https://chat-tradutor.onrender.com/translate';
@@ -226,7 +226,7 @@
       "next-button": "Next",
       "welcome-message": "Welcome",
       "chat-description": "Starting real-time translation",
-      "continue-button": "Continue to Call"
+      "start-call-button": "Start Video Call"
     };
 
     // ==== FUNÇÃO DE TRADUÇÃO ====
@@ -271,27 +271,12 @@
       }
     }
 
-    // ==== GERENCIAMENTO DAS PÁGINAS ====
-    function showPage(pageId) {
-      document.getElementById('initial-page').style.display = 'none';
-      document.getElementById('welcome-page').style.display = 'none';
-      document.getElementById('video-page').style.display = 'none';
-      
-      document.getElementById(pageId).style.display = 'flex';
-      if (pageId === 'video-page') {
-        document.getElementById(pageId).style.display = 'block';
-      }
-    }
-
     // ==== INICIALIZAÇÃO ====
     document.addEventListener('DOMContentLoaded', async () => {
       // Traduz a página automaticamente
       await translatePage();
 
-      // Mostra a página inicial
-      showPage('initial-page');
-
-      // ==== LÓGICA DO BOTÃO NEXT (PRIMEIRA PÁGINA) ====
+      // ==== LÓGICA DO BOTÃO NEXT ====
       document.getElementById('next-button').addEventListener('click', function() {
         const nameInput = document.getElementById('name-input');
         const name = nameInput.value.trim();
@@ -305,32 +290,37 @@
           return;
         }
         
-        // Atualiza a tela verde com o nome
+        // Mostra a tela verde (receiver)
+        document.getElementById('initial-page').style.display = 'none';
         document.getElementById('user-name-display').textContent = name;
+        document.getElementById('welcome-screen').style.display = 'flex';
+      });
+
+      // ==== LÓGICA DO BOTÃO START CALL ====
+      document.getElementById('start-call-button').addEventListener('click', function() {
+        // Mostra a página de videochamada
+        document.getElementById('welcome-screen').style.display = 'none';
+        document.getElementById('videochat-page').style.display = 'block';
         
-        // Gera o QR Code
-        new QRCode(document.getElementById("qrcode"), {
+        // Inicializa o QR Code (código original do receiver-ui.js)
+        const qrcode = new QRCode(document.getElementById("qrcode"), {
           text: window.location.href,
-          width: 128,
-          height: 128,
+          width: 100,
+          height: 100,
           colorDark: "#000000",
           colorLight: "#ffffff",
           correctLevel: QRCode.CorrectLevel.H
         });
-        
-        // Mostra a página verde
-        showPage('welcome-page');
-      });
 
-      // ==== LÓGICA DO BOTÃO CONTINUE (SEGUNDA PÁGINA) ====
-      document.getElementById('continue-button').addEventListener('click', function() {
-        // Mostra a página de videochamada
-        showPage('video-page');
-        
-        // Aqui você pode adicionar a lógica para iniciar a chamada
-        // Ex: conectar ao WebSocket, iniciar WebRTC, etc.
+        // Aqui você pode adicionar o restante da lógica de videochamada
+        // que estava no receiver-ui.js original
       });
     });
+  </script>
+  <script type="module">
+    // Aqui você pode incluir o conteúdo original do receiver-ui.js
+    // ou mantê-lo em um arquivo separado como estava originalmente
+    // importe suas funções necessárias para a videochamada aqui
   </script>
 </body>
 </html>
