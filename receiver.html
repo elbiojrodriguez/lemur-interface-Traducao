@@ -260,9 +260,9 @@
             // Limpa qualquer QR code existente
             document.getElementById('qrcode').innerHTML = '';
             
-            // Cria um novo QR code
+            // Cria um novo QR code com o link fornecido
             const qrcode = new QRCode(document.getElementById('qrcode'), {
-                text: 'https://example.com/video-call/' + encodeURIComponent(document.getElementById('name-input').value.trim()),
+                text: 'https://lemur-interface-traducao.netlify.app/caller.html?user=' + encodeURIComponent(document.getElementById('name-input').value.trim()),
                 width: 150,
                 height: 150,
                 colorDark: "#000000",
@@ -306,7 +306,7 @@
                 // Mostra a tela de videochamada
                 document.getElementById('page3').style.display = 'block';
                 
-                // Gera o QR code
+                // Gera o QR code com o link correto
                 generateQRCode();
             });
         });
