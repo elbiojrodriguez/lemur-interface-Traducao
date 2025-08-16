@@ -1,208 +1,29 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lemur Translator - Receiver</title>
-    <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
-    <script src="https://lemur-signal.onrender.com/socket.io/socket.io.js"></script>
-    <style>
-        /* ==== MAIN STYLES ==== */
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #87CEEB;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            text-align: center;
-            transition: background-color 0.5s;
-        }
-
-        .logo {
-            width: 150px;
-            height: auto;
-            margin-bottom: 20px;
-        }
-
-        .name-input {
-            width: 80%;
-            max-width: 300px;
-            padding: 15px;
-            border-radius: 25px;
-            border: none;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            font-size: 1rem;
-            margin-bottom: 20px;
-            text-align: center;
-            outline: none;
-        }
-
-        .next-button {
-            background-color: #3498db;
-            color: white;
-            border: none;
-            padding: 15px 30px;
-            border-radius: 25px;
-            font-size: 1rem;
-            cursor: pointer;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s;
-        }
-
-        /* ==== WELCOME SCREEN ==== */
-        .welcome-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: #2ecc71;
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            z-index: 1000;
-        }
-        
-        .welcome-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 30px;
-        }
-        
-        .welcome-text {
-            font-size: 2.5rem;
-            font-weight: bold;
-        }
-        
-        .user-name {
-            font-size: 3rem;
-            color: #f1c40f;
-        }
-
-        /* ==== VIDEO ELEMENTS ==== */
-        .video-container {
-            display: none;
-            width: 100%;
-            max-width: 500px;
-            position: relative;
-            margin: 20px auto;
-        }
-
-        video {
-            width: 100%;
-            border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-        }
-
-        #localVideo {
-            position: absolute;
-            bottom: 20px;
-            right: 20px;
-            width: 30%;
-            z-index: 10;
-        }
-
-        /* ==== QR CODE ==== */
-        #qrcode {
-            margin: 20px auto;
-            padding: 10px;
-            background: white;
-            border-radius: 10px;
-            display: inline-block;
-        }
-
-        .error-state {
-            background-color: #e74c3c;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Receiver - Videochamada Mobile</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="responsivo.css" />
+  <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
 </head>
 <body>
-    <!-- === INITIAL SCREEN === -->
-    <img src="assets/images/solemur.png" alt="Lemur Logo" class="logo">
-    <h1>Enter Your Name</h1>
-    <input type="text" class="name-input" id="name-input" placeholder="Type your name">
-    <button class="next-button" id="next-button">Next</button>
-
-    <!-- === WELCOME SCREEN === -->
-    <div class="welcome-screen" id="welcome-screen">
-        <div class="welcome-container">
-            <div class="welcome-text">Welcome</div>
-            <div class="user-name" id="user-name"></div>
-        </div>
-        
-        <!-- Video Call Elements -->
-        <div class="video-container">
-            <video id="remoteVideo" autoplay playsinline></video>
-            <video id="localVideo" autoplay muted playsinline></video>
-        </div>
-        
-        <div id="qrcode"></div>
-        <p>Scan this QR code to start the call</p>
+  <div class="container">
+    <div class="video-wrapper">
+      <video id="remoteVideo" autoplay playsinline></video>
     </div>
 
-    <script type="module">
-        import WebRTCCore from '../core/webrtc-core.js';
-        import { QRCodeGenerator } from './qr-code-utils.js';
+    <div class="video-wrapper">
+      <video id="localVideo" autoplay muted playsinline></video>
+    </div>
 
-        // Initialize WebRTC
-        const rtcCore = new WebRTCCore();
-        const myId = crypto.randomUUID().substr(0, 8);
-        let localStream = null;
+        <div class="info-overlay">
+      <div id="qrcode" class="qrcode-container"></div>
+    </div>
+  </div>
 
-        document.getElementById('next-button').addEventListener('click', async () => {
-            const name = document.getElementById('name-input').value.trim();
-            
-            if (!name) {
-                document.body.classList.add('error-state');
-                setTimeout(() => document.body.classList.remove('error-state'), 1000);
-                return;
-            }
-
-            try {
-                // Show welcome screen
-                document.getElementById('user-name').textContent = name;
-                document.getElementById('welcome-screen').style.display = 'flex';
-                
-                // Get camera access
-                localStream = await navigator.mediaDevices.getUserMedia({ 
-                    video: true, 
-                    audio: true 
-                });
-                
-                // Setup local video
-                document.getElementById('localVideo').srcObject = localStream;
-
-                // Initialize WebRTC
-                rtcCore.initialize(myId);
-                rtcCore.setupSocketHandlers();
-
-                // Handle incoming calls
-                rtcCore.onIncomingCall = (offer) => {
-                    rtcCore.handleIncomingCall(offer, localStream, (remoteStream) => {
-                        // Mute audio and show remote video
-                        remoteStream.getAudioTracks().forEach(track => track.enabled = false);
-                        document.getElementById('remoteVideo').srcObject = remoteStream;
-                    });
-                };
-
-                // Generate QR Code
-                const idioma = navigator.language || 'en-US';
-                const url = `${window.location.origin}/caller.html?targetId=${myId}&lang=${encodeURIComponent(idioma)}&nome=${encodeURIComponent(name)}`;
-                QRCodeGenerator.generate("qrcode", url);
-
-            } catch (error) {
-                console.error("Error accessing camera:", error);
-                alert("Camera access is required to continue.");
-            }
-        });
-    </script>
+  <script src="https://lemur-signal.onrender.com/socket.io/socket.io.js"></script>
+  <script type="module" src="js/receiver-ui.js"></script>
 </body>
 </html>
