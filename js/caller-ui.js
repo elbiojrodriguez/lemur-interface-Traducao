@@ -42,5 +42,4 @@ window.onload = () => {
     stream.getAudioTracks().forEach(track => track.enabled = false);
     localVideo.srcObject = stream;
   });
-     }
-};
+  };
