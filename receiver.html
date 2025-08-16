@@ -1,396 +1,191 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lemur Translator</title>
-    <link rel="stylesheet" href="style.css" />
-    <link rel="stylesheet" href="responsivo.css" />
-    <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
-    <style>
-        /* ==== ESTILOS PRINCIPAIS ==== */
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #87CEEB;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            text-align: center;
-            transition: background-color 0.5s;
-        }
-
-        .container {
-            display: none;
-            width: 100%;
-            height: 100%;
-            position: relative;
-        }
-
-        .logo {
-            width: 150px;
-            height: auto;
-            margin-bottom: 20px;
-        }
-
-        h1 {
-            color: #333;
-            margin-bottom: 30px;
-        }
-
-        .translator-label {
-            font-size: 1.5rem;
-            color: #2c3e50;
-            margin-bottom: 40px;
-        }
-
-        .name-input {
-            width: 80%;
-            max-width: 300px;
-            padding: 15px;
-            border-radius: 25px;
-            border: none;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            font-size: 1rem;
-            margin-bottom: 20px;
-            text-align: center;
-            outline: none;
-        }
-
-        .next-button {
-            background-color: #3498db;
-            color: white;
-            border: none;
-            padding: 15px 30px;
-            border-radius: 25px;
-            font-size: 1rem;
-            cursor: pointer;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s;
-        }
-
-        .next-button:hover {
-            background-color: #2980b9;
-            transform: translateY(-2px);
-        }
-
-        /* ==== TELA VERDE ==== */
-        .welcome-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: #2ecc71;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 2rem;
-            z-index: 1000;
-            display: none;
-        }
-        
-        /* ESTILOS DA MENSAGEM DE BOAS-VINDAS */
-        .welcome-message {
-            font-size: 2.5rem;
-            margin-bottom: 20px;
-        }
-        
-        .user-name {
-            font-size: 3rem;
-            color: #f1c40f;
-            margin-bottom: 30px;
-        }
-        
-        .error-state {
-            background-color: #e74c3c;
-            animation: shake 0.5s;
-        }
-
-        .video-wrapper {
-            width: 100%;
-            height: 50%;
-            position: relative;
-        }
-
-        video {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .info-overlay {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background: rgba(255, 255, 255, 0.8);
-            padding: 10px;
-            border-radius: 8px;
-        }
-
-        .qrcode-container {
-            width: 150px;
-            height: 150px;
-            margin: 0 auto;
-        }
-
-        .continue-button {
-            background-color: #3498db;
-            color: white;
-            border: none;
-            padding: 15px 30px;
-            border-radius: 25px;
-            font-size: 1rem;
-            cursor: pointer;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s;
-            margin-top: 20px;
-        }
-
-        .continue-button:hover {
-            background-color: #2980b9;
-            transform: translateY(-2px);
-        }
-
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            20%, 60% { transform: translateX(-5px); }
-            40%, 80% { transform: translateX(5px); }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lemur Translator</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="responsivo.css" />
+  <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
 </head>
 <body>
-    <!-- ==== TELA INICIAL ==== -->
-    <div id="page1">
-        <img src="assets/images/solemur.png" alt="Lemur Logo" class="logo" id="logo">
-        <h1 id="welcome-title">Welcome!</h1>
-        <div class="translator-label" id="translator-label">Real-Time Translator</div>
-        
-        <input type="text" class="name-input" id="name-input" placeholder="Type your name">
-        <button class="next-button" id="next-button">Next</button>
+  <!-- ==== TELA INICIAL ==== -->
+  <div id="page1">
+    <img src="assets/images/solemur.png" alt="Lemur Logo" class="logo" id="logo">
+    <h1 id="welcome-title">Welcome!</h1>
+    <div class="translator-label" id="translator-label">Real-Time Translator</div>
+    <input type="text" class="name-input" id="name-input" placeholder="Type your name">
+    <button class="next-button" id="next-button">Next</button>
+  </div>
+
+  <!-- ==== TELA VERDE (RECEIVER) ==== -->
+  <div class="welcome-screen" id="welcome-screen">
+    <div class="welcome-message" id="welcome-message">Welcome</div>
+    <div class="user-name" id="user-name-display"></div>
+    <p id="chat-description">Starting real-time translation</p>
+    <button class="continue-button" id="continue-button">Continue to Video Call</button>
+  </div>
+
+  <!-- ==== TELA DE VÍDEO CRUZADO ==== -->
+  <div class="container" id="page3">
+    <div class="video-wrapper">
+      <video id="remoteVideo" autoplay playsinline></video>
     </div>
-
-    <!-- ==== TELA VERDE (RECEIVER) ==== -->
-    <div class="welcome-screen" id="welcome-screen">
-        <div class="welcome-message" id="welcome-message">Welcome</div>
-        <div class="user-name" id="user-name-display"></div>
-        <p id="chat-description">Starting real-time translation</p>
-        <button class="continue-button" id="continue-button">Continue to Video Call</button>
+    <div class="info-overlay">
+      <div id="qrcode" class="qrcode-container"></div>
     </div>
+  </div>
 
-    <!-- ==== TELA DE VIDEOCHAMADA ==== -->
-    <div class="container" id="page3">
-        <div class="video-wrapper">
-            <video id="remoteVideo" autoplay playsinline></video>
-        </div>
+  <script>
+    const TRANSLATE_ENDPOINT = 'https://chat-tradutor.onrender.com/translate';
 
-        <div class="video-wrapper">
-            <video id="localVideo" autoplay muted playsinline></video>
-        </div>
+    const textsToTranslate = {
+      "welcome-title": "Welcome!",
+      "translator-label": "Real-Time Translator",
+      "name-input": "Type your name",
+      "next-button": "Next",
+      "welcome-message": "Welcome",
+      "chat-description": "Starting real-time translation",
+      "continue-button": "Continue to Video Call"
+    };
 
-        <div class="info-overlay">
-            <div id="qrcode" class="qrcode-container"></div>
-        </div>
-    </div>
+    async function translateText(text, targetLang) {
+      try {
+        if (targetLang === 'en') return text;
+        const response = await fetch(TRANSLATE_ENDPOINT, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text, targetLang })
+        });
+        const result = await response.json();
+        return result.translatedText || text;
+      } catch (error) {
+        console.error('Erro na tradução:', error);
+        return text;
+      }
+    }
 
-    <script>
-        // ==== CONFIGURAÇÕES DO TRADUTOR ====
-        const TRANSLATE_ENDPOINT = 'https://chat-tradutor.onrender.com/translate';
-        
-        // Textos que serão traduzidos
-        const textsToTranslate = {
-            "welcome-title": "Welcome!",
-            "translator-label": "Real-Time Translator",
-            "name-input": "Type your name",
-            "next-button": "Next",
-            "welcome-message": "Welcome",
-            "chat-description": "Starting real-time translation",
-            "continue-button": "Continue to Video Call"
+    async function translatePage() {
+      const browserLang = (navigator.language || 'en').split('-')[0];
+      for (const [elementId, text] of Object.entries(textsToTranslate)) {
+        try {
+          const translated = await translateText(text, browserLang);
+          const element = document.getElementById(elementId);
+          if (element) {
+            if (elementId === 'name-input') {
+              element.placeholder = translated;
+            } else {
+              element.textContent = translated;
+            }
+          }
+        } catch (error) {
+          console.error(`Erro ao traduzir ${elementId}:`, error);
+        }
+      }
+    }
+
+    function generateSessionId() {
+      return 'session-' + Math.random().toString(36).substr(2, 9);
+    }
+
+    function generateQRCode() {
+      document.getElementById('qrcode').innerHTML = '';
+      const sessionId = generateSessionId();
+      new QRCode(document.getElementById('qrcode'), {
+        text: `https://lemur-interface-traducao.netlify.app/caller.html?session=${sessionId}`,
+        width: 150,
+        height: 150,
+        colorDark: "#000000",
+        colorLight: "#ffffff",
+        correctLevel: QRCode.CorrectLevel.H
+      });
+      startReceiverConnection(sessionId);
+    }
+
+    function startReceiverConnection(sessionId) {
+      const socket = io('https://lemur-signal.onrender.com');
+      let peerConnection;
+
+      async function setupWebRTC() {
+        peerConnection = new RTCPeerConnection({
+          iceServers: [{ urls: 'stun:stun.l.google.com:19302' }]
+        });
+
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({
+            video: true,
+            audio: false
+          });
+          stream.getTracks().forEach(track => peerConnection.addTrack(track, stream));
+        } catch (error) {
+          console.error('Erro ao acessar câmera:', error);
+        }
+
+        socket.on('offer', async (offer) => {
+          try {
+            await peerConnection.setRemoteDescription(offer);
+            const answer = await peerConnection.createAnswer();
+            await peerConnection.setLocalDescription(answer);
+            socket.emit('answer', answer, sessionId);
+          } catch (error) {
+            console.error('Erro no tratamento da oferta:', error);
+          }
+        });
+
+        peerConnection.ontrack = (event) => {
+          document.getElementById('remoteVideo').srcObject = event.streams[0];
         };
 
-        // ==== FUNÇÃO DE TRADUÇÃO ====
-        async function translateText(text, targetLang) {
-            try {
-                if (targetLang === 'en') return text;
-                
-                const response = await fetch(TRANSLATE_ENDPOINT, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ text, targetLang })
-                });
-                
-                const result = await response.json();
-                return result.translatedText || text;
-                
-            } catch (error) {
-                console.error('Erro na tradução:', error);
-                return text;
-            }
-        }
+        peerConnection.onicecandidate = (event) => {
+          if (event.candidate) {
+            socket.emit('ice-candidate', event.candidate, sessionId);
+          }
+        };
 
-        // ==== TRADUZ TODA A PÁGINA ====
-        async function translatePage() {
-            const browserLang = (navigator.language || 'en').split('-')[0];
-            
-            for (const [elementId, text] of Object.entries(textsToTranslate)) {
-                try {
-                    const translated = await translateText(text, browserLang);
-                    const element = document.getElementById(elementId);
-                    
-                    if (element) {
-                        if (elementId === 'name-input') {
-                            element.placeholder = translated;
-                        } else {
-                            element.textContent = translated;
-                        }
-                    }
-                } catch (error) {
-                    console.error(`Erro ao traduzir ${elementId}:`, error);
-                }
-            }
-        }
-
-        // ==== GERAR QR CODE ====
-        function generateQRCode() {
-            // Limpa qualquer QR code existente
-            document.getElementById('qrcode').innerHTML = '';
-            
-            // Gera um ID único para a sessão
-            const sessionId = generateSessionId();
-            
-            // Cria o QR code com o link do caller incluindo o sessionId
-            const qrcode = new QRCode(document.getElementById('qrcode'), {
-                text: `https://lemur-interface-traducao.netlify.app/caller.html?session=${sessionId}`,
-                width: 150,
-                height: 150,
-                colorDark: "#000000",
-                colorLight: "#ffffff",
-                correctLevel: QRCode.CorrectLevel.H
-            });
-            
-            // Inicia a conexão como receiver
-            startReceiverConnection(sessionId);
-        }
-
-        // Função para gerar um ID de sessão único
-        function generateSessionId() {
-            return 'session-' + Math.random().toString(36).substr(2, 9);
-        }
-
-        // Função para iniciar a conexão como receiver
-        function startReceiverConnection(sessionId) {
-            // Carrega o Socket.io
-            const socket = io('https://lemur-signal.onrender.com');
-            let peerConnection;
-            
-            // Configuração do WebRTC
-            async function setupWebRTC() {
-                peerConnection = new RTCPeerConnection({
-                    iceServers: [{ urls: 'stun:stun.l.google.com:19302' }]
-                });
-
-                // Captura mídia local (EXATAMENTE COMO NO SEU CÓDIGO ORIGINAL)
-                try {
-                    const stream = await navigator.mediaDevices.getUserMedia({
-                        audio: true,
-                        video: true // SEM ESPECIFICAÇÃO DE CÂMERA
-                    });
-                    document.getElementById('localVideo').srcObject = stream;
-                    stream.getTracks().forEach(track => peerConnection.addTrack(track, stream));
-                } catch (error) {
-                    console.error('Erro ao acessar dispositivos de mídia:', error);
-                }
-
-                // Recebe oferta do caller
-                socket.on('offer', async (offer) => {
-                    try {
-                        await peerConnection.setRemoteDescription(offer);
-                        const answer = await peerConnection.createAnswer();
-                        await peerConnection.setLocalDescription(answer);
-                        socket.emit('answer', answer, sessionId);
-                    } catch (error) {
-                        console.error('Erro no tratamento da oferta:', error);
-                    }
-                });
-
-                // Recebe stream remoto
-                peerConnection.ontrack = (event) => {
-                    document.getElementById('remoteVideo').srcObject = event.streams[0];
-                };
-
-                // Troca de candidatos ICE
-                peerConnection.onicecandidate = (event) => {
-                    if (event.candidate) {
-                        socket.emit('ice-candidate', event.candidate, sessionId);
-                    }
-                };
-
-                socket.on('ice-candidate', (candidate) => {
-                    peerConnection.addIceCandidate(new RTCIceCandidate(candidate))
-                        .catch(e => console.error('Erro ao adicionar ICE candidate:', e));
-                });
-
-                socket.on('connect', () => {
-                    console.log('Conectado ao servidor de sinalização');
-                    socket.emit('join-receiver', sessionId);
-                });
-
-                socket.on('disconnect', () => {
-                    console.log('Desconectado do servidor de sinalização');
-                });
-            }
-
-            // Inicializa a conexão
-            setupWebRTC();
-        }
-
-        // ==== INICIALIZAÇÃO ====
-        document.addEventListener('DOMContentLoaded', async () => {
-            // Traduz a página automaticamente
-            await translatePage();
-
-            // ==== LÓGICA DO BOTÃO NEXT ====
-            document.getElementById('next-button').addEventListener('click', function() {
-                const nameInput = document.getElementById('name-input');
-                const name = nameInput.value.trim();
-                
-                // Validação do nome
-                if (!name) {
-                    document.body.classList.add('error-state');
-                    setTimeout(() => {
-                        document.body.classList.remove('error-state');
-                    }, 1000);
-                    return;
-                }
-                
-                // Esconde a primeira página
-                document.getElementById('page1').style.display = 'none';
-                
-                // Mostra a tela verde (receiver)
-                document.getElementById('user-name-display').textContent = name;
-                document.getElementById('welcome-screen').style.display = 'flex';
-            });
-
-            // ==== LÓGICA DO BOTÃO CONTINUE ====
-            document.getElementById('continue-button').addEventListener('click', function() {
-                // Esconde a tela verde
-                document.getElementById('welcome-screen').style.display = 'none';
-                
-                // Mostra a tela de videochamada
-                document.getElementById('page3').style.display = 'block';
-                
-                // Gera o QR code com o link correto
-                generateQRCode();
-            });
+        socket.on('ice-candidate', (candidate) => {
+          peerConnection.addIceCandidate(new RTCIceCandidate(candidate))
+            .catch(e => console.error('Erro ao adicionar ICE candidate:', e));
         });
-    </script>
-    
-    <!-- Adiciona o Socket.io -->
-    <script src="https://lemur-signal.onrender.com/socket.io/socket.io.js"></script>
+
+        socket.on('connect', () => {
+          console.log('Conectado ao servidor de sinalização');
+          socket.emit('join-receiver', sessionId);
+        });
+
+        socket.on('disconnect', () => {
+          console.log('Desconectado do servidor de sinalização');
+        });
+      }
+
+      setupWebRTC();
+    }
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      await translatePage();
+
+      document.getElementById('next-button').addEventListener('click', function () {
+        const nameInput = document.getElementById('name-input');
+        const name = nameInput.value.trim();
+        if (!name) {
+          document.body.classList.add('error-state');
+          setTimeout(() => {
+            document.body.classList.remove('error-state');
+          }, 1000);
+          return;
+        }
+        document.getElementById('page1').style.display = 'none';
+        document.getElementById('user-name-display').textContent = name;
+        document.getElementById('welcome-screen').style.display = 'flex';
+      });
+
+      document.getElementById('continue-button').addEventListener('click', function () {
+        document.getElementById('welcome-screen').style.display = 'none';
+        document.getElementById('page3').style.display = 'block';
+        generateQRCode();
+      });
+    });
+  </script>
+
+  <script src="https://lemur-signal.onrender.com/socket.io/socket.io.js"></script>
 </body>
 </html>
