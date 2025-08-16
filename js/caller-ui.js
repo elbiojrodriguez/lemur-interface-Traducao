@@ -13,7 +13,49 @@ window.onload = () => {
   let targetId = null;
   let localStream = null;
 
-  // 🌐 Idiomas disponíveis (com "Eu sou" e "Eu falo" traduzidos)
+  // ✨ Get name from URL
+  const urlParams = new URLSearchParams(window.location.search);
+  const userName = urlParams.get('nome');
+  
+  // Show personalized greeting if name exists
+  if (userName) {
+    const greetingElement = document.getElementById('userGreeting');
+    if (greetingElement) {
+      greetingElement.textContent = `I am ${decodeURIComponent(userName)}`;
+    }
+  }
+
+  // Request camera access on page load
+  navigator.mediaDevices.getUserMedia({ video: true, audio: false })
+    .then(stream => {
+      localStream = stream;
+      remoteVideo.srcObject = stream;
+    })
+    .catch(error => {
+      console.error("Camera access error:", error);
+    });
+
+  // Check for target ID in URL
+  const targetIdFromUrl = urlParams.get('targetId');
+
+  if (targetIdFromUrl) {
+    targetId = targetIdFromUrl;
+    document.getElementById('callActionBtn').style.display = 'block';
+  }
+
+  // Configure call button
+  document.getElementById('callActionBtn').onclick = () => {
+    if (!targetId || !localStream) return;
+    rtcCore.startCall(targetId, localStream);
+  };
+
+  // Mute any received audio
+  rtcCore.setRemoteStreamCallback(stream => {
+    stream.getAudioTracks().forEach(track => track.enabled = false);
+    localVideo.srcObject = stream;
+  });
+
+  // 🌐 Available languages with translated "I speak" and "I am"
   const languages = [
     {code:'en-US',flag:'🇺🇸',speakText:'I speak',greetingText:'I am',name:'English'},
     {code:'pt-BR',flag:'🇧🇷',speakText:'Eu falo',greetingText:'Eu sou',name:'Português'},
@@ -26,70 +68,25 @@ window.onload = () => {
     {code:'ar-SA',flag:'🇸🇦',speakText:'أنا أتكلم',greetingText:'أنا',name:'العربية'}
   ];
 
-  // 📥 Captura parâmetros da URL
-  const urlParams = new URLSearchParams(window.location.search);
-  const targetIdFromUrl = urlParams.get('targetId');
-  const userNameFromUrl = urlParams.get('nome');
-  const userLangFromUrl = urlParams.get('lang');
+  // 📥 Detect language (URL > browser > default)
+  const lang = urlParams.get('lang') || navigator.language || 'pt-BR';
 
-  // 🌍 Detecta idioma (prioridade: URL > navegador > padrão)
-  const detectedLanguage = userLangFromUrl || navigator.language || 'pt-BR';
-  const selectedLanguage = languages.find(l => l.code === detectedLanguage) || 
-                         languages.find(l => l.code.startsWith(detectedLanguage.split('-')[0])) || 
-                         languages[1];
+  // 🔍 Find matching language (with smart fallback)
+  const selectedLang = languages.find(l => l.code === lang) || 
+                      languages.find(l => l.code.startsWith(lang.split('-')[0])) || // Ex: "es" for "es-ES"
+                      languages[1]; // Fallback to pt-BR
 
-  // ✨ Exibe "Eu sou [nome]" se vier da URL
-  if (userNameFromUrl) {
-    const greetingElement = document.getElementById('userGreeting');
-    if (greetingElement) {
-      greetingElement.textContent = `${selectedLanguage.greetingText} ${decodeURIComponent(userNameFromUrl)}`;
-    }
-  }
-
-  // 🏳️ Exibe "Eu falo [bandeira]"
+  // 🖼️ Show translated phrases
   const languageInfoElement = document.getElementById('languageInfo');
   if (languageInfoElement) {
-    languageInfoElement.textContent = `${selectedLanguage.speakText} ${selectedLanguage.flag}`;
+    languageInfoElement.textContent = `${selectedLang.speakText} ${selectedLang.flag}`;
   }
 
-  // Solicita acesso à câmera logo na abertura
-  navigator.mediaDevices.getUserMedia({ video: true, audio: false })
-    .then(stream => {
-      localStream = stream;
-      remoteVideo.srcObject = stream;
-    })
-    .catch(error => {
-      console.error("Erro ao acessar a câmera:", error);
-    });
-
-  // Configura targetId se vier da URL
-  if (targetIdFromUrl) {
-    targetId = targetIdFromUrl;
-    document.getElementById('callActionBtn').style.display = 'block';
-  }
-
-  // 🔄 Novo: Configura botão para enviar nome + idioma do caller
-  document.getElementById('callActionBtn').onclick = () => {
-    if (!targetId || !localStream) return;
-
-    const nome = document.getElementById('nome').value.trim();
-    const sobrenome = document.getElementById('sobrenome').value.trim();
-
-    if (!nome) {
-      alert("Por favor, digite seu nome.");
-      return;
+  // ✨ Show "I am [name]" in correct language (if name exists)
+  if (userName) {
+    const greetingElement = document.getElementById('userGreeting');
+    if (greetingElement) {
+      greetingElement.textContent = `${selectedLang.greetingText} ${decodeURIComponent(userName)}`;
     }
-
-    // 🚀 Envia dados completos ao servidor
-    rtcCore.startCall(targetId, localStream, {
-      senderName: `${nome} ${sobrenome}`.trim(),
-      senderLanguage: detectedLanguage
-    });
-  };
-
-  // Silencia qualquer áudio recebido
-  rtcCore.setRemoteStreamCallback(stream => {
-    stream.getAudioTracks().forEach(track => track.enabled = false);
-    localVideo.srcObject = stream;
-  });
+  }
 };
