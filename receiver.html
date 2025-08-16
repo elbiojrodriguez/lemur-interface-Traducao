@@ -3,11 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Receiver - Videochamada Mobile</title>
+    <title>Lemur Translator</title>
     <link rel="stylesheet" href="style.css" />
     <link rel="stylesheet" href="responsivo.css" />
-    <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-ages/qrcode.min.js"></script>
-    <title>Lemur Translator</title>
+    <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
     <style>
         /* ==== ESTILOS PRINCIPAIS ==== */
         body {
@@ -22,6 +21,13 @@
             height: 100vh;
             text-align: center;
             transition: background-color 0.5s;
+        }
+
+        .container {
+            display: none;
+            width: 100%;
+            height: 100%;
+            position: relative;
         }
 
         .logo {
@@ -72,31 +78,125 @@
         }
 
         /* ==== TELA VERDE ==== */
-         </style>
+        .welcome-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #2ecc71;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2rem;
+            z-index: 1000;
+            display: none;
+        }
+        
+        /* ESTILOS DA MENSAGEM DE BOAS-VINDAS */
+        .welcome-message {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+        
+        .user-name {
+            font-size: 3rem;
+            color: #f1c40f;
+            margin-bottom: 30px;
+        }
+        
+        .error-state {
+            background-color: #e74c3c;
+            animation: shake 0.5s;
+        }
+
+        .video-wrapper {
+            width: 100%;
+            height: 50%;
+            position: relative;
+        }
+
+        video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .info-overlay {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 10px;
+            border-radius: 8px;
+        }
+
+        .qrcode-container {
+            width: 150px;
+            height: 150px;
+            margin: 0 auto;
+        }
+
+        .continue-button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 1rem;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s;
+            margin-top: 20px;
+        }
+
+        .continue-button:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-5px); }
+            40%, 80% { transform: translateX(5px); }
+        }
+    </style>
 </head>
 <body>
-  <div class="container">
-    <div class="video-wrapper">
-      <video id="remoteVideo" autoplay playsinline></video>
-    </div>
-
-    <div class="video-wrapper">
-      <video id="localVideo" autoplay muted playsinline></video>
-    </div>
-
-        <div class="info-overlay">
-      <div id="qrcode" class="qrcode-container"></div>
-    </div>
-  </div>
     <!-- ==== TELA INICIAL ==== -->
-    <img src="assets/images/solemur.png" alt="Lemur Logo" class="logo" id="logo">
-    <h1 id="welcome-title">Welcome!</h1>
-    <div class="translator-label" id="translator-label">Real-Time Translator</div>
-    
-    <input type="text" class="name-input" id="name-input" placeholder="Type your name">
-    <button class="next-button" id="next-button">Next</button>
+    <div id="page1">
+        <img src="assets/images/solemur.png" alt="Lemur Logo" class="logo" id="logo">
+        <h1 id="welcome-title">Welcome!</h1>
+        <div class="translator-label" id="translator-label">Real-Time Translator</div>
+        
+        <input type="text" class="name-input" id="name-input" placeholder="Type your name">
+        <button class="next-button" id="next-button">Next</button>
+    </div>
 
     <!-- ==== TELA VERDE (RECEIVER) ==== -->
+    <div class="welcome-screen" id="welcome-screen">
+        <div class="welcome-message" id="welcome-message">Welcome</div>
+        <div class="user-name" id="user-name-display"></div>
+        <p id="chat-description">Starting real-time translation</p>
+        <button class="continue-button" id="continue-button">Continue to Video Call</button>
+    </div>
+
+    <!-- ==== TELA DE VIDEOCHAMADA ==== -->
+    <div class="container" id="page3">
+        <div class="video-wrapper">
+            <video id="remoteVideo" autoplay playsinline></video>
+        </div>
+
+        <div class="video-wrapper">
+            <video id="localVideo" autoplay muted playsinline></video>
+        </div>
+
+        <div class="info-overlay">
+            <div id="qrcode" class="qrcode-container"></div>
+        </div>
+    </div>
 
     <script>
         // ==== CONFIGURAÇÕES DO TRADUTOR ====
@@ -109,7 +209,8 @@
             "name-input": "Type your name",
             "next-button": "Next",
             "welcome-message": "Welcome",
-            "chat-description": "Starting real-time translation"
+            "chat-description": "Starting real-time translation",
+            "continue-button": "Continue to Video Call"
         };
 
         // ==== FUNÇÃO DE TRADUÇÃO ====
@@ -154,6 +255,22 @@
             }
         }
 
+        // ==== GERAR QR CODE ====
+        function generateQRCode() {
+            // Limpa qualquer QR code existente
+            document.getElementById('qrcode').innerHTML = '';
+            
+            // Cria um novo QR code
+            const qrcode = new QRCode(document.getElementById('qrcode'), {
+                text: 'https://example.com/video-call/' + encodeURIComponent(document.getElementById('name-input').value.trim()),
+                width: 150,
+                height: 150,
+                colorDark: "#000000",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.H
+            });
+        }
+
         // ==== INICIALIZAÇÃO ====
         document.addEventListener('DOMContentLoaded', async () => {
             // Traduz a página automaticamente
@@ -173,12 +290,24 @@
                     return;
                 }
                 
-                // Atualiza a tela verde (receiver)
+                // Esconde a primeira página
+                document.getElementById('page1').style.display = 'none';
+                
+                // Mostra a tela verde (receiver)
                 document.getElementById('user-name-display').textContent = name;
                 document.getElementById('welcome-screen').style.display = 'flex';
+            });
+
+            // ==== LÓGICA DO BOTÃO CONTINUE ====
+            document.getElementById('continue-button').addEventListener('click', function() {
+                // Esconde a tela verde
+                document.getElementById('welcome-screen').style.display = 'none';
                 
-                // Aqui você pode adicionar a lógica para iniciar o chat
-                // Ex: conectar ao WebSocket, iniciar WebRTC, etc.
+                // Mostra a tela de videochamada
+                document.getElementById('page3').style.display = 'block';
+                
+                // Gera o QR code
+                generateQRCode();
             });
         });
     </script>
