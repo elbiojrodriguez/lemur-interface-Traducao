@@ -84,7 +84,30 @@
             z-index: 1000;
             display: none;
         }
-          </style>
+        
+        /* ESTILOS DA MENSAGEM DE BOAS-VINDAS */
+        .welcome-message {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+        
+        .user-name {
+            font-size: 3rem;
+            color: #f1c40f;
+            margin-bottom: 30px;
+        }
+        
+        .error-state {
+            background-color: #e74c3c;
+            animation: shake 0.5s;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-5px); }
+            40%, 80% { transform: translateX(5px); }
+        }
+    </style>
 </head>
 <body>
     <!-- ==== TELA INICIAL ==== -->
@@ -188,3 +211,6 @@
     </script>
 </body>
 </html>
+
+
+
