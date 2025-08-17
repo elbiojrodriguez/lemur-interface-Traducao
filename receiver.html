@@ -1,230 +1,132 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Lemur Video Chat</title>
-  <style>
-    /* Estilos da tela de entrada */
-    #entrada-screen {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #87CEEB;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      z-index: 1000;
-      transition: opacity 0.5s;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lemur Translator</title>
+    <style>
+        /* ==== ESTILOS PRINCIPAIS ==== */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #87CEEB; /* Celeste */
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            text-align: center;
+            transition: background-color 0.5s;
+        }
 
-    .logo {
-      width: 150px;
-      height: auto;
-      margin-bottom: 20px;
-    }
+        .logo {
+            width: 150px;
+            height: auto;
+            margin-bottom: 20px;
+        }
 
-    .translator-label {
-      font-size: 1.5rem;
-      color: #2c3e50;
-      margin-bottom: 40px;
-    }
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+        }
 
-    .name-input {
-      width: 80%;
-      max-width: 300px;
-      padding: 15px;
-      border-radius: 25px;
-      border: none;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-      font-size: 1rem;
-      margin-bottom: 20px;
-      text-align: center;
-      outline: none;
-    }
+        .translator-label {
+            font-size: 1.5rem;
+            color: #2c3e50;
+            margin-bottom: 40px;
+        }
 
-    .next-button {
-      background-color: #3498db;
-      color: white;
-      border: none;
-      padding: 15px 30px;
-      border-radius: 25px;
-      font-size: 1rem;
-      cursor: pointer;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-      transition: all 0.3s;
-    }
+        .name-input {
+            width: 80%;
+            max-width: 300px;
+            padding: 15px;
+            border-radius: 25px;
+            border: none;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            font-size: 1rem;
+            margin-bottom: 20px;
+            text-align: center;
+            outline: none;
+        }
 
-    .next-button:hover {
-      background-color: #2980b9;
-      transform: translateY(-2px);
-    }
+        .next-button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 1rem;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s;
+        }
 
-    .error-state {
-      background-color: #e74c3c;
-      animation: shake 0.5s;
-    }
+        .next-button:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+        }
 
-    @keyframes shake {
-      0%, 100% { transform: translateX(0); }
-      20%, 60% { transform: translateX(-5px); }
-      40%, 80% { transform: translateX(5px); }
-    }
-
-    /* Estilos do receiver (video) */
-    #video-screen {
-      display: none;
-      width: 100%;
-      height: 100%;
-    }
-
-    .container {
-      width: 100%;
-      height: 100%;
-      position: relative;
-    }
-
-    .video-wrapper {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-    }
-
-    video {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    .info-overlay {
-      position: absolute;
-      bottom: 20px;
-      right: 20px;
-      z-index: 10;
-    }
-  </style>
+        /* ==== NOVOS ESTILOS ==== */
+        .welcome-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #2ecc71; /* Verde */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2rem;
+            z-index: 1000;
+            display: none;
+        }
+        
+        .error-state {
+            background-color: #e74c3c; /* Vermelho */
+        }
+    </style>
 </head>
 <body>
-  <!-- Tela de Entrada -->
-  <div id="entrada-screen">
-    <img src="assets/images/solemur.png" alt="Lemur Logo" class="logo" id="logo">
-    <h1 id="welcome-title">Welcome!</h1>
-    <div class="translator-label" id="translator-label">Real-Time Translator</div>
+    <!-- ==== TELA INICIAL ==== -->
+    <img src="assets/images/solemur.png" alt="Lemur Logo" class="logo">
+    <h1>Welcome!</h1>
+    <div class="translator-label">Real-Time Translator</div>
     
-    <input type="text" class="name-input" id="name-input" placeholder="Type your name">
-    <button class="next-button" id="next-button">Next</button>
-  </div>
+    <input type="text" class="name-input" placeholder="Type your name">
+    <button class="next-button">Next</button>
 
-  <!-- Tela de Vídeo (Receiver) -->
-  <div id="video-screen">
-    <div class="container">
-      <div class="video-wrapper">
-        <video id="remoteVideo" autoplay playsinline></video>
-      </div>
-
-      <div class="video-wrapper">
-        <video id="localVideo" autoplay muted playsinline></video>
-      </div>
-
-      <div class="info-overlay">
-        <div id="qrcode" class="qrcode-container"></div>
-      </div>
+    <!-- ==== TELA DE BOAS-VINDAS ==== -->
+    <div class="welcome-screen">
+        <h1 id="welcome-message"></h1>
+        <p>This would be the chat screen</p>
     </div>
-  </div>
 
-  <!-- Scripts -->
-  <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
-  <script src="https://lemur-signal.onrender.com/socket.io/socket.io.js"></script>
-  <script type="module" src="js/receiver-ui.js"></script>
+    <script>
+        // ==== LÓGICA PRINCIPAL ====
+        const nextButton = document.querySelector('.next-button');
+        const nameInput = document.querySelector('.name-input');
+        const welcomeScreen = document.querySelector('.welcome-screen');
+        const welcomeMessage = document.getElementById('welcome-message');
 
-  <script>
-    const TRANSLATE_ENDPOINT = 'https://chat-tradutor.onrender.com/translate';
-    
-    const textsToTranslate = {
-      "welcome-title": "Welcome!",
-      "translator-label": "Real-Time Translator",
-      "name-input": "Type your name",
-      "next-button": "Next"
-    };
-
-    async function translateText(text, targetLang) {
-      try {
-        if (targetLang === 'en') return text;
-        
-        const response = await fetch(TRANSLATE_ENDPOINT, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ text, targetLang })
-        });
-        
-        const result = await response.json();
-        return result.translatedText || text;
-        
-      } catch (error) {
-        console.error('Erro na tradução:', error);
-        return text;
-      }
-    }
-
-    async function translatePage() {
-      const browserLang = (navigator.language || 'en').split('-')[0];
-      
-      for (const [elementId, text] of Object.entries(textsToTranslate)) {
-        try {
-          const translated = await translateText(text, browserLang);
-          const element = document.getElementById(elementId);
-          
-          if (element) {
-            if (elementId === 'name-input') {
-              element.placeholder = translated;
-            } else {
-              element.textContent = translated;
+        nextButton.addEventListener('click', function() {
+            
+            // Se nome estiver vazio: efeito vermelho
+            if (nameInput.value.trim() === "") {
+                document.body.classList.add('error-state');
+                setTimeout(() => {
+                    document.body.classList.remove('error-state');
+                }, 1000);
+            } 
+            // Se nome preenchido: mostra tela verde
+            else {
+                welcomeMessage.textContent = `Welcome, ${nameInput.value}!`;
+                welcomeScreen.style.display = 'flex';
             }
-          }
-        } catch (error) {
-          console.error(`Erro ao traduzir ${elementId}:`, error);
-        }
-      }
-    }
-
-    document.addEventListener('DOMContentLoaded', async () => {
-      await translatePage();
-
-      document.getElementById('next-button').addEventListener('click', function() {
-        const nameInput = document.getElementById('name-input');
-        const name = nameInput.value.trim();
-        
-        if (!name) {
-          document.getElementById('entrada-screen').classList.add('error-state');
-          setTimeout(() => {
-            document.getElementById('entrada-screen').classList.remove('error-state');
-          }, 1000);
-          return;
-        }
-        
-        // Esconde a tela de entrada e mostra o vídeo
-        document.getElementById('entrada-screen').style.opacity = '0';
-        setTimeout(() => {
-          document.getElementById('entrada-screen').style.display = 'none';
-          document.getElementById('video-screen').style.display = 'block';
-          
-          // Inicializa o QR Code (se necessário)
-          new QRCode(document.getElementById("qrcode"), {
-            text: "https://example.com",
-            width: 100,
-            height: 100
-          });
-          
-          // Aqui você pode adicionar lógica para iniciar o WebRTC
-          // ou ela já será iniciada automaticamente pelo receiver-ui.js
-        }, 500);
-      });
-    });
-  </script>
+        });
+    </script>
 </body>
 </html>
