@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lemur Translator</title>
-    <title>Receiver - Videochamada Mobile</title>
     <link rel="stylesheet" href="style.css" />
     <link rel="stylesheet" href="responsivo.css" />
     <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
@@ -185,25 +184,15 @@
     </div>
 
     <!-- ==== TELA DE VIDEOCHAMADA ==== -->
-     <link rel="stylesheet" href="style.css" />
-  <link rel="stylesheet" href="responsivo.css" />
-  <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
-</head>
-<body>
-  <div class="container">
-    <div class="video-wrapper">
-      <video id="remoteVideo" autoplay playsinline></video>
-    </div>
-
-    <div class="video-wrapper">
-      <video id="localVideo" autoplay muted playsinline></video>
-    </div>
+    <div class="container" id="page3">
+        <div class="video-wrapper">
+            <video id="remoteVideo" autoplay playsinline></video>
+        </div>
 
         <div class="info-overlay">
-      <div id="qrcode" class="qrcode-container"></div>
+            <div id="qrcode" class="qrcode-container"></div>
+        </div>
     </div>
-  </div>
-
 
     <script>
         // ==== CONFIGURAÇÕES DO TRADUTOR ====
@@ -262,7 +251,32 @@
             }
         }
 
-        
+        // ==== GERAR QR CODE ====
+          <title>Receiver - Videochamada Mobile</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="responsivo.css" />
+  <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
+</head>
+<body>
+  <div class="container">
+    <div class="video-wrapper">
+      <video id="remoteVideo" autoplay playsinline></video>
+    </div>
+
+    <div class="video-wrapper">
+      <video id="localVideo" autoplay muted playsinline></video>
+    </div>
+
+        <div class="info-overlay">
+      <div id="qrcode" class="qrcode-container"></div>
+    </div>
+  </div>
+
+  <script src="https://lemur-signal.onrender.com/socket.io/socket.io.js"></script>
+  <script type="module" src="js/receiver-ui.js"></script>
+</body>
+
+
         // ==== INICIALIZAÇÃO ====
         document.addEventListener('DOMContentLoaded', async () => {
             // Traduz a página automaticamente
@@ -305,8 +319,6 @@
     </script>
     
     <!-- Adiciona o Socket.io -->
-      <script src="https://lemur-signal.onrender.com/socket.io/socket.io.js"></script>
-  <script type="module" src="js/receiver-ui.js"></script>
-
-   </body>
+    <script src="https://lemur-signal.onrender.com/socket.io/socket.io.js"></script>
+</body>
 </html>
