@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lemur Translator</title>
+    <title>Receiver - Videochamada Mobile</title>
     <link rel="stylesheet" href="style.css" />
     <link rel="stylesheet" href="responsivo.css" />
     <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
@@ -184,15 +185,25 @@
     </div>
 
     <!-- ==== TELA DE VIDEOCHAMADA ==== -->
-    <div class="container" id="page3">
-        <div class="video-wrapper">
-            <video id="remoteVideo" autoplay playsinline></video>
-        </div>
+     <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="responsivo.css" />
+  <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
+</head>
+<body>
+  <div class="container">
+    <div class="video-wrapper">
+      <video id="remoteVideo" autoplay playsinline></video>
+    </div>
+
+    <div class="video-wrapper">
+      <video id="localVideo" autoplay muted playsinline></video>
+    </div>
 
         <div class="info-overlay">
-            <div id="qrcode" class="qrcode-container"></div>
-        </div>
+      <div id="qrcode" class="qrcode-container"></div>
     </div>
+  </div>
+
 
     <script>
         // ==== CONFIGURAÇÕES DO TRADUTOR ====
@@ -251,95 +262,7 @@
             }
         }
 
-        // ==== GERAR QR CODE ====
-        function generateQRCode() {
-            // Limpa qualquer QR code existente
-            document.getElementById('qrcode').innerHTML = '';
-            
-            // Gera um ID único para a sessão
-            const sessionId = generateSessionId();
-            
-            // Cria o QR code com o link do caller incluindo o sessionId
-            const qrcode = new QRCode(document.getElementById('qrcode'), {
-                text: `https://lemur-interface-traducao.netlify.app/caller.html?session=${sessionId}`,
-                width: 150,
-                height: 150,
-                colorDark: "#000000",
-                colorLight: "#ffffff",
-                correctLevel: QRCode.CorrectLevel.H
-            });
-            
-            // Inicia a conexão como receiver
-            startReceiverConnection(sessionId);
-        }
-
-        // Função para gerar um ID de sessão único
-        function generateSessionId() {
-            return 'session-' + Math.random().toString(36).substr(2, 9);
-        }
-
-        // Função para iniciar a conexão como receiver (atualizada conforme código 1)
-        function startReceiverConnection(sessionId) {
-            const socket = io('https://lemur-signal.onrender.com');
-            let peerConnection;
-
-            async function setupWebRTC() {
-                peerConnection = new RTCPeerConnection({
-                    iceServers: [{ urls: 'stun:stun.l.google.com:19302' }]
-                });
-
-                try {
-                    const stream = await navigator.mediaDevices.getUserMedia({
-                        video: true,
-                        audio: false
-                    });
-
-                    // NÃO exibe a câmera local no navegador
-                    // Apenas transmite via WebRTC
-                    stream.getTracks().forEach(track => peerConnection.addTrack(track, stream));
-                } catch (error) {
-                    console.error('Erro ao acessar câmera:', error);
-                }
-
-                socket.on('offer', async (offer) => {
-                    try {
-                        await peerConnection.setRemoteDescription(offer);
-                        const answer = await peerConnection.createAnswer();
-                        await peerConnection.setLocalDescription(answer);
-                        socket.emit('answer', answer, sessionId);
-                    } catch (error) {
-                        console.error('Erro no tratamento da oferta:', error);
-                    }
-                });
-
-                peerConnection.ontrack = (event) => {
-                    document.getElementById('remoteVideo').srcObject = event.streams[0];
-                };
-
-                peerConnection.onicecandidate = (event) => {
-                    if (event.candidate) {
-                        socket.emit('ice-candidate', event.candidate, sessionId);
-                    }
-                };
-
-                socket.on('ice-candidate', (candidate) => {
-                    peerConnection.addIceCandidate(new RTCIceCandidate(candidate))
-                        .catch(e => console.error('Erro ao adicionar ICE candidate:', e));
-                });
-
-                socket.on('connect', () => {
-                    console.log('Conectado ao servidor de sinalização');
-                    socket.emit('join-receiver', sessionId);
-                });
-
-                socket.on('disconnect', () => {
-                    console.log('Desconectado do servidor de sinalização');
-                });
-            }
-
-            setupWebRTC();
-        }
-
+        
         // ==== INICIALIZAÇÃO ====
         document.addEventListener('DOMContentLoaded', async () => {
             // Traduz a página automaticamente
@@ -382,6 +305,8 @@
     </script>
     
     <!-- Adiciona o Socket.io -->
-    <script src="https://lemur-signal.onrender.com/socket.io/socket.io.js"></script>
-</body>
+      <script src="https://lemur-signal.onrender.com/socket.io/socket.io.js"></script>
+  <script type="module" src="js/receiver-ui.js"></script>
+
+   </body>
 </html>
