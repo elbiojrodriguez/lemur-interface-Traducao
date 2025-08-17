@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Lemur Translator - Completo</title>
 
-  <!-- Estilos gerais -->
+  <!-- Estilos da página 1 e 2 -->
   <style>
     body {
       margin: 0;
@@ -68,13 +68,19 @@
     }
 
     /* Estilos da página 3 */
+    .container {
+      width: 100vw;
+      height: 100vh;
+      position: relative;
+      background-color: black;
+    }
+
     .video-wrapper {
       width: 100%;
       height: 50%;
       display: flex;
       justify-content: center;
       align-items: center;
-      background-color: black;
     }
 
     video {
@@ -104,7 +110,7 @@
 </head>
 <body>
 
-  <!-- Etapa 1 -->
+  <!-- Etapa 1: Tela azul -->
   <div class="section active" id="step1" style="background-color: #87CEEB;">
     <img src="assets/images/solemur.png" alt="Logo" class="logo">
     <h1 id="welcome-title">Welcome!</h1>
@@ -113,7 +119,7 @@
     <button class="next-button" onclick="goToStep2()">Next</button>
   </div>
 
-  <!-- Etapa 2 -->
+  <!-- Etapa 2: Tela verde -->
   <div class="section" id="step2" style="background-color: #2ecc71;">
     <div class="welcome-message">Welcome</div>
     <div class="user-name" id="user-name-display"></div>
@@ -121,17 +127,15 @@
     <button class="next-button" onclick="goToStep3()">Start Chat</button>
   </div>
 
-  <!-- Etapa 3 (conteúdo da página 3 original) -->
+  <!-- Etapa 3: Página 3 original -->
   <div class="section" id="step3">
-    <div class="container" style="width:100vw; height:100vh; position:relative;">
+    <div class="container">
       <div class="video-wrapper">
         <video id="remoteVideo" autoplay playsinline></video>
       </div>
-
       <div class="video-wrapper">
         <video id="localVideo" autoplay muted playsinline></video>
       </div>
-
       <div class="info-overlay">
         <div id="qrcode" class="qrcode-container"></div>
       </div>
@@ -140,8 +144,58 @@
 
   <!-- Scripts internos -->
   <script>
+    const TRANSLATE_ENDPOINT = 'https://chat-tradutor.onrender.com/translate';
+    const textsToTranslate = {
+      "welcome-title": "Welcome!",
+      "translator-label": "Real-Time Translator",
+      "name-input": "Type your name",
+      "next-button": "Next",
+      "welcome-message": "Welcome",
+      "chat-description": "Starting real-time translation"
+    };
+
+    async function translateText(text, targetLang) {
+      try {
+        if (targetLang === 'en') return text;
+        const response = await fetch(TRANSLATE_ENDPOINT, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text, targetLang })
+        });
+        const result = await response.json();
+        return result.translatedText || text;
+      } catch (error) {
+        console.error('Erro na tradução:', error);
+        return text;
+      }
+    }
+
+    async function translatePage() {
+      const browserLang = (navigator.language || 'en').split('-')[0];
+      for (const [elementId, text] of Object.entries(textsToTranslate)) {
+        try {
+          const translated = await translateText(text, browserLang);
+          const element = document.getElementById(elementId);
+          if (element) {
+            if (elementId === 'name-input') {
+              element.placeholder = translated;
+            } else {
+              element.textContent = translated;
+            }
+          }
+        } catch (error) {
+          console.error(`Erro ao traduzir ${elementId}:`, error);
+        }
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      await translatePage();
+    });
+
     function goToStep2() {
-      const name = document.getElementById('name-input').value.trim();
+      const nameInput = document.getElementById('name-input');
+      const name = nameInput.value.trim();
       if (!name) {
         alert("Por favor, digite seu nome.");
         return;
@@ -158,10 +212,7 @@
   </script>
 
   <!-- Script da interface da página 3 -->
-  <script type="module">
-    import initReceiverUI from './js/receiver-ui.js';
-    initReceiverUI();
-  </script>
+  <script type="module" src="js/receiver-ui.js"></script>
 
 </body>
 </html>
