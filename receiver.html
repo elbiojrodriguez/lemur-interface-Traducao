@@ -251,26 +251,6 @@
             }
         }
 
-        // ==== GERAR QR CODE ====
-        function generateQRCode() {
-            // Gera um ID único para a sessão
-            const sessionId = Math.random().toString(36).substring(2, 15);
-            const qrCodeUrl = `https://lemur-signal.onrender.com/receiver.html?session=${sessionId}`;
-            
-            // Limpa o container do QR code se já existir um
-            document.getElementById('qrcode').innerHTML = '';
-            
-            // Gera o novo QR code
-            new QRCode(document.getElementById('qrcode'), {
-                text: qrCodeUrl,
-                width: 150,
-                height: 150
-            });
-            
-            // Inicia a conexão WebRTC (implementação necessária)
-            // initWebRTC(sessionId);
-        }
-
         // ==== INICIALIZAÇÃO ====
         document.addEventListener('DOMContentLoaded', async () => {
             // Traduz a página automaticamente
@@ -306,8 +286,8 @@
                 // Mostra a tela de videochamada
                 document.getElementById('page3').style.display = 'block';
                 
-                // Gera o QR code com o link correto
-                generateQRCode();
+                // Gera o QR code com o link correto (original, sem modificações)
+                // O QR Code será gerado conforme definido nos scripts externos (receiver-ui.js)
             });
         });
     </script>
