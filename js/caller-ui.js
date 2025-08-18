@@ -14,7 +14,8 @@ window.onload = async () => {
   // Extrai parâmetros da URL
   const urlParams = new URLSearchParams(window.location.search);
   const userName = urlParams.get('name') || 'Visitante';
-  const userLang = urlParams.get('lang') || 'en';
+  const rawLang = urlParams.get('lang') || navigator.language || 'en';
+  const userLang = normalizeLangCode(rawLang);
   const userFlag = await getFlagEmoji(userLang); // ✅ Bandeira dinâmica
 
   // Exibe as informações do usuário
