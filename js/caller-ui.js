@@ -1,22 +1,20 @@
 import WebRTCCore from '../core/webrtc-core.js';
 
-// ✅ Usa o código completo do idioma (ex: pt-BR), sem normalizar
-function getFlagEmoji(lang) {
-  if (window.languageEmoji && typeof window.languageEmoji.langFlag === 'function') {
-    return window.languageEmoji.langFlag(lang);
-  }
-  return '🌐';
-}
+// Mapeamento de idiomas para bandeiras (adicionado no topo)
+const LANGUAGE_FLAGS = {
+  'pt': '🇧🇷', 'en': '🇺🇸', 'es': '🇪🇸', 
+  'fr': '🇫🇷', 'de': '🇩🇪', 'it': '🇮🇹',
+  'ja': '🇯🇵', 'zh': '🇨🇳', 'ru': '🇷🇺'
+};
 
-window.onload = async () => {
-  // Extrai parâmetros da URL
+window.onload = () => {
+  // Extrai parâmetros da URL (adicionado antes de qualquer lógica)
   const urlParams = new URLSearchParams(window.location.search);
   const userName = urlParams.get('name') || 'Visitante';
-  const rawLang = urlParams.get('lang') || navigator.language || 'en';
-  const userLang = rawLang.toLowerCase(); // ✅ Mantém o código completo (ex: pt-BR)
-  const userFlag = getFlagEmoji(userLang); // ✅ Bandeira correta via language-emoji
+  const userLang = urlParams.get('lang') || 'en';
+  const userFlag = LANGUAGE_FLAGS[userLang] || '🌐';
 
-  // Exibe as informações do usuário
+  // Exibe as informações do usuário (nova adição)
   const userInfoDisplay = document.createElement('div');
   userInfoDisplay.className = 'user-info';
   userInfoDisplay.innerHTML = `${userName} ${userFlag}`;
@@ -25,6 +23,7 @@ window.onload = async () => {
   // --------------------------------------------
   // TUDO ABAIXO DISTO PERMANECE EXATAMENTE IGUAL
   // --------------------------------------------
+  
   const rtcCore = new WebRTCCore();
   const myId = crypto.randomUUID().substr(0, 8);
   document.getElementById('myId').textContent = myId;
@@ -48,6 +47,7 @@ window.onload = async () => {
 
   // Verifica se há ID na URL
   const targetIdFromUrl = urlParams.get('targetId');
+  
   if (targetIdFromUrl) {
     targetId = targetIdFromUrl;
     document.getElementById('callActionBtn').style.display = 'block';
