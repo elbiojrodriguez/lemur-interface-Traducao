@@ -10,6 +10,11 @@ async function getFlagEmoji(lang) {
   }
 }
 
+// ✅ Função para normalizar o código do idioma
+function normalizeLangCode(lang) {
+  return lang?.split('-')[0]?.toLowerCase() || 'en';
+}
+
 window.onload = async () => {
   // Extrai parâmetros da URL
   const urlParams = new URLSearchParams(window.location.search);
