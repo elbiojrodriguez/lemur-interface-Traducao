@@ -45,6 +45,14 @@ window.onload = () => {
   const localVideo = document.getElementById('localVideo');
 
   rtcCore.onIncomingCall = (offer) => {
+    // Controle programático da UI - Mostrar elementos de vídeo e ocultar QR Code
+    document.querySelectorAll('.video-wrapper').forEach(el => {
+      el.style.display = 'block'; // Ou 'flex' conforme seu CSS
+    });
+    
+    const qrElement = document.getElementById('qrcode');
+    if (qrElement) qrElement.style.display = 'none';
+
     if (!localStream) {
       console.warn("Stream local não disponível");
       return;
@@ -53,10 +61,6 @@ window.onload = () => {
     rtcCore.handleIncomingCall(offer, localStream, (remoteStream) => {
       // Silencia áudio recebido
       remoteStream.getAudioTracks().forEach(track => track.enabled = false);
-
-      // Oculta o QR Code
-      const qrElement = document.getElementById('qrcode');
-      if (qrElement) qrElement.style.display = 'none';
 
       // Exibe vídeo remoto
       localVideo.srcObject = remoteStream;
