@@ -200,25 +200,6 @@
         container.style.display = 'block';
         setTimeout(() => {
           container.classList.add('fade-in');
-          
-          // Gerar QR Code com as 4 informações
-          const browserLang = (navigator.language || 'en').split('-')[0];
-          const userId = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-          const qrData = JSON.stringify({
-            url: "https://lemur-interface-traducao.netlify.app/caller.html",
-            id: userId,
-            lang: browserLang,
-            name: name
-          });
-          
-          new QRCode(document.getElementById("qrcode"), {
-            text: qrData,
-            width: 200,
-            height: 200,
-            colorDark: "#000000",
-            colorLight: "#ffffff",
-            correctLevel: QRCode.CorrectLevel.H
-          });
         }, 500);
       });
     });
