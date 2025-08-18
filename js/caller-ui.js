@@ -57,9 +57,9 @@ window.onload = async () => {
     userInfoDisplay.style.display = 'flex';
   }
 
-  // -----------------------------------------------------------------
-  // TUDO ABAIXO DESTE PONTO PERMANECE EXATAMENTE IGUAL AO ORIGINAL
-  // -----------------------------------------------------------------
+  // --------------------------------------------
+  // TUDO ABAIXO DISTO PERMANECE EXATAMENTE IGUAL
+  // --------------------------------------------
   
   const rtcCore = new WebRTCCore();
   const myId = crypto.randomUUID().substr(0, 8);
