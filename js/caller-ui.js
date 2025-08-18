@@ -51,11 +51,27 @@ window.onload = async () => {
   const userFlag = getFlagForLanguage(userLang);
 
   // Exibe as informações do usuário
-  const userInfoDisplay = document.getElementById('userInfoDisplay');
   if (userInfoDisplay) {
-    userInfoDisplay.textContent = `${userName} ${userFlag}`;
-    userInfoDisplay.style.display = 'flex';
-  }
+  // Limpa qualquer conteúdo anterior
+  userInfoDisplay.innerHTML = '';
+
+  // Cria o box do nome
+  const nameBox = document.createElement('div');
+  nameBox.className = 'user-name-box';
+  nameBox.textContent = userName;
+
+  // Cria o box da bandeira
+  const flagBox = document.createElement('div');
+  flagBox.className = 'user-flag-box';
+  flagBox.textContent = userFlag;
+
+  // Adiciona os boxes ao container
+  userInfoDisplay.appendChild(nameBox);
+  userInfoDisplay.appendChild(flagBox);
+
+  // Exibe o container
+  userInfoDisplay.style.display = 'flex';
+}
 
   // --------------------------------------------
   // TUDO ABAIXO DISTO PERMANECE EXATAMENTE IGUAL
