@@ -6,66 +6,102 @@
   <title>Caller - Videochamada Mobile</title>
   <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="responsivo.css" />
-  <script src="https://cdn.jsdelivr.net/npm/language-emoji@1.0.4/dist/language-emoji.min.js"></script>
   <style>
     /* Estilo do novo elemento de usuário */
     .user-info {
-      position: absolute;
-      top: 20px;
-      left: 20px;
-      background: rgba(0, 0, 0, 0.7);
-      color: white;
-      padding: 10px 15px;
-      border-radius: 20px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      z-index: 100;
-      font-size: 1.2rem;
-      backdrop-filter: blur(5px);
-    }
-    
-    /* Estilo da bandeira (ajuste conforme necessidade) */
-    .user-flag {
-      width: 24px;
-      height: 16px;
-      border-radius: 3px;
-      object-fit: cover;
+      font-size: 1.2em;
+      font-weight: bold;
+      margin: 10px;
     }
   </style>
 </head>
 <body>
-  <!-- Novo elemento de usuário (será preenchido via JavaScript) -->
-  <div id="userInfoDisplay" class="user-info" style="display: none;">
-    <img id="userFlag" class="user-flag" src="" alt="Bandeira" />
-    <span id="userName"></span>
-  </div>
+  <!-- Elementos da interface -->
+  <div id="myId"></div>
+  <video id="localVideo" autoplay muted></video>
+  <video id="remoteVideo" autoplay></video>
+  <button id="callActionBtn" style="display: none;">Chamar</button>
 
-  <!-- Container principal (mantido integralmente) -->
-  <div class="container">
-    <!-- Video remoto -->
-    <div class="video-wrapper">
-      <video id="remoteVideo" autoplay playsinline></video>
-    </div>
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/language-emoji@1.0.4/dist/language-emoji.min.js"></script>
+  <script type="module">
+    import WebRTCCore from '../core/webrtc-core.js';
 
-    <!-- Video local -->
-    <div class="video-wrapper">
-      <video id="localVideo" autoplay muted playsinline></video>
-    </div>
+    // ✅ Função para normalizar o código do idioma
+    function normalizeLangCode(lang) {
+      return lang?.split('-')[0]?.toLowerCase() || 'en';
+    }
 
-    <!-- Controles -->
-    <div class="controls">
-      <button id="callActionBtn" class="call-button">SEND 🚀</button>
-    </div>
+    // ✅ Função para obter bandeira com language-emoji
+    function getFlagEmoji(lang) {
+      if (window.languageEmoji && typeof window.languageEmoji.langFlag === 'function') {
+        const emoji = window.languageEmoji.langFlag(lang);
+        return emoji || '🌐';
+      }
+      console.warn("languageEmoji não está disponível.");
+      return '🌐';
+    }
 
-    <!-- Overlay de informações (original) -->
-    <div class="info-overlay" style="display: none;">
-      <span id="myId"></span>
-    </div>
-  </div>
+    window.onload = async () => {
+      // Extrai parâmetros da URL
+      const urlParams = new URLSearchParams(window.location.search);
+      const userName = urlParams.get('name') || 'Visitante';
+      const rawLang = urlParams.get('lang') || navigator.language || 'en';
+      const userLang = normalizeLangCode(rawLang);
+      console.log("Idioma detectado:", userLang);
+      const userFlag = getFlagEmoji(userLang); // ✅ Bandeira dinâmica via emoji
 
-  <!-- Scripts (mantidos sem alterações) -->
-  <script src="https://lemur-signal.onrender.com/socket.io/socket.io.js"></script>
-  <script type="module" src="js/caller-ui.js"></script>
+      // Exibe as informações do usuário
+      const userInfoDisplay = document.createElement('div');
+      userInfoDisplay.className = 'user-info';
+      userInfoDisplay.innerHTML = `${userName} ${userFlag}`;
+      document.body.appendChild(userInfoDisplay);
+
+      // --------------------------------------------
+      // TUDO ABAIXO DISTO PERMANECE EXATAMENTE IGUAL
+      // --------------------------------------------
+
+      const rtcCore = new WebRTCCore();
+      const myId = crypto.randomUUID().substr(0, 8);
+      document.getElementById('myId').textContent = myId;
+      rtcCore.initialize(myId);
+      rtcCore.setupSocketHandlers();
+
+      const localVideo = document.getElementById('localVideo');
+      const remoteVideo = document.getElementById('remoteVideo');
+      let targetId = null;
+      let localStream = null;
+
+      // 🔓 Solicita acesso à câmera logo na abertura
+      navigator.mediaDevices.getUserMedia({ video: true, audio: false })
+        .then(stream => {
+          localStream = stream;
+          remoteVideo.srcObject = stream;
+        })
+        .catch(error => {
+          console.error("Erro ao acessar a câmera:", error);
+        });
+
+      // Verifica se há ID na URL
+      const targetIdFromUrl = urlParams.get('targetId');
+      
+      if (targetIdFromUrl) {
+        targetId = targetIdFromUrl;
+        document.getElementById('callActionBtn').style.display = 'block';
+      }
+
+      // Configura o botão de chamada
+      document.getElementById('callActionBtn').onclick = () => {
+        if (!targetId || !localStream) return;
+        rtcCore.startCall(targetId, localStream);
+      };
+
+      // 🔇 Silencia qualquer áudio recebido
+      rtcCore.setRemoteStreamCallback(stream => {
+        stream.getAudioTracks().forEach(track => track.enabled = false);
+        localVideo.srcObject = stream;
+      });
+    };
+  </script>
 </body>
 </html>
