@@ -7,101 +7,89 @@
   <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="responsivo.css" />
   <style>
-    /* Estilo do novo elemento de usuário */
-    .user-info {
-      font-size: 1.2em;
+    /* 🔵 Estilo do box azul */
+    .chat-input-box {
+      position: absolute;
+      bottom: 350px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80%;
+      height: 200px;
+      border: 2px solid #007BFF;
+      border-radius: 12px;
+      background-color: rgba(255, 255, 255, 0.1);
+      z-index: 20;
+      overflow-y: auto;
+      padding: 10px;
+    }
+
+    /* 💬 Estilo das frases reconhecidas */
+    .phrase-box {
+      padding: 8px;
+      margin: 6px 0;
+      background-color: rgba(0, 123, 255, 0.1);
+      border-radius: 8px;
+      color: #000;
+      font-size: 16px;
+    }
+
+    /* 🌍 Estilo da frase de idioma */
+    #languageInfo {
+      position: absolute;
+      bottom: 560px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 20px;
       font-weight: bold;
-      margin: 10px;
+      color: #007BFF;
+      z-index: 30;
+    }
+    
+    /* ✨ Novo estilo para a frase personalizada */
+    #userGreeting {
+      position: absolute;
+      bottom: 590px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 18px;
+      font-weight: bold;
+      color: #007BFF;
+      z-index: 30;
+      text-align: center;
+      width: 100%;
     }
   </style>
 </head>
 <body>
-  <!-- Elementos da interface -->
-  <div id="myId"></div>
-  <video id="localVideo" autoplay muted></video>
-  <video id="remoteVideo" autoplay></video>
-  <button id="callActionBtn" style="display: none;">Chamar</button>
+  <!-- ✨ Nova frase personalizada -->
+  <div id="userGreeting"></div>
+  
+  <!-- 🌍 Frase com idioma detectado -->
+  <div id="languageInfo"></div>
 
-  <!-- Scripts -->
-  <script src="assets/bandeiras/language-emoji.js"></script>
-  <script type="module">
-    import WebRTCCore from '../core/webrtc-core.js';
+  <!-- 🔹 Box azul centralizado com ID para JS -->
+  <div class="chat-input-box" id="textDisplay"></div>
 
-    // ✅ Função para normalizar o código do idioma
-    function normalizeLangCode(lang) {
-      return lang?.split('-')[0]?.toLowerCase() || 'en';
-    }
+  <div class="container">
+    <div class="video-wrapper">
+      <video id="remoteVideo" autoplay playsinline></video>
+    </div>
+    <div class="video-wrapper">
+      <video id="localVideo" autoplay muted playsinline></video>
+    </div>
 
-    // ✅ Função para obter bandeira com language-emoji
-    function getFlagEmoji(lang) {
-      if (window.languageEmoji && typeof window.languageEmoji.langFlag === 'function') {
-        const emoji = window.languageEmoji.langFlag(lang);
-        return emoji || '🌐';
-      }
-      console.warn("languageEmoji não está disponível.");
-      return '🌐';
-    }
+    <!-- 🔻 Controles -->
+    <div class="controls">
+      <button id="callActionBtn" style="display:none;">SEND 🚀</button>
+    </div>
 
-    window.onload = async () => {
-      // Extrai parâmetros da URL
-      const urlParams = new URLSearchParams(window.location.search);
-      const userName = urlParams.get('name') || 'Visitante';
-      const rawLang = urlParams.get('lang') || navigator.language || 'en';
-      const userLang = normalizeLangCode(rawLang);
-      console.log("Idioma detectado:", userLang);
-      const userFlag = getFlagEmoji(userLang); // ✅ Bandeira dinâmica via emoji
+    <div class="info-overlay" style="display: none;">
+      <span id="myId"></span>
+    </div>
+  </div>
 
-      // Exibe as informações do usuário
-      const userInfoDisplay = document.createElement('div');
-      userInfoDisplay.className = 'user-info';
-      userInfoDisplay.innerHTML = `${userName} ${userFlag}`;
-      document.body.appendChild(userInfoDisplay);
-
-      // --------------------------------------------
-      // TUDO ABAIXO DISTO PERMANECE EXATAMENTE IGUAL
-      // --------------------------------------------
-
-      const rtcCore = new WebRTCCore();
-      const myId = crypto.randomUUID().substr(0, 8);
-      document.getElementById('myId').textContent = myId;
-      rtcCore.initialize(myId);
-      rtcCore.setupSocketHandlers();
-
-      const localVideo = document.getElementById('localVideo');
-      const remoteVideo = document.getElementById('remoteVideo');
-      let targetId = null;
-      let localStream = null;
-
-      // 🔓 Solicita acesso à câmera logo na abertura
-      navigator.mediaDevices.getUserMedia({ video: true, audio: false })
-        .then(stream => {
-          localStream = stream;
-          remoteVideo.srcObject = stream;
-        })
-        .catch(error => {
-          console.error("Erro ao acessar a câmera:", error);
-        });
-
-      // Verifica se há ID na URL
-      const targetIdFromUrl = urlParams.get('targetId');
-      
-      if (targetIdFromUrl) {
-        targetId = targetIdFromUrl;
-        document.getElementById('callActionBtn').style.display = 'block';
-      }
-
-      // Configura o botão de chamada
-      document.getElementById('callActionBtn').onclick = () => {
-        if (!targetId || !localStream) return;
-        rtcCore.startCall(targetId, localStream);
-      };
-
-      // 🔇 Silencia qualquer áudio recebido
-      rtcCore.setRemoteStreamCallback(stream => {
-        stream.getAudioTracks().forEach(track => track.enabled = false);
-        localVideo.srcObject = stream;
-      });
-    };
-  </script>
+  <!-- 🔌 Scripts -->
+  <script src="https://lemur-signal.onrender.com/socket.io/socket.io.js"></script>
+  <script type="module" src="js/caller-ui.js"></script>
 </body>
 </html>
