@@ -110,6 +110,11 @@
             20%, 60% { transform: translateX(-5px); }
             40%, 80% { transform: translateX(5px); }
         }
+
+        /* ==== ESCONDER CONTAINER INICIALMENTE ==== */
+        .container {
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -221,6 +226,9 @@
                 // Atualiza a tela verde (receiver)
                 document.getElementById('user-name-display').textContent = name;
                 document.getElementById('welcome-screen').style.display = 'flex';
+
+                // ==== MOSTRA O CONTAINER DE VÍDEO ====
+                document.querySelector('.container').style.display = 'block';
 
                 // Aqui você pode adicionar a lógica para iniciar o chat
                 // Ex: conectar ao WebSocket, iniciar WebRTC, etc.
