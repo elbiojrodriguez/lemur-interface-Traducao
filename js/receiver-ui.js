@@ -21,13 +21,13 @@ window.onload = () => {
     if (qrCodeGenerated) return;
 
     const nameInput = document.getElementById('name-input');
-    const userName = nameInput ? nameInput.value.trim() : 'Anonymous';
+    const userName = nameInput ? nameInput.value.trim() || 'Anonymous' : 'Anonymous';
 
-    // Usa o idioma completo com região, como pt-BR, en-US, etc.
+    // Mantém o idioma completo com região (pt-BR, pt-PT, etc)
     const browserLang = navigator.language || 'en';
 
     // URL com todos os parâmetros necessários
-    const callerUrl = `https://lemur-interface-traducao.netlify.app/caller.html?targetId=${myId}&lang=${encodeURIComponent(browserLang)}&name=${encodeURIComponent(userName)}`;
+    const callerUrl = `${window.location.origin}/caller.html?targetId=${myId}&lang=${encodeURIComponent(browserLang)}&name=${encodeURIComponent(userName)}`;
 
     QRCodeGenerator.generate("qrcode", callerUrl);
     qrCodeGenerated = true;
