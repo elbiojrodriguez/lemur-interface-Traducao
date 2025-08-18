@@ -1,6 +1,7 @@
 import WebRTCCore from '../core/webrtc-core.js';
 
 window.onload = () => {
+  const chatInputBox = document.querySelector('.chat-input-box');
   const rtcCore = new WebRTCCore();
   const myId = crypto.randomUUID().substr(0, 8);
   document.getElementById('myId').textContent = myId;
@@ -12,7 +13,19 @@ window.onload = () => {
   let targetId = null;
   let localStream = null;
 
-  // 🔓 Solicita acesso à câmera logo na abertura
+  // ✨ Captura o nome da URL
+  const urlParams = new URLSearchParams(window.location.search);
+  const userName = urlParams.get('nome');
+  
+  // Exibe a frase personalizada se existir nome
+  if (userName) {
+    const greetingElement = document.getElementById('userGreeting');
+    if (greetingElement) {
+      greetingElement.textContent = `Eu sou ${decodeURIComponent(userName)}`;
+    }
+  }
+
+  // Solicita acesso à câmera logo na abertura
   navigator.mediaDevices.getUserMedia({ video: true, audio: false })
     .then(stream => {
       localStream = stream;
@@ -23,9 +36,8 @@ window.onload = () => {
     });
 
   // Verifica se há ID na URL
-  const urlParams = new URLSearchParams(window.location.search);
   const targetIdFromUrl = urlParams.get('targetId');
-  
+
   if (targetIdFromUrl) {
     targetId = targetIdFromUrl;
     document.getElementById('callActionBtn').style.display = 'block';
@@ -37,9 +49,44 @@ window.onload = () => {
     rtcCore.startCall(targetId, localStream);
   };
 
-  // 🔇 Silencia qualquer áudio recebido
+  // Silencia qualquer áudio recebido
   rtcCore.setRemoteStreamCallback(stream => {
     stream.getAudioTracks().forEach(track => track.enabled = false);
     localVideo.srcObject = stream;
   });
-  };
+
+  // 🌐 Idiomas disponíveis com "Eu falo e Eu sou" traduzido
+  const languages = [
+  {code:'en-US',flag:'🇺🇸',speakText:'I speak',greetingText:'I am',name:'English'},
+  {code:'pt-BR',flag:'🇧🇷',speakText:'Eu falo',greetingText:'Eu sou',name:'Português'},
+  {code:'es-ES',flag:'🇪🇸',speakText:'Yo hablo',greetingText:'Yo soy',name:'Español'},
+  {code:'fr-FR',flag:'🇫🇷',speakText:'Je parle',greetingText:'Je suis',name:'Français'},
+  {code:'de-DE',flag:'🇩🇪',speakText:'Ich spreche',greetingText:'Ich bin',name:'Deutsch'},
+  {code:'ja-JP',flag:'🇯🇵',speakText:'私は話します',greetingText:'私は',name:'日本語'},
+  {code:'zh-CN',flag:'🇨🇳',speakText:'我说',greetingText:'我是',name:'中文'},
+  {code:'ru-RU',flag:'🇷🇺',speakText:'Я говорю',greetingText:'Я',name:'Русский'},
+  {code:'ar-SA',flag:'🇸🇦',speakText:'أنا أتكلم',greetingText:'أنا',name:'العربية'}
+];
+
+ // 📥 Detecta idioma (URL > navegador > padrão)
+const lang = urlParams.get('lang') || navigator.language || 'pt-BR';
+
+// 🔍 Busca idioma correspondente (com fallback inteligente)
+const selectedLang = languages.find(l => l.code === lang) || 
+                    languages.find(l => l.code.startsWith(lang.split('-')[0])) || // Ex: "es" para "es-ES"
+                    languages[1]; // Fallback para pt-BR
+
+// 🖼️ Exibe frases traduzidas
+const languageInfoElement = document.getElementById('languageInfo');
+if (languageInfoElement) {
+  languageInfoElement.textContent = `${selectedLang.speakText} ${selectedLang.flag}`;
+}
+
+// ✨ Exibe "Eu sou [nome]" no idioma correto (se houver nome)
+if (userName) {
+  const greetingElement = document.getElementById('userGreeting');
+  if (greetingElement) {
+    greetingElement.textContent = `${selectedLang.greetingText} ${decodeURIComponent(userName)}`;
+  }
+}
+};
