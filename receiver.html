@@ -82,17 +82,34 @@
 
     .container {
       display: none;
+      opacity: 0;
+      transition: opacity 1s ease;
+    }
+
+    #initial-screen {
+      transition: opacity 1s ease;
+    }
+
+    .fade-out {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .fade-in {
+      opacity: 1;
     }
   </style>
 </head>
 <body>
-  <!-- TELA INICIAL -->
-  <img src="assets/images/solemur.png" alt="Lemur Logo" class="logo" id="logo" />
-  <h1 id="welcome-title">Welcome!</h1>
-  <div class="translator-label" id="translator-label">Real-Time Translator</div>
+  <!-- TELA INICIAL AGRUPADA -->
+  <div id="initial-screen">
+    <img src="assets/images/solemur.png" alt="Lemur Logo" class="logo" id="logo" />
+    <h1 id="welcome-title">Welcome!</h1>
+    <div class="translator-label" id="translator-label">Real-Time Translator</div>
 
-  <input type="text" class="name-input" id="name-input" placeholder="Type your name" />
-  <button class="next-button" id="next-button">Next</button>
+    <input type="text" class="name-input" id="name-input" placeholder="Type your name" />
+    <button class="next-button" id="next-button">Next</button>
+  </div>
 
   <!-- CONTAINER DE VÍDEO E QR CODE -->
   <div class="container">
@@ -174,10 +191,16 @@
           return;
         }
 
-        // PULAR DIRETO PARA A TELA DE VÍDEO
-        document.querySelector('.container').style.display = 'block';
+        // FADE OUT DA TELA INICIAL
+        const initialScreen = document.getElementById('initial-screen');
+        initialScreen.classList.add('fade-out');
 
-        // Aqui você pode iniciar o WebRTC ou outras lógicas
+        // FADE IN DO CONTAINER
+        const container = document.querySelector('.container');
+        container.style.display = 'block';
+        setTimeout(() => {
+          container.classList.add('fade-in');
+        }, 500);
       });
     });
   </script>
