@@ -1,18 +1,17 @@
 import WebRTCCore from '../core/webrtc-core.js';
 
-// ✅ Função para obter bandeira via API
-async function getFlagEmoji(lang) {
-  try {
-    const response = await fetch(`https://language-flags.fly.dev/${lang}`);
-    return await response.text(); // Retorna emoji (ex: 🇧🇷)
-  } catch {
-    return '🌐'; // Fallback se falhar
-  }
-}
-
 // ✅ Função para normalizar o código do idioma
 function normalizeLangCode(lang) {
   return lang?.split('-')[0]?.toLowerCase() || 'en';
+}
+
+// ✅ Função para obter bandeira com language-emoji
+function getFlagEmoji(lang) {
+  if (window.languageEmoji) {
+    const emoji = window.languageEmoji.langFlag(lang);
+    return emoji || '🌐';
+  }
+  return '🌐';
 }
 
 window.onload = async () => {
@@ -21,7 +20,7 @@ window.onload = async () => {
   const userName = urlParams.get('name') || 'Visitante';
   const rawLang = urlParams.get('lang') || navigator.language || 'en';
   const userLang = normalizeLangCode(rawLang);
-  const userFlag = await getFlagEmoji(userLang); // ✅ Bandeira dinâmica
+  const userFlag = getFlagEmoji(userLang); // ✅ Bandeira dinâmica via emoji
 
   // Exibe as informações do usuário
   const userInfoDisplay = document.createElement('div');
