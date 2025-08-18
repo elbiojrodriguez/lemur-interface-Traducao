@@ -1,40 +1,54 @@
 import WebRTCCore from '../core/webrtc-core.js';
 
-// Mapeamento completo de idiomas e regiões para bandeiras
-const LANGUAGE_FLAGS = {
-  // Português
-  'pt-BR': '🇧🇷',
-  'pt-PT': '🇵🇹',
-  
-  // Inglês
-  'en': '🇺🇸',
-  'en-US': '🇺🇸',
-  'en-GB': '🇬🇧',
-  
-  // Espanhol
-  'es': '🇪🇸',
-  'es-ES': '🇪🇸',
-  'es-MX': '🇲🇽',
-  
-  // Outros idiomas
-  'fr': '🇫🇷',
-  'de': '🇩🇪',
-  'it': '🇮🇹',
-  'ja': '🇯🇵',
-  'zh': '🇨🇳',
-  'ru': '🇷🇺'
+// Função para carregar as bandeiras do arquivo JSON
+const loadLanguageFlags = async () => {
+  try {
+    const response = await fetch('../assets/bandeiras/flags.json');
+    if (!response.ok) throw new Error("Falha ao carregar bandeiras");
+    return await response.json();
+  } catch (error) {
+    console.error("Usando fallback de bandeiras:", error);
+    // Fallback básico caso o arquivo não carregue
+    return {
+      'pt-BR': '🇧🇷',
+      'pt-PT': '🇵🇹',
+      'en': '🇺🇸',
+      'en-US': '🇺🇸',
+      'es': '🇪🇸',
+      'fr': '🇫🇷',
+      'de': '🇩🇪'
+    };
+  }
 };
 
-window.onload = () => {
+// Função principal assíncrona
+window.onload = async () => {
+  // Carrega as bandeiras primeiro
+  const LANGUAGE_FLAGS = await loadLanguageFlags();
+
   // Extrai parâmetros da URL
   const urlParams = new URLSearchParams(window.location.search);
   const userName = urlParams.get('name') || 'Visitante';
   const userLang = urlParams.get('lang') || 'en';
   
-  // Lógica aprimorada para bandeiras (verifica primeiro a versão com região)
-  const userFlag = LANGUAGE_FLAGS[userLang] || 
-                  LANGUAGE_FLAGS[userLang.split('-')[0]] || 
-                  '🌐';
+  // Lógica inteligente para bandeiras
+  const getFlagForLanguage = (langCode) => {
+    // 1. Tenta o código completo (ex: pt-BR)
+    if (LANGUAGE_FLAGS[langCode]) {
+      return LANGUAGE_FLAGS[langCode];
+    }
+    
+    // 2. Tenta o código base (ex: pt)
+    const baseLang = langCode.split('-')[0];
+    if (LANGUAGE_FLAGS[baseLang]) {
+      return LANGUAGE_FLAGS[baseLang];
+    }
+    
+    // 3. Fallback para globo
+    return '🌐';
+  };
+
+  const userFlag = getFlagForLanguage(userLang);
 
   // Exibe as informações do usuário
   const userInfoDisplay = document.getElementById('userInfoDisplay');
@@ -43,9 +57,9 @@ window.onload = () => {
     userInfoDisplay.style.display = 'flex';
   }
 
-  // --------------------------------------------
-  // TUDO ABAIXO DISTO PERMANECE EXATAMENTE IGUAL
-  // --------------------------------------------
+  // -----------------------------------------------------------------
+  // TUDO ABAIXO DESTE PONTO PERMANECE EXATAMENTE IGUAL AO ORIGINAL
+  // -----------------------------------------------------------------
   
   const rtcCore = new WebRTCCore();
   const myId = crypto.randomUUID().substr(0, 8);
