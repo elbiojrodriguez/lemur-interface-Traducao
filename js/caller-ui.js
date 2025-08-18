@@ -7,9 +7,8 @@ function normalizeLangCode(lang) {
 
 // ✅ Função para obter bandeira com language-emoji
 function getFlagEmoji(lang) {
-  if (window.languageEmoji) {
-    const emoji = window.languageEmoji.langFlag(lang);
-    return emoji || '🌐';
+  if (window.languageEmoji && typeof window.languageEmoji.langFlag === 'function') {
+    return window.languageEmoji.langFlag(lang);
   }
   return '🌐';
 }
