@@ -1,11 +1,6 @@
 import WebRTCCore from '../core/webrtc-core.js';
 
-// ✅ Função para normalizar o código do idioma
-function normalizeLangCode(lang) {
-  return lang?.split('-')[0]?.toLowerCase() || 'en';
-}
-
-// ✅ Função para obter bandeira com language-emoji
+// ✅ Usa o código completo do idioma (ex: pt-BR), sem normalizar
 function getFlagEmoji(lang) {
   if (window.languageEmoji && typeof window.languageEmoji.langFlag === 'function') {
     return window.languageEmoji.langFlag(lang);
@@ -18,8 +13,8 @@ window.onload = async () => {
   const urlParams = new URLSearchParams(window.location.search);
   const userName = urlParams.get('name') || 'Visitante';
   const rawLang = urlParams.get('lang') || navigator.language || 'en';
-  const userLang = normalizeLangCode(rawLang);
-  const userFlag = getFlagEmoji(userLang); // ✅ Bandeira dinâmica via emoji
+  const userLang = rawLang.toLowerCase(); // ✅ Mantém o código completo (ex: pt-BR)
+  const userFlag = getFlagEmoji(userLang); // ✅ Bandeira correta via language-emoji
 
   // Exibe as informações do usuário
   const userInfoDisplay = document.createElement('div');
