@@ -19,20 +19,25 @@ window.onload = () => {
   // Função para gerar o QR Code com todas as informações
   const generateQRCode = () => {
     if (qrCodeGenerated) return;
-    
+
     const nameInput = document.getElementById('name-input');
     const userName = nameInput ? nameInput.value.trim() : 'Anonymous';
-    const browserLang = (navigator.language || 'en').split('-')[0];
-    
+
+    // Usa o idioma completo com região, como pt-BR, en-US, etc.
+    const browserLang = navigator.language || 'en';
+
     // URL com todos os parâmetros necessários
     const callerUrl = `https://lemur-interface-traducao.netlify.app/caller.html?targetId=${myId}&lang=${encodeURIComponent(browserLang)}&name=${encodeURIComponent(userName)}`;
-    
+
     QRCodeGenerator.generate("qrcode", callerUrl);
     qrCodeGenerated = true;
   };
 
   // Gera o QR Code quando o usuário clica em "Next"
-  document.getElementById('next-button')?.addEventListener('click', generateQRCode);
+  const nextButton = document.getElementById('next-button');
+  if (nextButton) {
+    nextButton.addEventListener('click', generateQRCode);
+  }
 
   rtcCore.initialize(myId);
   rtcCore.setupSocketHandlers();
