@@ -6,6 +6,7 @@
   <title>Caller - Videochamada Mobile</title>
   <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="responsivo.css" />
+  <link rel="icon" href="favicon.ico" type="image/x-icon" />
   <style>
     /* Estilo do novo elemento de usuário */
     .user-info {
@@ -24,15 +25,14 @@
 
   <!-- Scripts -->
   <script src="assets/bandeiras/language-emoji.js"></script>
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
   <script type="module">
     import WebRTCCore from '../core/webrtc-core.js';
-    
-    // ✅ Função para normalizar o código do idioma
+
     function normalizeLangCode(lang) {
       return lang?.split('-')[0]?.toLowerCase() || 'en';
     }
 
-    // ✅ Função para obter bandeira com language-emoji
     function getFlagEmoji(lang) {
       if (window.languageEmoji && typeof window.languageEmoji.langFlag === 'function') {
         const emoji = window.languageEmoji.langFlag(lang);
@@ -43,23 +43,18 @@
     }
 
     window.onload = async () => {
-      // Extrai parâmetros da URL
       const urlParams = new URLSearchParams(window.location.search);
       const userName = urlParams.get('name') || 'Visitante';
       const rawLang = urlParams.get('lang') || navigator.language || 'en';
       const userLang = normalizeLangCode(rawLang);
       console.log("Idioma detectado:", userLang);
-      const userFlag = getFlagEmoji(userLang); // ✅ Bandeira dinâmica via emoji
+      const userFlag = getFlagEmoji(userLang);
 
-      // Exibe as informações do usuário
       const userInfoDisplay = document.createElement('div');
       userInfoDisplay.className = 'user-info';
       userInfoDisplay.innerHTML = `${userName} ${userFlag}`;
       document.body.appendChild(userInfoDisplay);
 
-      // --------------------------------------------
-      // TUDO ABAIXO DISTO PERMANECE EXATAMENTE IGUAL
-      // --------------------------------------------
       const rtcCore = new WebRTCCore();
       const myId = crypto.randomUUID().substr(0, 8);
       document.getElementById('myId').textContent = myId;
@@ -71,7 +66,6 @@
       let targetId = null;
       let localStream = null;
 
-      // 🔓 Solicita acesso à câmera logo na abertura
       navigator.mediaDevices.getUserMedia({ video: true, audio: false })
         .then(stream => {
           localStream = stream;
@@ -81,20 +75,17 @@
           console.error("Erro ao acessar a câmera:", error);
         });
 
-      // Verifica se há ID na URL
       const targetIdFromUrl = urlParams.get('targetId');
       if (targetIdFromUrl) {
         targetId = targetIdFromUrl;
         document.getElementById('callActionBtn').style.display = 'block';
       }
 
-      // Configura o botão de chamada
       document.getElementById('callActionBtn').onclick = () => {
         if (!targetId || !localStream) return;
         rtcCore.startCall(targetId, localStream);
       };
 
-      // 🔇 Silencia qualquer áudio recebido
       rtcCore.setRemoteStreamCallback(stream => {
         stream.getAudioTracks().forEach(track => track.enabled = false);
         localVideo.srcObject = stream;
