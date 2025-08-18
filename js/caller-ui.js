@@ -1,20 +1,23 @@
 import WebRTCCore from '../core/webrtc-core.js';
 
-// Mapeamento de idiomas para bandeiras (adicionado no topo)
-const LANGUAGE_FLAGS = {
-  'pt': '🇧🇷', 'en': '🇺🇸', 'es': '🇪🇸', 
-  'fr': '🇫🇷', 'de': '🇩🇪', 'it': '🇮🇹',
-  'ja': '🇯🇵', 'zh': '🇨🇳', 'ru': '🇷🇺'
-};
+// ✅ Função para obter bandeira via API
+async function getFlagEmoji(lang) {
+  try {
+    const response = await fetch(`https://language-flags.fly.dev/${lang}`);
+    return await response.text(); // Retorna emoji (ex: 🇧🇷)
+  } catch {
+    return '🌐'; // Fallback se falhar
+  }
+}
 
-window.onload = () => {
-  // Extrai parâmetros da URL (adicionado antes de qualquer lógica)
+window.onload = async () => {
+  // Extrai parâmetros da URL
   const urlParams = new URLSearchParams(window.location.search);
   const userName = urlParams.get('name') || 'Visitante';
   const userLang = urlParams.get('lang') || 'en';
-  const userFlag = LANGUAGE_FLAGS[userLang] || '🌐';
+  const userFlag = await getFlagEmoji(userLang); // ✅ Bandeira dinâmica
 
-  // Exibe as informações do usuário (nova adição)
+  // Exibe as informações do usuário
   const userInfoDisplay = document.createElement('div');
   userInfoDisplay.className = 'user-info';
   userInfoDisplay.innerHTML = `${userName} ${userFlag}`;
@@ -23,7 +26,7 @@ window.onload = () => {
   // --------------------------------------------
   // TUDO ABAIXO DISTO PERMANECE EXATAMENTE IGUAL
   // --------------------------------------------
-  
+
   const rtcCore = new WebRTCCore();
   const myId = crypto.randomUUID().substr(0, 8);
   document.getElementById('myId').textContent = myId;
