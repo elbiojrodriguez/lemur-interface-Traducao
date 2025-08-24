@@ -1,288 +1,442 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Gerenciador de Permissões - Câmera e Microfone</title>
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
-    
-    body {
-      background: linear-gradient(135deg, #6e8efb, #a777e3);
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 20px;
-    }
-    
-    .container {
-      background-color: rgba(255, 255, 255, 0.9);
-      border-radius: 20px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-      width: 100%;
-      max-width: 500px;
-      padding: 30px;
-      text-align: center;
-    }
-    
-    h1 {
-      color: #333;
-      margin-bottom: 15px;
-      font-size: 28px;
-    }
-    
-    p {
-      color: #555;
-      margin-bottom: 25px;
-      line-height: 1.6;
-    }
-    
-    .permission-status {
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
-      margin: 25px 0;
-    }
-    
-    .status-item {
-      display: flex;
-      align-items: center;
-      padding: 12px 15px;
-      background-color: #f8f9fa;
-      border-radius: 10px;
-      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
-    }
-    
-    .icon {
-      width: 24px;
-      height: 24px;
-      margin-right: 15px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      border-radius: 50%;
-      background-color: #e9ecef;
-    }
-    
-    .status-text {
-      flex-grow: 1;
-      text-align: left;
-      font-weight: 500;
-    }
-    
-    .status-indicator {
-      width: 12px;
-      height: 12px;
-      border-radius: 50%;
-      background-color: #6c757d;
-    }
-    
-    .granted {
-      background-color: #28a745;
-    }
-    
-    .denied {
-      background-color: #dc3545;
-    }
-    
-    .button {
-      background-color: #4361ee;
-      color: white;
-      border: none;
-      padding: 14px 25px;
-      font-size: 16px;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      font-weight: 600;
-      margin-top: 10px;
-      width: 100%;
-    }
-    
-    .button:hover {
-      background-color: #3a56d4;
-      transform: translateY(-2px);
-      box-shadow: 0 5px 15px rgba(67, 97, 238, 0.3);
-    }
-    
-    .button:active {
-      transform: translateY(0);
-    }
-    
-    .button:disabled {
-      background-color: #adb5bd;
-      cursor: not-allowed;
-      transform: none;
-      box-shadow: none;
-    }
-    
-    .info-box {
-      background-color: #e9f5ff;
-      border-left: 4px solid #4361ee;
-      padding: 15px;
-      margin: 20px 0;
-      text-align: left;
-      border-radius: 0 8px 8px 0;
-    }
-    
-    .info-box h3 {
-      color: #4361ee;
-      margin-bottom: 8px;
-      font-size: 16px;
-    }
-    
-    .hidden {
-      display: none;
-    }
-    
-    .success-message {
-      color: #28a745;
-      font-weight: 600;
-      margin-top: 15px;
-      padding: 10px;
-      background-color: #f8fff9;
-      border-radius: 8px;
-      border: 1px solid #b7efc5;
-    }
-    
-    .error-message {
-      color: #dc3545;
-      font-weight: 600;
-      margin-top: 15px;
-      padding: 10px;
-      background-color: #fff9f9;
-      border-radius: 8px;
-      border: 1px solid #f5c6cb;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EchoMeP2P - Welcome & Permissions</title>
+    <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
+    <style>
+        html {
+            height: 100%;
+            font-size: clamp(14px, 2.5vw, 18px);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            text-align: center;
+            transition: background-color 0.5s;
+        }
+
+        body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            font-size: 1em;
+        }
+
+        .box-principal {
+            width: 100%;
+            max-width: 600px;
+            height: 100%;
+            margin: 0 auto;
+            padding: 2vh 2vw;
+            box-sizing: border-box;
+            background-color: #aee2ff;
+            position: relative;
+            overflow-y: auto;
+        }
+
+        .logo-lemur {
+            position: absolute;
+            top: 7%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 35%;
+            height: auto;
+        }
+
+        #EchoMeP2P-title {
+            position: absolute;
+            top: 10%;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #333;
+            font-size: 7vw;
+            white-space: nowrap;
+            text-align: center;
+        }
+
+        .translator-label {
+            position: absolute;
+            top: 17%;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #333;
+            font-size: 5vw;
+            text-align: center;
+            width: 80%;
+            max-width: 90%;
+        }
+
+        #welcome-title {
+            position: absolute;
+            top: 25%;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #333;
+            font-size: 9vw;
+            white-space: nowrap;
+            text-align: center;
+        }
+
+        .name-input {
+            position: absolute;
+            top: 35%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 70%;
+            height: 5%;
+            padding: 1vh 1vw;
+            border-radius: 3vw;
+            border: none;
+            box-shadow: 0 0.5vw 1vw rgba(0, 0, 0, 0.1);
+            font-size: 6vw;
+            text-align: center;
+        }
+
+        .name-input:focus {
+            outline: none;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .permissions-container {
+            position: absolute;
+            top: 45%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 70%;
+            display: flex;
+            flex-direction: column;
+            gap: 2vh;
+        }
+
+        .permission-item {
+            display: flex;
+            align-items: center;
+            padding: 1.5vh 2vw;
+            background-color: rgba(255, 255, 255, 0.7);
+            border-radius: 3vw;
+            box-shadow: 0 0.5vw 1vw rgba(0, 0, 0, 0.1);
+        }
+
+        .permission-checkbox {
+            width: 5vw;
+            height: 5vw;
+            margin-right: 3vw;
+            border: 2px solid #3498db;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .permission-checkbox.checked {
+            background-color: #3498db;
+        }
+
+        .permission-checkbox.checked::after {
+            content: "✓";
+            color: white;
+            font-size: 4vw;
+        }
+
+        .permission-text {
+            flex: 1;
+            text-align: left;
+            font-size: 4vw;
+            color: #333;
+        }
+
+        .next-button {
+            position: absolute;
+            top: 65%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 30%;
+            height: 5%;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 3vw;
+            font-size: 5vw;
+            cursor: pointer;
+            box-shadow: 0 0.5vw 1vw rgba(0, 0, 0, 0.1);
+            transition: all 0.3s;
+            z-index: 10;
+        }
+
+        .next-button:hover {
+            background-color: #2980b9;
+        }
+
+        .error-state {
+            background-color: #e74c3c;
+            animation: shake 0.5s;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-0.5vw); }
+            40%, 80% { transform: translateX(0.5vw); }
+        }
+
+        .qr-result-container {
+            position: absolute;
+            top: 75%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80%;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .qrcode-container {
+            padding: 12px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        }
+
+        .url-display {
+            width: 100%;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            word-break: break-all;
+            font-size: 12px;
+            text-align: center;
+        }
+
+        .loader-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+        }
+
+        .loader {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #3498db;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Gerenciador de Permissões</h1>
-    <p>Para utilizar todas as funcionalidades do nosso aplicativo, precisamos da sua permissão para acessar a câmera e o microfone.</p>
-    
-    <div class="permission-status">
-      <div class="status-item">
-        <div class="icon">📷</div>
-        <div class="status-text">Permissão de Câmera</div>
-        <div class="status-indicator" id="camera-status"></div>
-      </div>
-      
-      <div class="status-item">
-        <div class="icon">🎤</div>
-        <div class="status-text">Permissão de Microfone</div>
-        <div class="status-indicator" id="microphone-status"></div>
-      </div>
-    </div>
-    
-    <div class="info-box">
-      <h3>Por que solicitamos essas permissões?</h3>
-      <p>Precisamos acessar sua câmera e microfone para funcionalidades de vídeo-chamada, gravação de áudio e captura de fotos dentro do aplicativo.</p>
-    </div>
-    
-    <button id="permission-btn" class="button">Conceder Permissões</button>
-    
-    <div id="success-message" class="success-message hidden">
-      Permissões concedidas com sucesso! Você já pode usar todas as funcionalidades.
-    </div>
-    
-    <div id="error-message" class="error-message hidden">
-      Não foi possível obter as permissões necessárias. Algumas funcionalidades estarão limitadas.
-    </div>
-  </div>
+    <div class="box-principal" id="welcome-screen">
+        <div class="loader-container" id="loader-container">
+            <div class="loader"></div>
+        </div>
 
-  <script>
-    const permissionBtn = document.getElementById('permission-btn');
-    const cameraStatus = document.getElementById('camera-status');
-    const microphoneStatus = document.getElementById('microphone-status');
-    const successMessage = document.getElementById('success-message');
-    const errorMessage = document.getElementById('error-message');
-    
-    // Estado das permissões
-    let permissionsGranted = false;
-    
-    // Função para atualizar a interface com o status das permissões
-    function updatePermissionStatus() {
-      if (permissionsGranted) {
-        cameraStatus.classList.add('granted');
-        microphoneStatus.classList.add('granted');
-        successMessage.classList.remove('hidden');
-        errorMessage.classList.add('hidden');
-        permissionBtn.disabled = true;
-        permissionBtn.textContent = 'Permissões Concedidas';
-      } else {
-        cameraStatus.classList.remove('granted');
-        microphoneStatus.classList.remove('granted');
-        successMessage.classList.add('hidden');
-        errorMessage.classList.remove('hidden');
-      }
-    }
-    
-    // Função para solicitar permissões
-    async function solicitarPermissoes() {
-      try {
-        // Solicita acesso à câmera e microfone
-        const stream = await navigator.mediaDevices.getUserMedia({ 
-          video: true, 
-          audio: true 
-        });
+        <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTUwIiBoZWlnaHQ9IjE1MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8Y2lyY2xlIGN4PSI3NSIgY3k9Ijc1IiByPSI3MCIgZmlsbD0iIzM0OThkYiIvPgogIDx0ZXh0IHg9Ijc1IiB5PSI4MCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE0IiBmaWxsPSJ3aGl0ZSIgdGV4dC1hbmNob3I9Im1pZGRsZSI+PGZvbnQgc2l6ZT0iMjAiPkxlbXVyPC9mb250PjwvdGV4dD4KPC9zdmc+" alt="logo-lemur" class="logo-lemur" />
+        <h1 id="EchoMeP2P-title">EchoMeP2P</h1>
+        <h2 id="welcome-title">Welcome!</h2>
+        
+        <div class="translator-label" id="translator-label">Live translation. No filters. No platform.</div>
+        <input type="text" class="name-input" id="name-input" placeholder="Type your name" />
+        
+        <div class="permissions-container">
+            <div class="permission-item">
+                <div class="permission-checkbox" id="camera-checkbox"></div>
+                <div class="permission-text" id="camera-text">Allow camera access</div>
+            </div>
+            <div class="permission-item">
+                <div class="permission-checkbox" id="microphone-checkbox"></div>
+                <div class="permission-text" id="microphone-text">Allow microphone access</div>
+            </div>
+        </div>
+        
+        <button class="next-button" id="next-button">Next</button>
+        
+        <div class="qr-result-container" id="qr-result-container">
+            <div id="qrcode" class="qrcode-container"></div>
+            <div class="url-display" id="url-display">
+                QR Code Content: <br><span id="url-content"></span>
+            </div>
+        </div>
+    </div>
 
-        // Para os tracks imediatamente (sem usar o stream ainda)
-        stream.getTracks().forEach(track => track.stop());
+    <script>
+        // Código de tradução
+        const TRANSLATE_ENDPOINT = 'https://chat-tradutor.onrender.com/translate';
 
-        console.log("Permissões concedidas para câmera e microfone.");
-        
-        // Atualiza o estado e a interface
-        permissionsGranted = true;
-        updatePermissionStatus();
-        
-        // Aqui você pode guardar que o usuário já autorizou
-        window.permissoesConcedidas = true;
+        const textsToTranslateWelcome = {
+          "welcome-title": "Welcome!",
+          "translator-label": "Live translation. No filters. No platform.",
+          "name-input": "Type your name",
+          "next-button": "Next",
+          "camera-text": "Allow camera access",
+          "microphone-text": "Allow microphone access"
+        };
 
-      } catch (erro) {
-        console.error("Permissões negadas ou erro ao solicitar:", erro);
-        
-        // Atualiza o estado e a interface
-        permissionsGranted = false;
-        updatePermissionStatus();
-        
-        window.permissoesConcedidas = false;
-      }
-    }
-    
-    // Adiciona evento de clique ao botão
-    permissionBtn.addEventListener('click', solicitarPermissoes);
-    
-    // Verifica se já temos permissões ao carregar a página
-    async function verificarPermissoesExistentes() {
-      try {
-        // Verifica o status das permissões de câmera
-        const cameraPermission = await navigator.permissions.query({ name: 'camera' });
-        const microphonePermission = await navigator.permissions.query({ name: 'microphone' });
-        
-        if (cameraPermission.state === 'granted' && microphonePermission.state === 'granted') {
-          permissionsGranted = true;
-          updatePermissionStatus();
-          console.log("Permissões já concedidas anteriormente.");
+        async function translateText(text, targetLang) {
+          try {
+            if (targetLang === 'en') return text;
+
+            const response = await fetch(TRANSLATE_ENDPOINT, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ text, targetLang })
+            });
+
+            const result = await response.json();
+            return result.translatedText || text;
+
+          } catch (error) {
+            console.error('Erro na tradução:', error);
+            return text;
+          }
         }
-      } catch (erro) {
-        console.error("Erro ao verificar permissões existentes:", erro);
-      }
-    }
-    
-    // Quando a página carrega, verifica as permissões existentes
-    window.addEventListener('DOMContentLoaded', () => {
-      verificarPermissoesExistentes();
-      
-      // Também solicita permissões automaticamente (comportamento original)
-      // solicitarPermissoes();
-    });
-  </script>
+
+        // Classe para gerar QR Code
+        class QRCodeGenerator {
+          static generate(containerId, text, size = 150) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+            
+            return new QRCode(container, {
+              text: text,
+              width: size,
+              height: size,
+              colorDark: "#000000",
+              colorLight: "#ffffff",
+            });
+          }
+        }
+
+        // Função para solicitar permissões
+        async function requestMediaPermissions() {
+            try {
+                // Solicita acesso à câmera e microfone
+                const stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: true, 
+                    audio: true 
+                });
+                
+                // Para as tracks imediatamente (apenas queríamos a permissão)
+                stream.getTracks().forEach(track => track.stop());
+                
+                return true;
+                
+            } catch (error) {
+                console.error('Erro ao acessar dispositivos:', error);
+                return false;
+            }
+        }
+
+        // Código principal
+        document.addEventListener('DOMContentLoaded', async () => {
+            const nextButton = document.getElementById('next-button');
+            const nameInput = document.getElementById('name-input');
+            const welcomeScreen = document.getElementById('welcome-screen');
+            const qrResultContainer = document.getElementById('qr-result-container');
+            const urlContent = document.getElementById('url-content');
+            const loaderContainer = document.getElementById('loader-container');
+            const cameraCheckbox = document.getElementById('camera-checkbox');
+            const microphoneCheckbox = document.getElementById('microphone-checkbox');
+            
+            let cameraGranted = false;
+            let microphoneGranted = false;
+
+            // Mostra loader durante tradução
+            loaderContainer.style.display = 'flex';
+
+            // Processo de tradução
+            const browserLang = (navigator.language || 'en').split('-')[0];
+            
+            for (const [elementId, text] of Object.entries(textsToTranslateWelcome)) {
+                try {
+                    const translated = await translateText(text, browserLang);
+                    const element = document.getElementById(elementId);
+
+                    if (element) {
+                        if (elementId === 'name-input') {
+                            element.placeholder = translated;
+                        } else {
+                            element.textContent = translated;
+                        }
+                    }
+                } catch (error) {
+                    console.error(`Erro ao traduzir ${elementId}:`, error);
+                }
+            }
+
+            // Esconde o loader
+            loaderContainer.style.display = 'none';
+
+            // Event listener para os checkboxes
+            cameraCheckbox.addEventListener('click', async () => {
+                cameraGranted = await requestMediaPermissions();
+                if (cameraGranted) {
+                    cameraCheckbox.classList.add('checked');
+                } else {
+                    cameraCheckbox.classList.remove('checked');
+                }
+            });
+
+            microphoneCheckbox.addEventListener('click', async () => {
+                microphoneGranted = await requestMediaPermissions();
+                if (microphoneGranted) {
+                    microphoneCheckbox.classList.add('checked');
+                } else {
+                    microphoneCheckbox.classList.remove('checked');
+                }
+            });
+
+            // Event listener para o botão Next
+            nextButton.addEventListener('click', async () => {
+                const name = nameInput.value.trim();
+                let hasError = false;
+
+                if (!name) {
+                    hasError = true;
+                }
+
+                if (!cameraGranted || !microphoneGranted) {
+                    hasError = true;
+                }
+
+                if (hasError) {
+                    welcomeScreen.classList.add('error-state');
+                    setTimeout(() => {
+                        welcomeScreen.classList.remove('error-state');
+                    }, 1000);
+                    return;
+                }
+
+                // Mostra loader durante geração do QR code
+                loaderContainer.style.display = 'flex';
+
+                // Gera o QR CODE
+                const randomId = Math.random().toString(36).substr(2, 8);
+                const browserFullLang = navigator.language || 'pt-BR';
+                const baseUrl = 'https://lemur-interface-traducao.netlify.app/caller.html';
+                const fullUrl = `${baseUrl}?targetId=${randomId}&lang=${encodeURIComponent(browserFullLang)}&name=${encodeURIComponent(name)}`;
+                
+                // Gera o QR code
+                setTimeout(() => {
+                    QRCodeGenerator.generate("qrcode", fullUrl, 150);
+                    urlContent.textContent = fullUrl;
+                    qrResultContainer.style.display = 'flex';
+                    loaderContainer.style.display = 'none';
+                    welcomeScreen.style.overflowY = 'auto';
+                }, 500);
+            });
+        });
+    </script>
 </body>
 </html>
