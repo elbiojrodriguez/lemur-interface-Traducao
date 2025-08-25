@@ -3,9 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Caller - Videochamada Mobile</title>
+  <title>Caller - Videochamada com WebRTC</title>
   <style>
-    /* Reset mobile */
     * {
       margin: 0;
       padding: 0;
@@ -16,7 +15,6 @@
     body {
       background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
       min-height: 100vh;
-      height: 100%;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       color: white;
       padding: 20px;
@@ -31,6 +29,9 @@
     header {
       text-align: center;
       margin-bottom: 30px;
+      padding: 20px;
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 15px;
     }
 
     h1 {
@@ -120,21 +121,14 @@
       display: block;
     }
 
-    /* Vídeo local em PIP com moldura verde */
     .video-wrapper.local-video { 
-      position: relative; 
-      border-radius: 8px; 
-      overflow: hidden; 
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); 
       border: 2px solid #4CAF50; 
-      z-index: 10; 
     }
 
     .video-wrapper.local-video video {
       transform: scaleX(-1);
     }
 
-    /* Controles */
     .controls {
       display: flex;
       justify-content: center;
@@ -149,11 +143,7 @@
       font-size: 18px;
       font-weight: bold;
       cursor: pointer;
-      backdrop-filter: blur(6px);
       color: white;
-      display: flex;
-      align-items: center;
-      justify-content: center;
       transition: all 0.3s ease;
       box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
     }
@@ -176,58 +166,13 @@
       transform: translateY(-2px);
     }
 
-    /* Overlay de informações */
-    .info-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: transparent;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 999;
+    #copyIdBtn {
+      background: #9c27b0;
     }
 
-    .qrcode-container {
-      width: auto;
-      height: auto;
-      margin: 10px auto;
-      padding: 12px;
-      background: white;
-      border-radius: 12px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-      display: inline-block;
-    }
-
-    /* ID visual opcional */
-    #myId {
-      display: inline-block;
-      font-size: 16px;
-      font-weight: bold;
-      background: rgba(255, 255, 255, 0.1);
-      padding: 6px 12px;
-      border-radius: 20px;
-      user-select: all;
-      cursor: pointer;
-      color: white;
-    }
-
-    /* Novo estilo - não interfere nos existentes */
-    .user-info {
-      position: absolute;
-      top: 20px;
-      left: 20px;
-      background: rgba(0,0,0,0.7);
-      color: white;
-      padding: 10px 15px;
-      border-radius: 20px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      z-index: 100;
-      font-size: 1.2rem;
+    #copyIdBtn:hover {
+      background: #7b1fa2;
+      transform: translateY(-2px);
     }
 
     .status {
@@ -238,7 +183,14 @@
       background: rgba(255, 255, 255, 0.1);
     }
 
-    /* Responsividade */
+    .qr-info {
+      text-align: center;
+      margin-top: 20px;
+      padding: 15px;
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 10px;
+    }
+
     @media (max-width: 768px) {
       .panels-container, .video-container {
         flex-direction: column;
@@ -266,7 +218,7 @@
 <body>
   <div class="container">
     <header>
-      <h1>Caller - Videochamada Mobile</h1>
+      <h1>Caller - Videochamada com WebRTC</h1>
       <p class="subtitle">Sistema de videochamada ativado por QR Code</p>
     </header>
     
@@ -296,7 +248,7 @@
           </div>
           <div class="info-item">
             <span class="info-label">URL Completa:</span>
-            <span class="info-value" id="display-url">${window.location.href}</span>
+            <span class="info-value" id="display-url"></span>
           </div>
         </div>
       </div>
@@ -343,6 +295,12 @@
     <div class="controls">
       <button id="callActionBtn" class="call-button">INICIAR CHAMADA 🚀</button>
       <button id="simulateBtn" class="call-button">SIMULAR QR CODE</button>
+      <button id="copyIdBtn" class="call-button">COPIAR MEU ID</button>
+    </div>
+
+    <div class="qr-info">
+      <p>Para conectar com outro usuário, compartilhe seu ID ou escaneie o QR code dele.</p>
+      <p>Seu ID único: <strong id="myIdDisplay">Carregando...</strong></p>
     </div>
   </div>
 
@@ -353,6 +311,11 @@
       lang: "pt-BR",
       targetId: "abc123def"
     };
+
+    // Função para gerar um ID único
+    function generateUniqueId() {
+      return Math.random().toString(36).substring(2, 10) + Math.random().toString(36).substring(2, 10);
+    }
 
     // Função para carregar as bandeiras do arquivo JSON
     const loadLanguageFlags = async () => {
@@ -388,10 +351,15 @@
       document.getElementById('display-targetId').textContent = data.targetId || "Não especificado";
       document.getElementById('display-flag').textContent = data.userFlag;
       document.getElementById('display-url').textContent = window.location.href;
+      document.getElementById('display-myId').textContent = data.myId;
+      document.getElementById('myIdDisplay').textContent = data.myId;
     }
 
     // Função principal assíncrona
     window.onload = async () => {
+      // Gera um ID único para este cliente
+      const myId = generateUniqueId();
+      
       // Carrega as bandeiras primeiro
       const LANGUAGE_FLAGS = await loadLanguageFlags();
 
@@ -425,7 +393,8 @@
         userName,
         userLang,
         targetId,
-        userFlag
+        userFlag,
+        myId
       });
 
       // Configura o botão de simulação
@@ -441,7 +410,8 @@
           userName: simulationData.name,
           userLang: simulationData.lang,
           targetId: simulationData.targetId,
-          userFlag: getFlagForLanguage(simulationData.lang)
+          userFlag: getFlagForLanguage(simulationData.lang),
+          myId
         });
         
         // Atualiza o status
@@ -449,6 +419,17 @@
         document.getElementById('status-signaling').style.color = "#4CAF50";
         
         alert(`Simulação de QR Code realizada!\nParâmetros: ${simulatedParams.toString()}`);
+      };
+
+      // Configura o botão de copiar ID
+      document.getElementById('copyIdBtn').onclick = () => {
+        navigator.clipboard.writeText(myId)
+          .then(() => {
+            alert("ID copiado para a área de transferência: " + myId);
+          })
+          .catch(err => {
+            alert("Falha ao copiar ID: " + err);
+          });
       };
 
       // Atualiza o status da câmera
@@ -470,16 +451,26 @@
 
       // Configura o botão de chamada
       document.getElementById('callActionBtn').onclick = () => {
-        if (!targetId) {
+        const targetId = document.getElementById('display-targetId').textContent;
+        
+        if (!targetId || targetId === "Não especificado") {
           alert("Nenhum ID de destino especificado. Use o botão SIMULAR para testar.");
           return;
         }
         
-        alert(`Tentando conectar com: ${targetId}\nEm uma implementação real, a chamada WebRTC seria iniciada.`);
+        alert(`Tentando conectar com: ${targetId}\nMeu ID: ${myId}\n\nEm uma implementação real, a chamada WebRTC seria iniciada.`);
         
         // Atualiza status
         document.getElementById('status-webrtc').textContent = "Conectando...";
         document.getElementById('status-webrtc').style.color = "#FF9800";
+        
+        // Simula uma conexão bem-sucedida após 2 segundos
+        setTimeout(() => {
+          document.getElementById('status-webrtc').textContent = "Conectado";
+          document.getElementById('status-webrtc').style.color = "#4CAF50";
+          document.getElementById('status-remote').textContent = "Ativo";
+          document.getElementById('status-remote').style.color = "#4CAF50";
+        }, 2000);
       };
 
       // Atualiza o display com o URL atual
