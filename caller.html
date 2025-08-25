@@ -16,16 +16,24 @@
 
   <div id="qr-reader"></div>
   <p id="token-display">Token: <em>aguardando leitura...</em></p>
+  <p id="nome-display">Nome: <em>aguardando leitura...</em></p>
 
-  <input type="text" id="nome" placeholder="Nome da pessoa que está chamando" />
   <button onclick="enviarNotificacao()">Mandar notificação</button>
 
   <script>
     let tokenLido = "";
+    let nomeLido = "";
 
     function onScanSuccess(decodedText, decodedResult) {
-      tokenLido = decodedText;
+      const url = new URL(decodedText);
+      const params = new URLSearchParams(url.search);
+
+      tokenLido = params.get("targetId") || "";
+      nomeLido = params.get("name") || "Alguém";
+
       document.getElementById("token-display").innerHTML = "Token: <strong>" + tokenLido + "</strong>";
+      document.getElementById("nome-display").innerHTML = "Nome: <strong>" + nomeLido + "</strong>";
+
       html5QrcodeScanner.clear(); // Para parar o scanner após leitura
     }
 
@@ -34,10 +42,8 @@
     html5QrcodeScanner.render(onScanSuccess);
 
     async function enviarNotificacao() {
-      const nome = document.getElementById("nome").value.trim();
-
-      if (!tokenLido || !nome) {
-        alert("Por favor, leia o QR Code e informe o nome.");
+      if (!tokenLido || !nomeLido) {
+        alert("Por favor, leia o QR Code primeiro.");
         return;
       }
 
@@ -45,7 +51,7 @@
         const resposta = await fetch("https://fireweb-sfe0.onrender.com/enviar", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ token: tokenLido, nome: nome })
+          body: JSON.stringify({ token: tokenLido, nome: nomeLido })
         });
 
         if (resposta.ok) {
