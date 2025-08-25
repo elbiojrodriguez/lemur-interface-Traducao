@@ -40,7 +40,7 @@
       }
 
       try {
-        const resposta = await fetch("https://fireweb-sfe0.onrender.com/enviar", {
+        const resposta = await fetch("https://fireweb-sfe0.onrender.com/notify", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ token: tokenLido, nome: nomeLido })
