@@ -2,33 +2,150 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>QR Code Lido</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Leitor de Dados QR Code</title>
   <style>
     body {
-      font-family: sans-serif;
-      text-align: center;
-      margin-top: 100px;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+      color: white;
+      padding: 20px;
+      min-height: 100vh;
     }
-    #mensagem {
-      font-size: 24px;
-      color: #333;
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 15px;
+      padding: 20px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    }
+    .info-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .info-item {
+      padding: 10px;
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 8px;
+    }
+    .info-label {
+      font-weight: bold;
+      display: block;
+      margin-bottom: 5px;
+      color: #4CAF50;
+    }
+    .info-value {
+      word-break: break-all;
+    }
+    .note {
+      text-align: center;
+      margin-top: 20px;
+      padding: 10px;
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 8px;
     }
   </style>
 </head>
 <body>
-  <div id="mensagem">Carregando conteúdo do QR Code...</div>
+  <div class="container">
+    <h1>Dados Extraídos do QR Code</h1>
+    
+    <div class="info-grid">
+      <div class="info-item">
+        <span class="info-label">Nome do Usuário:</span>
+        <span class="info-value" id="display-name">Visitante</span>
+      </div>
+      <div class="info-item">
+        <span class="info-label">Idioma:</span>
+        <span class="info-value" id="display-lang">en</span>
+      </div>
+      <div class="info-item">
+        <span class="info-label">ID de Destino:</span>
+        <span class="info-value" id="display-targetId">Não especificado</span>
+      </div>
+      <div class="info-item">
+        <span class="info-label">Bandeira:</span>
+        <span class="info-value" id="display-flag">🌐</span>
+      </div>
+    </div>
+    
+    <div class="note">
+      <p>Estes dados foram extraídos dos parâmetros da URL após a leitura do QR Code.</p>
+    </div>
+  </div>
 
   <script>
-    // Pega o parâmetro "mensagem" da URL
-    const params = new URLSearchParams(window.location.search);
-    const texto = params.get("mensagem");
+    // Dados de exemplo para simulação
+    const simulationData = {
+      name: "João Silva",
+      lang: "pt-BR",
+      targetId: "abc123def"
+    };
 
-    // Exibe na tela
-    if (texto) {
-      document.getElementById("mensagem").textContent = texto;
-    } else {
-      document.getElementById("mensagem").textContent = "Nenhuma mensagem encontrada.";
+    // Função para carregar as bandeiras
+    const loadLanguageFlags = () => {
+      return {
+        'pt-BR': '🇧🇷',
+        'pt-PT': '🇵🇹',
+        'en': '🇺🇸',
+        'en-US': '🇺🇸',
+        'es': '🇪🇸',
+        'fr': '🇫🇷',
+        'de': '🇩🇪'
+      };
+    };
+
+    // Função para atualizar a interface com os dados recebidos
+    function updateDisplay(data) {
+      document.getElementById('display-name').textContent = data.userName;
+      document.getElementById('display-lang').textContent = data.userLang;
+      document.getElementById('display-targetId').textContent = data.targetId || "Não especificado";
+      document.getElementById('display-flag').textContent = data.userFlag;
     }
+
+    // Função principal
+    window.onload = () => {
+      // Carrega as bandeiras
+      const LANGUAGE_FLAGS = loadLanguageFlags();
+
+      // Extrai parâmetros da URL
+      const urlParams = new URLSearchParams(window.location.search);
+      const userName = urlParams.get('name') || 'Visitante';
+      const userLang = urlParams.get('lang') || 'en';
+      const targetId = urlParams.get('targetId') || null;
+      
+      // Lógica para bandeiras
+      const getFlagForLanguage = (langCode) => {
+        if (LANGUAGE_FLAGS[langCode]) {
+          return LANGUAGE_FLAGS[langCode];
+        }
+        
+        const baseLang = langCode.split('-')[0];
+        if (LANGUAGE_FLAGS[baseLang]) {
+          return LANGUAGE_FLAGS[baseLang];
+        }
+        
+        return '🌐';
+      };
+
+      const userFlag = getFlagForLanguage(userLang);
+
+      // Atualiza a exibição com os dados recebidos
+      updateDisplay({
+        userName,
+        userLang,
+        targetId,
+        userFlag
+      });
+    };
   </script>
 </body>
 </html>
