@@ -14,36 +14,115 @@
     }
 
     body {
-      background: transparent;
+      background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
       min-height: 100vh;
       height: 100%;
-      overflow: hidden;
-      position: relative;
-      font-family: Arial, sans-serif;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: white;
+      padding: 20px;
+      overflow-x: hidden;
     }
 
-    /* Containers de vídeo */
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    .subtitle {
+      font-size: 1.2rem;
+      opacity: 0.9;
+    }
+
+    .panels-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+
+    .panel {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 15px;
+      padding: 20px;
+      flex: 1;
+      min-width: 300px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    }
+
+    .panel h2 {
+      margin-bottom: 15px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .info-item {
+      padding: 10px;
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 8px;
+    }
+
+    .info-label {
+      font-weight: bold;
+      display: block;
+      margin-bottom: 5px;
+      color: #4CAF50;
+    }
+
+    .info-value {
+      word-break: break-all;
+    }
+
+    .video-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+
     .video-wrapper {
+      flex: 1;
+      min-width: 300px;
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 15px;
+      overflow: hidden;
       position: relative;
-      width: 100%;
-      height: 100%;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    }
+
+    .video-wrapper h3 {
+      padding: 15px;
+      background: rgba(0, 0, 0, 0.5);
+      margin: 0;
     }
 
     .video-wrapper video {
       width: 100%;
-      height: 100%;
+      height: 250px;
       object-fit: cover;
+      display: block;
     }
 
     /* Vídeo local em PIP com moldura verde */
-    .video-wrapper:nth-child(2) { 
-      position: absolute; 
-      bottom: calc(80px + 60px); 
-      right: 5px; 
-      width: 34.5%; 
-      max-width: 138px; 
-      height: 184px; 
-      transform: translateX(-17%); 
+    .video-wrapper.local-video { 
+      position: relative; 
       border-radius: 8px; 
       overflow: hidden; 
       box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); 
@@ -51,25 +130,21 @@
       z-index: 10; 
     }
 
-    .video-wrapper:nth-child(2) video {
+    .video-wrapper.local-video video {
       transform: scaleX(-1);
     }
 
     /* Controles */
     .controls {
-      position: absolute;
-      bottom: calc(225px + 60px);
-      left: 110px;
       display: flex;
-      flex-direction: column;
-      gap: 16px;
-      z-index: 20;
+      justify-content: center;
+      gap: 20px;
+      margin-top: 20px;
     }
 
     .controls button {
-      width: 120px;
-      height: 40px;
-      border-radius: 20px;
+      padding: 15px 30px;
+      border-radius: 30px;
       border: none;
       font-size: 18px;
       font-weight: bold;
@@ -79,10 +154,26 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
     }
 
     #callActionBtn {
       background: #4CAF50;
+    }
+
+    #callActionBtn:hover {
+      background: #3e8e41;
+      transform: translateY(-2px);
+    }
+
+    #simulateBtn {
+      background: #2196F3;
+    }
+
+    #simulateBtn:hover {
+      background: #0b7dda;
+      transform: translateY(-2px);
     }
 
     /* Overlay de informações */
@@ -139,177 +230,129 @@
       font-size: 1.2rem;
     }
 
+    .status {
+      text-align: center;
+      margin: 20px 0;
+      padding: 15px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.1);
+    }
+
     /* Responsividade */
-    @media (max-width: 400px) {
-      .video-wrapper:nth-child(2) {
-        height: 120px;
-        max-width: 100px;
-        bottom: calc(60px + 60px);
+    @media (max-width: 768px) {
+      .panels-container, .video-container {
+        flex-direction: column;
       }
-
-      .info-overlay {
-        padding: 8px;
+      
+      .video-wrapper {
+        min-width: 100%;
       }
-
-      .qrcode-container {
-        padding: 8px;
-        max-width: 90%;
+      
+      h1 {
+        font-size: 2rem;
       }
-
+      
       .controls {
-        bottom: calc(215px + 60px);
-        left: 50%;
-        transform: translateX(-50%);
+        flex-direction: column;
+        align-items: center;
       }
-
+      
       .controls button {
-        width: 100px;
-        height: 40px;
-        font-size: 16px;
+        width: 100%;
       }
     }
   </style>
 </head>
 <body>
-  <!-- Novo elemento adicionado - não interfere na estrutura existente -->
-  <div id="userInfoDisplay" class="user-info" style="display: none;"></div>
-
-  <!-- Toda a estrutura existente permanece EXATAMENTE igual -->
   <div class="container">
-    <div class="video-wrapper">
-      <video id="remoteVideo" autoplay playsinline></video>
+    <header>
+      <h1>Caller - Videochamada Mobile</h1>
+      <p class="subtitle">Sistema de videochamada ativado por QR Code</p>
+    </header>
+    
+    <div class="panels-container">
+      <div class="panel">
+        <h2>Informações Recebidas do QR Code</h2>
+        <div class="info-grid">
+          <div class="info-item">
+            <span class="info-label">Nome do Usuário:</span>
+            <span class="info-value" id="display-name">Visitante</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Idioma:</span>
+            <span class="info-value" id="display-lang">en</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">ID de Destino:</span>
+            <span class="info-value" id="display-targetId">Não especificado</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Meu ID:</span>
+            <span class="info-value" id="display-myId">Aguardando...</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Bandeira:</span>
+            <span class="info-value" id="display-flag">🌐</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">URL Completa:</span>
+            <span class="info-value" id="display-url">${window.location.href}</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="panel">
+        <h2>Status da Conexão</h2>
+        <div class="info-grid">
+          <div class="info-item">
+            <span class="info-label">Câmera:</span>
+            <span class="info-value" id="status-camera">Não inicializada</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Conexão WebRTC:</span>
+            <span class="info-value" id="status-webrtc">Desconectado</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Servidor de Sinalização:</span>
+            <span class="info-value" id="status-signaling">Desconectado</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Stream Remoto:</span>
+            <span class="info-value" id="status-remote">Não disponível</span>
+          </div>
+        </div>
+      </div>
     </div>
+    
+    <div class="status">
+      <p>Este sistema foi ativado pela leitura de um QR Code. Abaixo estão os streams de vídeo.</p>
+    </div>
+    
+    <div class="video-container">
+      <div class="video-wrapper">
+        <h3>Vídeo Remoto</h3>
+        <video id="remoteVideo" autoplay playsinline></video>
+      </div>
 
-    <div class="video-wrapper">
-      <video id="localVideo" autoplay muted playsinline></video>
+      <div class="video-wrapper local-video">
+        <h3>Seu Vídeo (Local)</h3>
+        <video id="localVideo" autoplay muted playsinline></video>
+      </div>
     </div>
 
     <div class="controls">
-      <button id="callActionBtn" class="call-button">SEND 🚀</button>
-    </div>
-
-    <div class="info-overlay" style="display: none;">
-      <span id="myId"></span>
+      <button id="callActionBtn" class="call-button">INICIAR CHAMADA 🚀</button>
+      <button id="simulateBtn" class="call-button">SIMULAR QR CODE</button>
     </div>
   </div>
 
-  <script src="https://lemur-signal.onrender.com/socket.io/socket.io.js"></script>
   <script>
-    // WebRTCCore - Módulo principal de WebRTC
-    class WebRTCCore {
-      constructor() {
-        this.socket = null;
-        this.peerConnection = null;
-        this.remoteStreamCallback = null;
-        this.myId = null;
-        this.configuration = {
-          iceServers: [
-            { urls: 'stun:stun.l.google.com:19302' },
-            { urls: 'stun:stun1.l.google.com:19302' }
-          ]
-        };
-      }
-
-      initialize(myId) {
-        this.myId = myId;
-        this.socket = io('https://lemur-signal.onrender.com');
-        this.socket.emit('register', myId);
-      }
-
-      setupSocketHandlers() {
-        this.socket.on('offer', (data) => {
-          this.handleOffer(data.offer, data.from);
-        });
-
-        this.socket.on('answer', (data) => {
-          this.handleAnswer(data.answer);
-        });
-
-        this.socket.on('ice-candidate', (data) => {
-          this.handleNewICECandidate(data.candidate);
-        });
-      }
-
-      async startCall(targetId, localStream) {
-        this.createPeerConnection(localStream);
-        
-        try {
-          const offer = await this.peerConnection.createOffer();
-          await this.peerConnection.setLocalDescription(offer);
-          this.socket.emit('offer', { offer, to: targetId, from: this.myId });
-        } catch (error) {
-          console.error('Error creating offer:', error);
-        }
-      }
-
-      createPeerConnection(localStream) {
-        this.peerConnection = new RTCPeerConnection(this.configuration);
-
-        // Add local stream tracks
-        localStream.getTracks().forEach(track => {
-          this.peerConnection.addTrack(track, localStream);
-        });
-
-        // Handle remote stream
-        this.peerConnection.ontrack = (event) => {
-          if (this.remoteStreamCallback) {
-            this.remoteStreamCallback(event.streams[0]);
-          }
-        };
-
-        // Handle ICE candidates
-        this.peerConnection.onicecandidate = (event) => {
-          if (event.candidate) {
-            this.socket.emit('ice-candidate', {
-              candidate: event.candidate,
-              to: this.targetId,
-              from: this.myId
-            });
-          }
-        };
-      }
-
-      async handleOffer(offer, from) {
-        this.targetId = from;
-        this.createPeerConnection(localStream);
-        
-        try {
-          await this.peerConnection.setRemoteDescription(offer);
-          const answer = await this.peerConnection.createAnswer();
-          await this.peerConnection.setLocalDescription(answer);
-          
-          this.socket.emit('answer', {
-            answer,
-            to: from,
-            from: this.myId
-          });
-        } catch (error) {
-          console.error('Error handling offer:', error);
-        }
-      }
-
-      async handleAnswer(answer) {
-        try {
-          await this.peerConnection.setRemoteDescription(answer);
-        } catch (error) {
-          console.error('Error handling answer:', error);
-        }
-      }
-
-      async handleNewICECandidate(candidate) {
-        try {
-          if (candidate) {
-            await this.peerConnection.addIceCandidate(candidate);
-          }
-        } catch (error) {
-          console.error('Error adding ICE candidate:', error);
-        }
-      }
-
-      setRemoteStreamCallback(callback) {
-        this.remoteStreamCallback = callback;
-      }
-    }
+    // Dados de exemplo para simulação
+    const simulationData = {
+      name: "João Silva",
+      lang: "pt-BR",
+      targetId: "abc123def"
+    };
 
     // Função para carregar as bandeiras do arquivo JSON
     const loadLanguageFlags = async () => {
@@ -338,6 +381,15 @@
       }
     };
 
+    // Função para atualizar a interface com os dados recebidos
+    function updateDisplay(data) {
+      document.getElementById('display-name').textContent = data.userName;
+      document.getElementById('display-lang').textContent = data.userLang;
+      document.getElementById('display-targetId').textContent = data.targetId || "Não especificado";
+      document.getElementById('display-flag').textContent = data.userFlag;
+      document.getElementById('display-url').textContent = window.location.href;
+    }
+
     // Função principal assíncrona
     window.onload = async () => {
       // Carrega as bandeiras primeiro
@@ -347,6 +399,7 @@
       const urlParams = new URLSearchParams(window.location.search);
       const userName = urlParams.get('name') || 'Visitante';
       const userLang = urlParams.get('lang') || 'en';
+      const targetId = urlParams.get('targetId') || null;
       
       // Lógica inteligente para bandeiras
       const getFlagForLanguage = (langCode) => {
@@ -367,57 +420,70 @@
 
       const userFlag = getFlagForLanguage(userLang);
 
-      // Exibe as informações do usuário
-      const userInfoDisplay = document.getElementById('userInfoDisplay');
-      if (userInfoDisplay) {
-        userInfoDisplay.textContent = `${userName} ${userFlag}`;
-        userInfoDisplay.style.display = 'flex';
-      }
+      // Atualiza a exibição com os dados recebidos
+      updateDisplay({
+        userName,
+        userLang,
+        targetId,
+        userFlag
+      });
 
-      // --------------------------------------------
-      // TUDO ABAIXO DISTO PERMANECE EXATAMENTE IGUAL
-      // --------------------------------------------
+      // Configura o botão de simulação
+      document.getElementById('simulateBtn').onclick = () => {
+        // Simula os parâmetros de um QR code
+        const simulatedParams = new URLSearchParams();
+        simulatedParams.set('name', simulationData.name);
+        simulatedParams.set('lang', simulationData.lang);
+        simulatedParams.set('targetId', simulationData.targetId);
+        
+        // Atualiza a exibição com os dados simulados
+        updateDisplay({
+          userName: simulationData.name,
+          userLang: simulationData.lang,
+          targetId: simulationData.targetId,
+          userFlag: getFlagForLanguage(simulationData.lang)
+        });
+        
+        // Atualiza o status
+        document.getElementById('status-signaling').textContent = "Simulado";
+        document.getElementById('status-signaling').style.color = "#4CAF50";
+        
+        alert(`Simulação de QR Code realizada!\nParâmetros: ${simulatedParams.toString()}`);
+      };
+
+      // Atualiza o status da câmera
+      document.getElementById('status-camera').textContent = "Solicitando permissão...";
       
-      const rtcCore = new WebRTCCore();
-      const myId = crypto.randomUUID().substr(0, 8);
-      document.getElementById('myId').textContent = myId;
-      rtcCore.initialize(myId);
-      rtcCore.setupSocketHandlers();
-
-      const localVideo = document.getElementById('localVideo');
-      const remoteVideo = document.getElementById('remoteVideo');
-      let targetId = null;
-      let localStream = null;
-
       // Solicita acesso à câmera
       navigator.mediaDevices.getUserMedia({ video: true, audio: false })
         .then(stream => {
-          localStream = stream;
+          document.getElementById('status-camera').textContent = "Ativa";
+          document.getElementById('status-camera').style.color = "#4CAF50";
+          const localVideo = document.getElementById('localVideo');
           localVideo.srcObject = stream;
         })
         .catch(error => {
+          document.getElementById('status-camera').textContent = "Erro: " + error.message;
+          document.getElementById('status-camera').style.color = "#f44336";
           console.error("Erro ao acessar a câmera:", error);
         });
 
-      // Verifica se há ID na URL
-      const targetIdFromUrl = urlParams.get('targetId');
-      
-      if (targetIdFromUrl) {
-        targetId = targetIdFromUrl;
-        document.getElementById('callActionBtn').style.display = 'block';
-      }
-
       // Configura o botão de chamada
       document.getElementById('callActionBtn').onclick = () => {
-        if (!targetId || !localStream) return;
-        rtcCore.startCall(targetId, localStream);
+        if (!targetId) {
+          alert("Nenhum ID de destino especificado. Use o botão SIMULAR para testar.");
+          return;
+        }
+        
+        alert(`Tentando conectar com: ${targetId}\nEm uma implementação real, a chamada WebRTC seria iniciada.`);
+        
+        // Atualiza status
+        document.getElementById('status-webrtc').textContent = "Conectando...";
+        document.getElementById('status-webrtc').style.color = "#FF9800";
       };
 
-      // Silencia qualquer áudio recebido
-      rtcCore.setRemoteStreamCallback(stream => {
-        stream.getAudioTracks().forEach(track => track.enabled = false);
-        remoteVideo.srcObject = stream;
-      });
+      // Atualiza o display com o URL atual
+      document.getElementById('display-url').textContent = window.location.href;
     };
   </script>
 </body>
