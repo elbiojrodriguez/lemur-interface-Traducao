@@ -1,1 +1,424 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Caller - Videochamada Mobile</title>
+  <style>
+    /* Reset mobile */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
 
+    body {
+      background: transparent;
+      min-height: 100vh;
+      height: 100%;
+      overflow: hidden;
+      position: relative;
+      font-family: Arial, sans-serif;
+    }
+
+    /* Containers de vídeo */
+    .video-wrapper {
+      position: relative;
+      width: 100%;
+      height: 100%;
+    }
+
+    .video-wrapper video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    /* Vídeo local em PIP com moldura verde */
+    .video-wrapper:nth-child(2) { 
+      position: absolute; 
+      bottom: calc(80px + 60px); 
+      right: 5px; 
+      width: 34.5%; 
+      max-width: 138px; 
+      height: 184px; 
+      transform: translateX(-17%); 
+      border-radius: 8px; 
+      overflow: hidden; 
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); 
+      border: 2px solid #4CAF50; 
+      z-index: 10; 
+    }
+
+    .video-wrapper:nth-child(2) video {
+      transform: scaleX(-1);
+    }
+
+    /* Controles */
+    .controls {
+      position: absolute;
+      bottom: calc(225px + 60px);
+      left: 110px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      z-index: 20;
+    }
+
+    .controls button {
+      width: 120px;
+      height: 40px;
+      border-radius: 20px;
+      border: none;
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+      backdrop-filter: blur(6px);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #callActionBtn {
+      background: #4CAF50;
+    }
+
+    /* Overlay de informações */
+    .info-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: transparent;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 999;
+    }
+
+    .qrcode-container {
+      width: auto;
+      height: auto;
+      margin: 10px auto;
+      padding: 12px;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+      display: inline-block;
+    }
+
+    /* ID visual opcional */
+    #myId {
+      display: inline-block;
+      font-size: 16px;
+      font-weight: bold;
+      background: rgba(255, 255, 255, 0.1);
+      padding: 6px 12px;
+      border-radius: 20px;
+      user-select: all;
+      cursor: pointer;
+      color: white;
+    }
+
+    /* Novo estilo - não interfere nos existentes */
+    .user-info {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      background: rgba(0,0,0,0.7);
+      color: white;
+      padding: 10px 15px;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      z-index: 100;
+      font-size: 1.2rem;
+    }
+
+    /* Responsividade */
+    @media (max-width: 400px) {
+      .video-wrapper:nth-child(2) {
+        height: 120px;
+        max-width: 100px;
+        bottom: calc(60px + 60px);
+      }
+
+      .info-overlay {
+        padding: 8px;
+      }
+
+      .qrcode-container {
+        padding: 8px;
+        max-width: 90%;
+      }
+
+      .controls {
+        bottom: calc(215px + 60px);
+        left: 50%;
+        transform: translateX(-50%);
+      }
+
+      .controls button {
+        width: 100px;
+        height: 40px;
+        font-size: 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Novo elemento adicionado - não interfere na estrutura existente -->
+  <div id="userInfoDisplay" class="user-info" style="display: none;"></div>
+
+  <!-- Toda a estrutura existente permanece EXATAMENTE igual -->
+  <div class="container">
+    <div class="video-wrapper">
+      <video id="remoteVideo" autoplay playsinline></video>
+    </div>
+
+    <div class="video-wrapper">
+      <video id="localVideo" autoplay muted playsinline></video>
+    </div>
+
+    <div class="controls">
+      <button id="callActionBtn" class="call-button">SEND 🚀</button>
+    </div>
+
+    <div class="info-overlay" style="display: none;">
+      <span id="myId"></span>
+    </div>
+  </div>
+
+  <script src="https://lemur-signal.onrender.com/socket.io/socket.io.js"></script>
+  <script>
+    // WebRTCCore - Módulo principal de WebRTC
+    class WebRTCCore {
+      constructor() {
+        this.socket = null;
+        this.peerConnection = null;
+        this.remoteStreamCallback = null;
+        this.myId = null;
+        this.configuration = {
+          iceServers: [
+            { urls: 'stun:stun.l.google.com:19302' },
+            { urls: 'stun:stun1.l.google.com:19302' }
+          ]
+        };
+      }
+
+      initialize(myId) {
+        this.myId = myId;
+        this.socket = io('https://lemur-signal.onrender.com');
+        this.socket.emit('register', myId);
+      }
+
+      setupSocketHandlers() {
+        this.socket.on('offer', (data) => {
+          this.handleOffer(data.offer, data.from);
+        });
+
+        this.socket.on('answer', (data) => {
+          this.handleAnswer(data.answer);
+        });
+
+        this.socket.on('ice-candidate', (data) => {
+          this.handleNewICECandidate(data.candidate);
+        });
+      }
+
+      async startCall(targetId, localStream) {
+        this.createPeerConnection(localStream);
+        
+        try {
+          const offer = await this.peerConnection.createOffer();
+          await this.peerConnection.setLocalDescription(offer);
+          this.socket.emit('offer', { offer, to: targetId, from: this.myId });
+        } catch (error) {
+          console.error('Error creating offer:', error);
+        }
+      }
+
+      createPeerConnection(localStream) {
+        this.peerConnection = new RTCPeerConnection(this.configuration);
+
+        // Add local stream tracks
+        localStream.getTracks().forEach(track => {
+          this.peerConnection.addTrack(track, localStream);
+        });
+
+        // Handle remote stream
+        this.peerConnection.ontrack = (event) => {
+          if (this.remoteStreamCallback) {
+            this.remoteStreamCallback(event.streams[0]);
+          }
+        };
+
+        // Handle ICE candidates
+        this.peerConnection.onicecandidate = (event) => {
+          if (event.candidate) {
+            this.socket.emit('ice-candidate', {
+              candidate: event.candidate,
+              to: this.targetId,
+              from: this.myId
+            });
+          }
+        };
+      }
+
+      async handleOffer(offer, from) {
+        this.targetId = from;
+        this.createPeerConnection(localStream);
+        
+        try {
+          await this.peerConnection.setRemoteDescription(offer);
+          const answer = await this.peerConnection.createAnswer();
+          await this.peerConnection.setLocalDescription(answer);
+          
+          this.socket.emit('answer', {
+            answer,
+            to: from,
+            from: this.myId
+          });
+        } catch (error) {
+          console.error('Error handling offer:', error);
+        }
+      }
+
+      async handleAnswer(answer) {
+        try {
+          await this.peerConnection.setRemoteDescription(answer);
+        } catch (error) {
+          console.error('Error handling answer:', error);
+        }
+      }
+
+      async handleNewICECandidate(candidate) {
+        try {
+          if (candidate) {
+            await this.peerConnection.addIceCandidate(candidate);
+          }
+        } catch (error) {
+          console.error('Error adding ICE candidate:', error);
+        }
+      }
+
+      setRemoteStreamCallback(callback) {
+        this.remoteStreamCallback = callback;
+      }
+    }
+
+    // Função para carregar as bandeiras do arquivo JSON
+    const loadLanguageFlags = async () => {
+      try {
+        // Fallback básico caso o arquivo não carregue
+        return {
+          'pt-BR': '🇧🇷',
+          'pt-PT': '🇵🇹',
+          'en': '🇺🇸',
+          'en-US': '🇺🇸',
+          'es': '🇪🇸',
+          'fr': '🇫🇷',
+          'de': '🇩🇪'
+        };
+      } catch (error) {
+        console.error("Usando fallback de bandeiras:", error);
+        return {
+          'pt-BR': '🇧🇷',
+          'pt-PT': '🇵🇹',
+          'en': '🇺🇸',
+          'en-US': '🇺🇸',
+          'es': '🇪🇸',
+          'fr': '🇫🇷',
+          'de': '🇩🇪'
+        };
+      }
+    };
+
+    // Função principal assíncrona
+    window.onload = async () => {
+      // Carrega as bandeiras primeiro
+      const LANGUAGE_FLAGS = await loadLanguageFlags();
+
+      // Extrai parâmetros da URL
+      const urlParams = new URLSearchParams(window.location.search);
+      const userName = urlParams.get('name') || 'Visitante';
+      const userLang = urlParams.get('lang') || 'en';
+      
+      // Lógica inteligente para bandeiras
+      const getFlagForLanguage = (langCode) => {
+        // 1. Tenta o código completo (ex: pt-BR)
+        if (LANGUAGE_FLAGS[langCode]) {
+          return LANGUAGE_FLAGS[langCode];
+        }
+        
+        // 2. Tenta o código base (ex: pt)
+        const baseLang = langCode.split('-')[0];
+        if (LANGUAGE_FLAGS[baseLang]) {
+          return LANGUAGE_FLAGS[baseLang];
+        }
+        
+        // 3. Fallback para globo
+        return '🌐';
+      };
+
+      const userFlag = getFlagForLanguage(userLang);
+
+      // Exibe as informações do usuário
+      const userInfoDisplay = document.getElementById('userInfoDisplay');
+      if (userInfoDisplay) {
+        userInfoDisplay.textContent = `${userName} ${userFlag}`;
+        userInfoDisplay.style.display = 'flex';
+      }
+
+      // --------------------------------------------
+      // TUDO ABAIXO DISTO PERMANECE EXATAMENTE IGUAL
+      // --------------------------------------------
+      
+      const rtcCore = new WebRTCCore();
+      const myId = crypto.randomUUID().substr(0, 8);
+      document.getElementById('myId').textContent = myId;
+      rtcCore.initialize(myId);
+      rtcCore.setupSocketHandlers();
+
+      const localVideo = document.getElementById('localVideo');
+      const remoteVideo = document.getElementById('remoteVideo');
+      let targetId = null;
+      let localStream = null;
+
+      // Solicita acesso à câmera
+      navigator.mediaDevices.getUserMedia({ video: true, audio: false })
+        .then(stream => {
+          localStream = stream;
+          localVideo.srcObject = stream;
+        })
+        .catch(error => {
+          console.error("Erro ao acessar a câmera:", error);
+        });
+
+      // Verifica se há ID na URL
+      const targetIdFromUrl = urlParams.get('targetId');
+      
+      if (targetIdFromUrl) {
+        targetId = targetIdFromUrl;
+        document.getElementById('callActionBtn').style.display = 'block';
+      }
+
+      // Configura o botão de chamada
+      document.getElementById('callActionBtn').onclick = () => {
+        if (!targetId || !localStream) return;
+        rtcCore.startCall(targetId, localStream);
+      };
+
+      // Silencia qualquer áudio recebido
+      rtcCore.setRemoteStreamCallback(stream => {
+        stream.getAudioTracks().forEach(track => track.enabled = false);
+        remoteVideo.srcObject = stream;
+      });
+    };
+  </script>
+</body>
+</html>
