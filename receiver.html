@@ -319,6 +319,20 @@
             width: 100%;
             box-sizing: border-box;
         }
+        
+        .warning-message {
+            position: absolute;
+            top: 65%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80%;
+            padding: 10px;
+            background-color: #ff9800;
+            color: white;
+            border-radius: 8px;
+            text-align: center;
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -359,6 +373,11 @@
             <h3 class="token-title" id="token-title">✅ Token recebido do aplicativo:</h3>
             <div class="token-value" id="token-value"></div>
         </div>
+        
+        <!-- Mensagem de aviso quando não há token -->
+        <div class="warning-message" id="warning-message">
+            ⚠️ Token não recebido. Não é possível gerar o QR Code.
+        </div>
     </div>
 
     <!-- NOVA TELA PARA O QR CODE -->
@@ -376,7 +395,7 @@
     </div>
 
     <script>
-        // Lê o token da URL (sugestão implementada)
+        // Lê o token da URL (chave do Firebase)
         const urlParams = new URLSearchParams(window.location.search);
         const token = urlParams.get('token');
         
@@ -388,6 +407,10 @@
             
             // Ajusta a posição dos outros elementos para acomodar o token
             document.getElementById('qr-result-container').style.top = '85%';
+        } else {
+            // Mostra aviso se não houver token
+            document.getElementById('warning-message').style.display = 'block';
+            document.getElementById('qr-result-container').style.top = '75%';
         }
 
         // Código de tradução
@@ -535,6 +558,12 @@
                 if (!cameraGranted || !microphoneGranted) {
                     hasError = true;
                 }
+                
+                // Verifica se há token (chave do Firebase)
+                if (!token) {
+                    hasError = true;
+                    document.getElementById('warning-message').style.display = 'block';
+                }
 
                 if (hasError) {
                     welcomeScreen.classList.add('error-state');
@@ -547,11 +576,11 @@
                 // Mostra loader durante geração do QR code
                 loaderContainer.style.display = 'flex';
 
-                // Gera o QR CODE
-                const randomId = Math.random().toString(36).substr(2, 8);
+                // Gera o QR CODE usando a chave do Firebase (token) em vez do ID dinâmico
                 const browserFullLang = navigator.language || 'pt-BR';
                 const baseUrl = 'https://lemur-interface-traducao.netlify.app/caller.html';
-                const fullUrl = `${baseUrl}?targetId=${randomId}&lang=${encodeURIComponent(browserFullLang)}&name=${encodeURIComponent(name)}`;
+                // Usa o token como targetId em vez de gerar um ID aleatório
+                const fullUrl = `${baseUrl}?targetId=${encodeURIComponent(token)}&lang=${encodeURIComponent(browserFullLang)}&name=${encodeURIComponent(name)}`;
                 
                 // Gera o QR code na nova tela
                 setTimeout(() => {
