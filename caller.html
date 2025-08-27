@@ -20,42 +20,52 @@
   <button onclick="enviarNotificacao()">Enviar Notificação</button>
 
   <script>
-    let tokenLido = "";
-    let nomeLido = "";
+let tokenLido = "";
+let nomeLido = "";
 
-    // Extrai os parâmetros da própria URL
-    const params = new URLSearchParams(window.location.search);
-    tokenLido = params.get("targetId") || "";
-    nomeLido = params.get("name") || "Alguém";
+// ✅ FUNÇÃO PARA DECODIFICAR CORRETAMENTE O TOKEN
+function decodificarToken(token) {
+  // Remove espaços e decodifica URI
+  return decodeURIComponent(token).replace(/\s+/g, '');
+}
 
-    // Atualiza a interface
-    document.getElementById("token-display").innerHTML = "Token: <strong>" + tokenLido + "</strong>";
-    document.getElementById("nome-display").innerHTML = "Nome: <strong>" + nomeLido + "</strong>";
+// Extrai os parâmetros da própria URL
+const params = new URLSearchParams(window.location.search);
+tokenLido = decodificarToken(params.get("targetId") || "");
+nomeLido = params.get("name") || "Alguém";
 
-    // Função para enviar a notificação
-    async function enviarNotificacao() {
-      if (!tokenLido || !nomeLido) {
-        alert("❌ Parâmetros ausentes na URL.");
-        return;
-      }
+// Atualiza a interface
+document.getElementById("token-display").innerHTML = "Token: <strong>" + tokenLido + "</strong>";
+document.getElementById("nome-display").innerHTML = "Nome: <strong>" + nomeLido + "</strong>";
 
-      try {
-        const resposta = await fetch("https://fireweb-sfe0.onrender.com/notify", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ token: tokenLido, nome: nomeLido })
-        });
+// Função para enviar a notificação
+async function enviarNotificacao() {
+  if (!tokenLido || !nomeLido) {
+    alert("❌ Parâmetros ausentes na URL.");
+    return;
+  }
 
-        if (resposta.ok) {
-          alert("✅ Notificação enviada com sucesso!");
-        } else {
-          alert("❌ Erro ao enviar notificação.");
-        }
-      } catch (e) {
-        console.error(e);
-        alert("❌ Falha na comunicação com o servidor.");
-      }
+  try {
+    const resposta = await fetch("https://fireweb-sfe0.onrender.com/notify", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ 
+        token: tokenLido, 
+        nome: nomeLido,
+        lang: params.get("lang") || "pt-br" // ✅ Adiciona language
+      })
+    });
+
+    if (resposta.ok) {
+      alert("✅ Notificação enviada com sucesso!");
+    } else {
+      alert("❌ Erro ao enviar notificação.");
     }
-  </script>
+  } catch (e) {
+    console.error(e);
+    alert("❌ Falha na comunicação com o servidor.");
+  }
+}
+</script>
 </body>
 </html>
