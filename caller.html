@@ -2,70 +2,486 @@
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8">
-  <title>Notificação Automática</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Painel de Controle de Notificações</title>
   <style>
-    body { font-family: Arial, sans-serif; text-align: center; padding: 20px; }
-    button { padding: 10px 20px; font-size: 16px; margin-top: 20px; }
-    .info { margin-top: 20px; font-size: 18px; }
+    :root {
+      --primary-color: #4361ee;
+      --success-color: #06d6a0;
+      --warning-color: #ffd166;
+      --danger-color: #ef476f;
+      --dark-color: #2b2d42;
+      --light-color: #f8f9fa;
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      background-color: #f5f7ff;
+      padding: 20px;
+    }
+    
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      padding: 25px;
+    }
+    
+    header {
+      text-align: center;
+      margin-bottom: 30px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid #eaeaea;
+    }
+    
+    h1 {
+      color: var(--primary-color);
+      margin-bottom: 10px;
+    }
+    
+    .description {
+      color: #666;
+      font-size: 1.1rem;
+    }
+    
+    .card {
+      background: white;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
+    
+    .card-title {
+      font-size: 1.2rem;
+      color: var(--dark-color);
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+    }
+    
+    .card-title i {
+      margin-right: 10px;
+    }
+    
+    .info-group {
+      display: flex;
+      margin-bottom: 12px;
+    }
+    
+    .info-label {
+      font-weight: bold;
+      width: 100px;
+      color: #555;
+    }
+    
+    .info-value {
+      flex: 1;
+      word-break: break-all;
+      font-family: monospace;
+      background: #f8f9fa;
+      padding: 8px 12px;
+      border-radius: 4px;
+      border: 1px solid #eaeaea;
+    }
+    
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: bold;
+      color: #444;
+    }
+    
+    textarea, input[type="text"] {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-family: inherit;
+      font-size: 1rem;
+    }
+    
+    textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+    
+    button {
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      padding: 12px 25px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: bold;
+      transition: background-color 0.3s;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    button i {
+      margin-right: 8px;
+    }
+    
+    button:hover {
+      background-color: #3a56d4;
+    }
+    
+    button:disabled {
+      background-color: #cccccc;
+      cursor: not-allowed;
+    }
+    
+    .button-success {
+      background-color: var(--success-color);
+    }
+    
+    .button-success:hover {
+      background-color: #05c290;
+    }
+    
+    .actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+    }
+    
+    .status {
+      margin-top: 20px;
+      padding: 15px;
+      border-radius: 6px;
+      display: none;
+    }
+    
+    .status.success {
+      background-color: #e6f7f2;
+      color: var(--success-color);
+      border: 1px solid #b6f0e2;
+      display: block;
+    }
+    
+    .status.error {
+      background-color: #fdedf0;
+      color: var(--danger-color);
+      border: 1px solid #f8cfd7;
+      display: block;
+    }
+    
+    .status.warning {
+      background-color: #fff8e6;
+      color: #e6b400;
+      border: 1px solid #ffeaa7;
+      display: block;
+    }
+    
+    .history {
+      margin-top: 30px;
+    }
+    
+    .history-item {
+      padding: 12px;
+      border-left: 4px solid var(--primary-color);
+      background-color: #f8f9fa;
+      margin-bottom: 10px;
+      border-radius: 0 4px 4px 0;
+    }
+    
+    .history-item.success {
+      border-left-color: var(--success-color);
+    }
+    
+    .history-item.error {
+      border-left-color: var(--danger-color);
+    }
+    
+    .copy-btn {
+      background: #e9ecef;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      margin-left: 10px;
+      cursor: pointer;
+      font-size: 0.8rem;
+    }
+    
+    .copy-btn:hover {
+      background: #dee2e6;
+    }
+    
+    @media (max-width: 600px) {
+      .container {
+        padding: 15px;
+      }
+      
+      .actions {
+        flex-direction: column;
+      }
+      
+      button {
+        width: 100%;
+      }
+    }
   </style>
 </head>
 <body>
-  <h2>📨 Enviar Notificação</h2>
-
-  <div class="info">
-    <p id="token-display">Token: <em>carregando...</em></p>
-    <p id="nome-display">Nome: <em>carregando...</em></p>
+  <div class="container">
+    <header>
+      <h1>📨 Painel de Controle de Notificações</h1>
+      <p class="description">Envie notificações para dispositivos específicos</p>
+    </header>
+    
+    <div class="card">
+      <h2 class="card-title"><i class="icon">🔍</i> Informações Recebidas</h2>
+      
+      <div class="info-group">
+        <span class="info-label">Token:</span>
+        <span class="info-value" id="token-display">Carregando...</span>
+        <button class="copy-btn" onclick="copyToClipboard('token-display')">Copiar</button>
+      </div>
+      
+      <div class="info-group">
+        <span class="info-label">Nome:</span>
+        <span class="info-value" id="nome-display">Carregando...</span>
+      </div>
+      
+      <div class="info-group">
+        <span class="info-label">Idioma:</span>
+        <span class="info-value" id="lang-display">Carregando...</span>
+      </div>
+    </div>
+    
+    <div class="card">
+      <h2 class="card-title"><i class="icon">✉️</i> Conteúdo da Notificação</h2>
+      
+      <div class="form-group">
+        <label for="notification-title">Título da Notificação:</label>
+        <input type="text" id="notification-title" placeholder="Digite o título da notificação" value="Notificação de Teste">
+      </div>
+      
+      <div class="form-group">
+        <label for="notification-body">Corpo da Notificação:</label>
+        <textarea id="notification-body" placeholder="Digite a mensagem da notificação">Esta é uma notificação de teste enviada pelo painel de controle.</textarea>
+      </div>
+      
+      <div class="actions">
+        <button id="send-button" onclick="enviarNotificacao()">
+          <i class="icon">🚀</i> Enviar Notificação
+        </button>
+        
+        <button class="button-success" onclick="prefillTestMessage()">
+          <i class="icon">💡</i> Mensagem de Teste
+        </button>
+      </div>
+      
+      <div id="status-message" class="status"></div>
+    </div>
+    
+    <div class="history">
+      <h2 class="card-title"><i class="icon">📊</i> Histórico de Envios</h2>
+      <div id="history-list"></div>
+    </div>
   </div>
 
-  <button onclick="enviarNotificacao()">Enviar Notificação</button>
-
   <script>
-let tokenLido = "";
-let nomeLido = "";
-
-// ✅ FUNÇÃO PARA DECODIFICAR CORRETAMENTE O TOKEN
-function decodificarToken(token) {
-  // Remove espaços e decodifica URI
-  return decodeURIComponent(token).replace(/\s+/g, '');
-}
-
-// Extrai os parâmetros da própria URL
-const params = new URLSearchParams(window.location.search);
-tokenLido = decodificarToken(params.get("targetId") || "");
-nomeLido = params.get("name") || "Alguém";
-
-// Atualiza a interface
-document.getElementById("token-display").innerHTML = "Token: <strong>" + tokenLido + "</strong>";
-document.getElementById("nome-display").innerHTML = "Nome: <strong>" + nomeLido + "</strong>";
-
-// Função para enviar a notificação
-async function enviarNotificacao() {
-  if (!tokenLido || !nomeLido) {
-    alert("❌ Parâmetros ausentes na URL.");
-    return;
-  }
-
-  try {
-    const resposta = await fetch("https://fireweb-sfe0.onrender.com/notify", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ 
-        token: tokenLido, 
-        nome: nomeLido,
-        lang: params.get("lang") || "pt-br" // ✅ Adiciona language
-      })
-    });
-
-    if (resposta.ok) {
-      alert("✅ Notificação enviada com sucesso!");
-    } else {
-      alert("❌ Erro ao enviar notificação.");
+    // Variáveis globais
+    let tokenLido = "";
+    let nomeLido = "";
+    let langLido = "pt-br";
+    let historyItems = [];
+    
+    // ✅ FUNÇÃO PARA DECODIFICAR CORRETAMENTE O TOKEN
+    function decodificarToken(token) {
+      if (!token) return "";
+      // Remove espaços e decodifica URI
+      return decodeURIComponent(token).replace(/\s+/g, '');
     }
-  } catch (e) {
-    console.error(e);
-    alert("❌ Falha na comunicação com o servidor.");
-  }
-}
-</script>
+    
+    // ✅ FUNÇÃO PARA VALIDAR TOKEN
+    function validarToken(token) {
+      if (!token || token.length < 10) {
+        return false;
+      }
+      // Verificação básica de formato de token
+      return /^[a-zA-Z0-9:_\-]+$/.test(token);
+    }
+    
+    // ✅ FUNÇÃO PARA COPIAR TEXTO
+    function copyToClipboard(elementId) {
+      const element = document.getElementById(elementId);
+      const textToCopy = element.textContent;
+      
+      navigator.clipboard.writeText(textToCopy).then(() => {
+        showStatus("Token copiado para a área de transferência!", "success");
+      }).catch(err => {
+        showStatus("Falha ao copiar o token.", "error");
+      });
+    }
+    
+    // ✅ FUNÇÃO PARA EXIBIR STATUS
+    function showStatus(message, type) {
+      const statusElement = document.getElementById("status-message");
+      statusElement.textContent = message;
+      statusElement.className = "status " + type;
+      
+      // Rolagem suave para o status
+      statusElement.scrollIntoView({ behavior: 'smooth' });
+      
+      // Auto-esconder após 5 segundos para mensagens de sucesso
+      if (type === "success") {
+        setTimeout(() => {
+          statusElement.style.display = "none";
+        }, 5000);
+      }
+    }
+    
+    // ✅ FUNÇÃO PARA ADICIONAR AO HISTÓRICO
+    function addToHistory(success, message) {
+      const historyList = document.getElementById("history-list");
+      const timestamp = new Date().toLocaleTimeString();
+      
+      const historyItem = {
+        timestamp,
+        success,
+        message,
+        token: tokenLido
+      };
+      
+      historyItems.unshift(historyItem);
+      
+      // Manter apenas os últimos 10 itens no histórico
+      if (historyItems.length > 10) {
+        historyItems.pop();
+      }
+      
+      // Atualizar a exibição do histórico
+      renderHistory();
+    }
+    
+    // ✅ FUNÇÃO PARA RENDERIZAR HISTÓRICO
+    function renderHistory() {
+      const historyList = document.getElementById("history-list");
+      historyList.innerHTML = "";
+      
+      if (historyItems.length === 0) {
+        historyList.innerHTML = '<div class="history-item">Nenhuma notificação enviada ainda.</div>';
+        return;
+      }
+      
+      historyItems.forEach(item => {
+        const itemElement = document.createElement('div');
+        itemElement.className = `history-item ${item.success ? 'success' : 'error'}`;
+        itemElement.innerHTML = `
+          <strong>${item.timestamp}</strong> - 
+          ${item.success ? '✅' : '❌'} ${item.message}
+        `;
+        historyList.appendChild(itemElement);
+      });
+    }
+    
+    // ✅ FUNÇÃO PARA PREENCHER MENSAGEM DE TESTE
+    function prefillTestMessage() {
+      document.getElementById('notification-title').value = 'Teste do Sistema';
+      document.getElementById('notification-body').value = `Esta é uma mensagem de teste para ${nomeLido}. Enviada em ${new Date().toLocaleString()}.`;
+      showStatus("Mensagem de teste preenchida. Revise e envie.", "warning");
+    }
+    
+    // ✅ FUNÇÃO PRINCIPAL PARA ENVIAR NOTIFICAÇÃO
+    async function enviarNotificacao() {
+      const title = document.getElementById('notification-title').value.trim();
+      const body = document.getElementById('notification-body').value.trim();
+      const sendButton = document.getElementById('send-button');
+      
+      // Validações
+      if (!validarToken(tokenLido)) {
+        showStatus("❌ Token inválido. Verifique os parâmetros da URL.", "error");
+        addToHistory(false, "Falha - Token inválido");
+        return;
+      }
+      
+      if (!title || !body) {
+        showStatus("❌ Preencha o título e o corpo da notificação.", "error");
+        return;
+      }
+      
+      // Desabilitar botão durante o envio
+      sendButton.disabled = true;
+      sendButton.innerHTML = '<i class="icon">⏳</i> Enviando...';
+      
+      try {
+        showStatus("Enviando notificação...", "warning");
+        
+        const resposta = await fetch("https://fireweb-sfe0.onrender.com/notify", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ 
+            token: tokenLido, 
+            nome: nomeLido,
+            lang: langLido,
+            title: title,
+            body: body
+          })
+        });
+
+        if (resposta.ok) {
+          showStatus("✅ Notificação enviada com sucesso!", "success");
+          addToHistory(true, "Notificação enviada");
+        } else {
+          const errorText = await resposta.text();
+          throw new Error(`Erro no servidor: ${resposta.status} - ${errorText}`);
+        }
+      } catch (error) {
+        console.error("Erro ao enviar notificação:", error);
+        showStatus(`❌ Falha: ${error.message || "Erro desconhecido"}`, "error");
+        addToHistory(false, `Falha - ${error.message || "Erro desconhecido"}`);
+      } finally {
+        // Reabilitar o botão
+        sendButton.disabled = false;
+        sendButton.innerHTML = '<i class="icon">🚀</i> Enviar Notificação';
+      }
+    }
+    
+    // ✅ INICIALIZAÇÃO DA PÁGINA
+    document.addEventListener('DOMContentLoaded', function() {
+      // Extrai os parâmetros da própria URL
+      const params = new URLSearchParams(window.location.search);
+      tokenLido = decodificarToken(params.get("targetId") || "");
+      nomeLido = params.get("name") || "Usuário";
+      langLido = params.get("lang") || "pt-br";
+      
+      // Validação básica
+      if (!validarToken(tokenLido)) {
+        showStatus("Aviso: Token não encontrado ou inválido na URL", "warning");
+      }
+      
+      // Atualiza a interface
+      document.getElementById("token-display").textContent = tokenLido || "Não fornecido";
+      document.getElementById("nome-display").textContent = nomeLido;
+      document.getElementById("lang-display").textContent = langLido;
+      
+      // Inicializa o histórico
+      renderHistory();
+      
+      // Mostra mensagem de boas-vindas
+      if (tokenLido && validarToken(tokenLido)) {
+        showStatus(`Pronto para enviar notificações para ${nomeLido}`, "success");
+      }
+    });
+  </script>
 </body>
 </html>
