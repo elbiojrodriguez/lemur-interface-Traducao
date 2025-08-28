@@ -333,6 +333,40 @@
             text-align: center;
             display: none;
         }
+        
+        /* NOVO: Estilos para exibição do ID fixo */
+        .fixed-id-container {
+            position: absolute;
+            top: 80%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80%;
+            padding: 15px;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            z-index: 50;
+        }
+        
+        .fixed-id-title {
+            color: #3498db;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+        
+        .fixed-id-value {
+            font-size: 14px;
+            word-break: break-all;
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 8px;
+            width: 100%;
+            box-sizing: border-box;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
@@ -374,6 +408,12 @@
             <div class="token-value" id="token-value"></div>
         </div>
         
+        <!-- NOVO: Container para exibir o ID fixo gerado -->
+        <div class="fixed-id-container" id="fixed-id-container">
+            <h3 class="fixed-id-title" id="fixed-id-title">🆔 ID Fixo Gerado (últimos 5 caracteres):</h3>
+            <div class="fixed-id-value" id="fixed-id-value"></div>
+        </div>
+        
         <!-- Mensagem de aviso quando não há token -->
         <div class="warning-message" id="warning-message">
             ⚠️ Token não recebido. Não é possível gerar o QR Code.
@@ -399,13 +439,24 @@
         const urlParams = new URLSearchParams(window.location.search);
         const token = urlParams.get('token');
         
+        // Variável para armazenar o ID fixo gerado
+        let fixedId = null;
+        
         // Exibe o token se estiver presente na URL
         if (token) {
             document.getElementById('token-value').textContent = token;
             document.getElementById('token-container').style.display = 'flex';
             console.log("Token recebido:", token);
             
-            // Ajusta a posição dos outros elementos para acomodar o token
+            // GERA O ID FIXO com os últimos 5 caracteres do token
+            fixedId = token.slice(-5);
+            console.log("ID Fixo gerado:", fixedId);
+            
+            // Exibe o ID fixo na tela
+            document.getElementById('fixed-id-value').textContent = fixedId;
+            document.getElementById('fixed-id-container').style.display = 'flex';
+            
+            // Ajusta a posição dos outros elementos para acomodar o token e o ID fixo
             document.getElementById('qr-result-container').style.top = '85%';
         } else {
             // Mostra aviso se não houver token
@@ -424,7 +475,8 @@
           "camera-text": "Allow camera access",
           "microphone-text": "Allow microphone access",
           "qr-modal-title": "Scan QR Code",
-          "token-title": "✅ Token received from the app:"
+          "token-title": "✅ Token received from the app:",
+          "fixed-id-title": "🆔 Fixed ID Generated (last 5 characters):"
         };
 
         async function translateText(text, targetLang) {
@@ -576,11 +628,11 @@
                 // Mostra loader durante geração do QR code
                 loaderContainer.style.display = 'flex';
 
-                // Gera o QR CODE usando a chave do Firebase (token) em vez do ID dinâmico
+                // Gera o QR CODE usando o ID FIXO (últimos 5 caracteres do token)
                 const browserFullLang = navigator.language || 'pt-BR';
                 const baseUrl = 'https://lemur-interface-traducao.netlify.app/caller.html';
-                // Usa o token como targetId em vez de gerar um ID aleatório
-                const fullUrl = `${baseUrl}?targetId=${encodeURIComponent(token)}&lang=${encodeURIComponent(browserFullLang)}&name=${encodeURIComponent(name)}`;
+                // Usa o ID fixo como targetId
+                const fullUrl = `${baseUrl}?targetId=${encodeURIComponent(fixedId)}&lang=${encodeURIComponent(browserFullLang)}&name=${encodeURIComponent(name)}`;
                 
                 // Gera o QR code na nova tela
                 setTimeout(() => {
