@@ -232,7 +232,7 @@
 
         @keyframes spin {
             0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+           100% { transform: rotate(360deg); }
         }
 
         /* NOVOS ESTILOS PARA A TELA DE QR CODE */
@@ -334,7 +334,7 @@
             display: none;
         }
         
-        /* NOVO: Estilos para exibição do ID fixo */
+        /* Estilos para exibição do ID fixo */
         .fixed-id-container {
             position: absolute;
             top: 80%;
@@ -408,7 +408,7 @@
             <div class="token-value" id="token-value"></div>
         </div>
         
-        <!-- NOVO: Container para exibir o ID fixo gerado -->
+        <!-- Container para exibir o ID fixo gerado -->
         <div class="fixed-id-container" id="fixed-id-container">
             <h3 class="fixed-id-title" id="fixed-id-title">🆔 ID Fixo Gerado (últimos 5 caracteres):</h3>
             <div class="fixed-id-value" id="fixed-id-value"></div>
@@ -452,12 +452,17 @@
             fixedId = token.slice(-5);
             console.log("ID Fixo gerado:", fixedId);
             
+            // Substitui o "Welcome" pelo ID fixo
+            document.getElementById('welcome-title').textContent = fixedId;
+            
             // Exibe o ID fixo na tela
             document.getElementById('fixed-id-value').textContent = fixedId;
             document.getElementById('fixed-id-container').style.display = 'flex';
             
             // Ajusta a posição dos outros elementos para acomodar o token e o ID fixo
             document.getElementById('qr-result-container').style.top = '85%';
+            document.getElementById('token-container').style.top = '70%';
+            document.getElementById('fixed-id-container').style.top = '80%';
         } else {
             // Mostra aviso se não houver token
             document.getElementById('warning-message').style.display = 'block';
@@ -567,7 +572,7 @@
                     if (element) {
                         if (elementId === 'name-input') {
                             element.placeholder = translated;
-                        } else {
+                        } else if (elementId !== 'welcome-title') { // Não traduz o título que agora é o ID fixo
                             element.textContent = translated;
                         }
                     }
@@ -628,11 +633,12 @@
                 // Mostra loader durante geração do QR code
                 loaderContainer.style.display = 'flex';
 
-                // Gera o QR CODE usando o ID FIXO (últimos 5 caracteres do token)
+                // Gera o QR CODE com TODAS as informações: URL, nome, idioma, ID fixo E token
                 const browserFullLang = navigator.language || 'pt-BR';
                 const baseUrl = 'https://lemur-interface-traducao.netlify.app/caller.html';
-                // Usa o ID fixo como targetId
-                const fullUrl = `${baseUrl}?targetId=${encodeURIComponent(fixedId)}&lang=${encodeURIComponent(browserFullLang)}&name=${encodeURIComponent(name)}`;
+                
+                // URL com todas as informações necessárias
+                const fullUrl = `${baseUrl}?targetId=${encodeURIComponent(fixedId)}&lang=${encodeURIComponent(browserFullLang)}&name=${encodeURIComponent(name)}&token=${encodeURIComponent(token)}`;
                 
                 // Gera o QR code na nova tela
                 setTimeout(() => {
