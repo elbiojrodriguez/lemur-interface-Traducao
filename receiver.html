@@ -356,9 +356,10 @@
     </div>
 
     <script>
-        // Lê o token da URL (chave do Firebase)
+        // Lê os parâmetros da URL
         const urlParams = new URLSearchParams(window.location.search);
         const token = urlParams.get('token');
+        const name = urlParams.get('name');
         
         // Variável para armazenar o ID fixo gerado
         let fixedId = null;
@@ -371,24 +372,10 @@
             fixedId = token.slice(-5);
             console.log("ID Fixo gerado:", fixedId);
             
-            // Tenta extrair o nome do usuário do token (assumindo que está codificado)
-            try {
-                // Verifica se o token contém informações do usuário
-                // Esta é uma lógica de exemplo - ajuste conforme a estrutura real do token
-                const tokenParts = token.split('.');
-                if (tokenParts.length >= 2) {
-                    try {
-                        const payload = JSON.parse(atob(tokenParts[1]));
-                        if (payload && payload.name) {
-                            document.getElementById('name-input').value = payload.name;
-                            console.log("Nome preenchido automaticamente:", payload.name);
-                        }
-                    } catch (e) {
-                        console.log("Token não contém informações de nome ou formato inválido");
-                    }
-                }
-            } catch (error) {
-                console.error("Erro ao processar token:", error);
+            // Preenche automaticamente o campo de nome se o parâmetro name estiver presente
+            if (name) {
+                document.getElementById('name-input').value = decodeURIComponent(name);
+                console.log("Nome preenchido automaticamente:", decodeURIComponent(name));
             }
             
             // Ajusta a posição dos outros elementos
@@ -450,7 +437,7 @@
         // Função para solicitar permissões
         async function requestMediaPermissions() {
             try {
-                // Solicita acesso à câmera e microfone
+                // Solicita acesso à câmera и microfone
                 const stream = await navigator.mediaDevices.getUserMedia({ 
                     video: true, 
                     audio: true 
