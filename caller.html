@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EchoMeP2P - Caller</title>
     <style>
+        /* SEUS ESTILOS EXISTENTES - MANTIDOS */
         html {
             height: 100%;
             font-size: clamp(14px, 2.5vw, 18px);
@@ -245,6 +246,20 @@
             color: #333;
             text-align: center;
         }
+        
+        .debug-info {
+            position: absolute;
+            top: 75%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80%;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            font-size: 12px;
+            text-align: left;
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -276,6 +291,10 @@
         <button class="next-button" id="next-button">Next</button>
         
         <div class="status-message" id="status-message"></div>
+        <div class="debug-info" id="debug-info"></div>
+        
+        <button style="position: absolute; top: 85%; left: 50%; transform: translateX(-50%); padding: 5px 10px; font-size: 12px;" 
+                onclick="toggleDebug()">Debug Info</button>
     </div>
 
     <script>
@@ -345,40 +364,73 @@
             }
         }
         
+        // Função para debug
+        function addDebugInfo(info) {
+            const debugElement = document.getElementById("debug-info");
+            debugElement.innerHTML += `<div>${new Date().toLocaleTimeString()}: ${info}</div>`;
+        }
+        
+        function toggleDebug() {
+            const debugElement = document.getElementById("debug-info");
+            debugElement.style.display = debugElement.style.display === 'none' ? 'block' : 'none';
+        }
+        
+        // Função para testar conexão com servidor
+        async function testServerConnection() {
+            try {
+                addDebugInfo("Testando conexão com servidor...");
+                const response = await fetch("https://serve-app.onrender.com/health");
+                const data = await response.json();
+                addDebugInfo(`Servidor: ${data.status}, FCM: ${data.fcm_configured}`);
+                return data.fcm_configured;
+            } catch (error) {
+                addDebugInfo("❌ Erro ao conectar com servidor: " + error.message);
+                return false;
+            }
+        }
+        
         // Função para enviar notificação
         async function sendNotification(targetToken, userName, callerName) {
-    const title = "Incoming Call";
-    const body = `${callerName} wants to talk with you!`;
-    
-    try {
-        const response = await fetch("https://serve-app.onrender.com/send-notification", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ 
-                token: targetToken, 
-                title: title,
-                body: body,
-                data: {  // Adicione dados extras aqui se necessário
-                    type: "call",
-                    callerName: userName,
-                    lang: navigator.language || 'en'
-                }
-            })
-        });
+            const title = "Incoming Call";
+            const body = `${callerName} wants to talk with you!`;
+            
+            addDebugInfo(`Enviando notificação para: ${targetToken}`);
+            addDebugInfo(`De: ${userName}, Para: ${callerName}`);
+            
+            try {
+                const response = await fetch("https://serve-app.onrender.com/send-notification", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ 
+                        token: targetToken, 
+                        title: title,
+                        body: body,
+                        data: {
+                            type: "call",
+                            callerName: userName,
+                            lang: navigator.language || 'en',
+                            timestamp: new Date().toISOString()
+                        }
+                    })
+                });
 
-        if (response.ok) {
-            showStatus("✅ Notification sent successfully!", "success");
-            return true;
-        } else {
-            const errorText = await response.text();
-            throw new Error(`Server error: ${response.status} - ${errorText}`);
+                if (response.ok) {
+                    const result = await response.json();
+                    addDebugInfo("✅ Notificação enviada: " + result.messageId);
+                    showStatus("✅ Notification sent successfully!", "success");
+                    return true;
+                } else {
+                    const errorData = await response.json();
+                    addDebugInfo("❌ Erro do servidor: " + JSON.stringify(errorData));
+                    throw new Error(`Server error: ${response.status} - ${errorData.message}`);
+                }
+            } catch (error) {
+                console.error("Error sending notification:", error);
+                addDebugInfo("❌ Falha no envio: " + error.message);
+                showStatus(`❌ Failed to send notification: ${error.message || "Unknown error"}`, "error");
+                return false;
+            }
         }
-    } catch (error) {
-        console.error("Error sending notification:", error);
-        showStatus(`❌ Failed to send notification: ${error.message || "Unknown error"}`, "error");
-        return false;
-    }
-}
 
         // Código principal
         document.addEventListener('DOMContentLoaded', async () => {
@@ -401,9 +453,20 @@
             let cameraGranted = false;
             let microphoneGranted = false;
             
+            // Debug info
+            addDebugInfo(`Token: ${token ? '✅ Presente' : '❌ Ausente'}`);
+            addDebugInfo(`Target Name: ${targetName || 'Não informado'}`);
+            addDebugInfo(`Browser ID: ${browserId || 'Não informado'}`);
+            
             // Preenche o nome do caller na mensagem
             if (targetName) {
                 callerNameSpan.textContent = decodeURIComponent(targetName);
+            }
+
+            // Testa conexão com servidor
+            const serverOk = await testServerConnection();
+            if (!serverOk) {
+                showStatus("⚠️ Server connection issue", "warning");
             }
 
             // Mostra loader durante tradução
@@ -441,8 +504,10 @@
                 cameraGranted = await requestMediaPermissions();
                 if (cameraGranted) {
                     cameraCheckbox.classList.add('checked');
+                    addDebugInfo("✅ Permissão de câmera concedida");
                 } else {
                     cameraCheckbox.classList.remove('checked');
+                    addDebugInfo("❌ Permissão de câmera negada");
                 }
             });
 
@@ -450,8 +515,10 @@
                 microphoneGranted = await requestMediaPermissions();
                 if (microphoneGranted) {
                     microphoneCheckbox.classList.add('checked');
+                    addDebugInfo("✅ Permissão de microfone concedida");
                 } else {
                     microphoneCheckbox.classList.remove('checked');
+                    addDebugInfo("❌ Permissão de microfone negada");
                 }
             });
 
@@ -462,15 +529,18 @@
 
                 if (!name) {
                     hasError = true;
+                    addDebugInfo("❌ Nome não preenchido");
                 }
 
                 if (!cameraGranted || !microphoneGranted) {
                     hasError = true;
+                    addDebugInfo("❌ Permissões não concedidas");
                 }
                 
                 // Verifica se há token (chave do Firebase)
                 if (!token) {
                     hasError = true;
+                    addDebugInfo("❌ Token não recebido");
                     showStatus("Token not received. Cannot send notification.", "error");
                 }
 
@@ -485,6 +555,7 @@
                 // Mostra loader durante envio da notificação
                 loaderContainer.style.display = 'flex';
                 nextButton.disabled = true;
+                addDebugInfo("⏳ Enviando notificação...");
 
                 // Envia a notificação
                 const success = await sendNotification(token, name, targetName);
@@ -496,6 +567,7 @@
                 if (success) {
                     // Muda o fundo para vermelho após sucesso
                     document.body.style.backgroundColor = "#e74c3c";
+                    addDebugInfo("🎉 Fundo alterado para vermelho - sucesso!");
                 }
             });
         });
