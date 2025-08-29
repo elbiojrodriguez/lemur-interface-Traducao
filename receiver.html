@@ -6,13 +6,433 @@
     <title>EchoMeP2P - Welcome & Permissions</title>
     <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
     <style>
-        /* [SEUS ESTILOS EXISTENTES AQUI] */
-        /* Mantenha todos os estilos anteriores */
+        html {
+            height: 100%;
+            font-size: clamp(14px, 2.5vw, 18px);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            text-align: center;
+            transition: background-color 0.5s;
+        }
+
+        body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            font-size: 1em;
+        }
+
+        .box-principal {
+            width: 100%;
+            max-width: 600px;
+            height: 100%;
+            margin: 0 auto;
+            padding: 2vh 2vw;
+            box-sizing: border-box;
+            background-color: #aee2ff;
+            position: relative;
+            overflow-y: auto;
+        }
+
+        .logo-lemur {
+            position: absolute;
+            top: 7%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 35%;
+            height: auto;
+        }
+
+        #EchoMeP2P-title {
+            position: absolute;
+            top: 10%;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #333;
+            font-size: 7vw;
+            white-space: nowrap;
+            text-align: center;
+        }
+
+        .translator-label {
+            position: absolute;
+            top: 17%;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #333;
+            font-size: 5vw;
+            text-align: center;
+            width: 80%;
+            max-width: 90%;
+        }
+
+        #welcome-title {
+            position: absolute;
+            top: 21%;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #333;
+            font-size: 9vw;
+            white-space: nowrap;
+            text-align: center;
+        }
+
+        .name-input {
+            position: absolute;
+            top: 32%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 70%;
+            height: 5%;
+            padding: 1vh 1vw;
+            border-radius: 3vw;
+            border: none;
+            box-shadow: 0 0.5vw 1vw rgba(0, 0, 0, 0.1);
+            font-size: 6vw;
+            text-align: center;
+        }
+
+        .name-input:focus {
+            outline: none;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .permissions-container {
+            position: absolute;
+            top: 41%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 70%;
+            display: flex;
+            flex-direction: column;
+            gap: 2vh;
+        }
+
+        .permission-item {
+            display: flex;
+            align-items: center;
+            padding: 1.5vh 2vw;
+            background-color: rgba(255, 255, 255, 0.7);
+            border-radius: 3vw;
+            box-shadow: 0 0.5vw 1vw rgba(0, 0, 0, 0.1);
+        }
+
+        .permission-checkbox {
+            width: 5vw;
+            height: 5vw;
+            margin-right: 3vw;
+            border: 2px solid #3498db;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .permission-checkbox.checked {
+            background-color: #3498db;
+        }
+
+        .permission-checkbox.checked::after {
+            content: "✓";
+            color: white;
+            font-size: 4vw;
+        }
+
+        .permission-text {
+            flex: 1;
+            text-align: left;
+            font-size: 4vw;
+            color: #333;
+        }
+
+        .next-button {
+            position: absolute;
+            top: 59%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 30%;
+            height: 5%;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 3vw;
+            font-size: 5vw;
+            cursor: pointer;
+            box-shadow: 0 0.5vw 1vw rgba(0, 0, 0, 0.1);
+            transition: all 0.3s;
+            z-index: 10;
+        }
+
+        .next-button:hover {
+            background-color: #2980b9;
+        }
+
+        .error-state {
+            background-color: #e74c3c;
+            animation: shake 0.5s;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-0.5vw); }
+            40%, 80% { transform: translateX(0.5vw); }
+        }
+
+        .qr-result-container {
+            position: absolute;
+            top: 70%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80%;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .qrcode-container {
+            padding: 12px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        }
+
+        .url-display {
+            width: 100%;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            word-break: break-all;
+            font-size: 12px;
+            text-align: center;
+        }
+
+        .loader-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+        }
+
+        .loader {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #3498db;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+           100% { transform: rotate(360deg); }
+        }
+
+        /* NOVOS ESTILOS PARA A TELA DE QR CODE */
+        #qr-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .qr-modal {
+            background-color: #aee2ff;
+            border-radius: 20px;
+            padding: 30px;
+            width: 80%;
+            max-width: 400px;
+            text-align: center;
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.5);
+        }
+
+        .qr-modal-title {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .qr-modal-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .close-button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .close-button:hover {
+            background-color: #2980b9;
+        }
+        
+        /* Estilos para a exibição do token */
+        .token-container {
+            position: absolute;
+            top: 70%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80%;
+            padding: 15px;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            z-index: 50;
+        }
+        
+        .token-title {
+            color: #27ae60;
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+        
+        .token-value {
+            font-size: 14px;
+            word-break: break-all;
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 8px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        
+        .warning-message {
+            position: absolute;
+            top: 65%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80%;
+            padding: 10px;
+            background-color: #ff9800;
+            color: white;
+            border-radius: 8px;
+            text-align: center;
+            display: none;
+        }
+        
+        /* Estilos para exibição do ID fixo */
+        .fixed-id-container {
+            position: absolute;
+            top: 80%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80%;
+            padding: 15px;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            z-index: 50;
+        }
+        
+        .fixed-id-title {
+            color: #3498db;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+        
+        .fixed-id-value {
+            font-size: 14px;
+            word-break: break-all;
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 8px;
+            width: 100%;
+            box-sizing: border-box;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
-    <!-- [SEU HTML EXISTENTE AQUI] -->
-    <!-- Mantenha toda a estrutura HTML anterior -->
+    <div class="box-principal" id="welcome-screen">
+        <div class="loader-container" id="loader-container">
+            <div class="loader"></div>
+        </div>
+
+        <img src="lemur.png" alt="logo-lemur" class="logo-lemur" />
+        <h1 id="EchoMeP2P-title">EchoMeP2P</h1>
+        <h2 id="welcome-title">Welcome!</h2>
+        
+        <div class="translator-label" id="translator-label">Live translation. No filters. No platform.</div>
+        <input type="text" class="name-input" id="name-input" placeholder="Type your name" />
+        
+        <div class="permissions-container">
+            <div class="permission-item">
+                <div class="permission-checkbox" id="camera-checkbox"></div>
+                <div class="permission-text" id="camera-text">Allow camera access</div>
+            </div>
+            <div class="permission-item">
+                <div class="permission-checkbox" id="microphone-checkbox"></div>
+                <div class="permission-text" id="microphone-text">Allow microphone access</div>
+            </div>
+        </div>
+        
+        <button class="next-button" id="next-button">Next</button>
+        
+        <div class="qr-result-container" id="qr-result-container">
+            <div id="qrcode" class="qrcode-container"></div>
+            <div class="url-display" id="url-display">
+                QR Code Content: <br><span id="url-content"></span>
+            </div>
+        </div>
+        
+        <!-- Container para exibir o token recebido -->
+        <div class="token-container" id="token-container">
+            <h3 class="token-title" id="token-title">✅ Token recebido do aplicativo:</h3>
+            <div class="token-value" id="token-value"></div>
+        </div>
+        
+        <!-- Container para exibir o ID fixo gerado -->
+        <div class="fixed-id-container" id="fixed-id-container">
+            <h3 class="fixed-id-title" id="fixed-id-title">🆔 ID Fixo Gerado (últimos 5 caracteres):</h3>
+            <div class="fixed-id-value" id="fixed-id-value"></div>
+        </div>
+        
+        <!-- Mensagem de aviso quando não há token -->
+        <div class="warning-message" id="warning-message">
+            ⚠️ Token não recebido. Não é possível gerar o QR Code.
+        </div>
+    </div>
+
+    <!-- NOVA TELA PARA O QR CODE -->
+    <div id="qr-screen">
+        <div class="qr-modal">
+            <h2 class="qr-modal-title" id="qr-modal-title">Scan QR Code</h2>
+            <div class="qr-modal-content">
+                <div id="qrcode-modal" class="qrcode-container"></div>
+                <div class="url-display" id="url-display-modal">
+                    QR Code Content: <br><span id="url-content-modal"></span>
+                </div>
+                <button class="close-button" id="close-button">Close</button>
+            </div>
+        </div>
+    </div>
 
     <script>
         // Lê o token da URL (chave do Firebase)
@@ -32,20 +452,56 @@
             fixedId = token.slice(-5);
             console.log("ID Fixo gerado:", fixedId);
             
+            // Substitui o "Welcome" pelo ID fixo
+            document.getElementById('welcome-title').textContent = fixedId;
+            
             // Exibe o ID fixo na tela
             document.getElementById('fixed-id-value').textContent = fixedId;
             document.getElementById('fixed-id-container').style.display = 'flex';
             
             // Ajusta a posição dos outros elementos para acomodar o token e o ID fixo
             document.getElementById('qr-result-container').style.top = '85%';
+            document.getElementById('token-container').style.top = '70%';
+            document.getElementById('fixed-id-container').style.top = '80%';
         } else {
             // Mostra aviso se não houver token
             document.getElementById('warning-message').style.display = 'block';
             document.getElementById('qr-result-container').style.top = '75%';
         }
 
-        // [CÓDIGO DE TRADUÇÃO EXISTENTE AQUI]
-        // Mantenha o código de tradução
+        // Código de tradução
+        const TRANSLATE_ENDPOINT = 'https://chat-tradutor.onrender.com/translate';
+
+        const textsToTranslateWelcome = {
+          "welcome-title": "Welcome!",
+          "translator-label": "Live translation. No filters. No platform.",
+          "name-input": "Type your name",
+          "next-button": "Next",
+          "camera-text": "Allow camera access",
+          "microphone-text": "Allow microphone access",
+          "qr-modal-title": "Scan QR Code",
+          "token-title": "✅ Token received from the app:",
+          "fixed-id-title": "🆔 Fixed ID Generated (last 5 characters):"
+        };
+
+        async function translateText(text, targetLang) {
+          try {
+            if (targetLang === 'en') return text;
+
+            const response = await fetch(TRANSLATE_ENDPOINT, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ text, targetLang })
+            });
+
+            const result = await response.json();
+            return result.translatedText || text;
+
+          } catch (error) {
+            console.error('Erro na tradução:', error);
+            return text;
+          }
+        }
 
         // Classe para gerar QR Code
         class QRCodeGenerator {
@@ -63,8 +519,25 @@
           }
         }
 
-        // [FUNÇÕES EXISTENTES DE PERMISSÕES AQUI]
-        // Mantenha as funções de requestMediaPermissions
+        // Função para solicitar permissões
+        async function requestMediaPermissions() {
+            try {
+                // Solicita acesso à câmera e microfone
+                const stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: true, 
+                    audio: true 
+                });
+                
+                // Para as tracks imediatamente (apenas queríamos a permissão)
+                stream.getTracks().forEach(track => track.stop());
+                
+                return true;
+                
+            } catch (error) {
+                console.error('Erro ao acessar dispositivos:', error);
+                return false;
+            }
+        }
 
         // Código principal
         document.addEventListener('DOMContentLoaded', async () => {
@@ -85,8 +558,31 @@
             let cameraGranted = false;
             let microphoneGranted = false;
 
-            // [PROCESSO DE TRADUÇÃO EXISTENTE AQUI]
-            // Mantenha o código de tradução
+            // Mostra loader durante tradução
+            loaderContainer.style.display = 'flex';
+
+            // Processo de tradução
+            const browserLang = (navigator.language || 'en').split('-')[0];
+            
+            for (const [elementId, text] of Object.entries(textsToTranslateWelcome)) {
+                try {
+                    const translated = await translateText(text, browserLang);
+                    const element = document.getElementById(elementId);
+
+                    if (element) {
+                        if (elementId === 'name-input') {
+                            element.placeholder = translated;
+                        } else if (elementId !== 'welcome-title') { // Não traduz o título que agora é o ID fixo
+                            element.textContent = translated;
+                        }
+                    }
+                } catch (error) {
+                    console.error(`Erro ao traduzir ${elementId}:`, error);
+                }
+            }
+
+            // Esconde o loader
+            loaderContainer.style.display = 'none';
 
             // Event listener para os checkboxes
             cameraCheckbox.addEventListener('click', async () => {
