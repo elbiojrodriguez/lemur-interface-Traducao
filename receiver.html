@@ -260,9 +260,17 @@
         }
 
         .qr-modal-title {
-            font-size: 24px;
-            margin-bottom: 20px;
+            font-size: 20px;
+            margin-bottom: 15px;
             color: #333;
+            font-weight: bold;
+        }
+
+        .qr-modal-description {
+            font-size: 16px;
+            margin-bottom: 20px;
+            color: #555;
+            line-height: 1.4;
         }
 
         .qr-modal-content {
@@ -344,7 +352,8 @@
     <!-- NOVA TELA PARA O QR CODE -->
     <div id="qr-screen">
         <div class="qr-modal">
-            <h2 class="qr-modal-title" id="qr-modal-title">Scan QR Code</h2>
+            <h2 class="qr-modal-title" id="qr-modal-title">This is your online key</h2>
+            <p class="qr-modal-description" id="qr-modal-description">You can ask to scan, share or print on your business card.</p>
             <div class="qr-modal-content">
                 <div id="qrcode-modal" class="qrcode-container"></div>
                 <div class="url-display" id="url-display-modal">
@@ -396,7 +405,9 @@
           "next-button": "Next",
           "camera-text": "Allow camera access",
           "microphone-text": "Allow microphone access",
-          "qr-modal-title": "Scan QR Code"
+          "qr-modal-title": "This is your online key",
+          "qr-modal-description": "You can ask to scan, share or print on your business card.",
+          "close-button": "Close"
         };
 
         async function translateText(text, targetLang) {
@@ -437,7 +448,7 @@
         // Função para solicitar permissões
         async function requestMediaPermissions() {
             try {
-                // Solicita acesso à câmera и microfone
+                // Solicita acesso à câmera e microfone
                 const stream = await navigator.mediaDevices.getUserMedia({ 
                     video: true, 
                     audio: true 
@@ -469,6 +480,8 @@
             const qrScreen = document.getElementById('qr-screen');
             const closeButton = document.getElementById('close-button');
             const urlContentModal = document.getElementById('url-content-modal');
+            const qrModalTitle = document.getElementById('qr-modal-title');
+            const qrModalDescription = document.getElementById('qr-modal-description');
             
             let cameraGranted = false;
             let microphoneGranted = false;
