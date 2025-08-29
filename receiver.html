@@ -287,39 +287,6 @@
             background-color: #2980b9;
         }
         
-        /* Estilos para a exibição do token */
-        .token-container {
-            position: absolute;
-            top: 70%;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 80%;
-            padding: 15px;
-            background-color: rgba(255, 255, 255, 0.9);
-            border-radius: 12px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            z-index: 50;
-        }
-        
-        .token-title {
-            color: #27ae60;
-            font-size: 18px;
-            margin-bottom: 10px;
-        }
-        
-        .token-value {
-            font-size: 14px;
-            word-break: break-all;
-            background-color: #f8f9fa;
-            padding: 10px;
-            border-radius: 8px;
-            width: 100%;
-            box-sizing: border-box;
-        }
-        
         .warning-message {
             position: absolute;
             top: 65%;
@@ -332,40 +299,6 @@
             border-radius: 8px;
             text-align: center;
             display: none;
-        }
-        
-        /* Estilos para exibição do ID fixo */
-        .fixed-id-container {
-            position: absolute;
-            top: 80%;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 80%;
-            padding: 15px;
-            background-color: rgba(255, 255, 255, 0.9);
-            border-radius: 12px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            z-index: 50;
-        }
-        
-        .fixed-id-title {
-            color: #3498db;
-            font-size: 16px;
-            margin-bottom: 10px;
-        }
-        
-        .fixed-id-value {
-            font-size: 14px;
-            word-break: break-all;
-            background-color: #f8f9fa;
-            padding: 10px;
-            border-radius: 8px;
-            width: 100%;
-            box-sizing: border-box;
-            font-weight: bold;
         }
     </style>
 </head>
@@ -402,18 +335,6 @@
             </div>
         </div>
         
-        <!-- Container para exibir o token recebido -->
-        <div class="token-container" id="token-container">
-            <h3 class="token-title" id="token-title">✅ Token recebido do aplicativo:</h3>
-            <div class="token-value" id="token-value"></div>
-        </div>
-        
-        <!-- Container para exibir o ID fixo gerado -->
-        <div class="fixed-id-container" id="fixed-id-container">
-            <h3 class="fixed-id-title" id="fixed-id-title">🆔 ID Fixo Gerado (últimos 5 caracteres):</h3>
-            <div class="fixed-id-value" id="fixed-id-value"></div>
-        </div>
-        
         <!-- Mensagem de aviso quando não há token -->
         <div class="warning-message" id="warning-message">
             ⚠️ Token não recebido. Não é possível gerar o QR Code.
@@ -444,29 +365,38 @@
         
         // Exibe o token se estiver presente na URL
         if (token) {
-            document.getElementById('token-value').textContent = token;
-            document.getElementById('token-container').style.display = 'flex';
             console.log("Token recebido:", token);
             
             // GERA O ID FIXO com os últimos 5 caracteres do token
             fixedId = token.slice(-5);
             console.log("ID Fixo gerado:", fixedId);
             
-            // Substitui o "Welcome" pelo ID fixo
-            document.getElementById('welcome-title').textContent = fixedId;
+            // Tenta extrair o nome do usuário do token (assumindo que está codificado)
+            try {
+                // Verifica se o token contém informações do usuário
+                // Esta é uma lógica de exemplo - ajuste conforme a estrutura real do token
+                const tokenParts = token.split('.');
+                if (tokenParts.length >= 2) {
+                    try {
+                        const payload = JSON.parse(atob(tokenParts[1]));
+                        if (payload && payload.name) {
+                            document.getElementById('name-input').value = payload.name;
+                            console.log("Nome preenchido automaticamente:", payload.name);
+                        }
+                    } catch (e) {
+                        console.log("Token não contém informações de nome ou formato inválido");
+                    }
+                }
+            } catch (error) {
+                console.error("Erro ao processar token:", error);
+            }
             
-            // Exibe o ID fixo na tela
-            document.getElementById('fixed-id-value').textContent = fixedId;
-            document.getElementById('fixed-id-container').style.display = 'flex';
-            
-            // Ajusta a posição dos outros elementos para acomodar o token e o ID fixo
-            document.getElementById('qr-result-container').style.top = '85%';
-            document.getElementById('token-container').style.top = '70%';
-            document.getElementById('fixed-id-container').style.top = '80%';
+            // Ajusta a posição dos outros elementos
+            document.getElementById('qr-result-container').style.top = '70%';
         } else {
             // Mostra aviso se não houver token
             document.getElementById('warning-message').style.display = 'block';
-            document.getElementById('qr-result-container').style.top = '75%';
+            document.getElementById('qr-result-container').style.top = '70%';
         }
 
         // Código de tradução
@@ -479,9 +409,7 @@
           "next-button": "Next",
           "camera-text": "Allow camera access",
           "microphone-text": "Allow microphone access",
-          "qr-modal-title": "Scan QR Code",
-          "token-title": "✅ Token received from the app:",
-          "fixed-id-title": "🆔 Fixed ID Generated (last 5 characters):"
+          "qr-modal-title": "Scan QR Code"
         };
 
         async function translateText(text, targetLang) {
@@ -572,7 +500,7 @@
                     if (element) {
                         if (elementId === 'name-input') {
                             element.placeholder = translated;
-                        } else if (elementId !== 'welcome-title') { // Não traduz o título que agora é o ID fixo
+                        } else {
                             element.textContent = translated;
                         }
                     }
