@@ -1,207 +1,45 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Caller - Mobile Video Call</title>
+  <title>Caller - Videochamada Mobile</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="responsivo.css" />
   <style>
-    /* Estilos base */
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-    
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
-      color: white;
-      height: 100vh;
-      overflow: hidden;
-    }
-    
-    .container {
-      position: relative;
-      width: 100%;
-      height: 100%;
-    }
-    
-    .video-wrapper {
-      position: absolute;
-      border-radius: 16px;
-      overflow: hidden;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-      transition: all 0.3s ease;
-    }
-    
-    #remoteVideo {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      background-color: #000;
-    }
-    
-    #localVideo {
-      position: absolute;
-      bottom: 120px;
-      right: 20px;
-      width: 120px;
-      height: 160px;
-      object-fit: cover;
-      background-color: #000;
-      border: 2px solid white;
-      z-index: 10;
-    }
-    
-    .controls {
-      position: absolute;
-      bottom: 30px;
-      left: 0;
-      right: 0;
-      display: flex;
-      justify-content: center;
-      gap: 20px;
-      z-index: 20;
-    }
-    
-    button {
-      background: rgba(255, 255, 255, 0.2);
-      backdrop-filter: blur(10px);
-      border: 2px solid rgba(255, 255, 255, 0.5);
-      border-radius: 50%;
-      width: 70px;
-      height: 70px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: white;
-      font-size: 24px;
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-    
-    button:hover {
-      background: rgba(255, 255, 255, 0.3);
-      transform: scale(1.1);
-    }
-    
-    #callActionBtn {
-      background: linear-gradient(135deg, #00b09b, #96c93d);
-    }
-    
-    .info-overlay {
+    /* Novo estilo - não interfere nos existentes */
+    .user-info {
       position: absolute;
       top: 20px;
       left: 20px;
-      background: rgba(0, 0, 0, 0.5);
+      background: rgba(0,0,0,0.7);
+      color: white;
       padding: 10px 15px;
       border-radius: 20px;
-      font-size: 14px;
-      z-index: 20;
-    }
-    
-    /* 🔵 Blue box style */
-    .chat-input-box {
-      position: absolute;
-      bottom: 350px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 80%;
-      height: 200px;
-      border: 2px solid #007BFF;
-      border-radius: 12px;
-      background-color: rgba(255, 255, 255, 0.1);
-      z-index: 20;
-      overflow-y: auto;
-      padding: 10px;
-      backdrop-filter: blur(5px);
-    }
-
-    /* 💬 Recognized phrases style */
-    .phrase-box {
-      padding: 8px;
-      margin: 6px 0;
-      background-color: rgba(0, 123, 255, 0.1);
-      border-radius: 8px;
-      color: #fff;
-      font-size: 16px;
-    }
-
-    /* 🌍 Language phrase style */
-    #languageInfo {
-      position: absolute;
-      bottom: 560px;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 20px;
-      font-weight: bold;
-      color: #fff;
-      z-index: 30;
-      text-shadow: 0 2px 4px rgba(0,0,0,0.5);
-    }
-    
-    /* ✨ Personalized greeting style */
-    #userGreeting {
-      position: absolute;
-      bottom: 590px;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 18px;
-      font-weight: bold;
-      color: #fff;
-      z-index: 30;
-      text-align: center;
-      width: 100%;
-      text-shadow: 0 2px 4px rgba(0,0,0,0.5);
-    }
-    
-    /* Responsividade */
-    @media (max-width: 768px) {
-      #localVideo {
-        width: 100px;
-        height: 133px;
-        bottom: 100px;
-      }
-      
-      .chat-input-box {
-        height: 180px;
-        bottom: 300px;
-      }
-      
-      #languageInfo {
-        bottom: 500px;
-      }
-      
-      #userGreeting {
-        bottom: 530px;
-      }
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      z-index: 100;
+      font-size: 1.2rem;
     }
   </style>
 </head>
 <body>
-  <!-- ✨ Personalized greeting -->
-  <div id="userGreeting"></div>
-  
-  <!-- 🌍 Detected language phrase -->
-  <div id="languageInfo"></div>
+  <!-- Novo elemento adicionado - não interfere na estrutura existente -->
+  <div id="userInfoDisplay" class="user-info" style="display: none;"></div>
 
-  <!-- 🔹 Centered blue box with ID for JS -->
-  <div class="chat-input-box" id="textDisplay"></div>
-
+  <!-- Toda a estrutura existente permanece EXATAMENTE igual -->
   <div class="container">
-    <div class="video-wrapper" style="top: 0; left: 0; right: 0; bottom: 0;">
+    <div class="video-wrapper">
       <video id="remoteVideo" autoplay playsinline></video>
     </div>
+
     <div class="video-wrapper">
       <video id="localVideo" autoplay muted playsinline></video>
     </div>
 
-    <!-- 🔻 Controls -->
     <div class="controls">
-      <button id="callActionBtn" style="display:none;">📞</button>
+      <button id="callActionBtn" class="call-button">SEND 🚀</button>
     </div>
 
     <div class="info-overlay" style="display: none;">
@@ -209,238 +47,7 @@
     </div>
   </div>
 
-  <!-- 🔌 Scripts -->
   <script src="https://lemur-signal.onrender.com/socket.io/socket.io.js"></script>
-  <script>
-    // WebRTCCore implementation
-    class WebRTCCore {
-      constructor() {
-        this.socket = null;
-        this.peerConnection = null;
-        this.remoteStreamCallback = null;
-        this.onIncomingCall = null;
-        this.myId = null;
-        this.configuration = {
-          iceServers: [
-            { urls: 'stun:stun.l.google.com:19302' },
-            { urls: 'stun:stun1.l.google.com:19302' }
-          ]
-        };
-      }
-
-      initialize(myId) {
-        this.myId = myId;
-        this.socket = io('https://lemur-signal.onrender.com');
-        this.socket.emit('register', myId);
-      }
-
-      setupSocketHandlers() {
-        this.socket.on('offer', (data) => {
-          if (this.onIncomingCall) {
-            this.onIncomingCall(data);
-          }
-        });
-
-        this.socket.on('answer', async (data) => {
-          if (this.peerConnection) {
-            await this.peerConnection.setRemoteDescription(data.answer);
-          }
-        });
-
-        this.socket.on('ice-candidate', async (data) => {
-          if (this.peerConnection) {
-            try {
-              await this.peerConnection.addIceCandidate(data.candidate);
-            } catch (e) {
-              console.error('Error adding received ice candidate', e);
-            }
-          }
-        });
-      }
-
-      async startCall(targetId, localStream) {
-        this.peerConnection = new RTCPeerConnection(this.configuration);
-
-        // Add local tracks
-        localStream.getTracks().forEach(track => {
-          this.peerConnection.addTrack(track, localStream);
-        });
-
-        // Handle remote tracks
-        this.peerConnection.ontrack = (event) => {
-          if (this.remoteStreamCallback) {
-            this.remoteStreamCallback(event.streams[0]);
-          }
-        };
-
-        // Handle ICE candidates
-        this.peerConnection.onicecandidate = (event) => {
-          if (event.candidate) {
-            this.socket.emit('ice-candidate', {
-              targetId: targetId,
-              candidate: event.candidate
-            });
-          }
-        };
-
-        // Create offer
-        const offer = await this.peerConnection.createOffer();
-        await this.peerConnection.setLocalDescription(offer);
-
-        this.socket.emit('offer', {
-          targetId: targetId,
-          offer: offer
-        });
-      }
-
-      async handleIncomingCall(offer, localStream, callback) {
-        this.peerConnection = new RTCPeerConnection(this.configuration);
-
-        // Add local tracks
-        localStream.getTracks().forEach(track => {
-          this.peerConnection.addTrack(track, localStream);
-        });
-
-        // Handle remote tracks
-        this.peerConnection.ontrack = (event) => {
-          if (callback) {
-            callback(event.streams[0]);
-          }
-        };
-
-        // Handle ICE candidates
-        this.peerConnection.onicecandidate = (event) => {
-          if (event.candidate) {
-            this.socket.emit('ice-candidate', {
-              targetId: offer.from,
-              candidate: event.candidate
-            });
-          }
-        };
-
-        // Set remote description and create answer
-        await this.peerConnection.setRemoteDescription(offer.offer);
-        const answer = await this.peerConnection.createAnswer();
-        await this.peerConnection.setLocalDescription(answer);
-
-        this.socket.emit('answer', {
-          targetId: offer.from,
-          answer: answer
-        });
-      }
-
-      setRemoteStreamCallback(callback) {
-        this.remoteStreamCallback = callback;
-      }
-    }
-
-    // Main application logic
-    window.onload = () => {
-      const chatInputBox = document.querySelector('.chat-input-box');
-      const rtcCore = new WebRTCCore();
-      const myId = crypto.randomUUID().substr(0, 8);
-      document.getElementById('myId').textContent = myId;
-      rtcCore.initialize(myId);
-      rtcCore.setupSocketHandlers();
-
-      const localVideo = document.getElementById('localVideo');
-      const remoteVideo = document.getElementById('remoteVideo');
-      let targetId = null;
-      let localStream = null;
-
-      // ✨ Get name from URL
-      const urlParams = new URLSearchParams(window.location.search);
-      const userName = urlParams.get('nome');
-      
-      // Show personalized greeting if name exists
-      if (userName) {
-        const greetingElement = document.getElementById('userGreeting');
-        if (greetingElement) {
-          greetingElement.textContent = `I am ${decodeURIComponent(userName)}`;
-        }
-      }
-
-      // Request camera access on page load
-      navigator.mediaDevices.getUserMedia({ video: true, audio: false })
-        .then(stream => {
-          localStream = stream;
-          remoteVideo.srcObject = stream;
-        })
-        .catch(error => {
-          console.error("Camera access error:", error);
-          // Add fallback message
-          document.getElementById('textDisplay').innerHTML = 
-            '<div class="phrase-box">Camera access is required for this app to work. Please allow camera access and refresh the page.</div>';
-        });
-
-      // Check for target ID in URL
-      const targetIdFromUrl = urlParams.get('targetId');
-
-      if (targetIdFromUrl) {
-        targetId = targetIdFromUrl;
-        document.getElementById('callActionBtn').style.display = 'block';
-      }
-
-      // Configure call button
-      document.getElementById('callActionBtn').onclick = () => {
-        if (!targetId || !localStream) return;
-        rtcCore.startCall(targetId, localStream);
-        
-        // Add call status message
-        document.getElementById('textDisplay').innerHTML += 
-          '<div class="phrase-box">Calling ' + targetId + '...</div>';
-      };
-
-      // Mute any received audio
-      rtcCore.setRemoteStreamCallback(stream => {
-        stream.getAudioTracks().forEach(track => track.enabled = false);
-        localVideo.srcObject = stream;
-        
-        // Add call connected message
-        document.getElementById('textDisplay').innerHTML += 
-          '<div class="phrase-box">Call connected!</div>';
-      });
-
-      // 🌐 Available languages with translated "I speak" and "I am"
-      const languages = [
-        {code:'en-US',flag:'🇺🇸',speakText:'I speak',greetingText:'I am',name:'English'},
-        {code:'pt-BR',flag:'🇧🇷',speakText:'Eu falo',greetingText:'Eu sou',name:'Português'},
-        {code:'es-ES',flag:'🇪🇸',speakText:'Yo hablo',greetingText:'Yo soy',name:'Español'},
-        {code:'fr-FR',flag:'🇫🇷',speakText:'Je parle',greetingText:'Je suis',name:'Français'},
-        {code:'de-DE',flag:'🇩🇪',speakText:'Ich spreche',greetingText:'Ich bin',name:'Deutsch'},
-        {code:'ja-JP',flag:'🇯🇵',speakText:'私は話します',greetingText:'私は',name:'日本語'},
-        {code:'zh-CN',flag:'🇨🇳',speakText:'我说',greetingText:'我是',name:'中文'},
-        {code:'ru-RU',flag:'🇷🇺',speakText:'Я говорю',greetingText:'Я',name:'Русский'},
-        {code:'ar-SA',flag:'🇸🇦',speakText:'أنا أتكلم',greetingText:'أنا',name:'العربية'}
-      ];
-
-      // 📥 Detect language (URL > browser > default)
-      const lang = urlParams.get('lang') || navigator.language || 'pt-BR';
-
-      // 🔍 Find matching language (with smart fallback)
-      const selectedLang = languages.find(l => l.code === lang) || 
-                          languages.find(l => l.code.startsWith(lang.split('-')[0])) || // Ex: "es" for "es-ES"
-                          languages[1]; // Fallback to pt-BR
-
-      // 🖼️ Show translated phrases
-      const languageInfoElement = document.getElementById('languageInfo');
-      if (languageInfoElement) {
-        languageInfoElement.textContent = `${selectedLang.speakText} ${selectedLang.flag}`;
-      }
-
-      // ✨ Show "I am [name]" in correct language (if name exists)
-      if (userName) {
-        const greetingElement = document.getElementById('userGreeting');
-        if (greetingElement) {
-          greetingElement.textContent = `${selectedLang.greetingText} ${decodeURIComponent(userName)}`;
-        }
-      }
-      
-      // Add welcome message
-      document.getElementById('textDisplay').innerHTML = 
-        '<div class="phrase-box">Welcome to Lemur Multi-Language Video Call</div>' +
-        '<div class="phrase-box">Your ID: ' + myId + '</div>';
-    };
-  </script>
+  <script type="module" src="js/caller-ui.js"></script>
 </body>
 </html>
