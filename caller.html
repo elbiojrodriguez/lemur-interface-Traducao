@@ -1,60 +1,114 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Caller - Videochamada Mobile</title>
-  <link rel="stylesheet" href="style.css" />
-  <link rel="stylesheet" href="responsivo.css" />
-  <style>
-    /* 🔵 Estilo do box azul */
-    .chat-input-box {
-      position: absolute;
-      bottom: 350px; /* Ajuste conforme necessário */
-      left: 50%;
-      transform: translateX(-50%);
-      width: 80%;
-      height: 200px; /* Altura aproximada do PIP */
-      border: 2px solid #007BFF;
-      border-radius: 12px;
-      background-color: rgba(255, 255, 255, 0.1);
-      z-index: 20;
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Caller - Videochamada Mobile</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="responsivo.css" />
+    <style>
+        /* 🔵 Estilo do box azul */
+        .chat-input-box {
+            position: absolute;
+            bottom: 350px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80%;
+            height: 200px;
+            border: 2px solid #007BFF;
+            border-radius: 12px;
+            background-color: rgba(255, 255, 255, 0.1);
+            z-index: 20;
+            overflow-y: auto;
+            padding: 10px;
+        }
+
+        /* 💬 Estilo BASE para todas as mensagens */
+.phrase-box {
+    background-color: transparent;
+    padding: 1px 0;
+    margin: 0.5px 0;
+    border-radius: 0;
+    font-size: 15px;
+    line-height: 1.0;
+    border: none;
+    box-shadow: none;
+    width: 100%;
+    word-break: break-word;
+}
+
+/* 🎯 Estilo para TEXTO TEMPORÁRIO (enquanto está falando) */
+.phrase-box.interim-box {
+    animation: fadeIn 0.3s ease-out; /* Suaviza a aparição */
+}
+
+.interim-text {
+    color: #666;
+    opacity: 0.8;
+    border-bottom: 1px dotted #aaa;
+    transition: all 0.2s; /* Suaviza as atualizações de texto */
+}
+
+/* ✅ Estilo para TEXTO FINALIZADO */
+.final-text {
+    color: inherit; /* Herda a cor do tema pai */
+    opacity: 1;
+    animation: textFinalized 0.3s ease-out;
+}
+
+/* 🎚️ Efeitos visuais */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(2px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+/* Estilo para quando o microfone está ativo continuamente */
+.listening-mode .text-display-placeholder {
+    animation: pulseOpacity 2s infinite;
+}
+
+@keyframes pulseOpacity {
+    0% { opacity: 0.8; }
+    50% { opacity: 0.4; }
+    100% { opacity: 0.8; }
+}
+@keyframes textFinalized {
+    from { opacity: 0.5; }
+    to { opacity: 1; }
+}
+
+/* 📱 Melhorias para mobile */
+@media (max-width: 768px) {
+    .phrase-box {
+        font-size: 14px;
+        line-height: 1.3;
     }
-  </style>
+}
+    </style>
 </head>
 <body>
+    <!-- 🔹 Box azul centralizado com ID para JS -->
+    <div class="chat-input-box" id="textDisplay"></div>
 
- <!-- 🔹 Box azul centralizado -->
-    <div class="chat-input-box"></div>
-  
-  <div class="container">
-  
+    <div class="container">
         <div class="video-wrapper">
-      <video id="remoteVideo" autoplay playsinline></video>
+            <video id="remoteVideo" autoplay playsinline></video>
+        </div>
+        <div class="video-wrapper">
+            <video id="localVideo" autoplay muted playsinline></video>
+        </div>
+        
+        <!-- 🔻 Controles -->
+        <div class="controls">
+            <button id="callActionBtn" style="display:none;">SEND 🚀</button>
+        </div>
+        
+        <div class="info-overlay" style="display: none;">
+            <span id="myId"></span>
+        </div>
     </div>
 
-    <div class="video-wrapper">
-      <video id="localVideo" autoplay muted playsinline></video>
-    </div>
-
-    <div class="controls">
-      <!-- 🔵 Botão de scanner removido -->
-      <button id="callActionBtn" style="display:none;">Call</button>
-
-      <!-- 🔻 Balões com bandeiras -->
-      <div class="language-bubbles">
-        <button class="lang-btn">🇬🇧</button>
-        <button class="lang-btn">🇧🇷</button>
-        <button class="lang-btn">🇪🇸</button>
-      </div>
-    </div>
-
-    <div class="info-overlay" style="display: none;">
-      <span id="myId"></span>
-    </div>
-  </div>
-
-  <script src="https://lemur-signal.onrender.com/socket.io/socket.io.js"></script>
-  <script type="module" src="js/caller-ui.js"></script>
+    <!-- 🔌 Scripts -->
+    <script src="https://lemur-signal.onrender.com/socket.io/socket.io.js"></script>
+    <script type="module" src="js/caller-ui.js"></script>
 </body>
 </html>
