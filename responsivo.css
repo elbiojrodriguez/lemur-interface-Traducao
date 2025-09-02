@@ -1,0 +1,146 @@
+/* Reset básico para mobile */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  background: transparent;
+  font-family: Arial, sans-serif;
+  height: 100vh;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Container principal */
+.container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* Vídeos principais */
+.video-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.video-wrapper video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Vídeo local em PIP */
+.video-wrapper:nth-child(2) { 
+position: absolute; 
+bottom: calc(80px + 60px); 
+right: 5px; 
+width: 34.5%; 
+max-width: 138px; 
+height: 184px; 
+transform: translateX(-17%); 
+border-radius: 8px; overflow: hidden; 
+box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); 
+border: 2px solid #4CAF50; z-index: 10; 
+}
+
+.video-wrapper:nth-child(2) video {
+  transform: scaleX(-1);
+}
+
+/* Controles */
+.controls {
+  position: absolute;
+  bottom: calc(225px + 60px);
+  left: 110px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  z-index: 20;
+}
+
+
+.controls button {
+  width: 100px;         /* Largura maior */
+  height: 40px;         /* Altura menor */
+  border-radius: 20px;  /* Metade da altura = forma oval */
+  border: none;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+  backdrop-filter: blur(6px);
+  color: white;
+}
+
+#callActionBtn {
+  background: #4CAF50;
+}
+
+#scanBtn {
+  background: #2196F3;
+}
+
+/* Overlay de informações */
+.info-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+.qrcode-container {
+  width: auto;
+  height: auto;
+}
+
+/* QR Code */
+.qrcode-container {
+  margin: 10px auto;
+  padding: 12px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  display: inline-block;
+}
+
+/* ID visual opcional */
+#myId {
+  display: inline-block;
+  font-size: 16px;
+  font-weight: bold;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 6px 12px;
+  border-radius: 20px;
+  user-select: all;
+  cursor: pointer;
+  color: white;
+}
+
+
+  .video-wrapper:nth-child(2) {
+  .video-wrapper:nth-child(2) {
+  height: 120px;
+  max-width: 100px;
+  bottom: calc(60px + 60px);
+}
+
+  .info-overlay {
+    padding: 8px;
+  }
+
+  .qrcode-container {
+    padding: 8px;
+    max-width: 90%;
+  }
+}
