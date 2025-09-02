@@ -7,30 +7,29 @@
   <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="responsivo.css" />
   <style>
-    /* Novo estilo - não interfere nos existentes */
-    .user-info {
+    /* 🔵 Estilo do box azul */
+    .chat-input-box {
       position: absolute;
-      top: 20px;
-      left: 20px;
-      background: rgba(0,0,0,0.7);
-      color: white;
-      padding: 10px 15px;
-      border-radius: 20px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      z-index: 100;
-      font-size: 1.2rem;
+      bottom: 350px; /* Ajuste conforme necessário */
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80%;
+      height: 200px; /* Altura aproximada do PIP */
+      border: 2px solid #007BFF;
+      border-radius: 12px;
+      background-color: rgba(255, 255, 255, 0.1);
+      z-index: 20;
     }
   </style>
 </head>
 <body>
-  <!-- Novo elemento adicionado - não interfere na estrutura existente -->
-  <div id="userInfoDisplay" class="user-info" style="display: none;"></div>
 
-  <!-- Toda a estrutura existente permanece EXATAMENTE igual -->
+ <!-- 🔹 Box azul centralizado -->
+    <div class="chat-input-box"></div>
+  
   <div class="container">
-    <div class="video-wrapper">
+  
+        <div class="video-wrapper">
       <video id="remoteVideo" autoplay playsinline></video>
     </div>
 
@@ -39,7 +38,15 @@
     </div>
 
     <div class="controls">
-      <button id="callActionBtn" class="call-button">SEND 🚀</button>
+      <!-- 🔵 Botão de scanner removido -->
+      <button id="callActionBtn" style="display:none;">Call</button>
+
+      <!-- 🔻 Balões com bandeiras -->
+      <div class="language-bubbles">
+        <button class="lang-btn">🇬🇧</button>
+        <button class="lang-btn">🇧🇷</button>
+        <button class="lang-btn">🇪🇸</button>
+      </div>
     </div>
 
     <div class="info-overlay" style="display: none;">
