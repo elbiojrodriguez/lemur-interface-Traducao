@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EchoMeP2P - Welcome & Caller</title>
-    <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
     <style>
         /* ESTILOS GLOBAIS */
         html {
@@ -196,36 +195,6 @@
             40%, 80% { transform: translateX(0.5vw); }
         }
 
-        .qr-result-container {
-            position: absolute;
-            top: 70%;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 80%;
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .qrcode-container {
-            padding: 12px;
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-        }
-
-        .url-display {
-            width: 100%;
-            padding: 10px;
-            background: #f8f9fa;
-            border-radius: 12px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-            word-break: break-all;
-            font-size: 12px;
-            text-align: center;
-        }
-
         .loader-container {
             position: absolute;
             top: 50%;
@@ -250,66 +219,6 @@
         @keyframes spin {
             0% { transform: rotate(0deg); }
            100% { transform: rotate(360deg); }
-        }
-
-        /* NOVOS ESTILOS PARA A TELA DE QR CODE */
-        #qr-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.8);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        }
-
-        .qr-modal {
-            background-color: #aee2ff;
-            border-radius: 20px;
-            padding: 30px;
-            width: 80%;
-            max-width: 400px;
-            text-align: center;
-            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.5);
-        }
-
-        .qr-modal-title {
-            font-size: 20px;
-            margin-bottom: 15px;
-            color: #333;
-            font-weight: bold;
-        }
-
-        .qr-modal-description {
-            font-size: 16px;
-            margin-bottom: 20px;
-            color: #555;
-            line-height: 1.4;
-        }
-
-        .qr-modal-content {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .close-button {
-            margin-top: 20px;
-            padding: 10px 20px;
-            background-color: #3498db;
-            color: white;
-            border: none;
-            border-radius: 20px;
-            cursor: pointer;
-            font-size: 16px;
-        }
-
-        .close-button:hover {
-            background-color: #2980b9;
         }
         
         .warning-message {
@@ -517,7 +426,7 @@
             background-color: #1a73e8;
             color: white;
             padding: 5px 10px;
-            border-radius: 4px;
+            borderRadius: 4px;
             font-size: 12px;
             font-weight: bold;
             margin-top: 8px;
@@ -535,14 +444,6 @@
             border-radius: 10px;
             box-shadow: 0 0 10px rgba(0,0,0,0.5);
             overflow: hidden;
-        }
-
-        /* Imagem da câmera */
-        .camera-feed {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
         }
 
         /* Camada de texto sobre o vídeo */
@@ -603,16 +504,9 @@
         
         <button class="next-button" id="next-button">Next</button>
         
-        <div class="qr-result-container" id="qr-result-container">
-            <div id="qrcode" class="qrcode-container"></div>
-            <div class="url-display" id="url-display">
-                QR Code Content: <br><span id="url-content"></span>
-            </div>
-        </div>
-        
         <!-- Mensagem de aviso quando não há token -->
         <div class="warning-message" id="warning-message">
-            ⚠️ Token não recebido. Não é possível gerar o QR Code.
+            ⚠️ Token não recebido. Não é possível prosseguir.
         </div>
     </div>
 
@@ -663,21 +557,6 @@
         </div>
     </div>
 
-    <!-- NOVA TELA PARA O QR CODE -->
-    <div id="qr-screen">
-        <div class="qr-modal">
-            <h2 class="qr-modal-title" id="qr-modal-title">This is your online key</h2>
-            <p class="qr-modal-description" id="qr-modal-description">You can ask to scan, share or print on your business card.</p>
-            <div class="qr-modal-content">
-                <div id="qrcode-modal" class="qrcode-container"></div>
-                <div class="url-display" id="url-display-modal">
-                    QR Code Content: <br><span id="url-content-modal"></span>
-                </div>
-                <button class="close-button" id="close-button">Close</button>
-            </div>
-        </div>
-    </div>
-
     <script>
         // Lê os parâmetros da URL
         const urlParams = new URLSearchParams(window.location.search);
@@ -700,13 +579,9 @@
                 document.getElementById('name-input').value = decodeURIComponent(name);
                 console.log("Nome preenchido automaticamente:", decodeURIComponent(name));
             }
-            
-            // Ajusta a posição dos outros elementos
-            document.getElementById('qr-result-container').style.top = '70%';
         } else {
             // Mostra aviso se não houver token
             document.getElementById('warning-message').style.display = 'block';
-            document.getElementById('qr-result-container').style.top = '70%';
         }
 
         // Código de tradução
@@ -718,10 +593,7 @@
           "name-input": "Your name",
           "next-button": "Next",
           "camera-text": "Allow camera access",
-          "microphone-text": "Allow microphone access",
-          "qr-modal-title": "This is your online key",
-          "qr-modal-description": "You can ask to scan, share or print on your business card.",
-          "close-button": "Close"
+          "microphone-text": "Allow microphone access"
         };
 
         // Objeto com os textos a serem traduzidos na tela caller
@@ -746,22 +618,6 @@
           } catch (error) {
             console.error('Erro na tradução:', error);
             return text;
-          }
-        }
-
-        // Classe para gerar QR Code
-        class QRCodeGenerator {
-          static generate(containerId, text, size = 150) {
-            const container = document.getElementById(containerId);
-            container.innerHTML = '';
-            
-            return new QRCode(container, {
-              text: text,
-              width: size,
-              height: size,
-              colorDark: "#000000",
-              colorLight: "#ffffff",
-            });
           }
         }
 
@@ -884,18 +740,9 @@
             const nameInput = document.getElementById('name-input');
             const welcomeScreen = document.getElementById('welcome-screen');
             const callerScreen = document.getElementById('caller-screen');
-            const qrResultContainer = document.getElementById('qr-result-container');
-            const urlContent = document.getElementById('url-content');
             const loaderContainer = document.getElementById('loader-container');
             const cameraCheckbox = document.getElementById('camera-checkbox');
             const microphoneCheckbox = document.getElementById('microphone-checkbox');
-            
-            // Elementos da nova tela de QR Code
-            const qrScreen = document.getElementById('qr-screen');
-            const closeButton = document.getElementById('close-button');
-            const urlContentModal = document.getElementById('url-content-modal');
-            const qrModalTitle = document.getElementById('qr-modal-title');
-            const qrModalDescription = document.getElementById('qr-modal-description');
             
             let cameraGranted = false;
             let microphoneGranted = false;
@@ -972,51 +819,18 @@
                     return;
                 }
 
-                // Mostra loader durante geração do QR code
+                // Mostra loader durante a transição
                 loaderContainer.style.display = 'flex';
 
-                // Gera o QR CODE com parâmetros bem identificados - MODIFICADO
-                const browserFullLang = navigator.language || 'pt-BR';
-                const baseUrl = window.location.href.split('?')[0]; // URL atual sem parâmetros
-                
-                // URL com parâmetros bem identificados (SUGESTÃO)
-                const fullUrl = `${baseUrl}?token=${encodeURIComponent(token)}&browserId=${encodeURIComponent(fixedId)}&lang=${encodeURIComponent(browserFullLang)}&name=${encodeURIComponent(name)}`;
-                
-                console.log("QR Code URL:", fullUrl);
-                
-                // Gera o QR code na nova tela
+                // Transição direta para a tela caller após um breve delay
                 setTimeout(() => {
-                    QRCodeGenerator.generate("qrcode-modal", fullUrl, 200);
-                    urlContentModal.textContent = fullUrl;
-                    qrScreen.style.display = 'flex';
-                    loaderContainer.style.display = 'none';
-                }, 500);
-            });
-
-            // Fechar a tela de QR Code
-            closeButton.addEventListener('click', () => {
-                qrScreen.style.display = 'none';
-                
-                // Transição para a tela caller
-                welcomeScreen.style.display = 'none';
-                callerScreen.style.display = 'block';
-                
-                // Inicializa a tela caller
-                initCallerApp();
-            });
-
-            // Fechar a tela de QR Code ao clicar fora do conteúdo
-            qrScreen.addEventListener('click', (e) => {
-                if (e.target === qrScreen) {
-                    qrScreen.style.display = 'none';
-                    
-                    // Transição para a tela caller
                     welcomeScreen.style.display = 'none';
                     callerScreen.style.display = 'block';
+                    loaderContainer.style.display = 'none';
                     
                     // Inicializa a tela caller
                     initCallerApp();
-                }
+                }, 800);
             });
         });
     </script>
