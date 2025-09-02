@@ -1,14 +1,13 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EchoMeP2P - Welcome & Caller</title>
+    <title>EchoMeP2P - Anúncios com Animação</title>
     <style>
-        /* ESTILOS GLOBAIS */
         html {
             height: 100%;
-            font-size: clamp(14px, 2.5vw, 18px);
+            font-size: clamp(14px, 2.5vw, 18px); /* Escalável e responsivo */
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             text-align: center;
             transition: background-color 0.5s;
@@ -18,266 +17,68 @@
             height: 100%;
             margin: 0;
             padding: 0;
-            font-size: 1em;
-            overflow: hidden;
+            font-size: 1em; /* Herda do html */
         }
 
-        /* TELA DE BOAS-VINDAS (WELCOME) */
-        #welcome-screen {
+        .box-principal {
             width: 100%;
-            max-width: 600px;
+            max-width: 600px; /* Limita largura em telas maiores */
             height: 100%;
             margin: 0 auto;
             padding: 2vh 2vw;
             box-sizing: border-box;
-            background-color: #aee2ff;
-            position: relative;
-            overflow-y: auto;
-            display: block;
-            transition: background-color 0.5s;
+            background-color: #aee2ff; /* pastel sky blue */
+            position: relative; /* Referência para elementos internos */
+            overflow: hidden;
         }
 
-        #caller-screen {
-            width: 100%;
-            max-width: 600px;
-            height: 100%;
-            margin: 0 auto;
-            padding: 2vh 2vw;
-            box-sizing: border-box;
-            background-color: #aee2ff;
-            position: relative;
-            overflow: hidden;
-            display: none;
-        }
+        /* Elementos internos posicionados dentro da box-principal */
 
         .logo {
             position: absolute;
-            top: 7%;
+            top: 7%; /* distância do topo do box-principal */
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 35%;
+            width: 35%; /* ou ajuste para % se quiser responsivo */
             height: auto;
         }
 
-        #EchoMeP2P-title {
+        h1 {
             position: absolute;
             top: 10%;
             left: 50%;
             transform: translateX(-50%);
             color: #333;
-            font-size: 7vw;
+            font-size: 7vw; /* 👈 se adapta ao tamanho da tela */
             white-space: nowrap;
             text-align: center;
         }
 
-        .translator-label {
-            position: absolute;
-            top: 17%;
-            left: 50%;
-            transform: translateX(-50%);
-            color: #333;
-            font-size: 5vw;
-            text-align: center;
-            width: 80%;
-            max-width: 90%;
-        }
-
-        #welcome-title {
-            position: absolute;
-            top: 21%;
-            left: 50%;
-            transform: translateX(-50%);
-            color: #333;
-            font-size: 9vw;
-            white-space: nowrap;
-            text-align: center;
-        }
-
-        .name-input {
-            position: absolute;
-            top: 32%;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 70%;
-            height: 5%;
-            padding: 1vh 1vw;
-            border-radius: 3vw;
-            border: none;
-            box-shadow: 0 0.5vw 1vw rgba(0, 0, 0, 0.1);
-            font-size: 6vw;
-            text-align: center;
-            transition: all 0.3s;
-        }
-
-        .name-input:focus {
-            outline: none;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        .name-input.error {
-            border: 2px solid #e74c3c;
-            background-color: #ffe6e6;
-        }
-
-        .permissions-container {
-            position: absolute;
-            top: 41%;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 70%;
-            display: flex;
-            flex-direction: column;
-            gap: 2vh;
-        }
-
-        .permission-item {
-            display: flex;
-            align-items: center;
-            padding: 1.5vh 2vw;
-            background-color: rgba(255, 255, 255, 0.7);
-            border-radius: 3vw;
-            box-shadow: 0 0.5vw 1vw rgba(0, 0, 0, 0.1);
-        }
-
-        .permission-checkbox {
-            width: 5vw;
-            height: 5vw;
-            margin-right: 3vw;
-            border: 2px solid #3498db;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .permission-checkbox.checked {
-            background-color: #3498db;
-        }
-
-        .permission-checkbox.checked::after {
-            content: "✓";
-            color: white;
-            font-size: 4vw;
-        }
-
-        .permission-text {
-            flex: 1;
-            text-align: left;
-            font-size: 4vw;
-            color: #333;
-        }
-
-        .next-button {
-            position: absolute;
-            top: 59%;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 30%;
-            height: 5%;
-            background-color: #3498db;
-            color: white;
-            border: none;
-            border-radius: 3vw;
-            font-size: 5vw;
-            cursor: pointer;
-            box-shadow: 0 0.5vw 1vw rgba(0, 0, 0, 0.1);
-            transition: all 0.3s;
-            z-index: 10;
-        }
-
-        .next-button:hover {
-            background-color: #2980b9;
-        }
-
-        .error-state {
-            background-color: #ffebee;
-            animation: shake 0.5s;
-        }
-
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            20%, 60% { transform: translateX(-0.5vw); }
-            40%, 80% { transform: translateX(0.5vw); }
-        }
-
-        .loader-container {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            z-index: 100;
-        }
-
-        .loader {
-            border: 5px solid #f3f3f3;
-            border-top: 5px solid #3498db;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-           100% { transform: rotate(360deg); }
-        }
-        
-        .warning-message {
-            position: absolute;
-            top: 65%;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 80%;
-            padding: 10px;
-            background-color: #ff9800;
-            color: white;
-            border-radius: 8px;
-            text-align: center;
-            display: none;
-        }
-
-        .error-message {
-            position: absolute;
-            top: 38%;
-            left: 50%;
-            transform: translateX(-50%);
-            color: #e74c3c;
-            font-size: 3.5vw;
-            display: none;
-        }
-
-        /* ESTILOS DA TELA CALLER */
-        #Instant-title {
+        h2 {
             position: absolute;
             top: 15%;
             left: 50%;
             transform: translateX(-50%);
             color: #333;
-            font-size: 5vw;
+            font-size: 5vw; /* REMOVA: white-space: nowrap; */
             text-align: center;
-            width: 80%;
-            max-width: 90%;
+            width: 80%; /* Adicione uma largura máxima */
+            max-width: 90%; /* Opcional: limite máximo */
         }
 
         .btn-send {
             position: absolute;
-            top: 54.5%;
+            top: 54.5%; /* ajusta a posição vertical */
             left: 31%;
-            transform: translateX(-50%);
+            transform: translateX(-50%); /* ✅ Apenas horizontal */
             width: 50%;
             height: 7%;
-            background-color: #28a745;
+            background-color: #28a745; /* verde padrão */
             color: white;
             font-size: 1.9em;
             font-weight: bold;
-            border: 2px solid #1e7e34;
-            border-radius: 10px;
+            border: 2px solid #1e7e34; /* borda verde escura */
+            border-radius: 10px; /* formato oval */
             box-shadow: 0 0 10px rgba(0,0,0,0.5);
             text-align: center;
             cursor: pointer;
@@ -287,9 +88,9 @@
             position: absolute;
             top: 27%;
             left: 50%;
-            transform: translateX(-50%);
+            transform: translateX(-50%); /* ✅ Apenas horizontal */
             width: 78%;
-            height: 18%;
+            height: 18%; /* ou defina uma altura fixa se quiser */
             padding: 20px;
             background-color: #ffffff;
             border: 2px solid #007bff;
@@ -300,20 +101,21 @@
 
         .red-box {
             position: absolute;
-            top: 27%;
+            top: 27%; /* ajusta a posição vertical */
             left: 50%;
-            transform: translateX(-50%);
+            transform: translateX(-50%); /* ✅ Apenas horizontal */
             width: 78%;
             height: 1%;
             padding: 20px;
             background-color: #ffffff;
-            border: 2px solid #ff4136;
+            border: 2px solid #ff4136; /* borda vermelha */
             border-radius: 10px;
             box-shadow: 0 0 10px rgba(0,0,0,0.5);
             text-align: center;
         }
 
         /* Containers para os anúncios do Google - SIMULAÇÃO */
+
         .ad-container {
             position: absolute;
             left: 50%;
@@ -360,6 +162,7 @@
         }
 
         /* Botão de fechar */
+
         .ad-close {
             position: absolute;
             top: 5px;
@@ -452,28 +255,36 @@
 
         .video-box {
             position: absolute;
-            bottom: 15%;
-            right: 5%;
-            width: 35%;
-            height: 30%;
+            bottom: 15%; /* antes: 20px → agora proporcional à altura */
+            right: 5%; /* antes: 20px → agora proporcional à largura */
+            width: 35%; /* antes: 120px → agora proporcional ao box-principal */
+            height: 30%; /* antes: 200px → agora proporcional à altura */
             background-color: #ffffff;
-            border: 2px solid #28a745;
-            border-radius: 10px;
+            border: 2px solid #28a745; /* borda proporcional à largura da tela */
+            border-radius: 10px; /* cantos arredondados proporcionais */
             box-shadow: 0 0 10px rgba(0,0,0,0.5);
             overflow: hidden;
+        }
+
+        /* Imagem da câmera */
+        .camera-feed {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
         }
 
         /* Camada de texto sobre o vídeo */
         .overlay-info {
             position: absolute;
-            bottom: 0px;
+            bottom: 0px; /* distância do fundo */
             left: 0;
             width: 100%;
             text-align: center;
             color: white;
             font-family: sans-serif;
-            z-index: 2;
-            background: rgba(0, 0, 0, 0.4);
+            z-index: 2; /* garante que fique acima da imagem */
+            background: rgba(0, 0, 0, 0.4); /* leve fundo escuro para contraste */
             padding: 4px 0;
             font-size: 12px;
             border-top: 1px solid rgba(255,255,255,0.2);
@@ -482,58 +293,27 @@
         /* Nome do usuário */
         .user-name {
             font-weight: bold;
-            font-size: 14px;
+            font-size: 14px; /* nome mais destacado */
             margin-bottom: 0px;
         }
 
         /* Idioma + bandeira */
         .user-language {
-            font-size: 22px;
+            font-size: 22px; /* bandeira maior */
             line-height: 1.2;
+        }
+
+        .user-language {
             opacity: 0.9;
         }
     </style>
 </head>
 <body>
-    <!-- TELA DE BOAS-VINDAS -->
-    <div id="welcome-screen">
-        <div class="loader-container" id="loader-container">
-            <div class="loader"></div>
-        </div>
-
-        <img src="assets/images/lemur.png" alt="Lemur Logo" class="logo" id="logo" />
+    <div class="box-principal">
+        <img src="lemur.png" alt="Seu Logo" class="logo">
         <h1 id="EchoMeP2P-title">EchoMeP2P</h1>
-        <h2 id="welcome-title">Welcome!</h2>
-        
-        <div class="translator-label" id="translator-label">Live translation. No filters. No platform.</div>
-        <input type="text" class="name-input" id="name-input" placeholder="Your name" />
-        <div class="error-message" id="name-error">Please enter your name</div>
-        
-        <div class="permissions-container">
-            <div class="permission-item">
-                <div class="permission-checkbox" id="camera-checkbox"></div>
-                <div class="permission-text" id="camera-text">Allow camera access</div>
-            </div>
-            <div class="permission-item">
-                <div class="permission-checkbox" id="microphone-checkbox"></div>
-                <div class="permission-text" id="microphone-text">Allow microphone access</div>
-            </div>
-        </div>
-        
-        <button class="next-button" id="next-button">Next</button>
-        
-        <!-- Mensagem de aviso quando não há token -->
-        <div class="warning-message" id="warning-message">
-            ⚠️ Token não recebido. Não é possível prosseguir.
-        </div>
-    </div>
-
-    <!-- TELA CALLER (OCULTA INICIALMENTE) -->
-    <div id="caller-screen">
-        <img src="assets/images/lemur.png" alt="Lemur Logo" class="logo" id="logo-caller" />
-        <h1 id="EchoMeP2P-title-caller">EchoMeP2P</h1>
         <h2 id="Instant-title">Live translation. No filters. No platform.</h2>       
-        <button class="btn-send" id="send-button">SEND🚀</button>
+        <button class="btn-send" id="send-button">SEND🚀</button> <!-- ID adicionado aqui -->
         
         <!-- Box Azul -->
         <div class="blue-box"></div>
@@ -569,60 +349,26 @@
         <!-- Box de vídeo -->
         <div class="video-box">
             <div class="overlay-info">
-                <div class="user-name" id="user-name-display">Pindamonhangaba</div>
+                <div class="user-name">Pindamonhangaba</div>
                 <div class="user-language">🇧🇷</div>
             </div>
         </div>
     </div>
 
     <script>
-        // Lê os parâmetros da URL
-        const urlParams = new URLSearchParams(window.location.search);
-        const token = urlParams.get('token');
-        const name = urlParams.get('name');
-        
-        // Variável para armazenar o ID fixo gerado
-        let fixedId = null;
-        
-        // Exibe o token se estiver presente na URL
-        if (token) {
-            console.log("Token recebido:", token);
-            
-            // GERA O ID FIXO com os últimos 5 caracteres do token
-            fixedId = token.slice(-5);
-            console.log("ID Fixo gerado:", fixedId);
-            
-            // Preenche automaticamente o campo de nome se o parâmetro name estiver presente
-            if (name) {
-                document.getElementById('name-input').value = decodeURIComponent(name);
-                console.log("Nome preenchido automaticamente:", decodeURIComponent(name));
-            }
-        } else {
-            // Mostra aviso se não houver token
-            document.getElementById('warning-message').style.display = 'block';
-        }
-
-        // Código de tradução
+        // ========== CÓDIGO DE TRADUÇÃO (NOVO) ==========
         const TRANSLATE_ENDPOINT = 'https://chat-tradutor.onrender.com/translate';
 
-        const textsToTranslateWelcome = {
-          "welcome-title": "Welcome!",
-          "translator-label": "Live translation. No filters. No platform.",
-          "name-input": "Your name",
-          "next-button": "Next",
-          "camera-text": "Allow camera access",
-          "microphone-text": "Allow microphone access",
-          "name-error": "Please enter your name"
-        };
-
-        // Objeto com os textos a serem traduzidos na tela caller
-        const textsToTranslateCaller = {
+        // Objeto com os textos a serem traduzidos e seus IDs
+        const textsToTranslate = {
           "Instant-title": "Live translation. No filters. No platform.",
           "send-button": "SEND🚀"
         };
 
+        // Função para traduzir um texto
         async function translateText(text, targetLang) {
           try {
+            // Se o idioma alvo for inglês, retorna o texto original.
             if (targetLang === 'en') return text;
 
             const response = await fetch(TRANSLATE_ENDPOINT, {
@@ -632,6 +378,7 @@
             });
 
             const result = await response.json();
+            // Retorna o texto traduzido ou o original em caso de falha
             return result.translatedText || text;
 
           } catch (error) {
@@ -640,27 +387,32 @@
           }
         }
 
-        // Função para solicitar permissões
-        async function requestMediaPermissions() {
-            try {
-                // Solicita acesso à câmera e microfone
-                const stream = await navigator.mediaDevices.getUserMedia({ 
-                    video: true, 
-                    audio: true 
-                });
-                
-                // Para as tracks imediatamente (apenas queríamos a permissão)
-                stream.getTracks().forEach(track => track.stop());
-                
-                return true;
-                
-            } catch (error) {
-                console.error('Erro ao acessar dispositivos:', error);
-                return false;
-            }
-        }
+        // Função principal que percorre e traduz todos os elementos
+        async function translatePage() {
+          // Obtém o idioma do navegador (ex: 'pt', 'es')
+          const browserLang = (navigator.language || 'en').split('-')[0];
 
-        // ========== CÓDIGO DOS ANÚNCIOS ==========
+          // Para cada item no objeto textsToTranslate...
+          for (const [elementId, text] of Object.entries(textsToTranslate)) {
+            try {
+              // ...traduz o texto para o idioma do navegador
+              const translated = await translateText(text, browserLang);
+              // ...encontra o elemento na página pelo ID
+              const element = document.getElementById(elementId);
+
+              if (element) {
+                // Se for um botão, altera o textContent
+                element.textContent = translated;
+              }
+            } catch (error) {
+              console.error(`Erro ao traduzir ${elementId}:`, error);
+            }
+          }
+        }
+        // ========== FIM DO CÓDIGO DE TRADUÇÃO ==========
+
+        // ========== CÓDIGO ORIGINAL DOS ANÚNCIOS ==========
+        // Variáveis para controlar o estado dos anúncios
         let topAdVisible = false;
         let bottomAdVisible = false;
         let topAdClosed = false;
@@ -731,138 +483,15 @@
             }
         }
 
-        // Função para inicializar a aplicação caller
-        async function initCallerApp(userName) {
-            // Exibe o nome do usuário na tela caller
-            document.getElementById('user-name-display').textContent = userName;
-            
-            // Traduz a página caller
-            const browserLang = (navigator.language || 'en').split('-')[0];
-            
-            for (const [elementId, text] of Object.entries(textsToTranslateCaller)) {
-                try {
-                    const translated = await translateText(text, browserLang);
-                    const element = document.getElementById(elementId);
-
-                    if (element) {
-                        element.textContent = translated;
-                    }
-                } catch (error) {
-                    console.error(`Erro ao traduzir ${elementId}:`, error);
-                }
-            }
-            
-            // Inicia os anúncios
-            startAdCycle();
+        // Função para inicializar a aplicação (NOVA)
+        async function initApp() {
+            await translatePage(); // Primeiro traduz a página
+            startAdCycle(); // Depois inicia os anúncios
         }
 
-        // Código principal
-        document.addEventListener('DOMContentLoaded', async () => {
-            const nextButton = document.getElementById('next-button');
-            const nameInput = document.getElementById('name-input');
-            const nameError = document.getElementById('name-error');
-            const welcomeScreen = document.getElementById('welcome-screen');
-            const callerScreen = document.getElementById('caller-screen');
-            const loaderContainer = document.getElementById('loader-container');
-            const cameraCheckbox = document.getElementById('camera-checkbox');
-            const microphoneCheckbox = document.getElementById('microphone-checkbox');
-            
-            let cameraGranted = false;
-            let microphoneGranted = false;
-
-            // Mostra loader durante tradução
-            loaderContainer.style.display = 'flex';
-
-            // Processo de tradução
-            const browserLang = (navigator.language || 'en').split('-')[0];
-            
-            for (const [elementId, text] of Object.entries(textsToTranslateWelcome)) {
-                try {
-                    const translated = await translateText(text, browserLang);
-                    const element = document.getElementById(elementId);
-
-                    if (element) {
-                        if (elementId === 'name-input') {
-                            element.placeholder = translated;
-                        } else {
-                            element.textContent = translated;
-                        }
-                    }
-                } catch (error) {
-                    console.error(`Erro ao traduzir ${elementId}:`, error);
-                }
-            }
-
-            // Esconde o loader
-            loaderContainer.style.display = 'none';
-
-            // Event listener para os checkboxes
-            cameraCheckbox.addEventListener('click', async () => {
-                cameraGranted = await requestMediaPermissions();
-                if (cameraGranted) {
-                    cameraCheckbox.classList.add('checked');
-                } else {
-                    cameraCheckbox.classList.remove('checked');
-                }
-            });
-
-            microphoneCheckbox.addEventListener('click', async () => {
-                microphoneGranted = await requestMediaPermissions();
-                if (microphoneGranted) {
-                    microphoneCheckbox.classList.add('checked');
-                } else {
-                    microphoneCheckbox.classList.remove('checked');
-                }
-            });
-
-            // Event listener para o botão Next - MODIFICADO
-            nextButton.addEventListener('click', async () => {
-                const name = nameInput.value.trim();
-                let hasError = false;
-
-                // Validação do nome
-                if (!name) {
-                    hasError = true;
-                    nameInput.classList.add('error');
-                    nameError.style.display = 'block';
-                } else {
-                    nameInput.classList.remove('error');
-                    nameError.style.display = 'none';
-                }
-
-                // Validação das permissões
-                if (!cameraGranted || !microphoneGranted) {
-                    hasError = true;
-                }
-                
-                // Verifica se há token (chave do Firebase)
-                if (!token) {
-                    hasError = true;
-                    document.getElementById('warning-message').style.display = 'block';
-                }
-
-                if (hasError) {
-                    welcomeScreen.classList.add('error-state');
-                    setTimeout(() => {
-                        welcomeScreen.classList.remove('error-state');
-                    }, 1000);
-                    return;
-                }
-
-                // Mostra loader durante a transição
-                loaderContainer.style.display = 'flex';
-
-                // Transição direta para a tela caller após um breve delay
-                setTimeout(() => {
-                    welcomeScreen.style.display = 'none';
-                    callerScreen.style.display = 'block';
-                    loaderContainer.style.display = 'none';
-                    
-                    // Inicializa a tela caller com o nome do usuário
-                    initCallerApp(name);
-                }, 800);
-            });
-        });
+        // Iniciar o ciclo de anúncios APÓS a tradução da página
+        window.onload = initApp; // Modificado para chamar initApp
+        // ========== FIM DO CÓDIGO ORIGINAL DOS ANÚNCIOS ==========
     </script>
 </body>
 </html>
