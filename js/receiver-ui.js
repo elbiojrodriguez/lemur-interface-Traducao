@@ -5,7 +5,6 @@ window.onload = () => {
   const rtcCore = new WebRTCCore();
   const myId = crypto.randomUUID().substr(0, 8);
   let localStream = null;
-  let qrCodeGenerated = false;
 
   // Solicita acesso à câmera
   navigator.mediaDevices.getUserMedia({ video: true, audio: false })
@@ -16,28 +15,9 @@ window.onload = () => {
       console.error("Erro ao acessar a câmera:", error);
     });
 
-  // Função para gerar o QR Code com todas as informações
-  const generateQRCode = () => {
-    if (qrCodeGenerated) return;
-
-    const nameInput = document.getElementById('name-input');
-    const userName = nameInput ? nameInput.value.trim() || 'Anonymous' : 'Anonymous';
-
-    // Mantém o idioma completo com região (pt-BR, pt-PT, etc)
-    const browserLang = navigator.language || 'en';
-
-    // URL com todos os parâmetros necessários
-    const callerUrl = `${window.location.origin}/caller.html?targetId=${myId}&lang=${encodeURIComponent(browserLang)}&name=${encodeURIComponent(userName)}`;
-
-    QRCodeGenerator.generate("qrcode", callerUrl);
-    qrCodeGenerated = true;
-  };
-
-  // Gera o QR Code quando o usuário clica em "Next"
-  const nextButton = document.getElementById('next-button');
-  if (nextButton) {
-    nextButton.addEventListener('click', generateQRCode);
-  }
+  // Gera QR Code com link para caller
+  const callerUrl = `${window.location.origin}/caller.html?targetId=${myId}`;
+  QRCodeGenerator.generate("qrcode", callerUrl);
 
   rtcCore.initialize(myId);
   rtcCore.setupSocketHandlers();
@@ -45,24 +25,20 @@ window.onload = () => {
   const localVideo = document.getElementById('localVideo');
 
   rtcCore.onIncomingCall = (offer) => {
-    // Controle programático da UI - Mostrar elementos de vídeo e ocultar QR Code
-    document.querySelectorAll('.video-wrapper').forEach(el => {
-      el.style.display = 'block'; // Ou 'flex' conforme seu CSS
-    });
-    
-    const qrElement = document.getElementById('qrcode');
-    if (qrElement) qrElement.style.display = 'none';
-
     if (!localStream) {
       console.warn("Stream local não disponível");
       return;
     }
 
     rtcCore.handleIncomingCall(offer, localStream, (remoteStream) => {
-      // Silencia áudio recebido
+      // 🔇 Silencia áudio recebido
       remoteStream.getAudioTracks().forEach(track => track.enabled = false);
 
-      // Exibe vídeo remoto
+      // 🔥 Oculta o QR Code (sem alterar mais nada)
+      const qrElement = document.getElementById('qrcode');
+      if (qrElement) qrElement.style.display = 'none';
+
+      // Exibe vídeo remoto no PIP
       localVideo.srcObject = remoteStream;
     });
   };
