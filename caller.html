@@ -34,6 +34,7 @@
             position: relative;
             overflow-y: auto;
             display: block;
+            transition: background-color 0.5s;
         }
 
         #caller-screen {
@@ -105,11 +106,17 @@
             box-shadow: 0 0.5vw 1vw rgba(0, 0, 0, 0.1);
             font-size: 6vw;
             text-align: center;
+            transition: all 0.3s;
         }
 
         .name-input:focus {
             outline: none;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .name-input.error {
+            border: 2px solid #e74c3c;
+            background-color: #ffe6e6;
         }
 
         .permissions-container {
@@ -185,7 +192,7 @@
         }
 
         .error-state {
-            background-color: #e74c3c;
+            background-color: #ffebee;
             animation: shake 0.5s;
         }
 
@@ -232,6 +239,16 @@
             color: white;
             border-radius: 8px;
             text-align: center;
+            display: none;
+        }
+
+        .error-message {
+            position: absolute;
+            top: 38%;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #e74c3c;
+            font-size: 3.5vw;
             display: none;
         }
 
@@ -426,7 +443,7 @@
             background-color: #1a73e8;
             color: white;
             padding: 5px 10px;
-            borderRadius: 4px;
+            border-radius: 4px;
             font-size: 12px;
             font-weight: bold;
             margin-top: 8px;
@@ -490,6 +507,7 @@
         
         <div class="translator-label" id="translator-label">Live translation. No filters. No platform.</div>
         <input type="text" class="name-input" id="name-input" placeholder="Your name" />
+        <div class="error-message" id="name-error">Please enter your name</div>
         
         <div class="permissions-container">
             <div class="permission-item">
@@ -551,7 +569,7 @@
         <!-- Box de vídeo -->
         <div class="video-box">
             <div class="overlay-info">
-                <div class="user-name">Pindamonhangaba</div>
+                <div class="user-name" id="user-name-display">Pindamonhangaba</div>
                 <div class="user-language">🇧🇷</div>
             </div>
         </div>
@@ -593,7 +611,8 @@
           "name-input": "Your name",
           "next-button": "Next",
           "camera-text": "Allow camera access",
-          "microphone-text": "Allow microphone access"
+          "microphone-text": "Allow microphone access",
+          "name-error": "Please enter your name"
         };
 
         // Objeto com os textos a serem traduzidos na tela caller
@@ -713,7 +732,10 @@
         }
 
         // Função para inicializar a aplicação caller
-        async function initCallerApp() {
+        async function initCallerApp(userName) {
+            // Exibe o nome do usuário na tela caller
+            document.getElementById('user-name-display').textContent = userName;
+            
             // Traduz a página caller
             const browserLang = (navigator.language || 'en').split('-')[0];
             
@@ -738,6 +760,7 @@
         document.addEventListener('DOMContentLoaded', async () => {
             const nextButton = document.getElementById('next-button');
             const nameInput = document.getElementById('name-input');
+            const nameError = document.getElementById('name-error');
             const welcomeScreen = document.getElementById('welcome-screen');
             const callerScreen = document.getElementById('caller-screen');
             const loaderContainer = document.getElementById('loader-container');
@@ -797,10 +820,17 @@
                 const name = nameInput.value.trim();
                 let hasError = false;
 
+                // Validação do nome
                 if (!name) {
                     hasError = true;
+                    nameInput.classList.add('error');
+                    nameError.style.display = 'block';
+                } else {
+                    nameInput.classList.remove('error');
+                    nameError.style.display = 'none';
                 }
 
+                // Validação das permissões
                 if (!cameraGranted || !microphoneGranted) {
                     hasError = true;
                 }
@@ -828,8 +858,8 @@
                     callerScreen.style.display = 'block';
                     loaderContainer.style.display = 'none';
                     
-                    // Inicializa a tela caller
-                    initCallerApp();
+                    // Inicializa a tela caller com o nome do usuário
+                    initCallerApp(name);
                 }, 800);
             });
         });
