@@ -397,4 +397,268 @@ body {
         padding: 8px 16px;
         font-size: 14px;
     }
+    /* ===== ESTILOS ESPECÍFICOS DO CALLER ===== */
+
+/* Elementos internos posicionados dentro da box-principal */
+.logo-solemur {
+    position: absolute;
+    top: 7%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 35%;
+    height: auto;
+}
+
+h1 {
+    position: absolute;
+    top: 10%;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #333;
+    font-size: 7vw;
+    white-space: nowrap;
+    text-align: center;
+}
+
+h2 {
+    position: absolute;
+    top: 15%;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #333;
+    font-size: 5vw;
+    text-align: center;
+    width: 80%;
+    max-width: 90%;
+}
+
+.btn-send {
+    position: absolute;
+    top: 54.5%;
+    left: 31%;
+    transform: translateX(-50%);
+    width: 50%;
+    height: 7%;
+    background-color: #28a745;
+    color: white;
+    font-size: 1.9em;
+    font-weight: bold;
+    border: 2px solid #1e7e34;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.5);
+    text-align: center;
+    cursor: pointer;
+}
+
+.blue-box {
+    position: absolute;
+    top: 27%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 78%;
+    height: 18%;
+    padding: 20px;
+    background-color: #ffffff;
+    border: 2px solid #007bff;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.5);
+    text-align: center;
+}
+
+.red-box {
+    position: absolute;
+    top: 27%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 78%;
+    height: 1%;
+    padding: 20px;
+    background-color: #ffffff;
+    border: 2px solid #ff4136;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.5);
+    text-align: center;
+}
+
+/* Containers para os anúncios do Google */
+.ad-container {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    max-width: 320px;
+    min-width: 280px;
+    min-height: 100px;
+    background-color: #f8f9fa;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    border: 1px solid #ddd;
+    padding: 8px;
+    box-sizing: border-box;
+    opacity: 0;
+    z-index: 10;
+    transition: transform 0.5s ease-in-out, opacity 0.5s ease-in-out;
+}
+
+.ad-container-top {
+    top: -150px;
+}
+
+.ad-container-bottom {
+    bottom: -150px;
+}
+
+.ad-container.visible {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+.ad-container-top.visible {
+    top: 0px;
+}
+
+.ad-container-bottom.visible {
+    bottom: 0px;
+}
+
+.ad-close {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background-color: rgba(0, 0, 0, 0.3);
+    color: white;
+    font-size: 14px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    z-index: 11;
+    transition: background-color 0.2s;
+}
+
+.ad-close:hover {
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.ad-label {
+    position: absolute;
+    top: 4px;
+    right: 30px;
+    color: #70757a;
+    font-size: 10px;
+    background: rgba(255,255,255,0.8);
+    padding: 1px 4px;
+    border-radius: 3px;
+}
+
+.ad-content {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.ad-headline {
+    font-size: 14px;
+    font-weight: bold;
+    color: #1a73e8;
+    margin-bottom: 5px;
+    text-align: left;
+}
+
+.ad-description {
+    font-size: 12px;
+    color: #3c4043;
+    text-align: left;
+    line-height: 1.3;
+}
+
+.ad-url {
+    font-size: 11px;
+    color: #5f6368;
+    text-align: left;
+    margin-top: 5px;
+}
+
+.ad-image {
+    width: 80px;
+    height: 80px;
+    background-color: #e8f0fe;
+    border-radius: 4px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #1a73e8;
+    font-size: 10px;
+    position: absolute;
+    right: 8px;
+    top: 25px;
+}
+
+.ad-call-to-action {
+    background-color: #1a73e8;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: bold;
+    margin-top: 8px;
+    align-self: flex-start;
+}
+
+.video-box {
+    position: absolute;
+    bottom: 15%;
+    right: 5%;
+    width: 35%;
+    height: 30%;
+    background-color: #ffffff;
+    border: 2px solid #28a745;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.5);
+    overflow: hidden;
+}
+
+.camera-feed {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.overlay-info {
+    position: absolute;
+    bottom: 0px;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    color: white;
+    font-family: sans-serif;
+    z-index: 2;
+    background: rgba(0, 0, 0, 0.4);
+    padding: 4px 0;
+    font-size: 12px;
+    border-top: 1px solid rgba(255,255,255,0.2);
+}
+
+.user-name {
+    font-weight: bold;
+    font-size: 14px;
+    margin-bottom: 0px;
+}
+
+.user-language {
+    font-size: 22px;
+    line-height: 1.2;
+    opacity: 0.9;
+}
 }
