@@ -68,14 +68,16 @@ async function requestMediaPermissions() {
 
 // ===== FUNÇÃO PARA GERAR QR CODE =====
 function generateQRCode(name) {
+    // Obtém os parâmetros da URL atual (enviados pelo app Flutter)
+    const urlParams = new URLSearchParams(window.location.search);
+    const token = urlParams.get('token'); // Token do Firebase
     const browserFullLang = navigator.language || 'pt-BR';
     
-    // Simula um token (em um caso real, isso viria do backend)
-    const simulatedToken = 'simulated_token_' + Date.now();
-    const fixedId = simulatedToken.slice(-5);
+    // Gera ID fixo com últimos 7 dígitos do token
+    const fixedId = token ? token.slice(-7) : 'unknown';
     
-    // URL com parâmetros
-    const fullUrl = `${window.location.origin}?token=${encodeURIComponent(simulatedToken)}&browserId=${encodeURIComponent(fixedId)}&lang=${encodeURIComponent(browserFullLang)}&name=${encodeURIComponent(name || 'User')}`;
+    // URL com TODOS os parâmetros necessários para o caller
+    const fullUrl = `https://lemur-interface-traducao.netlify.app/caller.html?token=${encodeURIComponent(token || '')}&browserId=${encodeURIComponent(fixedId)}&lang=${encodeURIComponent(browserFullLang)}&name=${encodeURIComponent(name || 'User')}`;
     
     console.log("QR Code URL:", fullUrl);
     
