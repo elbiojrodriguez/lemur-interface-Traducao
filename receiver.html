@@ -6,13 +6,19 @@
     <title>EchoMeP2P - QR Code Generator</title>
     <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
     <style>
-        html, body {
+        html {
+            height: 100%;
+            font-size: clamp(14px, 2.5vw, 18px);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            text-align: center;
+            transition: background-color 0.5s;
+        }
+
+        body {
             height: 100%;
             margin: 0;
             padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            text-align: center;
-            background-color: #aee2ff;
+            font-size: 1em;
         }
 
         .box-principal {
@@ -22,45 +28,87 @@
             margin: 0 auto;
             padding: 2vh 2vw;
             box-sizing: border-box;
+            background-color: #aee2ff;
             position: relative;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
+            overflow-y: auto;
         }
 
         .logo {
+            position: absolute;
+            top: 7%;
+            left: 50%;
+            transform: translate(-50%, -50%);
             width: 35%;
             height: auto;
-            margin-bottom: 20px;
         }
 
         #EchoMeP2P-title {
+            position: absolute;
+            top: 10%;
+            left: 50%;
+            transform: translateX(-50%);
             color: #333;
             font-size: 7vw;
-            margin-bottom: 10px;
+            white-space: nowrap;
+            text-align: center;
+        }
+
+        .loader-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+        }
+
+        .loader {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #3498db;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin-bottom: 15px;
+        }
+
+        .loader-text {
+            font-size: 4vw;
+            color: #333;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
         .qr-modal {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80%;
             background-color: #aee2ff;
             border-radius: 20px;
-            padding: 30px;
-            width: 80%;
-            max-width: 400px;
+            padding: 4vh 4vw;
             text-align: center;
             box-shadow: 0 5px 25px rgba(0, 0, 0, 0.2);
+            display: none;
         }
 
         .qr-modal-title {
-            font-size: 20px;
-            margin-bottom: 15px;
+            font-size: 6vw;
+            margin-bottom: 2vh;
             color: #333;
             font-weight: bold;
         }
 
         .qr-modal-description {
-            font-size: 16px;
-            margin-bottom: 20px;
+            font-size: 4vw;
+            margin-bottom: 3vh;
             color: #555;
             line-height: 1.4;
         }
@@ -86,45 +134,25 @@
             border-radius: 12px;
             box-shadow: 0 2px 6px rgba(0,0,0,0.1);
             word-break: break-all;
-            font-size: 12px;
+            font-size: 3vw;
             text-align: center;
         }
 
         .close-button {
-            margin-top: 20px;
-            padding: 10px 20px;
+            margin-top: 2vh;
+            padding: 1.5vh 4vw;
             background-color: #3498db;
             color: white;
             border: none;
             border-radius: 20px;
             cursor: pointer;
-            font-size: 16px;
+            font-size: 4vw;
+            box-shadow: 0 0.5vw 1vw rgba(0, 0, 0, 0.1);
+            transition: all 0.3s;
         }
 
         .close-button:hover {
             background-color: #2980b9;
-        }
-
-        .loader-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 20px;
-        }
-
-        .loader {
-            border: 5px solid #f3f3f3;
-            border-top: 5px solid #3498db;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
         }
     </style>
 </head>
@@ -135,10 +163,10 @@
         
         <div class="loader-container" id="loader-container">
             <div class="loader"></div>
-            <p>Generating your QR Code...</p>
+            <div class="loader-text" id="loader-text">Generating your QR Code...</div>
         </div>
         
-        <div class="qr-modal" id="qr-modal" style="display: none;">
+        <div class="qr-modal" id="qr-modal">
             <h2 class="qr-modal-title" id="qr-modal-title">This is your online key</h2>
             <p class="qr-modal-description" id="qr-modal-description">You can ask to scan, share or print on your business card.</p>
             <div class="qr-modal-content">
@@ -160,6 +188,7 @@
         const TRANSLATE_ENDPOINT = 'https://chat-tradutor.onrender.com/translate';
 
         const textsToTranslateQR = {
+          "loader-text": "Generating your QR Code...",
           "qr-modal-title": "This is your online key",
           "qr-modal-description": "You can ask to scan, share or print on your business card.",
           "close-button": "Close"
@@ -203,6 +232,7 @@
         // Código principal
         document.addEventListener('DOMContentLoaded', async () => {
             const loaderContainer = document.getElementById('loader-container');
+            const loaderText = document.getElementById('loader-text');
             const qrModal = document.getElementById('qr-modal');
             const closeButton = document.getElementById('close-button');
             const urlContentModal = document.getElementById('url-content-modal');
