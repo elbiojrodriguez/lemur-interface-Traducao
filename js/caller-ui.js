@@ -1,6 +1,4 @@
-// caller-ui.js - VERSÃO COMPATÍVEL COM QR CODE ORIGINAL
-import WebRTCCore from '../core/webrtc-core.js';
-
+// caller-ui.js - VERSÃO COMPLETA E CORRIGIDA
 window.onload = () => {
   const chatInputBox = document.querySelector('.chat-input-box');
   const rtcCore = new WebRTCCore();
@@ -14,7 +12,7 @@ window.onload = () => {
   let targetId = null;
   let localStream = null;
 
-  // Solicita acesso à câmera logo na abertura
+  // Acesso à câmera
   navigator.mediaDevices.getUserMedia({ video: true, audio: false })
     .then(stream => {
       localStream = stream;
@@ -24,66 +22,61 @@ window.onload = () => {
       console.error("Erro ao acessar a câmera:", error);
     });
 
-  // 🔽🔽🔽 EXTRAÇÃO DE PARÂMETROS COMPATÍVEL COM QR CODE ORIGINAL 🔽🔽🔽
+  // EXTRAI PARÂMETROS do QR Code
   const urlParams = new URLSearchParams(window.location.search);
   
-  // Tenta obter targetId de múltiplas fontes (compatibilidade total)
-  targetId = urlParams.get('targetId') ||                // Formato preferido
-             urlParams.get('browserId') ||               // Formato alternativo 1
-             extractIdFromToken(urlParams.get('token')); // Formato alternativo 2
-
-  // Função para extrair ID de token no formato "simulated_token_TIMESTAMP_ID"
-  function extractIdFromToken(token) {
-    if (!token) return null;
-    // Token format: "simulated_token_1705000000123_abcde"
-    const parts = token.split('_');
-    if (parts.length >= 4) {
-      return parts[parts.length - 1]; // Última parte é o ID
-    }
-    return null;
-  }
-
-  console.log("Parâmetros da URL:", Object.fromEntries(urlParams.entries()));
-  console.log("Target ID detectado:", targetId);
+  // PEGA APENAS o targetId (ID do receiver)
+  targetId = urlParams.get('targetId');
+  
+  // Mostra informações do QR Code (apenas para visualização)
+  const token = urlParams.get('token');
+  const browserId = urlParams.get('browserId');
+  const lang = urlParams.get('lang');
+  const username = urlParams.get('username');
+  
+  console.log("=== INFORMAÇÕES DO QR CODE ===");
+  console.log("Token:", token);
+  console.log("Browser ID:", browserId);
+  console.log("Idioma:", lang);
+  console.log("Usuário:", username);
+  console.log("Target ID (receiver):", targetId);
+  console.log("==============================");
 
   if (targetId) {
     document.getElementById('callActionBtn').style.display = 'block';
-    
-    // Opcional: Mostrar informações do QR Code escaneado
-    const lang = urlParams.get('lang') || 'pt-BR';
-    const token = urlParams.get('token');
-    console.log(`Conexão detectada: ID=${targetId}, Idioma=${lang}, Token=${token}`);
+    console.log("Pronto para conectar com o receiver!");
+  } else {
+    console.error("ERRO: Target ID não encontrado!");
   }
 
-  // Configura o botão de chamada
+  // Botão de chamada
   document.getElementById('callActionBtn').onclick = () => {
     if (!targetId || !localStream) {
-      console.error("Faltam parâmetros para iniciar chamada:", { targetId, localStream });
+      console.error("Não pode iniciar chamada:", { targetId, localStream });
       return;
     }
     
-    console.log("Iniciando chamada para:", targetId);
+    console.log("Conectando com receiver:", targetId);
     rtcCore.startCall(targetId, localStream);
   };
 
-  // Silencia qualquer áudio recebido
+  // Configura áudio mudo no stream remoto
   rtcCore.setRemoteStreamCallback(stream => {
     stream.getAudioTracks().forEach(track => track.enabled = false);
     localVideo.srcObject = stream;
-    console.log("Stream remoto recebido e configurado");
+    console.log("Conexão estabelecida com sucesso!");
   });
 
-  // Configura handler para chamadas recebidas (caso necessário)
+  // Handler para chamadas recebidas (opcional)
   rtcCore.onIncomingCall = (offer) => {
-    console.log("Chamada recebida (caller side)", offer);
-    // Implemente se necessário receber chamadas no caller
+    console.log("Chamada recebida", offer);
   };
 
-  // #############################################
-  // Controles de idioma dinâmicos (MANTIDO ORIGINAL)
-  // #############################################
+  // =============================================
+  // CONTROLES DE IDIOMA E RECONHECIMENTO DE VOZ
+  // =============================================
 
-  // 1. Configuração do chat (box azul)
+  // 1. Configuração do chat
   const textDisplay = document.createElement('div');
   textDisplay.className = 'text-display-placeholder';
   textDisplay.style.padding = '10px';
@@ -97,7 +90,7 @@ window.onload = () => {
   textDisplay.style.overflowY = 'auto';
   chatInputBox.appendChild(textDisplay);
 
-  // 2. Criação do container dos controles
+  // 2. Controles de idioma
   const langControls = document.createElement('div');
   langControls.style.position = 'fixed';
   langControls.style.bottom = '80px';
@@ -110,7 +103,7 @@ window.onload = () => {
   langControls.style.gap = '10px';
   document.body.appendChild(langControls);
 
-  // 3. Balão do idioma detectado
+  // 3. Bolha do idioma
   const detectedLangBubble = document.createElement('div');
   detectedLangBubble.className = 'lang-bubble';
   detectedLangBubble.style.display = 'flex';
@@ -125,7 +118,7 @@ window.onload = () => {
   detectedLangBubble.style.fontSize = '24px';
   langControls.appendChild(detectedLangBubble);
 
-  // 4. Botão de seleção de idiomas (🌐)
+  // 4. Botão seleção idioma
   const langSelectButton = document.createElement('button');
   langSelectButton.className = 'lang-select-btn';
   langSelectButton.textContent = '🌐';
@@ -156,7 +149,7 @@ window.onload = () => {
   languageMenu.style.minWidth = '60px';
   document.body.appendChild(languageMenu);
 
-  // 6. Idiomas disponíveis
+  // 6. Lista de idiomas
   const languages = [
     { code: 'en-US', flag: '🇺🇸', speakText: 'Speak now', name: 'English' },
     { code: 'pt-BR', flag: '🇧🇷', speakText: 'Fale agora', name: 'Português' },
@@ -169,7 +162,7 @@ window.onload = () => {
     { code: 'ar-SA', flag: '🇸🇦', speakText: 'تحدث الآن', name: 'العربية' }
   ];
 
-  // 7. Lógica de detecção de idioma - USA O IDIOMA DO QR CODE SE DISPONÍVEL
+  // 7. Detecta idioma do QR Code ou navegador
   const browserLanguage = navigator.language;
   const urlLang = urlParams.get('lang');
   let currentLang = languages.find(lang => lang.code === urlLang) || 
@@ -177,9 +170,9 @@ window.onload = () => {
                    languages[0];
   
   detectedLangBubble.textContent = currentLang.flag;
-  detectedLangBubble.title = `Idioma atual: ${currentLang.name}`;
+  detectedLangBubble.title = `Idioma: ${currentLang.name}`;
 
-  // 8. Popula o menu de idiomas
+  // 8. Popula menu de idiomas
   languages.forEach(lang => {
     const langBtn = document.createElement('button');
     langBtn.className = 'lang-option';
@@ -219,7 +212,7 @@ window.onload = () => {
     languageMenu.style.display = 'none';
   });
 
-  // 10. Configuração do reconhecimento de voz
+  // 10. Reconhecimento de voz
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   let recognition = null;
   let isListening = false;
@@ -230,10 +223,10 @@ window.onload = () => {
     recognition.interimResults = false;
     recognition.lang = currentLang.code;
 
-    // Mensagem inicial no idioma correto
+    // Mensagem inicial
     textDisplay.textContent = `${getClickToSpeakMessage(currentLang.code)}`;
 
-    // Clique na bandeira ativa/desativa o microfone
+    // Clique para falar
     detectedLangBubble.addEventListener('click', () => {
       if (!isListening) {
         try {
@@ -242,7 +235,7 @@ window.onload = () => {
           textDisplay.style.display = 'flex';
           isListening = true;
         } catch (e) {
-          console.error('Erro ao iniciar microfone:', e);
+          console.error('Erro microfone:', e);
           textDisplay.textContent = `${getErrorMessage(currentLang.code)}`;
           textDisplay.style.display = 'flex';
         }
@@ -254,7 +247,7 @@ window.onload = () => {
       }
     });
 
-    // Menu de idiomas
+    // Seleção de idioma
     languageMenu.addEventListener('click', (e) => {
       if (e.target.classList.contains('lang-option')) {
         const langCode = e.target.dataset.langCode;
@@ -267,7 +260,7 @@ window.onload = () => {
 
         currentLang = languages.find(l => l.code === langCode);
         detectedLangBubble.textContent = currentLang.flag;
-        detectedLangBubble.title = `Idioma atual: ${currentLang.name}`;
+        detectedLangBubble.title = `Idioma: ${currentLang.name}`;
 
         if (isListening) {
           recognition.stop();
@@ -327,7 +320,7 @@ window.onload = () => {
     };
 
     recognition.onerror = (event) => {
-      console.error('Erro no reconhecimento:', event.error);
+      console.error('Erro reconhecimento:', event.error);
       textDisplay.textContent = `${getErrorMessage(currentLang.code)}`;
       textDisplay.style.display = 'flex';
       isListening = false;
@@ -343,7 +336,7 @@ window.onload = () => {
           try {
             recognition.start();
           } catch (e) {
-            console.error('Erro ao reiniciar:', e);
+            console.error('Erro reiniciar:', e);
             isListening = false;
             textDisplay.textContent = `${getErrorMessage(currentLang.code)}`;
             textDisplay.style.display = 'flex';
@@ -352,12 +345,12 @@ window.onload = () => {
       }
     };
   } else {
-    textDisplay.textContent = 'Seu navegador não suporta reconhecimento de voz';
+    textDisplay.textContent = 'Navegador não suporta reconhecimento de voz';
     textDisplay.style.color = 'black';
-    console.error('API de reconhecimento de voz não suportada');
+    console.error('API de voz não suportada');
   }
 
-  // Funções auxiliares para mensagens
+  // Funções de mensagem
   function getClickToSpeakMessage(langCode) {
     const messages = {
       'en-US': 'Click flag to speak',
@@ -383,7 +376,7 @@ window.onload = () => {
       'ja-JP': 'マイクオフ',
       'zh-CN': '麦克风关闭',
       'ru-RU': 'Микрофон выключен',
-      'ar-SA': 'تم إيقaf الميكروفون'
+      'ar-SA': 'تم إيقاف الميكروفون'
     };
     return messages[langCode] || messages['en-US'];
   }
