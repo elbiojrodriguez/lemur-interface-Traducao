@@ -1,189 +1,400 @@
-/* Reset mobile */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  -webkit-tap-highlight-color: transparent;
+/* ===== ESTILOS GERAIS ===== */
+html {
+    height: 100%;
+    font-size: clamp(14px, 2.5vw, 18px);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    text-align: center;
+    transition: background-color 0.5s;
 }
 
 body {
-  background: transparent;
-  min-height: 100vh;
-  height: 100%;
-  overflow: hidden;
-  position: relative;
-  font-family: Arial, sans-serif;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    font-size: 1em;
 }
 
-/* Containers de vídeo */
-.remote-container {
-  position: absolute;
-  width: 100%;
-  height: 100%;
+.box-principal {
+    width: 100%;
+    max-width: 600px;
+    height: 100%;
+    margin: 0 auto;
+    padding: 2vh 2vw;
+    box-sizing: border-box;
+    background-color: #aee2ff;
+    position: relative;
+    overflow-y: auto;
 }
 
-/* Oculta o vídeo remoto */
-#remoteVideo {
-  display: none;
+/* ===== ESTILOS DA TELA DE BOAS-VINDAS ===== */
+.logo {
+    position: absolute;
+    top: 7%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 35%;
+    height: auto;
 }
 
-/* Vídeo local em PIP com moldura verde */
-.local-pip {
-  position: absolute;
-  bottom: calc(80px + 60px);
-  right: 20px;
-  width: 34.5%;
-  max-width: 138px;
-  height: 184px;
-  transform: translateX(-17%);
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-  border: 2px solid #4CAF50;
-  z-index: 10;
+#EchoMeP2P-title {
+    position: absolute;
+    top: 10%;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #333;
+    font-size: 7vw;
+    white-space: nowrap;
+    text-align: center;
 }
 
-#localVideo {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transform: scaleX(-1);
-}
-
-/* Controles principais: botão verde */
-.controls {
-  position: absolute;
-  bottom: calc(215px + 60px);
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 20;
-}
-
-.controls button {
-  width: 120px;            /* Largura fixa */
-  height: 40px;            /* Altura fixa */
-  border-radius: 999px;    /* Cápsula garantida */
-  border: none;
-  font-size: 16px;
-  font-weight: bold;
-  cursor: pointer;
-  backdrop-filter: blur(6px);
-  color: white;
-  background: #4CAF50;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;              /* Remove espaçamento extra */
-  box-sizing: border-box; /* Garante que padding não afete tamanho */
-}
-
-
-#callActionBtn {
-  background: #4CAF50;
-}
-
-/* 🔻 Balões com bandeiras */
-.language-bubbles {
-  display: flex;
-  gap: 8px;
-  justify-content: center;
-}
-
-.lang-btn {
-  width: 40px;
-  height: 40px;
-  font-size: 20px;
-  border-radius: 50%;
-  border: none;
-  background-color: rgba(0, 0, 0, 0.3);
-  color: white;
-  cursor: pointer;
-  backdrop-filter: blur(4px);
-}
-
-/* 🔵 Box azul centralizado */
-.chat-input-box {
-  position: absolute;
-  bottom: 100px; /* Ajuste conforme a altura do PIP */
-  left: 50%;
-  transform: translateX(-50%);
-  width: 60%;
-  height: 160px; /* Altura aproximada do PIP */
-  border: 2px solid #007BFF;
-  border-radius: 12px;
-  background-color: rgba(255, 255, 255, 0.1);
-  z-index: 20;
-}
-
-/* Overlay de informações */
-.info-overlay {
-  position: absolute;
-  top: 20px;
-  left: 0;
-  right: 0;
-  z-index: 30;
-  color: white;
-  text-align: center;
-  background: rgba(0, 0, 0, 0.5);
-  padding: 10px;
-  border-radius: 0 0 10px 10px;
-}
-
-/* Container do QR Code */
-.info-overlay #qrcode {
-  margin: 10px auto;
-  padding: 12px;
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-  display: inline-block;
-}
-
-/* Destaque visual para ID */
-.id-display {
-  display: inline-block;
-  font-size: 16px;
-  font-weight: bold;
-  background: rgba(255, 255, 255, 0.1);
-  padding: 6px 12px;
-  border-radius: 20px;
-  user-select: all;
-  cursor: pointer;
-  color: white;
-}
-
-/* Responsivo para telas pequenas */
-@media (max-width: 400px) {
-  .controls button {
-    width: 50px;
-    height: 50px;
-    font-size: 16px;
-  }
-
-  .local-pip {
-    height: 120px;
-    max-width: 100px;
-    bottom: calc(60px + 60px);
-  }
-
-  .info-overlay {
-    padding: 8px;
-  }
-
-  .info-overlay #qrcode {
-    padding: 8px;
-    max-width: 90%;
-  }
-
-  .chat-input-box {
+.translator-label {
+    position: absolute;
+    top: 17%;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #333;
+    font-size: 5vw;
+    text-align: center;
     width: 80%;
-    height: 120px;
-    bottom: 80px;
-  }
+    max-width: 90%;
+}
 
-  .lang-btn {
-    width: 36px;
-    height: 36px;
-    font-size: 18px;
-  }
+#welcome-title {
+    position: absolute;
+    top: 21%;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #333;
+    font-size: 9vw;
+    white-space: nowrap;
+    text-align: center;
+}
+
+.name-input {
+    position: absolute;
+    top: 32%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 70%;
+    height: 5%;
+    padding: 1vh 1vw;
+    border-radius: 3vw;
+    border: none;
+    box-shadow: 0 0.5vw 1vw rgba(0, 0, 0, 0.1);
+    font-size: 6vw;
+    text-align: center;
+}
+
+.name-input:focus {
+    outline: none;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.permissions-container {
+    position: absolute;
+    top: 41%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 70%;
+    display: flex;
+    flex-direction: column;
+    gap: 2vh;
+}
+
+.permission-item {
+    display: flex;
+    align-items: center;
+    padding: 1.5vh 2vw;
+    background-color: rgba(255, 255, 255, 0.7);
+    border-radius: 3vw;
+    box-shadow: 0 0.5vw 1vw rgba(0, 0, 0, 0.1);
+}
+
+.permission-checkbox {
+    width: 5vw;
+    height: 5vw;
+    margin-right: 3vw;
+    border: 2px solid #3498db;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.permission-checkbox.checked {
+    background-color: #3498db;
+}
+
+.permission-checkbox.checked::after {
+    content: "✓";
+    color: white;
+    font-size: 4vw;
+}
+
+.permission-text {
+    flex: 1;
+    text-align: left;
+    font-size: 4vw;
+    color: #333;
+}
+
+.next-button {
+    position: absolute;
+    top: 59%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 30%;
+    height: 5%;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 3vw;
+    font-size: 5vw;
+    cursor: pointer;
+    box-shadow: 0 0.5vw 1vw rgba(0, 0, 0, 0.1);
+    transition: all 0.3s;
+    z-index: 10;
+}
+
+.next-button:hover {
+    background-color: #2980b9;
+}
+
+.error-state {
+    background-color: #e74c3c;
+    animation: shake 0.5s;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-0.5vw); }
+    40%, 80% { transform: translateX(0.5vw); }
+}
+
+.loader-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+}
+
+.loader {
+    border: 5px solid #f3f3f3;
+    border-top: 5px solid #3498db;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* ===== ESTILOS DA TELA DE QR CODE ===== */
+.qr-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.9);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.qr-modal {
+    background-color: #aee2ff;
+    border-radius: 20px;
+    padding: 30px;
+    width: 80%;
+    max-width: 400px;
+    text-align: center;
+    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.5);
+}
+
+.qr-modal-title {
+    font-size: 20px;
+    margin-bottom: 15px;
+    color: #333;
+    font-weight: bold;
+}
+
+.qr-modal-description {
+    font-size: 16px;
+    margin-bottom: 20px;
+    color: #555;
+    line-height: 1.4;
+}
+
+.qr-modal-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+
+.qrcode-container {
+    padding: 12px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+.url-display {
+    width: 100%;
+    padding: 10px;
+    background: #f8f9fa;
+    border-radius: 12px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    word-break: break-all;
+    font-size: 12px;
+    text-align: center;
+}
+
+.mode-button {
+    margin-top: 20px;
+    padding: 10px 20px;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.mode-button:hover {
+    background-color: #2980b9;
+}
+
+/* ===== ESTILOS DA TELA DE COMUNICAÇÃO WEBRTC ===== */
+.container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+.video-wrapper {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.video-wrapper video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Vídeo local em PIP - EXATAMENTE como no original */
+/* Este é o PIP verde que mostra a câmera do outro usuário */
+.video-wrapper:nth-child(2) { 
+    position: absolute; 
+    bottom: calc(80px + 60px); 
+    right: 5px; 
+    width: 34.5%; 
+    max-width: 138px; 
+    height: 184px; 
+    transform: translateX(-17%); 
+    border-radius: 8px; 
+    overflow: hidden; 
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); 
+    border: 2px solid #4CAF50; /* Borda verde */
+    z-index: 10; 
+}
+
+/* Overlay de informações - EXATAMENTE como no original */
+.info-overlay {
+    position: absolute;
+    top: 20px;
+    left: 0;
+    right: 0;
+    z-index: 30;
+    color: white;
+    text-align: center;
+    background: transparent;
+    padding: 10px;
+    border-radius: 0 0 10px 10px;
+}
+
+/* ID visual - EXATAMENTE como no original */
+#myId {
+    display: inline-block;
+    font-size: 16px;
+    font-weight: bold;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 6px 12px;
+    border-radius: 20px;
+    user-select: all;
+    cursor: pointer;
+    color: white;
+}
+
+/* ===== ESTILOS PARA TRANSIÇÃO ENTRE MODOS ===== */
+.app-mode {
+    display: none;
+    width: 100%;
+    height: 100%;
+}
+
+.app-mode.active {
+    display: block;
+}
+
+/* ===== RESPONSIVIDADE ===== */
+@media (max-width: 768px) {
+    .video-wrapper:nth-child(2) {
+        height: 120px;
+        max-width: 100px;
+        bottom: calc(60px + 60px);
+    }
+
+    .info-overlay {
+        padding: 8px;
+    }
+    
+    .permission-text {
+        font-size: 3.5vw;
+    }
+    
+    .name-input {
+        font-size: 5vw;
+        height: 6%;
+    }
+    
+    .next-button {
+        font-size: 4.5vw;
+        height: 6%;
+    }
+}
+
+@media (max-width: 480px) {
+    .qr-modal {
+        padding: 20px;
+        width: 90%;
+    }
+    
+    .qr-modal-title {
+        font-size: 18px;
+    }
+    
+    .qr-modal-description {
+        font-size: 14px;
+    }
+    
+    .mode-button {
+        padding: 8px 16px;
+        font-size: 14px;
+    }
 }
