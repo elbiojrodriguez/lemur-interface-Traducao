@@ -44,7 +44,6 @@ window.onload = () => {
     localVideo.srcObject = stream;
   });
 
-
   // =============================================
   // CONTROLES DE IDIOMA E RECONHECIMENTO DE VOZ
   // =============================================
