@@ -6,14 +6,33 @@
     <title>EchoMeP2P - QR Code Generator</title>
     <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
     <style>
-        html, body {
+        html {
+            height: 100%;
+            font-size: clamp(14px, 2.5vw, 18px);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            text-align: center;
+            transition: background-color 0.5s;
+        }
+
+        body {
             height: 100%;
             margin: 0;
             padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            text-align: center;
-            background-color: #000000; /* Fundo preto desde o início */
-            transition: background-color 0.5s;
+            font-size: 1em;
+            background-color: #000000; /* Fundo preto para toda a página */
+        }
+
+        .box-principal {
+            width: 100%;
+            max-width: 600px;
+            height: 100%;
+            margin: 0 auto;
+            padding: 2vh 2vw;
+            box-sizing: border-box;
+            background-color: #aee2ff; /* Azul apenas quando mostrar o QR Code */
+            position: relative;
+            overflow-y: auto;
+            display: none; /* Inicialmente oculto */
         }
 
         .loader-container {
@@ -26,7 +45,7 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            background-color: rgba(0, 0, 0, 0.9); /* Fundo escuro semi-transparente */
+            background-color: rgba(0, 0, 0, 0.9);
             z-index: 1000;
         }
 
@@ -52,39 +71,49 @@
             100% { transform: rotate(360deg); }
         }
 
-        .qr-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.9);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
+        .logo {
+            position: absolute;
+            top: 7%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 35%;
+            height: auto;
+        }
+
+        #EchoMeP2P-title {
+            position: absolute;
+            top: 10%;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #333;
+            font-size: 7vw;
+            white-space: nowrap;
+            text-align: center;
         }
 
         .qr-modal {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80%;
             background-color: #aee2ff;
             border-radius: 20px;
-            padding: 30px;
-            width: 80%;
-            max-width: 400px;
+            padding: 4vh 4vw;
             text-align: center;
-            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.2);
         }
 
         .qr-modal-title {
-            font-size: 20px;
-            margin-bottom: 15px;
+            font-size: 6vw;
+            margin-bottom: 2vh;
             color: #333;
             font-weight: bold;
         }
 
         .qr-modal-description {
-            font-size: 16px;
-            margin-bottom: 20px;
+            font-size: 4vw;
+            margin-bottom: 3vh;
             color: #555;
             line-height: 1.4;
         }
@@ -110,19 +139,21 @@
             border-radius: 12px;
             box-shadow: 0 2px 6px rgba(0,0,0,0.1);
             word-break: break-all;
-            font-size: 12px;
+            font-size: 3vw;
             text-align: center;
         }
 
         .close-button {
-            margin-top: 20px;
-            padding: 10px 20px;
+            margin-top: 2vh;
+            padding: 1.5vh 4vw;
             background-color: #3498db;
             color: white;
             border: none;
             border-radius: 20px;
             cursor: pointer;
-            font-size: 16px;
+            font-size: 4vw;
+            box-shadow: 0 0.5vw 1vw rgba(0, 0, 0, 0.1);
+            transition: all 0.3s;
         }
 
         .close-button:hover {
@@ -137,8 +168,11 @@
         <div class="loader-text" id="loader-text">Generating your QR Code...</div>
     </div>
 
-    <!-- Tela do QR Code (inicialmente oculta) -->
-    <div class="qr-screen" id="qr-screen">
+    <!-- Container principal (inicialmente oculto) -->
+    <div class="box-principal" id="box-principal">
+        <img src="assets/images/lemur.png" alt="Lemur Logo" class="logo" />
+        <h1 id="EchoMeP2P-title">EchoMeP2P</h1>
+        
         <div class="qr-modal">
             <h2 class="qr-modal-title" id="qr-modal-title">This is your online key</h2>
             <p class="qr-modal-description" id="qr-modal-description">You can ask to scan, share or print on your business card.</p>
@@ -206,7 +240,7 @@
         document.addEventListener('DOMContentLoaded', async () => {
             const loaderContainer = document.getElementById('loader-container');
             const loaderText = document.getElementById('loader-text');
-            const qrScreen = document.getElementById('qr-screen');
+            const boxPrincipal = document.getElementById('box-principal');
             const closeButton = document.getElementById('close-button');
             const urlContentModal = document.getElementById('url-content-modal');
             const qrModalTitle = document.getElementById('qr-modal-title');
@@ -233,7 +267,6 @@
             const baseUrl = 'https://lemur-interface-traducao.netlify.app/caller.html';
             
             // Simula um token (em um caso real, isso viria do backend)
-            // Para demonstração, estamos usando um ID fixo baseado no timestamp
             const simulatedToken = 'simulated_token_' + Date.now();
             const fixedId = simulatedToken.slice(-5);
             
@@ -242,14 +275,14 @@
             
             console.log("QR Code URL:", fullUrl);
             
-            // Gera o QR code após um breve delay (simulando processamento)
+            // Gera o QR code após um breve delay
             setTimeout(() => {
                 QRCodeGenerator.generate("qrcode-modal", fullUrl, 200);
                 urlContentModal.textContent = fullUrl;
                 
-                // Esconde o loader e mostra a tela do QR code
+                // Esconde o loader e mostra o container principal
                 loaderContainer.style.display = 'none';
-                qrScreen.style.display = 'flex';
+                boxPrincipal.style.display = 'block';
             }, 1500);
 
             // Fechar a aplicação (voltar para a tela inicial)
