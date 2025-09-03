@@ -1,17 +1,17 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EchoMeP2P - Anúncios com Animação</title>
-       <link rel="stylesheet" href="stylesMobileADS.css">
+    <title>EchoMeP2P - Conectar</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="box-principal">
-        <img src="solemur.png" alt="Seu Logo" class="logo-solemur">
+        <img src="assets/images/solemur.png" alt="Seu Logo" class="logo-solemur">
         <h1 id="EchoMeP2P-title">EchoMeP2P</h1>
         <h2 id="Instant-title">Live translation. No filters. No platform.</h2>       
-        <button class="btn-send">SEND🚀</button>
+        <button class="btn-send" id="send-button">SEND🚀</button>
         
         <!-- Box Azul -->
         <div class="blue-box"></div>
@@ -19,7 +19,7 @@
         <!-- Box Vermelho -->
         <div class="red-box"></div>
         
-        <!-- Containers para anúncios do Google - SIMULAÇÃO REALISTA -->
+        <!-- Containers para anúncios -->
         <div class="ad-container ad-container-top" id="ad-top">
             <div class="ad-close" onclick="closeAd('top')">✕</div>
             <div class="ad-label">Anúncio</div>
@@ -46,6 +46,7 @@
         
         <!-- Box de vídeo -->
         <div class="video-box">
+            <img src="assets/images/lemur.png" class="camera-feed" alt="Video feed">
             <div class="overlay-info">
                 <div class="user-name">Pindamonhangaba</div>
                 <div class="user-language">🇧🇷</div>
@@ -53,6 +54,6 @@
         </div>
     </div>
 
-    <script src="scriptMobileADS.js"></script>
+    <script src="js/caller-ui.js"></script>
 </body>
 </html>
