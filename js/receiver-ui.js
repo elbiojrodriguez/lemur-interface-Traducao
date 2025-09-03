@@ -1,3 +1,6 @@
+// ===== IMPORTAÇÃO DO QR CODE =====
+import { QRCodeGenerator } from './qr-code-utils.js';
+
 // ===== CÓDIGO DE TRADUÇÃO =====
 const TRANSLATE_ENDPOINT = 'https://chat-tradutor.onrender.com/translate';
 
