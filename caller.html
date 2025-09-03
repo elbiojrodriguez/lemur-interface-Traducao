@@ -1,58 +1,58 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EchoMeP2P - Conectar</title>
-    <script src="https://lemur-signal.onrender.com/socket.io/socket.io.js"></script>
-    <link rel="stylesheet" href="style.css">
+    <title>EchoMeP2P - Anúncios com Animação</title>
+       <link rel="stylesheet" href="stylesMobileADS.css">
 </head>
 <body>
-    <!-- Modo 1: Apresentação e Conexão -->
-    <div class="app-mode active" id="connection-mode">
-        <div class="box-principal">
-            <div class="connection-screen">
-                <img src="assets/images/solemur.png" alt="Solemur Logo" class="logo" />
-                <h1 id="caller-title">Conectar com</h1>
-                <div id="contact-info">
-                    <h2 id="contact-name">Carregando...</h2>
-                    <p id="contact-lang">Idioma: detectando</p>
-                </div>
-                
-                <div class="connection-status">
-                    <div class="loader" id="connection-loader"></div>
-                    <p id="status-text">Preparando conexão...</p>
-                </div>
-                
-                <button class="connect-button" id="connect-button">Iniciar Conexão</button>
+    <div class="box-principal">
+        <img src="solemur.png" alt="Seu Logo" class="logo-solemur">
+        <h1 id="EchoMeP2P-title">EchoMeP2P</h1>
+        <h2 id="Instant-title">Live translation. No filters. No platform.</h2>       
+        <button class="btn-send">SEND🚀</button>
+        
+        <!-- Box Azul -->
+        <div class="blue-box"></div>
+        
+        <!-- Box Vermelho -->
+        <div class="red-box"></div>
+        
+        <!-- Containers para anúncios do Google - SIMULAÇÃO REALISTA -->
+        <div class="ad-container ad-container-top" id="ad-top">
+            <div class="ad-close" onclick="closeAd('top')">✕</div>
+            <div class="ad-label">Anúncio</div>
+            <div class="ad-content">
+                <div class="ad-headline">Tradutor Premium Online</div>
+                <div class="ad-description">Traduza textos em tempo real com nossa tecnologia avançada. Experimente grátis!</div>
+                <div class="ad-url">www.tradutorpremium.com</div>
+                <div class="ad-image">Imagem</div>
+                <div class="ad-call-to-action">Saiba Mais</div>
+            </div>
+        </div>
+        
+        <div class="ad-container ad-container-bottom" id="ad-bottom">
+            <div class="ad-close" onclick="closeAd('bottom')">✕</div>
+            <div class="ad-label">Anúncio</div>
+            <div class="ad-content">
+                <div class="ad-headline">Curso de Idiomas em 30 Dias</div>
+                <div class="ad-description">Aprenda um novo idioma rapidamente com método comprovado. Matrículas abertas!</div>
+                <div class="ad-url">www.cursoidiomasrapido.com</div>
+                <div class="ad-image">Imagem</div>
+                <div class="ad-call-to-action">Inscreva-se</div>
+            </div>
+        </div>
+        
+        <!-- Box de vídeo -->
+        <div class="video-box">
+            <div class="overlay-info">
+                <div class="user-name">Pindamonhangaba</div>
+                <div class="user-language">🇧🇷</div>
             </div>
         </div>
     </div>
 
-    <!-- Modo 2: Comunicação WebRTC -->
-    <div class="app-mode" id="communication-mode">
-        <div class="box-principal">
-            <div class="container">
-                <!-- Vídeo remoto (outra pessoa) -->
-                <div class="video-wrapper">
-                    <video id="remoteVideo" autoplay playsinline></video>
-                </div>
-
-                <!-- Seu próprio vídeo em PIP -->
-                <div class="video-wrapper">
-                    <video id="localVideo" autoplay muted playsinline></video>
-                </div>
-
-                <div class="info-overlay">
-                    <span id="connection-id"></span>
-                    <button id="end-call-button">Encerrar</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script src="core/internet-config.js"></script>
-    <script src="core/webrtc-core.js"></script>
-    <script src="js/caller-ui.js"></script>
+    <script src="scriptMobileADS.js"></script>
 </body>
 </html>
