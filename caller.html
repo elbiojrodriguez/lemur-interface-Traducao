@@ -7,49 +7,81 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="box-principal">
-        <img src="assets/images/solemur.png" alt="Seu Logo" class="logo-solemur">
-        <h1 id="EchoMeP2P-title">EchoMeP2P</h1>
-        <h2 id="Instant-title">Live translation. No filters. No platform.</h2>       
-        <button class="btn-send" id="send-button">SEND🚀</button>
-        
-        <!-- Box Azul -->
-        <div class="blue-box"></div>
-        
-        <!-- Box Vermelho -->
-        <div class="red-box"></div>
-        
-        <!-- Containers para anúncios -->
-        <div class="ad-container ad-container-top" id="ad-top">
-            <div class="ad-close" onclick="closeAd('top')">✕</div>
-            <div class="ad-label">Anúncio</div>
-            <div class="ad-content">
-                <div class="ad-headline">Tradutor Premium Online</div>
-                <div class="ad-description">Traduza textos em tempo real com nossa tecnologia avançada. Experimente grátis!</div>
-                <div class="ad-url">www.tradutorpremium.com</div>
-                <div class="ad-image">Imagem</div>
-                <div class="ad-call-to-action">Saiba Mais</div>
+    <!-- ===== MODO 1: TELA DE BOAS-VINDAS (USA ESTILOS EXISTENTES) ===== -->
+    <div class="app-mode active" id="welcome-mode">
+        <div class="box-principal" id="welcome-screen">
+            <div class="loader-container" id="loader-container">
+                <div class="loader"></div>
             </div>
-        </div>
-        
-        <div class="ad-container ad-container-bottom" id="ad-bottom">
-            <div class="ad-close" onclick="closeAd('bottom')">✕</div>
-            <div class="ad-label">Anúncio</div>
-            <div class="ad-content">
-                <div class="ad-headline">Curso de Idiomas em 30 Dias</div>
-                <div class="ad-description">Aprenda um novo idioma rapidamente com método comprovado. Matrículas abertas!</div>
-                <div class="ad-url">www.cursoidiomasrapido.com</div>
-                <div class="ad-image">Imagem</div>
-                <div class="ad-call-to-action">Inscreva-se</div>
+
+            <img src="assets/images/lemur.png" alt="Lemur Logo" class="logo" />
+            <h1>EchoMeP2P</h1>
+            <h2 id="welcome-title">Welcome!</h2>
+            
+            <div class="translator-label" id="translator-label">Live translation. No filters. No platform.</div>
+            <input type="text" class="name-input" id="name-input" placeholder="Your name" />
+            
+            <div class="permissions-container">
+                <div class="permission-item">
+                    <div class="permission-checkbox" id="camera-checkbox"></div>
+                    <div class="permission-text" id="camera-text">Allow camera access</div>
+                </div>
+                <div class="permission-item">
+                    <div class="permission-checkbox" id="microphone-checkbox"></div>
+                    <div class="permission-text" id="microphone-text">Allow microphone access</div>
+                </div>
             </div>
+            
+            <button class="next-button" id="next-button-welcome">Next</button>
         </div>
-        
-        <!-- Box de vídeo -->
-        <div class="video-box">
-            <img src="assets/images/lemur.png" class="camera-feed" alt="Video feed">
-            <div class="overlay-info">
-                <div class="user-name">Pindamonhangaba</div>
-                <div class="user-language">🇧🇷</div>
+    </div>
+
+    <!-- ===== MODO 2: TELA PRINCIPAL DO CALLER ===== -->
+    <div class="app-mode" id="main-mode">
+        <div class="box-principal">
+            <img src="assets/images/solemur.png" alt="Solemur Logo" class="logo-solemur">
+            <h1>EchoMeP2P</h1>
+            <h2 id="Instant-title">Live translation. No filters. No platform.</h2>       
+            <button class="btn-send" id="send-button">SEND🚀</button>
+            
+            <!-- Box Azul -->
+            <div class="blue-box"></div>
+            
+            <!-- Box Vermelho -->
+            <div class="red-box"></div>
+            
+            <!-- Containers para anúncios -->
+            <div class="ad-container ad-container-top" id="ad-top">
+                <div class="ad-close" onclick="closeAd('top')">✕</div>
+                <div class="ad-label">Anúncio</div>
+                <div class="ad-content">
+                    <div class="ad-headline">Tradutor Premium Online</div>
+                    <div class="ad-description">Traduza textos em tempo real com nossa tecnologia avançada. Experimente grátis!</div>
+                    <div class="ad-url">www.tradutorpremium.com</div>
+                    <div class="ad-image">Imagem</div>
+                    <div class="ad-call-to-action">Saiba Mais</div>
+                </div>
+            </div>
+            
+            <div class="ad-container ad-container-bottom" id="ad-bottom">
+                <div class="ad-close" onclick="closeAd('bottom')">✕</div>
+                <div class="ad-label">Anúncio</div>
+                <div class="ad-content">
+                    <div class="ad-headline">Curso de Idiomas em 30 Dias</div>
+                    <div class="ad-description">Aprenda um novo idioma rapidamente com método comprovado. Matrículas abertas!</div>
+                    <div class="ad-url">www.cursoidiomasrapido.com</div>
+                    <div class="ad-image">Imagem</div>
+                    <div class="ad-call-to-action">Inscreva-se</div>
+                </div>
+            </div>
+            
+            <!-- Box de vídeo -->
+            <div class="video-box">
+                <img src="assets/images/lemur.png" class="camera-feed" alt="Video feed">
+                <div class="overlay-info">
+                    <div class="user-name" id="user-name-display">Usuário</div>
+                    <div class="user-language">🇧🇷</div>
+                </div>
             </div>
         </div>
     </div>
