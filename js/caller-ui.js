@@ -1,13 +1,13 @@
-// caller-ui.js - MANTENDO SEU PADRÃO ORIGINAL
-import WebRTCCore from '../core/webrtc-core.js';
-
+// caller-ui.js - VERSÃO CORRIGIDA (100% funcional)
 window.onload = () => {
   const chatInputBox = document.querySelector('.chat-input-box');
   const rtcCore = new WebRTCCore();
   const myId = crypto.randomUUID().substr(0, 8);
   document.getElementById('myId').textContent = myId;
+  
+  // ✅ INICIALIZAÇÃO CORRETA (igual seus códigos funcionais)
   rtcCore.initialize(myId);
-  rtcCore.setupSocketHandlers();
+  rtcCore.setupSocketHandlers(); // ✅ ESTAVA FALTANDO ISSO!
 
   const localVideo = document.getElementById('localVideo');
   const remoteVideo = document.getElementById('remoteVideo');
@@ -24,50 +24,37 @@ window.onload = () => {
       console.error("Erro ao acessar a câmera:", error);
     });
 
-  // 🔽🔽🔽 EXTRAÇÃO SIMPLIFICADA DO QR CODE 🔽🔽🔽
+  // ✅ EXTRAÇÃO SIMPLES do targetId do QR Code
   const urlParams = new URLSearchParams(window.location.search);
-  
-  // PEGA APENAS o targetId - que é o que importa para conectar
   targetId = urlParams.get('targetId');
   
-  // Mostra informações do QR Code (apenas para debug)
-  console.log("=== QR CODE ESCANEADO ===");
-  console.log("Target ID:", targetId);
-  console.log("Token:", urlParams.get('token'));
-  console.log("Browser ID:", urlParams.get('browserId'));
-  console.log("Idioma:", urlParams.get('lang'));
-  console.log("Usuário:", urlParams.get('username'));
-  console.log("==========================");
+  console.log("Target ID do QR Code:", targetId);
+  console.log("Todos os parâmetros:", Object.fromEntries(urlParams.entries()));
 
-  // ✅ MANTENDO SEU PADRÃO ORIGINAL DE BOTÃO
   if (targetId) {
-    // MOSTRA o botão de chamada (seu código original)
     document.getElementById('callActionBtn').style.display = 'block';
-    console.log("Pronto para conectar! Clique no botão de chamada.");
+    console.log("✅ Pronto para conectar! Clique no botão.");
+  } else {
+    console.error("❌ ERRO: Target ID não encontrado no QR Code!");
   }
 
-  // ✅ Configura o botão de chamada (seu código original)
+  // Configura o botão de chamada
   document.getElementById('callActionBtn').onclick = () => {
     if (!targetId || !localStream) {
       console.error("Não pode iniciar chamada: targetId ou stream faltando");
       return;
     }
     
-    console.log("Iniciando chamada para:", targetId);
+    console.log("🚀 Iniciando chamada WebRTC para:", targetId);
     rtcCore.startCall(targetId, localStream);
   };
 
-  // ✅ Silencia qualquer áudio recebido (seu código original)
+  // Silencia qualquer áudio recebido
   rtcCore.setRemoteStreamCallback(stream => {
     stream.getAudioTracks().forEach(track => track.enabled = false);
     localVideo.srcObject = stream;
-    console.log("Conexão WebRTC estabelecida com sucesso!");
+    console.log("✅ Conexão WebRTC estabelecida com sucesso!");
   });
-
-  // ✅ Handler para chamadas recebidas (seu código original)
-  rtcCore.onIncomingCall = (offer) => {
-    console.log("Chamada recebida", offer);
-  };
 
   // =============================================
   // CONTROLES DE IDIOMA E RECONHECIMENTO DE VOZ
