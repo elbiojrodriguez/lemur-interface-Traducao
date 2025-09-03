@@ -3,48 +3,184 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EchoMeP2P - QR Code Generator</title>
-    <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
+    <title>EchoMeP2P - Welcome & Permissions</title>
     <style>
-        html, body {
-            height: 100%;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            text-align: center;
-            background-color: #000000; /* Fundo preto desde o início */
-            transition: background-color 0.5s;
-        }
-
-        .loader-container {
-            position: fixed;
+        /* Estilos da tela de boas-vindas */
+        .welcome-screen {
+            position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
+            background-color: #aee2ff;
+            z-index: 1000;
+        }
+
+        .logo {
+            position: absolute;
+            top: 7%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 35%;
+            height: auto;
+        }
+
+        #EchoMeP2P-title {
+            position: absolute;
+            top: 10%;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #333;
+            font-size: 7vw;
+            white-space: nowrap;
+            text-align: center;
+        }
+
+        .translator-label {
+            position: absolute;
+            top: 17%;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #333;
+            font-size: 5vw;
+            text-align: center;
+            width: 80%;
+            max-width: 90%;
+        }
+
+        #welcome-title {
+            position: absolute;
+            top: 21%;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #333;
+            font-size: 9vw;
+            white-space: nowrap;
+            text-align: center;
+        }
+
+        .name-input {
+            position: absolute;
+            top: 32%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 70%;
+            height: 5%;
+            padding: 1vh 1vw;
+            border-radius: 3vw;
+            border: none;
+            box-shadow: 0 0.5vw 1vw rgba(0, 0, 0, 0.1);
+            font-size: 6vw;
+            text-align: center;
+        }
+
+        .name-input:focus {
+            outline: none;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .permissions-container {
+            position: absolute;
+            top: 41%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 70%;
             display: flex;
+            flex-direction: column;
+            gap: 2vh;
+        }
+
+        .permission-item {
+            display: flex;
+            align-items: center;
+            padding: 1.5vh 2vw;
+            background-color: rgba(255, 255, 255, 0.7);
+            border-radius: 3vw;
+            box-shadow: 0 0.5vw 1vw rgba(0, 0, 0, 0.1);
+        }
+
+        .permission-checkbox {
+            width: 5vw;
+            height: 5vw;
+            margin-right: 3vw;
+            border: 2px solid #3498db;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .permission-checkbox.checked {
+            background-color: #3498db;
+        }
+
+        .permission-checkbox.checked::after {
+            content: "✓";
+            color: white;
+            font-size: 4vw;
+        }
+
+        .permission-text {
+            flex: 1;
+            text-align: left;
+            font-size: 4vw;
+            color: #333;
+        }
+
+        .next-button {
+            position: absolute;
+            top: 59%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 30%;
+            height: 5%;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 3vw;
+            font-size: 5vw;
+            cursor: pointer;
+            box-shadow: 0 0.5vw 1vw rgba(0, 0, 0, 0.1);
+            transition: all 0.3s;
+            z-index: 10;
+        }
+
+        .next-button:hover {
+            background-color: #2980b9;
+        }
+
+        .error-state {
+            background-color: #e74c3c;
+            animation: shake 0.5s;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-0.5vw); }
+            40%, 80% { transform: translateX(0.5vw); }
+        }
+
+        .loader-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: none;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            background-color: rgba(0, 0, 0, 0.9); /* Fundo escuro semi-transparente */
-            z-index: 1000;
+            z-index: 100;
         }
 
         .loader {
             border: 5px solid #f3f3f3;
             border-top: 5px solid #3498db;
             border-radius: 50%;
-            width: 50px;
-            height: 50px;
+            width: 40px;
+            height: 40px;
             animation: spin 1s linear infinite;
-            margin-bottom: 20px;
-        }
-
-        .loader-text {
-            font-size: 18px;
-            color: white;
-            max-width: 80%;
-            text-align: center;
         }
 
         @keyframes spin {
@@ -52,119 +188,170 @@
             100% { transform: rotate(360deg); }
         }
 
-        .qr-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
+        /* SEU PADRÃO PRINCIPAL - EXATAMENTE como especificado */
+        html {
+            height: 100%;
+            font-size: clamp(14px, 2.5vw, 18px);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            text-align: center;
+            transition: background-color 0.5s;
+        }
+
+        body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            font-size: 1em;
+        }
+
+        .box-principal {
+            width: 100%;
+            max-width: 600px; /* Respeitando os 600px */
+            height: 100%;
+            margin: 0 auto;
+            padding: 2vh 2vw;
+            box-sizing: border-box;
+            background-color: #aee2ff;
+            position: relative;
+            overflow-y: auto;
+        }
+
+        /* Container principal ORIGINAL - sem modificações */
+        .container {
+            position: relative;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.9);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
+            overflow: hidden;
         }
 
-        .qr-modal {
-            background-color: #aee2ff;
-            border-radius: 20px;
-            padding: 30px;
-            width: 80%;
-            max-width: 400px;
-            text-align: center;
-            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.5);
-        }
-
-        .qr-modal-title {
-            font-size: 20px;
-            margin-bottom: 15px;
-            color: #333;
-            font-weight: bold;
-        }
-
-        .qr-modal-description {
-            font-size: 16px;
-            margin-bottom: 20px;
-            color: #555;
-            line-height: 1.4;
-        }
-
-        .qr-modal-content {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .qrcode-container {
-            padding: 12px;
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-        }
-
-        .url-display {
+        .video-wrapper {
+            position: relative;
             width: 100%;
-            padding: 10px;
-            background: #f8f9fa;
-            border-radius: 12px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-            word-break: break-all;
-            font-size: 12px;
-            text-align: center;
+            height: 100%;
         }
 
-        .close-button {
-            margin-top: 20px;
-            padding: 10px 20px;
-            background-color: #3498db;
+        .video-wrapper video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Vídeo local em PIP - EXATAMENTE como no original */
+        /* Este é o PIP verde que mostra a câmera do outro usuário */
+        .video-wrapper:nth-child(2) { 
+            position: absolute; 
+            bottom: calc(80px + 60px); 
+            right: 5px; 
+            width: 34.5%; 
+            max-width: 138px; 
+            height: 184px; 
+            transform: translateX(-17%); 
+            border-radius: 8px; 
+            overflow: hidden; 
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); 
+            border: 2px solid #4CAF50; /* Borda verde */
+            z-index: 10; 
+        }
+
+        /* Overlay de informações - EXATAMENTE como no original */
+        .info-overlay {
+            position: absolute;
+            top: 20px;
+            left: 0;
+            right: 0;
+            z-index: 30;
             color: white;
-            border: none;
-            border-radius: 20px;
-            cursor: pointer;
-            font-size: 16px;
+            text-align: center;
+            background: transparent;
+            padding: 10px;
+            border-radius: 0 0 10px 10px;
         }
 
-        .close-button:hover {
-            background-color: #2980b9;
+        /* ID visual - EXATAMENTE como no original */
+        #myId {
+            display: inline-block;
+            font-size: 16px;
+            font-weight: bold;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 6px 12px;
+            border-radius: 20px;
+            user-select: all;
+            cursor: pointer;
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            .video-wrapper:nth-child(2) {
+                height: 120px;
+                max-width: 100px;
+                bottom: calc(60px + 60px);
+            }
+
+            .info-overlay {
+                padding: 8px;
+            }
         }
     </style>
+    <script src="https://lemur-signal.onrender.com/socket.io/socket.io.js"></script>
 </head>
 <body>
-    <!-- Tela de carregamento (sempre visível inicialmente) -->
-    <div class="loader-container" id="loader-container">
-        <div class="loader"></div>
-        <div class="loader-text" id="loader-text">Generating your QR Code...</div>
+    <!-- Tela de boas-vindas (inicialmente visível) -->
+    <div class="welcome-screen" id="welcome-screen">
+        <div class="loader-container" id="loader-container">
+            <div class="loader"></div>
+        </div>
+
+        <img src="assets/images/lemur.png" alt="Lemur Logo" class="logo" id="logo" />
+        <h1 id="EchoMeP2P-title">EchoMeP2P</h1>
+        <h2 id="welcome-title">Welcome!</h2>
+        
+        <div class="translator-label" id="translator-label">Live translation. No filters. No platform.</div>
+        <input type="text" class="name-input" id="name-input" placeholder="Your name" />
+        
+        <div class="permissions-container">
+            <div class="permission-item">
+                <div class="permission-checkbox" id="camera-checkbox"></div>
+                <div class="permission-text" id="camera-text">Allow camera access</div>
+            </div>
+            <div class="permission-item">
+                <div class="permission-checkbox" id="microphone-checkbox"></div>
+                <div class="permission-text" id="microphone-text">Allow microphone access</div>
+            </div>
+        </div>
+        
+        <button class="next-button" id="next-button">Next</button>
     </div>
 
-    <!-- Tela do QR Code (inicialmente oculta) -->
-    <div class="qr-screen" id="qr-screen">
-        <div class="qr-modal">
-            <h2 class="qr-modal-title" id="qr-modal-title">This is your online key</h2>
-            <p class="qr-modal-description" id="qr-modal-description">You can ask to scan, share or print on your business card.</p>
-            <div class="qr-modal-content">
-                <div id="qrcode-modal" class="qrcode-container"></div>
-                <div class="url-display" id="url-display-modal">
-                    QR Code Content: <br><span id="url-content-modal"></span>
-                </div>
-                <button class="close-button" id="close-button">Close</button>
+    <!-- Interface WebRTC (inicialmente oculta) -->
+    <div class="box-principal" id="webrtc-interface" style="display: none;">
+        <div class="container">
+            <!-- Vídeo remoto (tela principal) -->
+            <div class="video-wrapper">
+                <video id="remoteVideo" autoplay playsinline></video>
+            </div>
+
+            <!-- PIP verde com a câmera do outro usuário -->
+            <div class="video-wrapper">
+                <video id="localVideo" autoplay muted playsinline></video>
+            </div>
+
+            <div class="info-overlay">
+                <span id="myId"></span>
             </div>
         </div>
     </div>
 
     <script>
-        // Lê os parâmetros da URL
-        const urlParams = new URLSearchParams(window.location.search);
-        const name = urlParams.get('name');
-        
-        // Código de tradução
+        // ===== Configurações de tradução =====
         const TRANSLATE_ENDPOINT = 'https://chat-tradutor.onrender.com/translate';
 
-        const textsToTranslateQR = {
-          "loader-text": "Generating your QR Code...",
-          "qr-modal-title": "This is your online key",
-          "qr-modal-description": "You can ask to scan, share or print on your business card.",
-          "close-button": "Close"
+        const textsToTranslateWelcome = {
+          "welcome-title": "Welcome!",
+          "translator-label": "Live translation. No filters. No platform.",
+          "name-input": "Your name",
+          "next-button": "Next",
+          "camera-text": "Allow camera access",
+          "microphone-text": "Allow microphone access"
         };
 
         async function translateText(text, targetLang) {
@@ -186,76 +373,303 @@
           }
         }
 
-        // Classe para gerar QR Code
-        class QRCodeGenerator {
-          static generate(containerId, text, size = 150) {
-            const container = document.getElementById(containerId);
-            container.innerHTML = '';
+        // ===== internet-config.js =====
+        const SIGNALING_SERVER_URL = 'https://lemur-signal.onrender.com';
+
+        const getIceServers = () => {
+          return [
+            { urls: 'stun:stun.l.google.com:19302' },
+            { urls: 'stun:stun1.l.google.com:19302' },
+            {
+              urls: 'turn:meet-jit-si-turnrelay.jitsi.net:443?transport=tcp',
+              username: 'guest',
+              credential: 'guest'
+            }
+          ];
+        };
+
+        // ===== webrtc-core.js =====
+        class WebRTCCore {
+          constructor(socketUrl = SIGNALING_SERVER_URL) {
+            this.socket = io(socketUrl);
+            this.peer = null;
+            this.localStream = null;
+            this.remoteStreamCallback = null;
+            this.currentCaller = null;
+            this.iceServers = getIceServers();
             
-            return new QRCode(container, {
-              text: text,
-              width: size,
-              height: size,
-              colorDark: "#000000",
-              colorLight: "#ffffff",
+            // Configura handlers imediatamente
+            this.setupSocketHandlers();
+          }
+
+          initialize(userId) {
+            this.socket.emit('register', userId);
+          }
+
+          startCall(targetId, stream) {
+            this.localStream = stream;
+            this.peer = new RTCPeerConnection({ iceServers: this.iceServers });
+
+            stream.getTracks().forEach(track => {
+              this.peer.addTrack(track, stream);
             });
+
+            this.peer.ontrack = event => {
+              if (this.remoteStreamCallback) {
+                this.remoteStreamCallback(event.streams[0]);
+              }
+            };
+
+            this.peer.onicecandidate = event => {
+              if (event.candidate) {
+                this.socket.emit('ice-candidate', {
+                  to: targetId,
+                  candidate: event.candidate
+                });
+              }
+            };
+
+            this.peer.createOffer()
+              .then(offer => this.peer.setLocalDescription(offer))
+              .then(() => {
+                this.socket.emit('call', {
+                  to: targetId,
+                  offer: this.peer.localDescription
+                });
+              })
+              .catch(error => {
+                console.error('Erro ao criar oferta:', error);
+              });
+          }
+
+          handleIncomingCall(offer, localStream, callback) {
+            this.peer = new RTCPeerConnection({ iceServers: this.iceServers });
+
+            if (localStream) {
+              localStream.getTracks().forEach(track => {
+                this.peer.addTrack(track, localStream);
+              });
+            }
+
+            this.peer.ontrack = event => callback(event.streams[0]);
+
+            this.peer.onicecandidate = event => {
+              if (event.candidate) {
+                this.socket.emit('ice-candidate', {
+                  to: this.currentCaller,
+                  candidate: event.candidate
+                });
+              }
+            };
+
+            this.peer.setRemoteDescription(new RTCSessionDescription(offer))
+              .then(() => this.peer.createAnswer())
+              .then(answer => this.peer.setLocalDescription(answer))
+              .then(() => {
+                this.socket.emit('answer', {
+                  to: this.currentCaller,
+                  answer: this.peer.localDescription
+                });
+              })
+              .catch(error => {
+                console.error('Erro ao processar chamada recebida:', error);
+              });
+          }
+
+          setupSocketHandlers() {
+            this.socket.on('acceptAnswer', data => {
+              if (this.peer) {
+                this.peer.setRemoteDescription(new RTCSessionDescription(data.answer))
+                  .catch(error => {
+                    console.error('Erro ao definir descrição remota:', error);
+                  });
+              }
+            });
+
+            this.socket.on('ice-candidate', data => {
+              if (this.peer) {
+                this.peer.addIceCandidate(new RTCIceCandidate(data.candidate))
+                  .catch(error => {
+                    console.error('Erro ao adicionar ICE candidate:', error);
+                  });
+              }
+            });
+
+            this.socket.on('incomingCall', data => {
+              this.currentCaller = data.from;
+              if (this.onIncomingCall) {
+                this.onIncomingCall(data.offer);
+              }
+            });
+          }
+
+          setRemoteStreamCallback(callback) {
+            this.remoteStreamCallback = callback;
           }
         }
 
-        // Código principal
+        // ===== Código principal =====
         document.addEventListener('DOMContentLoaded', async () => {
+            // Elementos da tela de boas-vindas
+            const nextButton = document.getElementById('next-button');
+            const nameInput = document.getElementById('name-input');
+            const welcomeScreen = document.getElementById('welcome-screen');
             const loaderContainer = document.getElementById('loader-container');
-            const loaderText = document.getElementById('loader-text');
-            const qrScreen = document.getElementById('qr-screen');
-            const closeButton = document.getElementById('close-button');
-            const urlContentModal = document.getElementById('url-content-modal');
-            const qrModalTitle = document.getElementById('qr-modal-title');
-            const qrModalDescription = document.getElementById('qr-modal-description');
+            const cameraCheckbox = document.getElementById('camera-checkbox');
+            const microphoneCheckbox = document.getElementById('microphone-checkbox');
             
+            // Elementos da interface WebRTC
+            const webrtcInterface = document.getElementById('webrtc-interface');
+            
+            let cameraGranted = false;
+            let microphoneGranted = false;
+            let userName = '';
+
+            // Mostra loader durante tradução
+            loaderContainer.style.display = 'flex';
+
             // Processo de tradução
             const browserLang = (navigator.language || 'en').split('-')[0];
             
-            for (const [elementId, text] of Object.entries(textsToTranslateQR)) {
+            for (const [elementId, text] of Object.entries(textsToTranslateWelcome)) {
                 try {
                     const translated = await translateText(text, browserLang);
                     const element = document.getElementById(elementId);
 
                     if (element) {
-                        element.textContent = translated;
+                        if (elementId === 'name-input') {
+                            element.placeholder = translated;
+                        } else {
+                            element.textContent = translated;
+                        }
                     }
                 } catch (error) {
                     console.error(`Erro ao traduzir ${elementId}:`, error);
                 }
             }
 
-            // Gera o QR Code
-            const browserFullLang = navigator.language || 'pt-BR';
-            const baseUrl = 'https://lemur-interface-traducao.netlify.app/caller.html';
-            
-            // Simula um token (em um caso real, isso viria do backend)
-            // Para demonstração, estamos usando um ID fixo baseado no timestamp
-            const simulatedToken = 'simulated_token_' + Date.now();
-            const fixedId = simulatedToken.slice(-5);
-            
-            // URL com parâmetros
-            const fullUrl = `${baseUrl}?token=${encodeURIComponent(simulatedToken)}&browserId=${encodeURIComponent(fixedId)}&lang=${encodeURIComponent(browserFullLang)}&name=${encodeURIComponent(name || 'User')}`;
-            
-            console.log("QR Code URL:", fullUrl);
-            
-            // Gera o QR code após um breve delay (simulando processamento)
-            setTimeout(() => {
-                QRCodeGenerator.generate("qrcode-modal", fullUrl, 200);
-                urlContentModal.textContent = fullUrl;
-                
-                // Esconde o loader e mostra a tela do QR code
-                loaderContainer.style.display = 'none';
-                qrScreen.style.display = 'flex';
-            }, 1500);
+            // Esconde o loader
+            loaderContainer.style.display = 'none';
 
-            // Fechar a aplicação (voltar para a tela inicial)
-            closeButton.addEventListener('click', () => {
-                window.location.href = 'welcome.html';
+            // Função para solicitar permissões
+            async function requestMediaPermissions() {
+                try {
+                    // Solicita acesso à câmera e microfone
+                    const stream = await navigator.mediaDevices.getUserMedia({ 
+                        video: true, 
+                        audio: true 
+                    });
+                    
+                    // Para as tracks imediatamente (apenas queríamos a permissão)
+                    stream.getTracks().forEach(track => track.stop());
+                    
+                    return true;
+                    
+                } catch (error) {
+                    console.error('Erro ao acessar dispositivos:', error);
+                    return false;
+                }
+            }
+
+            // Event listener para os checkboxes
+            cameraCheckbox.addEventListener('click', async () => {
+                cameraGranted = await requestMediaPermissions();
+                if (cameraGranted) {
+                    cameraCheckbox.classList.add('checked');
+                } else {
+                    cameraCheckbox.classList.remove('checked');
+                }
             });
+
+            microphoneCheckbox.addEventListener('click', async () => {
+                microphoneGranted = await requestMediaPermissions();
+                if (microphoneGranted) {
+                    microphoneCheckbox.classList.add('checked');
+                } else {
+                    microphoneCheckbox.classList.remove('checked');
+                }
+            });
+
+            // Event listener para o botão Next
+            nextButton.addEventListener('click', async () => {
+                const name = nameInput.value.trim();
+                let hasError = false;
+
+                if (!name) {
+                    hasError = true;
+                }
+
+                if (!cameraGranted || !microphoneGranted) {
+                    hasError = true;
+                }
+
+                if (hasError) {
+                    welcomeScreen.classList.add('error-state');
+                    setTimeout(() => {
+                        welcomeScreen.classList.remove('error-state');
+                    }, 1000);
+                    return;
+                }
+
+                // Salva o nome do usuário
+                userName = name;
+
+                // Esconde a tela de boas-vindas e mostra a interface WebRTC
+                welcomeScreen.style.display = 'none';
+                webrtcInterface.style.display = 'block';
+
+                // Inicializa a interface WebRTC
+                initializeWebRTC();
+            });
+
+            // ===== receiver-ui.js =====
+            function initializeWebRTC() {
+                const rtcCore = new WebRTCCore();
+                const myId = crypto.randomUUID().substr(0, 8);
+                let localStream = null;
+
+                // Solicita acesso à câmera (conforme padrão do projeto)
+                navigator.mediaDevices.getUserMedia({ video: true, audio: false })
+                    .then(stream => {
+                        localStream = stream;
+                        // NÃO atribui ao elemento de vídeo local - conforme especificação do projeto
+                    })
+                    .catch(error => {
+                        console.error("Erro ao acessar a câmera:", error);
+                    });
+
+                // Exibe o ID para conexão
+                document.getElementById('myId').textContent = myId;
+
+                // Inicializa WebRTC
+                rtcCore.initialize(myId);
+
+                // Configura callback para stream remoto
+                rtcCore.setRemoteStreamCallback((remoteStream) => {
+                    // Silencia áudio recebido
+                    remoteStream.getAudioTracks().forEach(track => track.enabled = false);
+                    
+                    // Exibe vídeo remoto no PIP (usuário vê apenas a imagem do outro)
+                    // Conforme seu projeto, o PIP verde mostra a câmera do outro usuário
+                    document.getElementById('localVideo').srcObject = remoteStream;
+                });
+
+                // Handler para chamadas recebidas
+                rtcCore.onIncomingCall = (offer) => {
+                    if (!localStream) {
+                        console.warn("Stream local não disponível para atender chamada");
+                        return;
+                    }
+
+                    rtcCore.handleIncomingCall(offer, localStream, (remoteStream) => {
+                        // Callback já está configurado via setRemoteStreamCallback
+                        console.log("Chamada recebida e conectada com sucesso");
+                    });
+                };
+
+                // Log para debug
+                console.log("Receiver inicializado com ID:", myId);
+            }
         });
     </script>
 </body>
