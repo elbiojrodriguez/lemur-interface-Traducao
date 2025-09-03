@@ -1,3 +1,4 @@
+// caller-ui.js - VERSÃO COMPATÍVEL COM QR CODE ORIGINAL
 import WebRTCCore from '../core/webrtc-core.js';
 
 window.onload = () => {
@@ -23,18 +24,45 @@ window.onload = () => {
       console.error("Erro ao acessar a câmera:", error);
     });
 
-  // Verifica se há ID na URL
+  // 🔽🔽🔽 EXTRAÇÃO DE PARÂMETROS COMPATÍVEL COM QR CODE ORIGINAL 🔽🔽🔽
   const urlParams = new URLSearchParams(window.location.search);
-  const targetIdFromUrl = urlParams.get('targetId');
   
-  if (targetIdFromUrl) {
-    targetId = targetIdFromUrl;
+  // Tenta obter targetId de múltiplas fontes (compatibilidade total)
+  targetId = urlParams.get('targetId') ||                // Formato preferido
+             urlParams.get('browserId') ||               // Formato alternativo 1
+             extractIdFromToken(urlParams.get('token')); // Formato alternativo 2
+
+  // Função para extrair ID de token no formato "simulated_token_TIMESTAMP_ID"
+  function extractIdFromToken(token) {
+    if (!token) return null;
+    // Token format: "simulated_token_1705000000123_abcde"
+    const parts = token.split('_');
+    if (parts.length >= 4) {
+      return parts[parts.length - 1]; // Última parte é o ID
+    }
+    return null;
+  }
+
+  console.log("Parâmetros da URL:", Object.fromEntries(urlParams.entries()));
+  console.log("Target ID detectado:", targetId);
+
+  if (targetId) {
     document.getElementById('callActionBtn').style.display = 'block';
+    
+    // Opcional: Mostrar informações do QR Code escaneado
+    const lang = urlParams.get('lang') || 'pt-BR';
+    const token = urlParams.get('token');
+    console.log(`Conexão detectada: ID=${targetId}, Idioma=${lang}, Token=${token}`);
   }
 
   // Configura o botão de chamada
   document.getElementById('callActionBtn').onclick = () => {
-    if (!targetId || !localStream) return;
+    if (!targetId || !localStream) {
+      console.error("Faltam parâmetros para iniciar chamada:", { targetId, localStream });
+      return;
+    }
+    
+    console.log("Iniciando chamada para:", targetId);
     rtcCore.startCall(targetId, localStream);
   };
 
@@ -42,10 +70,17 @@ window.onload = () => {
   rtcCore.setRemoteStreamCallback(stream => {
     stream.getAudioTracks().forEach(track => track.enabled = false);
     localVideo.srcObject = stream;
+    console.log("Stream remoto recebido e configurado");
   });
 
+  // Configura handler para chamadas recebidas (caso necessário)
+  rtcCore.onIncomingCall = (offer) => {
+    console.log("Chamada recebida (caller side)", offer);
+    // Implemente se necessário receber chamadas no caller
+  };
+
   // #############################################
-  // Controles de idioma dinâmicos
+  // Controles de idioma dinâmicos (MANTIDO ORIGINAL)
   // #############################################
 
   // 1. Configuração do chat (box azul)
@@ -134,9 +169,13 @@ window.onload = () => {
     { code: 'ar-SA', flag: '🇸🇦', speakText: 'تحدث الآن', name: 'العربية' }
   ];
 
-  // 7. Lógica de detecção de idioma
+  // 7. Lógica de detecção de idioma - USA O IDIOMA DO QR CODE SE DISPONÍVEL
   const browserLanguage = navigator.language;
-  let currentLang = languages.find(lang => browserLanguage.startsWith(lang.code.split('-')[0])) || languages[0];
+  const urlLang = urlParams.get('lang');
+  let currentLang = languages.find(lang => lang.code === urlLang) || 
+                   languages.find(lang => browserLanguage.startsWith(lang.code.split('-')[0])) || 
+                   languages[0];
+  
   detectedLangBubble.textContent = currentLang.flag;
   detectedLangBubble.title = `Idioma atual: ${currentLang.name}`;
 
@@ -200,17 +239,17 @@ window.onload = () => {
         try {
           recognition.start();
           textDisplay.textContent = `${currentLang.speakText}...`;
-          textDisplay.style.display = 'flex'; // Garante visibilidade
+          textDisplay.style.display = 'flex';
           isListening = true;
         } catch (e) {
           console.error('Erro ao iniciar microfone:', e);
           textDisplay.textContent = `${getErrorMessage(currentLang.code)}`;
-          textDisplay.style.display = 'flex'; // Garante visibilidade
+          textDisplay.style.display = 'flex';
         }
       } else {
         recognition.stop();
         textDisplay.textContent = `${getMicOffMessage(currentLang.code)}`;
-        textDisplay.style.display = 'flex'; // MODIFICAÇÃO 1 - Garante que a mensagem apareça
+        textDisplay.style.display = 'flex';
         isListening = false;
       }
     });
@@ -222,7 +261,6 @@ window.onload = () => {
         const flag = e.target.textContent;
         const langName = e.target.title;
 
-        // MODIFICAÇÃO 2 - Limpa mensagens antigas e reseta o display
         document.querySelectorAll('.phrase-box').forEach(el => el.remove());
         textDisplay.style.display = 'flex';
         textDisplay.textContent = getClickToSpeakMessage(langCode);
@@ -241,90 +279,78 @@ window.onload = () => {
       }
     });
 
-// Resultado do reconhecimento - VERSÃO OTIMIZADA
-recognition.onresult = (event) => {
-  // Mantém a lógica original de esconder placeholder
-  if (textDisplay.classList.contains('text-display-placeholder')) {
-    textDisplay.style.display = 'none';
-  }
+    recognition.onresult = (event) => {
+      if (textDisplay.classList.contains('text-display-placeholder')) {
+        textDisplay.style.display = 'none';
+      }
 
-  let finalTranscript = '';
-  let interimTranscript = '';
+      let finalTranscript = '';
+      let interimTranscript = '';
 
-  // Processamento dos resultados (original)
-  for (let i = event.resultIndex; i < event.results.length; i++) {
-    const transcript = event.results[i][0].transcript;
-    if (event.results[i].isFinal) {
-      finalTranscript += transcript;
-    } else {
-      interimTranscript += transcript;
-    }
-  }
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        const transcript = event.results[i][0].transcript;
+        if (event.results[i].isFinal) {
+          finalTranscript += transcript;
+        } else {
+          interimTranscript += transcript;
+        }
+      }
 
-  const chatInputBox = document.querySelector('.chat-input-box');
-  
-  // COMPORTAMENTO ORIGINAL (frases finais)
-  if (finalTranscript.trim()) {
-    // Remove texto temporário se existir
-    const interimBox = document.querySelector('.interim-box');
-    if (interimBox) interimBox.remove();
-    
-    // Cria a mensagem final (como no original)
-    const phraseBox = document.createElement('div');
-    phraseBox.className = 'phrase-box';
-    phraseBox.textContent = finalTranscript; // ← Mantém formato original
-    
-    if (chatInputBox) {
-      chatInputBox.appendChild(phraseBox);
-      chatInputBox.scrollTop = chatInputBox.scrollHeight;
+      const chatInputBox = document.querySelector('.chat-input-box');
       
-      // Mantém o microfone ativo visualmente (sua sugestão)
-      textDisplay.textContent = `${currentLang.speakText}...`;
-    }
-  }
-  // NOVO: Feedback em tempo real (sua sugestão)
-  else if (interimTranscript) {
-    let interimBox = document.querySelector('.interim-box');
-    
-    if (!interimBox) {
-      interimBox = document.createElement('div');
-      interimBox.className = 'interim-box'; // Classe diferente para não conflitar
-      if (chatInputBox) chatInputBox.appendChild(interimBox);
-    }
-    
-    interimBox.textContent = interimTranscript; // ← Sem formatação extra
-    if (chatInputBox) chatInputBox.scrollTop = chatInputBox.scrollHeight;
-  }
-};
-    // Tratamento de erros
+      if (finalTranscript.trim()) {
+        const interimBox = document.querySelector('.interim-box');
+        if (interimBox) interimBox.remove();
+        
+        const phraseBox = document.createElement('div');
+        phraseBox.className = 'phrase-box';
+        phraseBox.textContent = finalTranscript;
+        
+        if (chatInputBox) {
+          chatInputBox.appendChild(phraseBox);
+          chatInputBox.scrollTop = chatInputBox.scrollHeight;
+          textDisplay.textContent = `${currentLang.speakText}...`;
+        }
+      }
+      else if (interimTranscript) {
+        let interimBox = document.querySelector('.interim-box');
+        
+        if (!interimBox) {
+          interimBox = document.createElement('div');
+          interimBox.className = 'interim-box';
+          if (chatInputBox) chatInputBox.appendChild(interimBox);
+        }
+        
+        interimBox.textContent = interimTranscript;
+        if (chatInputBox) chatInputBox.scrollTop = chatInputBox.scrollHeight;
+      }
+    };
+
     recognition.onerror = (event) => {
       console.error('Erro no reconhecimento:', event.error);
       textDisplay.textContent = `${getErrorMessage(currentLang.code)}`;
-      textDisplay.style.display = 'flex'; // Garante visibilidade
+      textDisplay.style.display = 'flex';
       isListening = false;
     };
 
-// Reinício com delay para Android - VERSÃO ORIGINAL FUNCIONAL
-recognition.onend = () => {
-  // Mantém APENAS a verificação original do placeholder
-  if (!document.querySelector('.phrase-box')) {
-    textDisplay.style.display = 'flex';
-  }
-
-  // Mantém EXATAMENTE a lógica original de reinício
-  if (isListening) {
-    setTimeout(() => {
-      try {
-        recognition.start();
-      } catch (e) {
-        console.error('Erro ao reiniciar:', e);
-        isListening = false;
-        textDisplay.textContent = `${getErrorMessage(currentLang.code)}`;
+    recognition.onend = () => {
+      if (!document.querySelector('.phrase-box')) {
         textDisplay.style.display = 'flex';
       }
-    }, 300);
-  }
-};
+
+      if (isListening) {
+        setTimeout(() => {
+          try {
+            recognition.start();
+          } catch (e) {
+            console.error('Erro ao reiniciar:', e);
+            isListening = false;
+            textDisplay.textContent = `${getErrorMessage(currentLang.code)}`;
+            textDisplay.style.display = 'flex';
+          }
+        }, 300);
+      }
+    };
   } else {
     textDisplay.textContent = 'Seu navegador não suporta reconhecimento de voz';
     textDisplay.style.color = 'black';
@@ -357,7 +383,7 @@ recognition.onend = () => {
       'ja-JP': 'マイクオフ',
       'zh-CN': '麦克风关闭',
       'ru-RU': 'Микрофон выключен',
-      'ar-SA': 'تم إيقاف الميكروفون'
+      'ar-SA': 'تم إيقaf الميكروفون'
     };
     return messages[langCode] || messages['en-US'];
   }
