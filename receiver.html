@@ -3,21 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EchoMeP2P - Welcome & Permissions</title>
+    <title>EchoMeP2P - QR Code Generator</title>
+    <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
     <style>
-        html {
-            height: 100%;
-            font-size: clamp(14px, 2.5vw, 18px);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            text-align: center;
-            transition: background-color 0.5s;
-        }
-
-        body {
+        html, body {
             height: 100%;
             margin: 0;
             padding: 0;
-            font-size: 1em;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            text-align: center;
+            background-color: #aee2ff;
         }
 
         .box-principal {
@@ -27,167 +22,95 @@
             margin: 0 auto;
             padding: 2vh 2vw;
             box-sizing: border-box;
-            background-color: #aee2ff;
             position: relative;
-            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
         }
 
         .logo {
-            position: absolute;
-            top: 7%;
-            left: 50%;
-            transform: translate(-50%, -50%);
             width: 35%;
             height: auto;
+            margin-bottom: 20px;
         }
 
         #EchoMeP2P-title {
-            position: absolute;
-            top: 10%;
-            left: 50%;
-            transform: translateX(-50%);
             color: #333;
             font-size: 7vw;
-            white-space: nowrap;
-            text-align: center;
+            margin-bottom: 10px;
         }
 
-        .translator-label {
-            position: absolute;
-            top: 17%;
-            left: 50%;
-            transform: translateX(-50%);
-            color: #333;
-            font-size: 5vw;
-            text-align: center;
+        .qr-modal {
+            background-color: #aee2ff;
+            border-radius: 20px;
+            padding: 30px;
             width: 80%;
-            max-width: 90%;
+            max-width: 400px;
+            text-align: center;
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.2);
         }
 
-        #welcome-title {
-            position: absolute;
-            top: 21%;
-            left: 50%;
-            transform: translateX(-50%);
+        .qr-modal-title {
+            font-size: 20px;
+            margin-bottom: 15px;
             color: #333;
-            font-size: 9vw;
-            white-space: nowrap;
-            text-align: center;
+            font-weight: bold;
         }
 
-        .name-input {
-            position: absolute;
-            top: 32%;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 70%;
-            height: 5%;
-            padding: 1vh 1vw;
-            border-radius: 3vw;
-            border: none;
-            box-shadow: 0 0.5vw 1vw rgba(0, 0, 0, 0.1);
-            font-size: 6vw;
-            text-align: center;
+        .qr-modal-description {
+            font-size: 16px;
+            margin-bottom: 20px;
+            color: #555;
+            line-height: 1.4;
         }
 
-        .name-input:focus {
-            outline: none;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        .permissions-container {
-            position: absolute;
-            top: 41%;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 70%;
+        .qr-modal-content {
             display: flex;
             flex-direction: column;
-            gap: 2vh;
-        }
-
-        .permission-item {
-            display: flex;
             align-items: center;
-            padding: 1.5vh 2vw;
-            background-color: rgba(255, 255, 255, 0.7);
-            border-radius: 3vw;
-            box-shadow: 0 0.5vw 1vw rgba(0, 0, 0, 0.1);
+            gap: 15px;
         }
 
-        .permission-checkbox {
-            width: 5vw;
-            height: 5vw;
-            margin-right: 3vw;
-            border: 2px solid #3498db;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            transition: all 0.3s;
+        .qrcode-container {
+            padding: 12px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
         }
 
-        .permission-checkbox.checked {
-            background-color: #3498db;
+        .url-display {
+            width: 100%;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            word-break: break-all;
+            font-size: 12px;
+            text-align: center;
         }
 
-        .permission-checkbox.checked::after {
-            content: "✓";
-            color: white;
-            font-size: 4vw;
-        }
-
-        .permission-text {
-            flex: 1;
-            text-align: left;
-            font-size: 4vw;
-            color: #333;
-        }
-
-        .next-button {
-            position: absolute;
-            top: 59%;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 30%;
-            height: 5%;
+        .close-button {
+            margin-top: 20px;
+            padding: 10px 20px;
             background-color: #3498db;
             color: white;
             border: none;
-            border-radius: 3vw;
-            font-size: 5vw;
+            border-radius: 20px;
             cursor: pointer;
-            box-shadow: 0 0.5vw 1vw rgba(0, 0, 0, 0.1);
-            transition: all 0.3s;
-            z-index: 10;
+            font-size: 16px;
         }
 
-        .next-button:hover {
+        .close-button:hover {
             background-color: #2980b9;
         }
 
-        .error-state {
-            background-color: #e74c3c;
-            animation: shake 0.5s;
-        }
-
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            20%, 60% { transform: translateX(-0.5vw); }
-            40%, 80% { transform: translateX(0.5vw); }
-        }
-
         .loader-container {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            display: none;
+            display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            z-index: 100;
+            margin-bottom: 20px;
         }
 
         .loader {
@@ -206,43 +129,40 @@
     </style>
 </head>
 <body>
-    <div class="box-principal" id="welcome-screen">
+    <div class="box-principal">
+        <img src="assets/images/lemur.png" alt="Lemur Logo" class="logo" />
+        <h1 id="EchoMeP2P-title">EchoMeP2P</h1>
+        
         <div class="loader-container" id="loader-container">
             <div class="loader"></div>
-        </div>
-
-        <img src="assets/images/lemur.png" alt="Lemur Logo" class="logo" id="logo" />
-        <h1 id="EchoMeP2P-title">EchoMeP2P</h1>
-        <h2 id="welcome-title">Welcome!</h2>
-        
-        <div class="translator-label" id="translator-label">Live translation. No filters. No platform.</div>
-        <input type="text" class="name-input" id="name-input" placeholder="Your name" />
-        
-        <div class="permissions-container">
-            <div class="permission-item">
-                <div class="permission-checkbox" id="camera-checkbox"></div>
-                <div class="permission-text" id="camera-text">Allow camera access</div>
-            </div>
-            <div class="permission-item">
-                <div class="permission-checkbox" id="microphone-checkbox"></div>
-                <div class="permission-text" id="microphone-text">Allow microphone access</div>
-            </div>
+            <p>Generating your QR Code...</p>
         </div>
         
-        <button class="next-button" id="next-button">Next</button>
+        <div class="qr-modal" id="qr-modal" style="display: none;">
+            <h2 class="qr-modal-title" id="qr-modal-title">This is your online key</h2>
+            <p class="qr-modal-description" id="qr-modal-description">You can ask to scan, share or print on your business card.</p>
+            <div class="qr-modal-content">
+                <div id="qrcode-modal" class="qrcode-container"></div>
+                <div class="url-display" id="url-display-modal">
+                    QR Code Content: <br><span id="url-content-modal"></span>
+                </div>
+                <button class="close-button" id="close-button">Close</button>
+            </div>
+        </div>
     </div>
 
     <script>
+        // Lê os parâmetros da URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const name = urlParams.get('name');
+        
         // Código de tradução
         const TRANSLATE_ENDPOINT = 'https://chat-tradutor.onrender.com/translate';
 
-        const textsToTranslateWelcome = {
-          "welcome-title": "Welcome!",
-          "translator-label": "Live translation. No filters. No platform.",
-          "name-input": "Your name",
-          "next-button": "Next",
-          "camera-text": "Allow camera access",
-          "microphone-text": "Allow microphone access"
+        const textsToTranslateQR = {
+          "qr-modal-title": "This is your online key",
+          "qr-modal-description": "You can ask to scan, share or print on your business card.",
+          "close-button": "Close"
         };
 
         async function translateText(text, targetLang) {
@@ -264,106 +184,74 @@
           }
         }
 
-        // Função para solicitar permissões
-        async function requestMediaPermissions() {
-            try {
-                // Solicita acesso à câmera e microfone
-                const stream = await navigator.mediaDevices.getUserMedia({ 
-                    video: true, 
-                    audio: true 
-                });
-                
-                // Para as tracks imediatamente (apenas queríamos a permissão)
-                stream.getTracks().forEach(track => track.stop());
-                
-                return true;
-                
-            } catch (error) {
-                console.error('Erro ao acessar dispositivos:', error);
-                return false;
-            }
+        // Classe para gerar QR Code
+        class QRCodeGenerator {
+          static generate(containerId, text, size = 150) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+            
+            return new QRCode(container, {
+              text: text,
+              width: size,
+              height: size,
+              colorDark: "#000000",
+              colorLight: "#ffffff",
+            });
+          }
         }
 
         // Código principal
         document.addEventListener('DOMContentLoaded', async () => {
-            const nextButton = document.getElementById('next-button');
-            const nameInput = document.getElementById('name-input');
-            const welcomeScreen = document.getElementById('welcome-screen');
             const loaderContainer = document.getElementById('loader-container');
-            const cameraCheckbox = document.getElementById('camera-checkbox');
-            const microphoneCheckbox = document.getElementById('microphone-checkbox');
+            const qrModal = document.getElementById('qr-modal');
+            const closeButton = document.getElementById('close-button');
+            const urlContentModal = document.getElementById('url-content-modal');
+            const qrModalTitle = document.getElementById('qr-modal-title');
+            const qrModalDescription = document.getElementById('qr-modal-description');
             
-            let cameraGranted = false;
-            let microphoneGranted = false;
-
-            // Mostra loader durante tradução
-            loaderContainer.style.display = 'flex';
-
             // Processo de tradução
             const browserLang = (navigator.language || 'en').split('-')[0];
             
-            for (const [elementId, text] of Object.entries(textsToTranslateWelcome)) {
+            for (const [elementId, text] of Object.entries(textsToTranslateQR)) {
                 try {
                     const translated = await translateText(text, browserLang);
                     const element = document.getElementById(elementId);
 
                     if (element) {
-                        if (elementId === 'name-input') {
-                            element.placeholder = translated;
-                        } else {
-                            element.textContent = translated;
-                        }
+                        element.textContent = translated;
                     }
                 } catch (error) {
                     console.error(`Erro ao traduzir ${elementId}:`, error);
                 }
             }
 
-            // Esconde o loader
-            loaderContainer.style.display = 'none';
+            // Gera o QR Code
+            const browserFullLang = navigator.language || 'pt-BR';
+            const baseUrl = 'https://lemur-interface-traducao.netlify.app/caller.html';
+            
+            // Simula um token (em um caso real, isso viria do backend)
+            // Para demonstração, estamos usando um ID fixo baseado no timestamp
+            const simulatedToken = 'simulated_token_' + Date.now();
+            const fixedId = simulatedToken.slice(-5);
+            
+            // URL com parâmetros
+            const fullUrl = `${baseUrl}?token=${encodeURIComponent(simulatedToken)}&browserId=${encodeURIComponent(fixedId)}&lang=${encodeURIComponent(browserFullLang)}&name=${encodeURIComponent(name || 'User')}`;
+            
+            console.log("QR Code URL:", fullUrl);
+            
+            // Gera o QR code
+            setTimeout(() => {
+                QRCodeGenerator.generate("qrcode-modal", fullUrl, 200);
+                urlContentModal.textContent = fullUrl;
+                
+                // Esconde o loader e mostra o QR code
+                loaderContainer.style.display = 'none';
+                qrModal.style.display = 'block';
+            }, 1500);
 
-            // Event listener para os checkboxes
-            cameraCheckbox.addEventListener('click', async () => {
-                cameraGranted = await requestMediaPermissions();
-                if (cameraGranted) {
-                    cameraCheckbox.classList.add('checked');
-                } else {
-                    cameraCheckbox.classList.remove('checked');
-                }
-            });
-
-            microphoneCheckbox.addEventListener('click', async () => {
-                microphoneGranted = await requestMediaPermissions();
-                if (microphoneGranted) {
-                    microphoneCheckbox.classList.add('checked');
-                } else {
-                    microphoneCheckbox.classList.remove('checked');
-                }
-            });
-
-            // Event listener para o botão Next
-            nextButton.addEventListener('click', async () => {
-                const name = nameInput.value.trim();
-                let hasError = false;
-
-                if (!name) {
-                    hasError = true;
-                }
-
-                if (!cameraGranted || !microphoneGranted) {
-                    hasError = true;
-                }
-
-                if (hasError) {
-                    welcomeScreen.classList.add('error-state');
-                    setTimeout(() => {
-                        welcomeScreen.classList.remove('error-state');
-                    }, 1000);
-                    return;
-                }
-
-                // Redireciona para a página do QR Code com os parâmetros necessários
-                window.location.href = `qrcode.html?name=${encodeURIComponent(name)}`;
+            // Fechar a aplicação (voltar para a tela inicial)
+            closeButton.addEventListener('click', () => {
+                window.location.href = 'welcome.html';
             });
         });
     </script>
