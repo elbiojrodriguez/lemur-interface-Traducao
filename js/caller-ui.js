@@ -1,13 +1,12 @@
-// caller-ui.js - VERSÃO CORRIGIDA (100% funcional)
+import WebRTCCore from '../core/webrtc-core.js';
+
 window.onload = () => {
   const chatInputBox = document.querySelector('.chat-input-box');
   const rtcCore = new WebRTCCore();
   const myId = crypto.randomUUID().substr(0, 8);
   document.getElementById('myId').textContent = myId;
-  
-  // ✅ INICIALIZAÇÃO CORRETA (igual seus códigos funcionais)
   rtcCore.initialize(myId);
-  rtcCore.setupSocketHandlers(); // ✅ ESTAVA FALTANDO ISSO!
+  rtcCore.setupSocketHandlers();
 
   const localVideo = document.getElementById('localVideo');
   const remoteVideo = document.getElementById('remoteVideo');
@@ -24,28 +23,18 @@ window.onload = () => {
       console.error("Erro ao acessar a câmera:", error);
     });
 
-  // ✅ EXTRAÇÃO SIMPLES do targetId do QR Code
+  // Verifica se há ID na URL
   const urlParams = new URLSearchParams(window.location.search);
-  targetId = urlParams.get('targetId');
+  const targetIdFromUrl = urlParams.get('targetId');
   
-  console.log("Target ID do QR Code:", targetId);
-  console.log("Todos os parâmetros:", Object.fromEntries(urlParams.entries()));
-
-  if (targetId) {
+  if (targetIdFromUrl) {
+    targetId = targetIdFromUrl;
     document.getElementById('callActionBtn').style.display = 'block';
-    console.log("✅ Pronto para conectar! Clique no botão.");
-  } else {
-    console.error("❌ ERRO: Target ID não encontrado no QR Code!");
   }
 
   // Configura o botão de chamada
   document.getElementById('callActionBtn').onclick = () => {
-    if (!targetId || !localStream) {
-      console.error("Não pode iniciar chamada: targetId ou stream faltando");
-      return;
-    }
-    
-    console.log("🚀 Iniciando chamada WebRTC para:", targetId);
+    if (!targetId || !localStream) return;
     rtcCore.startCall(targetId, localStream);
   };
 
@@ -53,8 +42,8 @@ window.onload = () => {
   rtcCore.setRemoteStreamCallback(stream => {
     stream.getAudioTracks().forEach(track => track.enabled = false);
     localVideo.srcObject = stream;
-    console.log("✅ Conexão WebRTC estabelecida com sucesso!");
   });
+
 
   // =============================================
   // CONTROLES DE IDIOMA E RECONHECIMENTO DE VOZ
