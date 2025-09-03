@@ -91,48 +91,60 @@ function generateQRCode(name) {
 
 // ===== FUNÇÃO PARA INICIALIZAR WEBRTC =====
 async function initializeWebRTC() {
-    // Solicita acesso à câmera (apenas vídeo, sem áudio)
     try {
-        const localStream = await navigator.mediaDevices.getUserMedia({ 
-            video: true, 
-            audio: false 
-        });
+        // ✅ USA A STREAM JÁ AUTORIZADA (não pede permissão de novo)
+        const localStream = window.authorizedStream;
         
-        // Inicializa WebRTC
+        if (!localStream) {
+            throw new Error('Stream de câmera não disponível');
+        }
+
+        // Obtém o token da URL (enviado pelo app Flutter)
+        const urlParams = new URLSearchParams(window.location.search);
+        const token = urlParams.get('token');
+        
+        // Gera ID FIXO com últimos 7 dígitos do token
+        const fixedId = token ? token.slice(-7) : crypto.randomUUID().substr(0, 7);
+        
+        // Inicializa WebRTC com ID FIXO
         const rtcCore = new WebRTCCore();
-        const myId = crypto.randomUUID().substr(0, 8);
-
-        // Exibe o ID para conexão
-        document.getElementById('myId').textContent = myId;
-
-        // Inicializa WebRTC
-        rtcCore.initialize(myId);
+        
+        // 🔥 REGISTRA NO SERVER COM ID FIXO
+        rtcCore.initialize(fixedId);
+        
+        // Exibe o ID fixo para conexão
+        document.getElementById('myId').textContent = fixedId;
+        console.log("📡 Registrado no servidor com ID:", fixedId);
 
         // Configura callback para stream remoto
         rtcCore.setRemoteStreamCallback((remoteStream) => {
             // Silencia áudio recebido (se houver)
             remoteStream.getAudioTracks().forEach(track => track.enabled = false);
             
-            // Exibe vídeo remoto no PIP (usuário vê apenas a imagem do outro)
+            // Exibe vídeo remoto no PIP
             document.getElementById('localVideo').srcObject = remoteStream;
+            console.log("✅ Conexão WebRTC estabelecida!");
         });
 
         // Handler para chamadas recebidas
         rtcCore.onIncomingCall = (offer) => {
+            console.log("📞 Chamada recebida!", offer);
+            
             if (!localStream) {
-                console.warn("Stream local não disponível para atender chamada");
+                console.warn("Stream local não disponível");
                 return;
             }
 
             rtcCore.handleIncomingCall(offer, localStream, (remoteStream) => {
-                console.log("Chamada recebida e conectada com sucesso");
+                console.log("✅ Chamada atendida com sucesso!");
             });
         };
 
-        console.log("WebRTC inicializado com ID:", myId);
+        console.log("🟢 WebRTC inicializado. Aguardando conexão...");
 
     } catch (error) {
-        console.error("Erro ao inicializar WebRTC:", error);
+        console.error("❌ Erro no WebRTC:", error);
+        alert("Erro na conexão. Recarregue a página.");
     }
 }
 
@@ -235,9 +247,24 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
 
-        // Avança para a tela de QR Code
-        switchMode('qrcode-mode');
-        generateQRCode(userName);
+        // ✅ CAPTURA A STREAM DA CÂMERA JÁ AUTORIZADA!
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ 
+                video: true, 
+                audio: false 
+            });
+            
+            // 🔥 GUARDA A STREAM PARA USAR DEPOIS!
+            window.authorizedStream = stream;
+            
+            // Avança para a tela de QR Code
+            switchMode('qrcode-mode');
+            generateQRCode(userName);
+            
+        } catch (error) {
+            console.error('Erro ao acessar câmera:', error);
+            alert('Erro ao acessar a câmera. Por favor, recarregue a página.');
+        }
     });
 
     // Event listener para o botão da tela de QR Code
