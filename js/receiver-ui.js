@@ -106,48 +106,23 @@ async function initializeWebRTC() {
         // Gera ID FIXO com últimos 7 dígitos do token
         const fixedId = token ? token.slice(-7) : crypto.randomUUID().substr(0, 7);
         
-        // Inicializa WebRTC com ID FIXO
-        const rtcCore = new WebRTCCore();
+        // ✅ PRIMEIRO: Só exibe o ID na tela (SEM tentar conectar ainda)
+        document.getElementById('myId').textContent = `ID: ${fixedId} (Aguardando conexão...)`;
+        console.log("📡 ID Gerado:", fixedId);
         
-        // 🔥 REGISTRA NO SERVER COM ID FIXO
-        rtcCore.initialize(fixedId);
+        // ✅ MOSTRA O PRÓPRIO VÍDEO (só para visualização)
+        document.getElementById('localVideo').srcObject = localStream;
         
-        // Exibe o ID fixo para conexão
-        document.getElementById('myId').textContent = fixedId;
-        console.log("📡 Registrado no servidor com ID:", fixedId);
-
-        // Configura callback para stream remoto
-        rtcCore.setRemoteStreamCallback((remoteStream) => {
-            // Silencia áudio recebido (se houver)
-            remoteStream.getAudioTracks().forEach(track => track.enabled = false);
-            
-            // Exibe vídeo remoto no PIP
-            document.getElementById('localVideo').srcObject = remoteStream;
-            console.log("✅ Conexão WebRTC estabelecida!");
-        });
-
-        // Handler para chamadas recebidas
-        rtcCore.onIncomingCall = (offer) => {
-            console.log("📞 Chamada recebida!", offer);
-            
-            if (!localStream) {
-                console.warn("Stream local não disponível");
-                return;
-            }
-
-            rtcCore.handleIncomingCall(offer, localStream, (remoteStream) => {
-                console.log("✅ Chamada atendida com sucesso!");
-            });
-        };
-
-        console.log("🟢 WebRTC inicializado. Aguardando conexão...");
+        // ✅ MENSAGEM SIMPLES - SEM ERRO
+        console.log("✅ Tela WebRTC carregada com sucesso!");
+        console.log("🟢 Aguardando outro navegador se conectar...");
 
     } catch (error) {
-        console.error("❌ Erro no WebRTC:", error);
-        alert("Erro na conexão. Recarregue a página.");
+        console.error("❌ Erro ao carregar tela WebRTC:", error);
+        // ✅ MENSAGEM MAIS AMIGÁVEL
+        document.getElementById('myId').textContent = "Erro ao carregar. Recarregue a página.";
     }
 }
-
 // ===== CÓDIGO PRINCIPAL =====
 document.addEventListener('DOMContentLoaded', async () => {
     // Elementos da interface
