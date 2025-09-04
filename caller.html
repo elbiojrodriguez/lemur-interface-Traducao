@@ -8,7 +8,7 @@
 </head>
 <body>
     <!-- ===== MODO 1: TELA DE BOAS-VINDAS (USA ESTILOS EXISTENTES) ===== -->
-    <div class="app-mode active" id="welcome-mode">
+    <div class="app-mode" id="welcome-mode">
         <div class="box-principal" id="welcome-screen">
             <div class="loader-container" id="loader-container">
                 <div class="loader"></div>
@@ -36,7 +36,7 @@
         </div>
     </div>
 
-    <!-- ===== MODO 2: TELA PRINCIPAL DO CALLER ===== -->
+    <!-- ===== MODO 2: TELA PRINCIPAL DO CALLER (SEM ANÚNCIOS) ===== -->
     <div class="app-mode" id="main-mode">
         <div class="box-principal">
             <img src="assets/images/solemur.png" alt="Solemur Logo" class="logo-solemur">
@@ -50,31 +50,6 @@
             <!-- Box Vermelho -->
             <div class="red-box"></div>
             
-            <!-- Containers para anúncios -->
-            <div class="ad-container ad-container-top" id="ad-top">
-                <div class="ad-close" onclick="closeAd('top')">✕</div>
-                <div class="ad-label">Anúncio</div>
-                <div class="ad-content">
-                    <div class="ad-headline">Tradutor Premium Online</div>
-                    <div class="ad-description">Traduza textos em tempo real com nossa tecnologia avançada. Experimente grátis!</div>
-                    <div class="ad-url">www.tradutorpremium.com</div>
-                    <div class="ad-image">Imagem</div>
-                    <div class="ad-call-to-action">Saiba Mais</div>
-                </div>
-            </div>
-            
-            <div class="ad-container ad-container-bottom" id="ad-bottom">
-                <div class="ad-close" onclick="closeAd('bottom')">✕</div>
-                <div class="ad-label">Anúncio</div>
-                <div class="ad-content">
-                    <div class="ad-headline">Curso de Idiomas em 30 Dias</div>
-                    <div class="ad-description">Aprenda um novo idioma rapidamente com método comprovado. Matrículas abertas!</div>
-                    <div class="ad-url">www.cursoidiomasrapido.com</div>
-                    <div class="ad-image">Imagem</div>
-                    <div class="ad-call-to-action">Inscreva-se</div>
-                </div>
-            </div>
-            
             <!-- Box de vídeo -->
             <div class="video-box">
                 <img src="assets/images/lemur.png" class="camera-feed" alt="Video feed">
@@ -87,5 +62,30 @@
     </div>
 
     <script src="js/caller-ui.js"></script>
+    
+    <!-- Script para gerenciar as transições entre telas -->
+    <script>
+        // Inicialmente mostra apenas a tela de boas-vindas
+        document.getElementById('welcome-mode').classList.add('active');
+        document.getElementById('main-mode').classList.remove('active');
+        
+        // Quando clicar no botão "Next" na tela de boas-vindas
+        document.getElementById('next-button-welcome').addEventListener('click', function() {
+            // Esconde a tela de boas-vindas
+            document.getElementById('welcome-mode').classList.remove('active');
+            
+            // Mostra a tela principal
+            document.getElementById('main-mode').classList.add('active');
+            
+            // Atualiza o nome do usuário se foi inserido
+            const userName = document.getElementById('name-input').value || 'Usuário';
+            document.getElementById('user-name-display').textContent = userName;
+        });
+        
+        // Desabilita função de anúncios (caso exista no caller-ui.js)
+        if (typeof startAdCycle === 'function') {
+            window.startAdCycle = function() {};
+        }
+    </script>
 </body>
 </html>
