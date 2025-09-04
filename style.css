@@ -53,7 +53,7 @@ h1 {
 }
 .translator-label {
     position: absolute;
-    top: 21%;
+    top: 15%;
     left: 50%;
     transform: translateX(-50%);
     color: #333;
@@ -63,25 +63,14 @@ h1 {
     max-width: 90%;
     margin: 0;
     }
+
 h2 {
     position: absolute;
-    top: 17%;
+    top: 19%;
     left: 50%;
     transform: translateX(-50%);
     color: #333;
     font-size: 12vw;
-    text-align: center;
-    width: 80%;
-    margin: 0;
-}
-
-h3 {
-    position: absolute;
-    top: 17%;
-    left: 50%;
-    transform: translateX(-50%);
-    color: #333;
-    font-size:23vw;
     text-align: center;
     width: 80%;
     margin: 0;
