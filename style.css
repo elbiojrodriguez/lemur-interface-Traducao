@@ -63,6 +63,18 @@ h2 {
     margin: 0;
 }
 
+h3 {
+    position: absolute;
+    top: 17%;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #333;
+    font-size: 7vw;
+    text-align: center;
+    width: 80%;
+    margin: 0;
+}
+
 .name-input {
     position: absolute;
     top: 32%;
