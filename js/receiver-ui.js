@@ -1,43 +1,3 @@
-// ===== IMPORTAÇÃO DO QR CODE =====
-import { QRCodeGenerator } from './qr-code-utils.js';
-
-// ===== CÓDIGO DE TRADUÇÃO =====
-const TRANSLATE_ENDPOINT = 'https://chat-tradutor.onrender.com/translate';
-
-const textsToTranslateWelcome = {
-    "welcome-title": "Welcome!",
-    "translator-label": "Live translation. No filters. No platform.",
-    "name-input": "Your name",
-    "next-button-welcome": "Next",
-    "camera-text": "Allow camera access",
-    "microphone-text": "Allow microphone access"
-};
-
-const textsToTranslateQR = {
-    "qr-modal-title": "This is your online key",
-    "qr-modal-description": "You can ask to scan, share or print on your business card.",
-    "next-button-qrcode": "Start Connection"
-};
-
-async function translateText(text, targetLang) {
-    try {
-        if (targetLang === 'en') return text;
-
-        const response = await fetch(TRANSLATE_ENDPOINT, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ text, targetLang })
-        });
-
-        const result = await response.json();
-        return result.translatedText || text;
-
-    } catch (error) {
-        console.error('Erro na tradução:', error);
-        return text;
-    }
-}
-
 // ===== FUNÇÕES DE NAVEGAÇÃO =====
 function switchMode(modeId) {
     // Esconde todos os modos
@@ -84,45 +44,16 @@ function generateQRCode(name) {
     
     console.log("QR Code URL:", fullUrl);
     
-    // Gera o QR code
-    QRCodeGenerator.generate("qrcode-modal", fullUrl, 200);
+    // Gera o QR code (usando a biblioteca externa)
+    new QRCode(document.getElementById("qrcode-modal"), {
+        text: fullUrl,
+        width: 200,
+        height: 200
+    });
+    
     document.getElementById('url-content-modal').textContent = fullUrl;
 }
 
-// ===== FUNÇÃO PARA INICIALIZAR WEBRTC =====
-async function initializeWebRTC() {
-    try {
-        // ✅ USA A STREAM JÁ AUTORIZADA (não pede permissão de novo)
-        const localStream = window.authorizedStream;
-        
-        if (!localStream) {
-            throw new Error('Stream de câmera não disponível');
-        }
-
-        // Obtém o token da URL (enviado pelo app Flutter)
-        const urlParams = new URLSearchParams(window.location.search);
-        const token = urlParams.get('token');
-        
-        // Gera ID FIXO com últimos 7 dígitos do token
-        const fixedId = token ? token.slice(-7) : crypto.randomUUID().substr(0, 7);
-        
-        // ✅ PRIMEIRO: Só exibe o ID na tela (SEM tentar conectar ainda)
-        document.getElementById('myId').textContent = `ID: ${fixedId} (Aguardando conexão...)`;
-        console.log("📡 ID Gerado:", fixedId);
-        
-        // ✅ MOSTRA O PRÓPRIO VÍDEO (só para visualização)
-        document.getElementById('localVideo').srcObject = localStream;
-        
-        // ✅ MENSAGEM SIMPLES - SEM ERRO
-        console.log("✅ Tela WebRTC carregada com sucesso!");
-        console.log("🟢 Aguardando outro navegador se conectar...");
-
-    } catch (error) {
-        console.error("❌ Erro ao carregar tela WebRTC:", error);
-        // ✅ MENSAGEM MAIS AMIGÁVEL
-        document.getElementById('myId').textContent = "Erro ao carregar. Recarregue a página.";
-    }
-}
 // ===== CÓDIGO PRINCIPAL =====
 document.addEventListener('DOMContentLoaded', async () => {
     // Elementos da interface
@@ -130,57 +61,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     const nextButtonQrcode = document.getElementById('next-button-qrcode');
     const nameInput = document.getElementById('name-input');
     const welcomeScreen = document.getElementById('welcome-screen');
-    const loaderContainer = document.getElementById('loader-container');
     const cameraCheckbox = document.getElementById('camera-checkbox');
     const microphoneCheckbox = document.getElementById('microphone-checkbox');
+    const userIdDisplay = document.getElementById('user-id-display'); // Novo elemento para mostrar o ID
     
     // Variáveis de estado
     let cameraGranted = false;
     let microphoneGranted = false;
     let userName = '';
-
-    // Processo de tradução inicial
-    const browserLang = (navigator.language || 'en').split('-')[0];
-    
-    // Mostra loader durante tradução
-    loaderContainer.style.display = 'flex';
-
-    // Traduz textos da primeira tela
-    for (const [elementId, text] of Object.entries(textsToTranslateWelcome)) {
-        try {
-            const translated = await translateText(text, browserLang);
-            const element = document.getElementById(elementId);
-
-            if (element) {
-                if (elementId === 'name-input') {
-                    element.placeholder = translated;
-                } else if (elementId === 'next-button-welcome') {
-                    element.textContent = translated;
-                } else {
-                    element.textContent = translated;
-                }
-            }
-        } catch (error) {
-            console.error(`Erro ao traduzir ${elementId}:`, error);
-        }
-    }
-
-    // Traduz textos da segunda tela
-    for (const [elementId, text] of Object.entries(textsToTranslateQR)) {
-        try {
-            const translated = await translateText(text, browserLang);
-            const element = document.getElementById(elementId);
-
-            if (element) {
-                element.textContent = translated;
-            }
-        } catch (error) {
-            console.error(`Erro ao traduzir ${elementId}:`, error);
-        }
-    }
-
-    // Esconde o loader
-    loaderContainer.style.display = 'none';
 
     // Event listener para os checkboxes
     cameraCheckbox.addEventListener('click', async () => {
@@ -246,6 +134,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     nextButtonQrcode.addEventListener('click', () => {
         // Avança para a tela de comunicação WebRTC
         switchMode('communication-mode');
-        initializeWebRTC();
+        
+        // ✅ GERA E EXIBE O ID DE 7 DÍGITOS NA TERCEIRA TELA
+        const urlParams = new URLSearchParams(window.location.search);
+        const token = urlParams.get('token');
+        const fixedId = token ? token.slice(-7) : 'unknown';
+        
+        // Exibe o ID na tela
+        userIdDisplay.textContent = `Seu ID: ${fixedId}`;
+        
+        // Também exibe o nome do usuário
+        document.getElementById('user-name-display').textContent = userName;
     });
 });
