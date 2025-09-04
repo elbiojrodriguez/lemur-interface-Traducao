@@ -96,12 +96,24 @@ h1 {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 .user-id-display {
-    background: rgba(255, 255, 255, 0.1);
-    padding: 10px;
-    border-radius: 5px;
-    margin: 60px 0;
-    font-size: 16px;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 12px;
+    border-radius: 8px;
+    font-size: 1.1em;
     font-weight: bold;
+    text-align: center;
+    color: #1a2a6c;
+    border: 2px solid #4b6cb7;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    
+    /* POSICIONAMENTO ABSOLUTO */
+    position: absolute;
+    top: 60px; /* Distância do topo do box-principal */
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+    width: 80%;
+    max-width: 400px;
 }
 
 .permissions-container {
