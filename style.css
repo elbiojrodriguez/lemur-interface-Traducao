@@ -388,11 +388,11 @@ h1 {
 
 .red-box {
     position: absolute;
-    top: 50%;
+    top: 27%;
     left: 50%;
     transform: translateX(-50%);
     width: 78%;
-    height: 18%;
+    height: 1%;
     padding: 20px;
     background-color: #ffffff;
     border: 2px solid #ff4136;
