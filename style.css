@@ -1,3 +1,4 @@
+
 /* ===== ESTILOS GERAIS ===== */
 html {
     height: 100%;
@@ -33,40 +34,33 @@ body {
     left: 50%;
     transform: translate(-50%, -50%);
     width: 35%;
+    max-width: 200px;
     height: auto;
 }
 
 h1 {
     position: absolute;
-    top: 10%;
+    top: 15%;
     left: 50%;
     transform: translateX(-50%);
     color: #333;
     font-size: 7vw;
     white-space: nowrap;
     text-align: center;
+    margin: 0;
+    z-index: 5;
 }
 
 h2 {
     position: absolute;
-    top: 17%;
+    top: 21%;
     left: 50%;
     transform: translateX(-50%);
     color: #333;
     font-size: 5vw;
     text-align: center;
     width: 80%;
-}
-
-.welcome-title {
-    position: absolute;
-    top: 21%;
-    left: 50%;
-    transform: translateX(-50%);
-    color: #333;
-    font-size: 9vw;
-    white-space: nowrap;
-    text-align: center;
+    margin: 0;
 }
 
 .name-input {
@@ -173,15 +167,17 @@ h2 {
 }
 
 .loader-container {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
     display: none;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    z-index: 100;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
 }
 
 .loader {
@@ -223,14 +219,14 @@ h2 {
 }
 
 .qr-modal-title {
-    font-size: 20px;
+    font-size: 1.25rem;
     margin-bottom: 15px;
     color: #333;
     font-weight: bold;
 }
 
 .qr-modal-description {
-    font-size: 16px;
+    font-size: 1rem;
     margin-bottom: 20px;
     color: #555;
     line-height: 1.4;
@@ -257,7 +253,7 @@ h2 {
     border-radius: 12px;
     box-shadow: 0 2px 6px rgba(0,0,0,0.1);
     word-break: break-all;
-    font-size: 12px;
+    font-size: 0.75rem;
     text-align: center;
 }
 
@@ -269,11 +265,22 @@ h2 {
     border: none;
     border-radius: 20px;
     cursor: pointer;
-    font-size: 16px;
+    font-size: 1rem;
 }
 
 .mode-button:hover {
     background-color: #2980b9;
+}
+
+/* ===== ESTILOS PARA TRANSIÇÃO ENTRE MODOS ===== */
+.app-mode {
+    display: none;
+    width: 100%;
+    height: 100%;
+}
+
+.app-mode.active {
+    display: block;
 }
 
 /* ===== BOTÃO DE ENVIO ===== */
@@ -367,7 +374,7 @@ h2 {
 }
 
 .user-language {
-    font-size: 22px;
+    font-size: 12px;
     line-height: 1.2;
     opacity: 0.9;
 }
@@ -406,9 +413,5 @@ h2 {
     .mode-button {
         padding: 8px 16px;
         font-size: 14px;
-    }
-    
-    .user-language {
-        font-size: 18px;
     }
 }
