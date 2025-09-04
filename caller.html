@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <!-- ===== MODO 1: TELA DE BOAS-VINDAS (USA ESTILOS EXISTENTES) ===== -->
+    <!-- ===== MODO 1: TELA DE BOAS-VINDAS ===== -->
     <div class="app-mode active" id="welcome-mode">
         <div class="box-principal" id="welcome-screen">
             <div class="loader-container" id="loader-container">
@@ -36,7 +36,7 @@
         </div>
     </div>
 
-    <!-- ===== MODO 2: TELA PRINCIPAL DO CALLER (SUBSTITUÍDA PELO MÓDULO 3) ===== -->
+    <!-- ===== MODO 2: TELA PRINCIPAL DO CALLER ===== -->
     <div class="app-mode" id="main-mode">
         <div class="box-principal">
             <img src="assets/images/lemur.png" alt="Lemur Logo" class="logo">
@@ -62,7 +62,7 @@
         </div>
     </div>
 
-    <script src="js/caller-ui.js"></script>
-       
+    <!-- ✅ SCRIPT COM DEFER -->
+    <script src="js/caller-ui.js" defer></script>
 </body>
-</html>    
+</html>
