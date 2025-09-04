@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <!-- ===== MODO 1: TELA DE BOAS-VINDAS ===== -->
+    <!-- ===== MODO 1: TELA DE BOAS-VINDAS (USA ESTILOS EXISTENTES) ===== -->
     <div class="app-mode active" id="welcome-mode">
         <div class="box-principal" id="welcome-screen">
             <div class="loader-container" id="loader-container">
@@ -16,8 +16,9 @@
 
             <img src="assets/images/lemur.png" alt="Lemur Logo" class="logo">
             <h1>EchoMeP2P</h1>
-            <h2>Welcome!</h2>
+            <h2 id="welcome-title">Welcome!</h2>
             
+            <div class="translator-label" id="translator-label">Live translation. No filters. No platform.</div>
             <input type="text" class="name-input" id="name-input" placeholder="Your name" />
             
             <div class="permissions-container">
@@ -35,12 +36,12 @@
         </div>
     </div>
 
-    <!-- ===== MODO 2: TELA PRINCIPAL DO CALLER ===== -->
+    <!-- ===== MODO 2: TELA PRINCIPAL DO CALLER (SUBSTITUÍDA PELO MÓDULO 3) ===== -->
     <div class="app-mode" id="main-mode">
         <div class="box-principal">
             <img src="assets/images/lemur.png" alt="Lemur Logo" class="logo">
             <h1>EchoMeP2P</h1>
-            <h2>Live translation. No filters. No platform.</h2>       
+            <h2 id="Instant-title">Live translation. No filters. No platform.</h2>       
             <button class="btn-send" id="send-button">SEND🚀</button>
             
             <!-- Box Azul -->
@@ -60,6 +61,7 @@
         </div>
     </div>
 
-    <script type="module" src="js/caller-ui.js"></script>
+    <script src="js/caller-ui.js"></script>
+       
 </body>
-</html>
+</html>    
