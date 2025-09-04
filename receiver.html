@@ -55,22 +55,26 @@
         </div>
     </div>
 
-    <!-- Modo 3: Comunicação WebRTC -->
+    <!-- Modo 3: Comunicação WebRTC (SUBSTITUÍDO PELO MÓDULO 3) -->
     <div class="app-mode" id="communication-mode">
         <div class="box-principal">
-            <div class="container">
-                <!-- Vídeo remoto (tela principal) -->
-                <div class="video-wrapper">
-                    <video id="remoteVideo" autoplay playsinline></video>
-                </div>
-
-                <!-- PIP verde com a câmera do outro usuário -->
-                <div class="video-wrapper">
-                    <video id="localVideo" autoplay muted playsinline></video>
-                </div>
-
-                <div class="info-overlay">
-                    <span id="myId"></span>
+            <img src="assets/images/solemur.png" alt="Solemur Logo" class="logo-solemur">
+            <h1>EchoMeP2P</h1>
+            <h2 id="Instant-title">Live translation. No filters. No platform.</h2>       
+            <button class="btn-send" id="send-button">SEND🚀</button>
+            
+            <!-- Box Azul -->
+            <div class="blue-box"></div>
+            
+            <!-- Box Vermelho -->
+            <div class="red-box"></div>
+            
+            <!-- Box de vídeo -->
+            <div class="video-box">
+                <img src="assets/images/lemur.png" class="camera-feed" alt="Video feed">
+                <div class="overlay-info">
+                    <div class="user-name" id="user-name-display">Usuário</div>
+                    <div class="user-language">🇧🇷</div>
                 </div>
             </div>
         </div>
@@ -80,5 +84,13 @@
     <script src="core/webrtc-core.js"></script>
     <script src="js/qr-code-utils.js"></script>
     <script type="module" src="js/receiver-ui.js"></script>
+    
+    <!-- Script para desativar anúncios -->
+    <script>
+        // Desabilita função de anúncios (caso exista)
+        if (typeof startAdCycle === 'function') {
+            window.startAdCycle = function() {};
+        }
+    </script>
 </body>
 </html>
