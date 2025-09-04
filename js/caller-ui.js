@@ -2,7 +2,7 @@
 const TRANSLATE_ENDPOINT = 'https://chat-tradutor.onrender.com/translate';
 
 const textsToTranslateWelcome = {
-    "welcome": "Welcome!",
+    "Welcome": "Welcome!",
     "translator-label": "Live translation. No filters. No platform.",
     "name-input": "Your name",
     "next-button-welcome": "Next",
