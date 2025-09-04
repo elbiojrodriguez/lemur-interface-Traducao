@@ -233,7 +233,7 @@ h2 {
 
 .qr-modal-title {
     font-size: 1.25rem;
-    margin-bottom: 5px;
+    margin-bottom: 15px;
     color: #333;
     font-weight: bold;
 }
@@ -417,6 +417,7 @@ h2 {
     
     .qr-modal-title {
         font-size: 18px;
+        margin-bottom: 20px;
     }
     
     .qr-modal-description {
