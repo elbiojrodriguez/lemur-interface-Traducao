@@ -18,8 +18,9 @@
 
             <img src="assets/images/lemur.png" alt="Lemur Logo" class="logo">
             <h1>EchoMeP2P</h1>
-            <h2>Welcome!</h2>
+            <h2 id="welcome-title">Welcome!</h2>
             
+            <div class="translator-label" id="translator-label">Live translation. No filters. No platform.</div>
             <input type="text" class="name-input" id="name-input" placeholder="Your name" />
             
             <div class="permissions-container">
@@ -54,12 +55,12 @@
         </div>
     </div>
 
-    <!-- Modo 3: Comunicação WebRTC -->
+    <!-- Modo 3: Comunicação WebRTC (SUBSTITUÍDO PELO MÓDULO 3 COMPLETO) -->
     <div class="app-mode" id="communication-mode">
         <div class="box-principal">
             <img src="assets/images/lemur.png" alt="Lemur Logo" class="logo">
             <h1>EchoMeP2P</h1>
-            <h2>Live translation. No filters. No platform.</h2>       
+            <h2 id="Instant-title">Live translation. No filters. No platform.</h2>       
             <button class="btn-send" id="send-button">SEND🚀</button>
             
             <!-- Box Azul -->
@@ -79,22 +80,32 @@
         </div>
     </div>
 
-    <script type="module" src="core/internet-config.js"></script>
-    <script type="module" src="core/webrtc-core.js"></script>
-    <script type="module" src="js/qr-code-utils.js"></script>
+    <script src="core/internet-config.js"></script>
+    <script src="core/webrtc-core.js"></script>
+    <script src="js/qr-code-utils.js"></script>
     <script type="module" src="js/receiver-ui.js"></script>
     
+    <!-- Script do módulo 3 para tradução automática (CORRIGIDO) -->
     <script>
+              
+        // Aguarda o carregamento completo da página
         document.addEventListener('DOMContentLoaded', function() {
+            // Configura a transição para a terceira tela
             const nextButtonQRCode = document.getElementById('next-button-qrcode');
             if (nextButtonQRCode) {
                 nextButtonQRCode.addEventListener('click', function() {
+                    // Aplica as características do módulo 3 quando entrar na terceira tela
                     document.getElementById('communication-mode').classList.add('active');
+                    
+                    // Atualiza o nome do usuário se foi inserido na primeira tela
                     const userName = document.getElementById('name-input').value || 'Usuário';
                     document.getElementById('user-name-display').textContent = userName;
+                    
+                    // Aqui viria a lógica de tradução automática do módulo 3
+                    // baseada no idioma do navegador
                 });
             }
         });
     </script>
 </body>
-</html>
+</html>   
