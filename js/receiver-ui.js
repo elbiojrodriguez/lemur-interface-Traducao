@@ -1,28 +1,57 @@
+// ===== CONFIGURAÇÃO DE TRADUÇÃO =====
+const TRANSLATE_ENDPOINT = 'https://chat-tradutor.onrender.com/translate';
+
+const textsToTranslateWelcome = {
+    "welcome-title": "Welcome!",
+    "translator-label": "Live translation. No filters. No platform.",
+    "name-input": "Your name",
+    "next-button-welcome": "Next",
+    "camera-text": "Allow camera access",
+    "microphone-text": "Allow microphone access"
+};
+
+const textsToTranslateQR = {
+    "qr-modal-title": "This is your online key",
+    "qr-modal-description": "You can ask to scan, share or print on your business card.",
+    "next-button-qrcode": "Start Connection"
+};
+
+async function translateText(text, targetLang) {
+    try {
+        if (targetLang === 'en') return text;
+
+        const response = await fetch(TRANSLATE_ENDPOINT, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ text, targetLang })
+        });
+
+        const result = await response.json();
+        return result.translatedText || text;
+
+    } catch (error) {
+        console.error('Erro na tradução:', error);
+        return text;
+    }
+}
+
 // ===== FUNÇÕES DE NAVEGAÇÃO =====
 function switchMode(modeId) {
-    // Esconde todos os modos
     document.querySelectorAll('.app-mode').forEach(mode => {
         mode.classList.remove('active');
     });
-    
-    // Mostra o modo solicitado
     document.getElementById(modeId).classList.add('active');
 }
 
 // ===== FUNÇÃO PARA SOLICITAÇÃO DE PERMISSÕES =====
 async function requestMediaPermissions() {
     try {
-        // Solicita acesso à câmera e microfone
         const stream = await navigator.mediaDevices.getUserMedia({ 
             video: true, 
             audio: true 
         });
-        
-        // Para as tracks imediatamente (apenas queríamos a permissão)
         stream.getTracks().forEach(track => track.stop());
-        
         return true;
-        
     } catch (error) {
         console.error('Erro ao acessar dispositivos:', error);
         return false;
@@ -31,20 +60,16 @@ async function requestMediaPermissions() {
 
 // ===== FUNÇÃO PARA GERAR QR CODE =====
 function generateQRCode(name) {
-    // Obtém os parâmetros da URL atual (enviados pelo app Flutter)
     const urlParams = new URLSearchParams(window.location.search);
-    const token = urlParams.get('token'); // Token do Firebase
+    const token = urlParams.get('token');
     const browserFullLang = navigator.language || 'pt-BR';
-    
-    // Gera ID fixo com últimos 7 dígitos do token
     const fixedId = token ? token.slice(-7) : 'unknown';
     
-    // URL com TODOS os parâmetros necessários para o caller
     const fullUrl = `https://lemur-interface-traducao.netlify.app/caller.html?token=${encodeURIComponent(token || '')}&browserId=${encodeURIComponent(fixedId)}&lang=${encodeURIComponent(browserFullLang)}&name=${encodeURIComponent(name || 'User')}`;
     
     console.log("QR Code URL:", fullUrl);
     
-    // Gera o QR code (usando a biblioteca externa)
+    // Gera o QR code
     new QRCode(document.getElementById("qrcode-modal"), {
         text: fullUrl,
         width: 200,
@@ -61,14 +86,58 @@ document.addEventListener('DOMContentLoaded', async () => {
     const nextButtonQrcode = document.getElementById('next-button-qrcode');
     const nameInput = document.getElementById('name-input');
     const welcomeScreen = document.getElementById('welcome-screen');
+    const loaderContainer = document.getElementById('loader-container');
     const cameraCheckbox = document.getElementById('camera-checkbox');
     const microphoneCheckbox = document.getElementById('microphone-checkbox');
-    const userIdDisplay = document.getElementById('user-id-display'); // Novo elemento para mostrar o ID
     
     // Variáveis de estado
     let cameraGranted = false;
     let microphoneGranted = false;
     let userName = '';
+
+    // ===== PROCESSO DE TRADUÇÃO =====
+    const browserLang = (navigator.language || 'en').split('-')[0];
+    
+    // Mostra loader durante tradução
+    loaderContainer.style.display = 'flex';
+
+    // Traduz textos da primeira tela
+    for (const [elementId, text] of Object.entries(textsToTranslateWelcome)) {
+        try {
+            const translated = await translateText(text, browserLang);
+            const element = document.getElementById(elementId);
+
+            if (element) {
+                if (elementId === 'name-input') {
+                    element.placeholder = translated;
+                } else if (elementId === 'next-button-welcome') {
+                    element.textContent = translated;
+                } else {
+                    element.textContent = translated;
+                }
+            }
+        } catch (error) {
+            console.error(`Erro ao traduzir ${elementId}:`, error);
+        }
+    }
+
+    // Traduz textos da segunda tela
+    for (const [elementId, text] of Object.entries(textsToTranslateQR)) {
+        try {
+            const translated = await translateText(text, browserLang);
+            const element = document.getElementById(elementId);
+
+            if (element) {
+                element.textContent = translated;
+            }
+        } catch (error) {
+            console.error(`Erro ao traduzir ${elementId}:`, error);
+        }
+    }
+
+    // Esconde o loader
+    loaderContainer.style.display = 'none';
+    // ===== FIM DA TRADUÇÃO =====
 
     // Event listener para os checkboxes
     cameraCheckbox.addEventListener('click', async () => {
@@ -110,17 +179,14 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
 
-        // ✅ CAPTURA A STREAM DA CÂMERA JÁ AUTORIZADA!
         try {
             const stream = await navigator.mediaDevices.getUserMedia({ 
                 video: true, 
                 audio: false 
             });
             
-            // 🔥 GUARDA A STREAM PARA USAR DEPOIS!
             window.authorizedStream = stream;
             
-            // Avança para a tela de QR Code
             switchMode('qrcode-mode');
             generateQRCode(userName);
             
@@ -132,16 +198,23 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Event listener para o botão da tela de QR Code
     nextButtonQrcode.addEventListener('click', () => {
-        // Avança para a tela de comunicação WebRTC
         switchMode('communication-mode');
         
-        // ✅ GERA E EXIBE O ID DE 7 DÍGITOS NA TERCEIRA TELA
+        // ✅ GERA E EXIBE O ID DE 7 DÍGITOS
         const urlParams = new URLSearchParams(window.location.search);
         const token = urlParams.get('token');
         const fixedId = token ? token.slice(-7) : 'unknown';
         
-        // Exibe o ID na tela
+        // Exibe o ID na terceira tela
+        const userIdDisplay = document.createElement('div');
+        userIdDisplay.className = 'user-id-display';
+        userIdDisplay.id = 'user-id-display';
         userIdDisplay.textContent = `Seu ID: ${fixedId}`;
+        
+        // Adiciona o ID display no início do box-principal
+        const boxPrincipal = document.querySelector('#communication-mode .box-principal');
+        const firstChild = boxPrincipal.firstChild;
+        boxPrincipal.insertBefore(userIdDisplay, firstChild);
         
         // Também exibe o nome do usuário
         document.getElementById('user-name-display').textContent = userName;
