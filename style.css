@@ -515,16 +515,17 @@ h1 {
 
 .video-box {
     position: absolute;
-    bottom: 80px;
-    right: 10px;
-    width: 30%;
-    max-width: 138px;
-    height: 184px;
+    bottom: 15%;
+    right: 5%;
+    width: 35%;
+    height: 30%;
     background-color: #ffffff;
     border: 2px solid #28a745;
     border-radius: 10px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    box-shadow: 0 0 10px rgba(0,0,0,0.5);
     overflow: hidden;
+    /* Garantir que não tenha box-sizing que altere as dimensões */
+    box-sizing: content-box;
 }
 
 .camera-feed {
