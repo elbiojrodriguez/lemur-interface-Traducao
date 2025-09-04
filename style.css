@@ -53,11 +53,11 @@ h1 {
 
 h2 {
     position: absolute;
-    top: 21%;
+    top: 5%;
     left: 50%;
     transform: translateX(-50%);
     color: #333;
-    font-size: 5vw;
+    font-size: 9vw;
     text-align: center;
     width: 80%;
     margin: 0;
