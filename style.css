@@ -108,7 +108,7 @@ h1 {
     
     /* POSICIONAMENTO ABSOLUTO */
     position: absolute;
-    top: 60px; /* Distância do topo do box-principal */
+    top: 200px; /* Distância do topo do box-principal */
     left: 50%;
     transform: translateX(-50%);
     z-index: 10;
