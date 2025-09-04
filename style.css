@@ -28,92 +28,76 @@ body {
 
 /* ===== ESTILOS DA TELA DE BOAS-VINDAS ===== */
 .logo {
-    position: absolute;
-    top: 7%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    position: relative;
     width: 35%;
+    max-width: 200px;
     height: auto;
+    margin: 7% auto 2%;
 }
 
-#EchoMeP2P-title {
-    position: absolute;
-    top: 10%;
-    left: 50%;
-    transform: translateX(-50%);
+.titles-container {
+    position: relative;
+    width: 100%;
+    margin-bottom: 5%;
+}
+
+.main-title {
     color: #333;
-    font-size: 7vw;
+    font-size: 1.8rem;
+    margin: 0.5rem 0;
     white-space: nowrap;
-    text-align: center;
 }
 
-.translator-label {
-    position: absolute;
-    top: 17%;
-    left: 50%;
-    transform: translateX(-50%);
+.subtitle {
     color: #333;
-    font-size: 5vw;
-    text-align: center;
-    width: 80%;
-    max-width: 90%;
-}
-
-#welcome-title {
-    position: absolute;
-    top: 21%;
-    left: 50%;
-    transform: translateX(-50%);
-    color: #333;
-    font-size: 9vw;
-    white-space: nowrap;
-    text-align: center;
+    font-size: 1.2rem;
+    margin: 0.5rem 0 2rem;
+    width: 90%;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .name-input {
-    position: absolute;
-    top: 32%;
-    left: 50%;
-    transform: translateX(-50%);
     width: 70%;
-    height: 5%;
-    padding: 1vh 1vw;
-    border-radius: 3vw;
+    max-width: 400px;
+    height: 40px;
+    padding: 0.5rem;
+    margin: 2rem auto;
+    border-radius: 20px;
     border: none;
-    box-shadow: 0 0.5vw 1vw rgba(0, 0, 0, 0.1);
-    font-size: 6vw;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    font-size: 1rem;
     text-align: center;
+    display: block;
 }
 
 .name-input:focus {
     outline: none;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
 .permissions-container {
-    position: absolute;
-    top: 41%;
-    left: 50%;
-    transform: translateX(-50%);
     width: 70%;
+    max-width: 400px;
+    margin: 2rem auto;
     display: flex;
     flex-direction: column;
-    gap: 2vh;
+    gap: 1rem;
 }
 
 .permission-item {
     display: flex;
     align-items: center;
-    padding: 1.5vh 2vw;
+    padding: 0.8rem 1rem;
     background-color: rgba(255, 255, 255, 0.7);
-    border-radius: 3vw;
-    box-shadow: 0 0.5vw 1vw rgba(0, 0, 0, 0.1);
+    border-radius: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .permission-checkbox {
-    width: 5vw;
-    height: 5vw;
-    margin-right: 3vw;
+    width: 24px;
+    height: 24px;
+    margin-right: 12px;
     border: 2px solid #3498db;
     border-radius: 50%;
     display: flex;
@@ -121,6 +105,7 @@ body {
     align-items: center;
     cursor: pointer;
     transition: all 0.3s;
+    flex-shrink: 0;
 }
 
 .permission-checkbox.checked {
@@ -130,32 +115,30 @@ body {
 .permission-checkbox.checked::after {
     content: "✓";
     color: white;
-    font-size: 4vw;
+    font-size: 14px;
 }
 
 .permission-text {
     flex: 1;
     text-align: left;
-    font-size: 4vw;
+    font-size: 0.9rem;
     color: #333;
 }
 
 .next-button {
-    position: absolute;
-    top: 59%;
-    left: 50%;
-    transform: translateX(-50%);
     width: 30%;
-    height: 5%;
+    max-width: 180px;
+    height: 40px;
+    margin: 2rem auto;
     background-color: #3498db;
     color: white;
     border: none;
-    border-radius: 3vw;
-    font-size: 5vw;
+    border-radius: 20px;
+    font-size: 1rem;
     cursor: pointer;
-    box-shadow: 0 0.5vw 1vw rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     transition: all 0.3s;
-    z-index: 10;
+    display: block;
 }
 
 .next-button:hover {
@@ -169,20 +152,22 @@ body {
 
 @keyframes shake {
     0%, 100% { transform: translateX(0); }
-    20%, 60% { transform: translateX(-0.5vw); }
-    40%, 80% { transform: translateX(0.5vw); }
+    20%, 60% { transform: translateX(-4px); }
+    40%, 80% { transform: translateX(4px); }
 }
 
 .loader-container {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
     display: none;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    z-index: 100;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
 }
 
 .loader {
@@ -224,14 +209,14 @@ body {
 }
 
 .qr-modal-title {
-    font-size: 20px;
+    font-size: 1.25rem;
     margin-bottom: 15px;
     color: #333;
     font-weight: bold;
 }
 
 .qr-modal-description {
-    font-size: 16px;
+    font-size: 1rem;
     margin-bottom: 20px;
     color: #555;
     line-height: 1.4;
@@ -258,7 +243,7 @@ body {
     border-radius: 12px;
     box-shadow: 0 2px 6px rgba(0,0,0,0.1);
     word-break: break-all;
-    font-size: 12px;
+    font-size: 0.75rem;
     text-align: center;
 }
 
@@ -270,7 +255,7 @@ body {
     border: none;
     border-radius: 20px;
     cursor: pointer;
-    font-size: 16px;
+    font-size: 1rem;
 }
 
 .mode-button:hover {
@@ -297,24 +282,22 @@ body {
     object-fit: cover;
 }
 
-/* Vídeo local em PIP - EXATAMENTE como no original */
-/* Este é o PIP verde que mostra a câmera do outro usuário */
-.video-wrapper:nth-child(2) { 
-    position: absolute; 
-    bottom: calc(80px + 60px); 
-    right: 5px; 
-    width: 34.5%; 
-    max-width: 138px; 
-    height: 184px; 
-    transform: translateX(-17%); 
-    border-radius: 8px; 
-    overflow: hidden; 
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); 
-    border: 2px solid #4CAF50; /* Borda verde */
-    z-index: 10; 
+/* Vídeo local em PIP */
+.video-wrapper.pip {
+    position: absolute;
+    bottom: 140px;
+    right: 10px;
+    width: 30%;
+    max-width: 138px;
+    height: 184px;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    border: 2px solid #4CAF50;
+    z-index: 10;
 }
 
-/* Overlay de informações - EXATAMENTE como no original */
+/* Overlay de informações */
 .info-overlay {
     position: absolute;
     top: 20px;
@@ -328,10 +311,10 @@ body {
     border-radius: 0 0 10px 10px;
 }
 
-/* ID visual - EXATAMENTE como no original */
+/* ID visual */
 #myId {
     display: inline-block;
-    font-size: 16px;
+    font-size: 1rem;
     font-weight: bold;
     background: rgba(255, 255, 255, 0.1);
     padding: 6px 12px;
@@ -352,143 +335,51 @@ body {
     display: block;
 }
 
-/* ===== RESPONSIVIDADE ===== */
-@media (max-width: 768px) {
-    .video-wrapper:nth-child(2) {
-        height: 120px;
-        max-width: 100px;
-        bottom: calc(60px + 60px);
-    }
-
-    .info-overlay {
-        padding: 8px;
-    }
-    
-    .permission-text {
-        font-size: 3.5vw;
-    }
-    
-    .name-input {
-        font-size: 5vw;
-        height: 6%;
-    }
-    
-    .next-button {
-        font-size: 4.5vw;
-        height: 6%;
-    }
-}
-
-@media (max-width: 480px) {
-    .qr-modal {
-        padding: 20px;
-        width: 90%;
-    }
-    
-    .qr-modal-title {
-        font-size: 18px;
-    }
-    
-    .qr-modal-description {
-        font-size: 14px;
-    }
-    
-    .mode-button {
-        padding: 8px 16px;
-        font-size: 14px;
-    }
-    /* ===== ESTILOS ESPECÍFICOS DO CALLER ===== */
-
-/* Elementos internos posicionados dentro da box-principal */
-.logo-solemur {
-    position: absolute;
-    top: 7%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 35%;
-    height: auto;
-}
-
-h1 {
-    position: absolute;
-    top: 10%;
-    left: 50%;
-    transform: translateX(-50%);
-    color: #333;
-    font-size: 7vw;
-    white-space: nowrap;
-    text-align: center;
-}
-
-h2 {
-    position: absolute;
-    top: 15%;
-    left: 50%;
-    transform: translateX(-50%);
-    color: #333;
-    font-size: 5vw;
-    text-align: center;
-    width: 80%;
-    max-width: 90%;
-}
-
+/* ===== ESTILOS ESPECÍFICOS DO CALLER ===== */
 .btn-send {
-    position: absolute;
-    top: 54.5%;
-    left: 31%;
-    transform: translateX(-50%);
     width: 50%;
-    height: 7%;
+    max-width: 300px;
+    height: 50px;
+    margin: 2rem auto;
     background-color: #28a745;
     color: white;
-    font-size: 1.9em;
+    font-size: 1.2rem;
     font-weight: bold;
     border: 2px solid #1e7e34;
     border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.5);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
     text-align: center;
     cursor: pointer;
+    display: block;
+}
+
+.info-box {
+    width: 78%;
+    max-width: 468px;
+    padding: 20px;
+    margin: 2rem auto;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    text-align: center;
 }
 
 .blue-box {
-    position: absolute;
-    top: 27%;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 78%;
-    height: 18%;
-    padding: 20px;
-    background-color: #ffffff;
     border: 2px solid #007bff;
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.5);
-    text-align: center;
 }
 
 .red-box {
-    position: absolute;
-    top: 27%;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 78%;
-    height: 1%;
-    padding: 20px;
-    background-color: #ffffff;
     border: 2px solid #ff4136;
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.5);
-    text-align: center;
+    height: auto;
+    min-height: 60px;
 }
 
 /* Containers para os anúncios do Google */
 .ad-container {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
     width: 90%;
     max-width: 320px;
-    min-width: 280px;
     min-height: 100px;
+    margin: 1rem auto;
     background-color: #f8f9fa;
     display: flex;
     flex-direction: column;
@@ -500,30 +391,7 @@ h2 {
     border: 1px solid #ddd;
     padding: 8px;
     box-sizing: border-box;
-    opacity: 0;
-    z-index: 10;
-    transition: transform 0.5s ease-in-out, opacity 0.5s ease-in-out;
-}
-
-.ad-container-top {
-    top: -150px;
-}
-
-.ad-container-bottom {
-    bottom: -150px;
-}
-
-.ad-container.visible {
-    opacity: 1;
-    transform: translateX(-50%) translateY(0);
-}
-
-.ad-container-top.visible {
-    top: 0px;
-}
-
-.ad-container-bottom.visible {
-    bottom: 0px;
+    position: relative;
 }
 
 .ad-close {
@@ -617,14 +485,15 @@ h2 {
 
 .video-box {
     position: absolute;
-    bottom: 15%;
-    right: 5%;
-    width: 35%;
-    height: 30%;
+    bottom: 80px;
+    right: 10px;
+    width: 30%;
+    max-width: 138px;
+    height: 184px;
     background-color: #ffffff;
     border: 2px solid #28a745;
     border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.5);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
     overflow: hidden;
 }
 
@@ -637,7 +506,7 @@ h2 {
 
 .overlay-info {
     position: absolute;
-    bottom: 0px;
+    bottom: 0;
     left: 0;
     width: 100%;
     text-align: center;
@@ -653,12 +522,74 @@ h2 {
 .user-name {
     font-weight: bold;
     font-size: 14px;
-    margin-bottom: 0px;
+    margin-bottom: 0;
 }
 
 .user-language {
-    font-size: 22px;
+    font-size: 12px;
     line-height: 1.2;
     opacity: 0.9;
 }
+
+/* ===== RESPONSIVIDADE ===== */
+@media (max-width: 768px) {
+    .permission-text {
+        font-size: 0.8rem;
+    }
+    
+    .name-input {
+        font-size: 0.9rem;
+        height: 35px;
+    }
+    
+    .next-button {
+        font-size: 0.9rem;
+        height: 35px;
+    }
+    
+    .video-wrapper.pip,
+    .video-box {
+        width: 25%;
+        height: 120px;
+        bottom: 100px;
+    }
+}
+
+@media (max-width: 480px) {
+    .qr-modal {
+        padding: 20px;
+        width: 90%;
+    }
+    
+    .qr-modal-title {
+        font-size: 1.1rem;
+    }
+    
+    .qr-modal-description {
+        font-size: 0.9rem;
+    }
+    
+    .mode-button {
+        padding: 8px 16px;
+        font-size: 0.9rem;
+    }
+    
+    .main-title {
+        font-size: 1.5rem;
+    }
+    
+    .subtitle {
+        font-size: 1rem;
+    }
+    
+    .permissions-container {
+        width: 85%;
+    }
+    
+    .video-wrapper.pip,
+    .video-box {
+        width: 30%;
+        height: 100px;
+        bottom: 90px;
+    }
 }
