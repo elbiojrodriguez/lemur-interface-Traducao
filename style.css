@@ -370,14 +370,38 @@ h1 {
     text-align: center;
 }
 
+/* ===== BOX AZUL INDEPENDENTE ===== */
 .blue-box {
+    position: absolute;
+    top: 27%; /* Ajuste a posição vertical */
+    left: 50%;
+    transform: translateX(-50%);
+    width: 78%;
+    height: 18%; /* Altura em porcentagem */
+    background-color: #ffffff;
     border: 2px solid #007bff;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.5);
+    text-align: center;
+    box-sizing: border-box;
+    z-index: 2; /* Garante que fique acima de outros elementos */
 }
 
+/* ===== BOX VERMELHO INDEPENDENTE ===== */
 .red-box {
+    position: absolute;
+    top: 50%; /* Posição diferente do azul */
+    left: 50%;
+    transform: translateX(-50%);
+    width: 78%;
+    height: 5%; /* Altura em porcentagem */
+    background-color: #ffffff;
     border: 2px solid #ff4136;
-    height: auto;
-    min-height: 60px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.5);
+    text-align: center;
+    box-sizing: border-box;
+    z-index: 2;
 }
 
 /* Containers para os anúncios do Google */
