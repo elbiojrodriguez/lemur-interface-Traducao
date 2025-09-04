@@ -8,7 +8,7 @@
 </head>
 <body>
     <!-- ===== MODO 1: TELA DE BOAS-VINDAS (USA ESTILOS EXISTENTES) ===== -->
-    <div class="app-mode" id="welcome-mode">
+    <div class="app-mode active" id="welcome-mode">
         <div class="box-principal" id="welcome-screen">
             <div class="loader-container" id="loader-container">
                 <div class="loader"></div>
@@ -36,7 +36,7 @@
         </div>
     </div>
 
-    <!-- ===== MODO 2: TELA PRINCIPAL DO CALLER (SEM ANÚNCIOS) ===== -->
+    <!-- ===== MODO 2: TELA PRINCIPAL DO CALLER ===== -->
     <div class="app-mode" id="main-mode">
         <div class="box-principal">
             <img src="assets/images/solemur.png" alt="Solemur Logo" class="logo-solemur">
@@ -63,25 +63,8 @@
 
     <script src="js/caller-ui.js"></script>
     
-    <!-- Script para gerenciar as transições entre telas -->
+    <!-- Script para desativar anúncios -->
     <script>
-        // Inicialmente mostra apenas a tela de boas-vindas
-        document.getElementById('welcome-mode').classList.add('active');
-        document.getElementById('main-mode').classList.remove('active');
-        
-        // Quando clicar no botão "Next" na tela de boas-vindas
-        document.getElementById('next-button-welcome').addEventListener('click', function() {
-            // Esconde a tela de boas-vindas
-            document.getElementById('welcome-mode').classList.remove('active');
-            
-            // Mostra a tela principal
-            document.getElementById('main-mode').classList.add('active');
-            
-            // Atualiza o nome do usuário se foi inserido
-            const userName = document.getElementById('name-input').value || 'Usuário';
-            document.getElementById('user-name-display').textContent = userName;
-        });
-        
         // Desabilita função de anúncios (caso exista no caller-ui.js)
         if (typeof startAdCycle === 'function') {
             window.startAdCycle = function() {};
