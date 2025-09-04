@@ -36,7 +36,7 @@
         </div>
     </div>
 
-    <!-- ===== MODO 2: TELA PRINCIPAL DO CALLER ===== -->
+    <!-- ===== MODO 2: TELA PRINCIPAL DO CALLER (SUBSTITUÍDA PELO MÓDULO 3) ===== -->
     <div class="app-mode" id="main-mode">
         <div class="box-principal">
             <img src="assets/images/solemur.png" alt="Solemur Logo" class="logo-solemur">
@@ -63,9 +63,9 @@
 
     <script src="js/caller-ui.js"></script>
     
-    <!-- Script para desativar anúncios -->
+    <!-- Script simplificado para desabilitar anúncios -->
     <script>
-        // Desabilita função de anúncios (caso exista no caller-ui.js)
+        // Desabilita função de anúncios se existir
         if (typeof startAdCycle === 'function') {
             window.startAdCycle = function() {};
         }
