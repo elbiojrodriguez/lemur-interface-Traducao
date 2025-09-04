@@ -4,109 +4,34 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EchoMeP2P - Comunicação Cruzada</title>
-    <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
-    <script src="https://lemur-signal.onrender.com/socket.io/socket.io.js"></script>
+    
+    <!-- ✅ SCRIPTS EXTERNOS COM DEFER -->
+    <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js" defer></script>
+    <script src="https://lemur-signal.onrender.com/socket.io/socket.io.js" defer></script>
+    
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <!-- Modo 1: Boas-vindas e Permissões -->
-    <div class="app-mode active" id="welcome-mode">
-        <div class="box-principal" id="welcome-screen">
-            <div class="loader-container" id="loader-container">
-                <div class="loader"></div>
-            </div>
+    <!-- ... (todo o conteúdo do body permanece IGUAL) ... -->
 
-            <img src="assets/images/lemur.png" alt="Lemur Logo" class="logo">
-            <h1>EchoMeP2P</h1>
-            <div class="translator-label" id="translator-label">Live translation. No filters. No platform.</div>
-            <h2 id="welcome-title">Welcome!</h2>
-      
-            <input type="text" class="name-input" id="name-input" placeholder="Your name" />
-            
-            <div class="permissions-container">
-                <div class="permission-item">
-                    <div class="permission-checkbox" id="camera-checkbox"></div>
-                    <div class="permission-text" id="camera-text">Allow camera access</div>
-                </div>
-                <div class="permission-item">
-                    <div class="permission-checkbox" id="microphone-checkbox"></div>
-                    <div class="permission-text" id="microphone-text">Allow microphone access</div>
-                </div>
-            </div>
-            
-            <button class="next-button" id="next-button-welcome">Next</button>
-        </div>
-    </div>
-
-    <!-- Modo 2: Geração de QR Code -->
-    <div class="app-mode" id="qrcode-mode">
-        <div class="qr-screen">
-            <div class="qr-modal">
-             <h2 id="qr-modal-title">This is your online key</h2>
-                <p class="qr-modal-description" id="qr-modal-description">You can ask to scan, share or print on your business card.</p>
-                <div class="qr-modal-content">
-                    <div id="qrcode-modal" class="qrcode-container"></div>
-                    <div class="url-display" id="url-display-modal">
-                        QR Code Content: <br><span id="url-content-modal"></span>
-                    </div>
-                    <button class="mode-button" id="next-button-qrcode">Start Connection</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modo 3: Comunicação WebRTC (SUBSTITUÍDO PELO MÓDULO 3 COMPLETO) -->
-    <div class="app-mode" id="communication-mode">
-        <div class="box-principal">
-            <img src="assets/images/lemur.png" alt="Lemur Logo" class="logo">
-            <h1>EchoMeP2P</h1>
-            <div class="translator-label" id="translator-label">Live translation. No filters. No platform.</div>   
-            
-            <button class="btn-send" id="send-button">SEND🚀</button>
-            
-            <!-- Box Azul -->
-            <div class="blue-box"></div>
-            
-            <!-- Box Vermelho -->
-            <div class="red-box"></div>
-            
-            <!-- Box de vídeo -->
-            <div class="video-box">
-                <img src="assets/images/lemur.png" class="camera-feed" alt="Video feed">
-                <div class="overlay-info">
-                    <div class="user-name" id="user-name-display">Usuário</div>
-                    <div class="user-language">🇧🇷</div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script src="core/internet-config.js"></script>
-    <script src="core/webrtc-core.js"></script>
-    <script src="js/qr-code-utils.js"></script>
-    <script type="module" src="js/receiver-ui.js"></script>
+    <!-- ✅ SCRIPTS LOCAIS COM DEFER -->
+    <script src="core/internet-config.js" defer></script>
+    <script src="core/webrtc-core.js" defer></script>
+    <script src="js/qr-code-utils.js" defer></script>
+    <script type="module" src="js/receiver-ui.js" defer></script>
     
-    <!-- Script do módulo 3 para tradução automática (CORRIGIDO) -->
+    <!-- Script do módulo 3 para tradução automática -->
     <script>
-              
-        // Aguarda o carregamento completo da página
         document.addEventListener('DOMContentLoaded', function() {
-            // Configura a transição para a terceira tela
             const nextButtonQRCode = document.getElementById('next-button-qrcode');
             if (nextButtonQRCode) {
                 nextButtonQRCode.addEventListener('click', function() {
-                    // Aplica as características do módulo 3 quando entrar na terceira tela
                     document.getElementById('communication-mode').classList.add('active');
-                    
-                    // Atualiza o nome do usuário se foi inserido na primeira tela
                     const userName = document.getElementById('name-input').value || 'Usuário';
                     document.getElementById('user-name-display').textContent = userName;
-                    
-                    // Aqui viria a lógica de tradução automática do módulo 3
-                    // baseada no idioma do navegador
                 });
             }
         });
     </script>
 </body>
-</html>   
+</html>
