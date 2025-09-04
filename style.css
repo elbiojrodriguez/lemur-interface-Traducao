@@ -41,11 +41,17 @@ body {
     margin-bottom: 5%;
 }
 
-.main-title {
+h1 {
+    position: absolute;
+    top: 10%; /* Ajuste esta porcentagem */
+    left: 50%;
+    transform: translateX(-50%);
     color: #333;
-    font-size: 1.8rem;
-    margin: 0.5rem 0;
+    font-size: 7vw;
     white-space: nowrap;
+    text-align: center;
+    margin: 0;
+    z-index: 5;
 }
 
 .subtitle {
