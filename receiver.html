@@ -55,7 +55,7 @@
         </div>
     </div>
 
-    <!-- Modo 3: Comunicação WebRTC (SUBSTITUÍDO PELO MÓDULO 3) -->
+    <!-- Modo 3: Comunicação WebRTC (SUBSTITUÍDO PELO MÓDULO 3 COMPLETO) -->
     <div class="app-mode" id="communication-mode">
         <div class="box-principal">
             <img src="assets/images/solemur.png" alt="Solemur Logo" class="logo-solemur">
@@ -85,12 +85,30 @@
     <script src="js/qr-code-utils.js"></script>
     <script type="module" src="js/receiver-ui.js"></script>
     
-    <!-- Script para desativar anúncios -->
+    <!-- Script do módulo 3 para tradução automática -->
     <script>
-        // Desabilita função de anúncios (caso exista)
+        // Remove a tela de boas-vindas do DOM
+        const welcomeMode = document.getElementById('welcome-mode');
+        if (welcomeMode) welcomeMode.remove();
+        
+        // Remove os anúncios
+        const adTop = document.getElementById('ad-top');
+        const adBottom = document.getElementById('ad-bottom');
+        if (adTop) adTop.remove();
+        if (adBottom) adBottom.remove();
+        
+        // Força modo ativo
+        document.getElementById('main-mode').classList.add('active');
+        
+        // Desabilita função de anúncios
         if (typeof startAdCycle === 'function') {
             window.startAdCycle = function() {};
         }
+        
+        // Simula que veio da tela de boas-vindas
+        setTimeout(() => {
+            document.getElementById('user-name-display').textContent = 'Usuário Teste';
+        }, 1000);
     </script>
 </body>
 </html>
