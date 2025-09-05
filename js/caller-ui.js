@@ -1,3 +1,4 @@
+
 // ===== CONFIGURAÇÕES =====
 const TRANSLATE_ENDPOINT = 'https://chat-tradutor.onrender.com/translate';
 const FIREBASE_API_URL = 'https://seu-servidor-firebase.com/check-online';
@@ -7,26 +8,17 @@ let languageFlags = {};
 let rtcCore = null;
 
 // ===== TRADUÇÃO =====
-const textsToTranslateWelcome = {
-    "welcome-title": "Welcome!", 
-    "translator-label-welcome": "Live translation. No filters. No platform.",
-    "name-input": "Your name", 
-    "next-button-welcome": "Next", 
-    "camera-text": "Allow camera access",
-    "microphone-text": "Allow microphone access"
-};
-
-const textsToTranslateMain = {
-    "translator-label-main": "Live translation. No filters. No platform.",
-    "callActionBtn": "SEND🚀"
+const textsToTranslate = {
+    "welcome-title": "Welcome!", "translator-label": "Live translation. No filters. No platform.",
+    "name-input": "Your name", "next-button-welcome": "Next", "camera-text": "Allow camera access",
+    "microphone-text": "Allow microphone access", "send-button": "SEND🚀"
 };
 
 async function translateText(text, targetLang) {
     if (targetLang === 'en') return text;
     try {
         const response = await fetch(TRANSLATE_ENDPOINT, {
-            method: 'POST', 
-            headers: { 'Content-Type': 'application/json' },
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ text, targetLang })
         });
         const result = await response.json();
@@ -43,11 +35,7 @@ async function loadLanguageFlags() {
         languageFlags = await response.json();
     } catch (error) {
         console.error('Erro ao carregar bandeiras:', error);
-        languageFlags = {
-            'en':'🇺🇸','es':'🇪🇸','pt':'🇧🇷','fr':'🇫🇷','de':'🇩🇪',
-            'it':'🇮🇹','ja':'🇯🇵','zh':'🇨🇳','ru':'🇷🇺','ar':'🇸🇦',
-            'hi':'🇮🇳','ko':'🇰🇷'
-        };
+        languageFlags = {'en':'🇺🇸','es':'🇪🇸','pt':'🇧🇷','fr':'🇫🇷','de':'🇩🇪','it':'🇮🇹','ja':'🇯🇵','zh':'🇨🇳','ru':'🇷🇺','ar':'🇸🇦','hi':'🇮🇳','ko':'🇰🇷'};
     }
 }
 
@@ -58,33 +46,16 @@ function getLanguageFlag(langCode) {
     return languageFlags[baseLang] || '🌐';
 }
 
-async function translateMainScreen(browserLang) {
-    for (const [elementId, text] of Object.entries(textsToTranslateMain)) {
-        try {
-            const translated = await translateText(text, browserLang);
-            const element = document.getElementById(elementId);
-            if (element) element.textContent = translated;
-        } catch (error) {
-            console.error(`Erro ao traduzir ${elementId}:`, error);
-        }
-    }
-}
-
 function sendUserMetadata(targetId, userName, userLang) {
     if (window.socket) {
-        window.socket.emit('user-metadata', { 
-            to: targetId, 
-            name: userName, 
-            lang: userLang 
-        });
+        window.socket.emit('user-metadata', { to: targetId, name: userName, lang: userLang });
     }
 }
 
 async function checkUserOnline(targetBrowserId, firebaseToken) {
     try {
         const response = await fetch(FIREBASE_API_URL, {
-            method: 'POST', 
-            headers: { 'Content-Type': 'application/json' },
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ targetBrowserId, token: firebaseToken })
         });
         const result = await response.json();
@@ -98,8 +69,7 @@ async function checkUserOnline(targetBrowserId, firebaseToken) {
 async function wakeUpUser(targetBrowserId, firebaseToken) {
     try {
         await fetch('https://seu-servidor-firebase.com/wake-up', {
-            method: 'POST', 
-            headers: { 'Content-Type': 'application/json' },
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ targetBrowserId, token: firebaseToken })
         });
     } catch (error) {
@@ -108,18 +78,13 @@ async function wakeUpUser(targetBrowserId, firebaseToken) {
 }
 
 function switchMode(modeId) {
-    document.querySelectorAll('.app-mode').forEach(mode => {
-        mode.classList.remove('active');
-    });
+    document.querySelectorAll('.app-mode').forEach(mode => mode.classList.remove('active'));
     document.getElementById(modeId).classList.add('active');
 }
 
 async function requestMediaPermissions(type) {
     try {
-        const constraints = { 
-            video: type === 'camera', 
-            audio: type === 'microphone' 
-        };
+        const constraints = { video: type === 'camera', audio: type === 'microphone' };
         const stream = await navigator.mediaDevices.getUserMedia(constraints);
         stream.getTracks().forEach(track => track.stop());
         return true;
@@ -132,41 +97,25 @@ async function requestMediaPermissions(type) {
 // ===== WEBRTC =====
 async function setupWebRTC() {
     try {
-        // ✅ CORREÇÃO: Inicializar WebRTC CORRETAMENTE
-        rtcCore = new WebRTCCore();
-        
-        // ✅ Usar browserid do QR code (NÃO gerar UUID)
-        const urlParams = new URLSearchParams(window.location.search);
-        const targetBrowserId = urlParams.get('browserid');
-        const myId = targetBrowserId; // ✅ Usar o ID do QR code
-        
-        rtcCore.initialize(myId);
-        rtcCore.setupSocketHandlers(); // ✅ CONFIGURAR HANDLERS PRIMEIRO
-        
-        console.log("✅ Caller ID:", myId); // ✅ Deve ser "936ff2cd"
-        
-        const connectionStatus = document.querySelector('.connection-status');
-        const connectionText = document.getElementById('connection-text');
-        connectionText.textContent = 'Conectando...';
-        connectionStatus.classList.remove('error', 'connected');
-        
         await loadLanguageFlags();
         
+        const urlParams = new URLSearchParams(window.location.search);
+        const targetBrowserId = urlParams.get('browserid');
         const firebaseToken = urlParams.get('token');
         const userLang = urlParams.get('lang');
         const userName = urlParams.get('name') || 'Usuário';
-        
-        const browserLang = (navigator.language || 'en').split('-')[0];
-        await translateMainScreen(browserLang);
         
         const userFlag = getLanguageFlag(userLang);
         document.getElementById('user-name-display').textContent = userName;
         document.querySelector('.user-language').textContent = userFlag;
 
-        const localStream = await navigator.mediaDevices.getUserMedia({ 
-            video: true, 
-            audio: false 
-        });
+        // ✅ CORREÇÃO: WebRTCCore global (já carregado pelo HTML)
+        rtcCore = new window.WebRTCCore();
+        const myId = crypto.randomUUID().substr(0, 8);
+        rtcCore.initialize(myId);
+        rtcCore.setupSocketHandlers();
+
+        const localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
 
         if (targetBrowserId) {
             document.getElementById('callActionBtn').style.display = 'block';
@@ -186,21 +135,13 @@ async function setupWebRTC() {
             rtcCore.startCall(targetBrowserId, localStream);
         });
 
-        // ✅ Configurar callback de stream remoto
         rtcCore.setRemoteStreamCallback(remoteStream => {
             remoteStream.getAudioTracks().forEach(track => track.enabled = false);
             const remoteVideo = document.getElementById('remoteVideo');
             if (remoteVideo) remoteVideo.srcObject = remoteStream;
-            
-            connectionText.textContent = 'Conectado!';
-            connectionStatus.classList.add('connected');
         });
-        
     } catch (error) {
         console.error('Erro no WebRTC:', error);
-        const connectionText = document.getElementById('connection-text');
-        connectionText.textContent = 'Erro na conexão. Tente novamente.';
-        document.querySelector('.connection-status').classList.add('error');
     }
 }
 
@@ -220,17 +161,13 @@ async function initApp() {
 
     const browserLang = (navigator.language || 'en').split('-')[0];
     
-    // Traduzir primeira tela
-    for (const [elementId, text] of Object.entries(textsToTranslateWelcome)) {
+    for (const [elementId, text] of Object.entries(textsToTranslate)) {
         try {
             const translated = await translateText(text, browserLang);
             const element = document.getElementById(elementId);
             if (element) {
-                if (elementId === 'name-input') {
-                    element.placeholder = translated;
-                } else {
-                    element.textContent = translated;
-                }
+                if (elementId === 'name-input') element.placeholder = translated;
+                else element.textContent = translated;
             }
         } catch (error) {
             console.error(`Erro ao traduzir ${elementId}:`, error);
@@ -257,7 +194,7 @@ async function initApp() {
 
         switchMode('main-mode');
         document.getElementById('user-name-display').textContent = userName;
-        setupWebRTC();
+        setTimeout(setupWebRTC, 1000);
     });
 }
 
