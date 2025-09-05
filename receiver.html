@@ -61,8 +61,7 @@
     <!-- Modo 3: Comunicação WebRTC -->
     <div class="app-mode" id="communication-mode">
         <div class="box-principal">
-            <!-- ✅ ID de 7 dígitos (ÚNICA ADIÇÃO NO HTML) -->
-            <div class="user-id-display" id="user-id-display">Seu ID: Carregando...</div>
+            <!-- ✅ ID de 7 dígitos (será adicionado dinamicamente) -->
             
             <img src="assets/images/lemur.png" alt="Lemur Logo" class="logo">
             <h1>EchoMeP2P</h1>
@@ -80,7 +79,7 @@
             <!-- Box Vermelho -->
             <div class="red-box"></div>
             
-            <!-- Box de vídeo -->
+            <!-- ✅ ALTERAR O BOX DE VÍDEO PARA USAR <video> EM VEZ DE <img> -->
             <div class="video-box">
                 <img src="assets/images/lemur.png" class="camera-feed" alt="Video feed">
                 <div class="overlay-info">
@@ -96,163 +95,5 @@
     <script src="core/webrtc-core.js" defer></script>
     <script src="js/qr-code-utils.js" defer></script>
     <script type="module" src="js/receiver-ui.js" defer></script>
-    
-    <!-- ✅ SCRIPT PRINCIPAL (MANTIDO + WEBRTC) -->
-    <script>
-        // ===== CONFIGURAÇÃO DE TRADUÇÃO =====
-        const TRANSLATE_ENDPOINT = 'https://chat-tradutor.onrender.com/translate';
-
-        const textsToTranslateWelcome = {
-            "welcome-title": "Welcome!",
-            "translator-label": "Live translation. No filters. No platform.",
-            "name-input": "Your name",
-            "next-button-welcome": "Next",
-            "camera-text": "Allow camera access",
-            "microphone-text": "Allow microphone access"
-        };
-
-        const textsToTranslateQR = {
-            "qr-modal-title": "This is your online key",
-            "qr-modal-description": "You can ask to scan, share or print on your business card.",
-            "next-button-qrcode": "Start Connection"
-        };
-
-        async function translateText(text, targetLang) {
-            try {
-                if (targetLang === 'en') return text;
-                const response = await fetch(TRANSLATE_ENDPOINT, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ text, targetLang })
-                });
-                const result = await response.json();
-                return result.translatedText || text;
-            } catch (error) {
-                console.error('Erro na tradução:', error);
-                return text;
-            }
-        }
-
-        // ===== FUNÇÕES DE NAVEGAÇÃO =====
-        function switchMode(modeId) {
-            document.querySelectorAll('.app-mode').forEach(mode => {
-                mode.classList.remove('active');
-            });
-            document.getElementById(modeId).classList.add('active');
-        }
-
-        // ===== FUNÇÃO PARA SOLICITAÇÃO DE PERMISSÕES =====
-        async function requestMediaPermissions() {
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ 
-                    video: true, 
-                    audio: true 
-                });
-                stream.getTracks().forEach(track => track.stop());
-                return true;
-            } catch (error) {
-                console.error('Erro ao acessar dispositivos:', error);
-                return false;
-            }
-        }
-
-        // ===== FUNÇÃO PARA GERAR QR CODE =====
-        function generateQRCode(name) {
-            const urlParams = new URLSearchParams(window.location.search);
-            const token = urlParams.get('token');
-            const browserFullLang = navigator.language || 'pt-BR';
-            const fixedId = token ? token.slice(-7) : 'unknown';
-            
-            const fullUrl = `https://lemur-interface-traducao.netlify.app/caller.html?token=${encodeURIComponent(token || '')}&browserId=${encodeURIComponent(fixedId)}&lang=${encodeURIComponent(browserFullLang)}&name=${encodeURIComponent(name || 'User')}`;
-            
-            console.log("QR Code URL:", fullUrl);
-            
-            // Gera o QR code
-            new QRCode(document.getElementById("qrcode-modal"), {
-                text: fullUrl,
-                width: 200,
-                height: 200
-            });
-            
-            document.getElementById('url-content-modal').textContent = fullUrl;
-        }
-
-        // ===== WEBRTC INTEGRATION (ÚNICA ADIÇÃO REAL) =====
-        let rtcCore = null;
-        let localStream = null;
-
-        function initializeWebRTC(userId) {
-            // Usa o WebRTC core que já existe
-            rtcCore = new window.WebRTCCore();
-            rtcCore.initialize(userId);
-            rtcCore.setupSocketHandlers();
-
-            // Configura callback para vídeo recebido
-            rtcCore.setRemoteStreamCallback(stream => {
-                // 🔇 Silencia áudio recebido
-                stream.getAudioTracks().forEach(track => track.enabled = false);
-                
-                // Exibe vídeo remoto
-                const remoteVideo = document.getElementById('remoteVideo');
-                remoteVideo.srcObject = stream;
-                remoteVideo.style.display = 'block';
-                
-                // Oculta a imagem estática
-                document.querySelector('.camera-feed').style.display = 'none';
-            });
-
-            // Configura handler para chamadas recebidas
-            rtcCore.onIncomingCall = (offer) => {
-                if (!localStream) {
-                    console.warn("Stream local não disponível");
-                    return;
-                }
-
-                rtcCore.handleIncomingCall(offer, localStream, (remoteStream) => {
-                    // 🔇 Silencia áudio recebido
-                    remoteStream.getAudioTracks().forEach(track => track.enabled = false);
-
-                    // Exibe vídeo remoto
-                    const remoteVideo = document.getElementById('remoteVideo');
-                    remoteVideo.srcObject = remoteStream;
-                    remoteVideo.style.display = 'block';
-                    
-                    // Oculta a imagem estática
-                    document.querySelector('.camera-feed').style.display = 'none';
-                });
-            };
-        }
-
-        // ===== CÓDIGO PRINCIPAL (MANTIDO ORIGINAL) =====
-        document.addEventListener('DOMContentLoaded', async () => {
-            // [TODO O CÓDIGO ORIGINAL DE TRADUÇÃO E INTERAÇÃO]
-            // ... (todo o código que JÁ FUNCIONAVA antes)
-            
-            // ⚠️⚠️⚠️ IMPORTANTE: MANTENHA TODO O CÓDIGO ORIGINAL AQUI ⚠️⚠️⚠️
-            // O código de tradução, event listeners, etc deve ser MANTIDO
-            
-            // ✅ APENAS ADICIONE ISSO no event listener do botão QR Code:
-            if (nextButtonQrcode) {
-                nextButtonQrcode.addEventListener('click', async () => {
-                    // ... código existente ...
-                    
-                    // ✅ ADICIONE APENAS ESTAS LINHAS:
-                    try {
-                        // Obtém stream da câmera
-                        localStream = await navigator.mediaDevices.getUserMedia({ 
-                            video: true, 
-                            audio: false 
-                        });
-                        
-                        // Inicializa WebRTC com o ID
-                        initializeWebRTC(fixedId);
-                        
-                    } catch (error) {
-                        console.error('Erro ao inicializar WebRTC:', error);
-                    }
-                });
-            }
-        });
-    </script>
 </body>
 </html>
