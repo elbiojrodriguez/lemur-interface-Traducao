@@ -9,17 +9,17 @@ let rtcCore = null;
 // ===== TRADUÇÃO =====
 const textsToTranslateWelcome = {
     "welcome-title": "Welcome!", 
-    "translator-label": "Live translation. No filters. No platform.",
+    "translator-label-welcome": "Live translation. No filters. No platform.",
     "name-input": "Your name", 
     "next-button-welcome": "Next", 
     "camera-text": "Allow camera access",
     "microphone-text": "Allow microphone access"
 };
 
-// ✅ ADICIONAR: Textos para traduzir a SEGUNDA TELA
+// ✅ TEXTOS DA SEGUNDA TELA COM IDs ÚNICOS
 const textsToTranslateMain = {
-    "translator-label": "Live translation. No filters. No platform.",
-    "send-button": "SEND🚀"
+    "translator-label-main": "Live translation. No filters. No platform.",
+    "callActionBtn": "SEND🚀"
 };
 
 async function translateText(text, targetLang) {
@@ -146,7 +146,7 @@ async function setupWebRTC() {
         
         const browserLang = (navigator.language || 'en').split('-')[0];
         
-        // ✅ TRADUZIR SEGUNDA TELA ANTES DE CONFIGURAR WEBRTC
+        // ✅ TRADUZIR SEGUNDA TELA
         await translateMainScreen(browserLang);
         
         const userFlag = getLanguageFlag(userLang);
@@ -244,8 +244,6 @@ async function initApp() {
 
         switchMode('main-mode');
         document.getElementById('user-name-display').textContent = userName;
-        
-        // ✅ AGORA A SEGUNDA TELA SERÁ TRADUZIDA DENTRO DO setupWebRTC
         setTimeout(setupWebRTC, 1000);
     });
 }
