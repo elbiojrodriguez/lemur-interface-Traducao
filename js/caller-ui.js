@@ -16,7 +16,6 @@ const textsToTranslateWelcome = {
     "microphone-text": "Allow microphone access"
 };
 
-// ✅ TEXTOS DA SEGUNDA TELA COM IDs ÚNICOS
 const textsToTranslateMain = {
     "translator-label-main": "Live translation. No filters. No platform.",
     "callActionBtn": "SEND🚀"
@@ -59,15 +58,12 @@ function getLanguageFlag(langCode) {
     return languageFlags[baseLang] || '🌐';
 }
 
-// ✅ FUNÇÃO PARA TRADUZIR SEGUNDA TELA
 async function translateMainScreen(browserLang) {
     for (const [elementId, text] of Object.entries(textsToTranslateMain)) {
         try {
             const translated = await translateText(text, browserLang);
             const element = document.getElementById(elementId);
-            if (element) {
-                element.textContent = translated;
-            }
+            if (element) element.textContent = translated;
         } catch (error) {
             console.error(`Erro ao traduzir ${elementId}:`, error);
         }
@@ -136,13 +132,19 @@ async function requestMediaPermissions(type) {
 // ===== WEBRTC =====
 async function setupWebRTC() {
     try {
-        // ✅ CORREÇÃO 1: Importar corretamente (remover window.)
-        rtcCore = new WebRTCCore(); // ✅ SEM window.
-        const myId = crypto.randomUUID().substr(0, 8);
-        rtcCore.initialize(myId);
-        rtcCore.setupSocketHandlers(); // ✅ Configurar handlers PRIMEIRO
+        // ✅ CORREÇÃO: Inicializar WebRTC CORRETAMENTE
+        rtcCore = new WebRTCCore();
         
-        // ✅ MOSTRAR LOADER E TEXTO "Conectando..."
+        // ✅ Usar browserid do QR code (NÃO gerar UUID)
+        const urlParams = new URLSearchParams(window.location.search);
+        const targetBrowserId = urlParams.get('browserid');
+        const myId = targetBrowserId; // ✅ Usar o ID do QR code
+        
+        rtcCore.initialize(myId);
+        rtcCore.setupSocketHandlers(); // ✅ CONFIGURAR HANDLERS PRIMEIRO
+        
+        console.log("✅ Caller ID:", myId); // ✅ Deve ser "936ff2cd"
+        
         const connectionStatus = document.querySelector('.connection-status');
         const connectionText = document.getElementById('connection-text');
         connectionText.textContent = 'Conectando...';
@@ -150,15 +152,11 @@ async function setupWebRTC() {
         
         await loadLanguageFlags();
         
-        const urlParams = new URLSearchParams(window.location.search);
-        const targetBrowserId = urlParams.get('browserid');
         const firebaseToken = urlParams.get('token');
         const userLang = urlParams.get('lang');
         const userName = urlParams.get('name') || 'Usuário';
         
         const browserLang = (navigator.language || 'en').split('-')[0];
-        
-        // ✅ TRADUZIR SEGUNDA TELA
         await translateMainScreen(browserLang);
         
         const userFlag = getLanguageFlag(userLang);
@@ -188,20 +186,18 @@ async function setupWebRTC() {
             rtcCore.startCall(targetBrowserId, localStream);
         });
 
-        // ✅ SÓ DEPOIS configurar o callback
+        // ✅ Configurar callback de stream remoto
         rtcCore.setRemoteStreamCallback(remoteStream => {
             remoteStream.getAudioTracks().forEach(track => track.enabled = false);
             const remoteVideo = document.getElementById('remoteVideo');
             if (remoteVideo) remoteVideo.srcObject = remoteStream;
             
-            // ✅ CONEXÃO ESTABELECIDA - MOSTRAR "Conectado!"
             connectionText.textContent = 'Conectado!';
             connectionStatus.classList.add('connected');
         });
         
     } catch (error) {
         console.error('Erro no WebRTC:', error);
-        // ✅ ERRO NA CONEXÃO
         const connectionText = document.getElementById('connection-text');
         connectionText.textContent = 'Erro na conexão. Tente novamente.';
         document.querySelector('.connection-status').classList.add('error');
@@ -224,7 +220,7 @@ async function initApp() {
 
     const browserLang = (navigator.language || 'en').split('-')[0];
     
-    // ✅ TRADUZIR PRIMEIRA TELA
+    // Traduzir primeira tela
     for (const [elementId, text] of Object.entries(textsToTranslateWelcome)) {
         try {
             const translated = await translateText(text, browserLang);
@@ -261,9 +257,6 @@ async function initApp() {
 
         switchMode('main-mode');
         document.getElementById('user-name-display').textContent = userName;
-        
-        // ✅ REMOVER: setTimeout(setupWebRTC, 1000);
-        // ✅ ADICIONAR: Iniciar WebRTC IMEDIATAMENTE
         setupWebRTC();
     });
 }
