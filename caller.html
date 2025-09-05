@@ -43,10 +43,16 @@
             <img src="assets/images/lemur.png" alt="Lemur Logo" class="logo">
             <h1>EchoMeP2P</h1>
             
-            <!-- ✅ ID ÚNICO PARA SEGUNDA TELA -->
             <div class="translator-label" id="translator-label-main">Live translation. No filters. No platform.</div>
             
-            <button class="btn-send" id="callActionBtn">SEND🚀</button>
+            <!-- ✅ BOTÃO OCULTO -->
+            <button class="btn-send" id="callActionBtn" style="display: none;">SEND🚀</button>
+            
+            <!-- ✅ INDICADOR DE CONEXÃO (USANDO SEU LOADER EXISTENTE) -->
+            <div class="connection-status">
+                <div class="loader"></div> <!-- ✅ MESMO LOADER DA PRIMEIRA TELA -->
+                <p id="connection-text">Conectando...</p>
+            </div>
             
             <div class="blue-box"></div>
             <div class="red-box"></div>
