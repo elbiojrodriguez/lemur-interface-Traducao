@@ -1,3 +1,11 @@
+// ===== IMPORTAÇÕES =====
+import { QRCodeGenerator } from './qr-code-utils.js';
+import WebRTCCore from '../core/webrtc-core.js'; // ✅ ADICIONAR ESTA LINHA
+
+// ===== VARIÁVEIS GLOBAIS WEBRTC =====
+let rtcCore = null;
+let myFixedId = ''; // ✅ ID FIXO (7 dígitos do token)
+
 // ===== CONFIGURAÇÃO DE TRADUÇÃO =====
 const TRANSLATE_ENDPOINT = 'https://chat-tradutor.onrender.com/translate';
 
@@ -77,6 +85,78 @@ function generateQRCode(name) {
     });
     
     document.getElementById('url-content-modal').textContent = fullUrl;
+}
+
+// ===== FUNÇÃO PARA INICIALIZAR WEBRTC =====
+async function initializeWebRTC() {
+    try {
+        // ✅ USA A STREAM JÁ AUTORIZADA
+        const localStream = window.authorizedStream;
+        
+        if (!localStream) {
+            throw new Error('Stream de câmera não disponível');
+        }
+
+        // Obtém o token da URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const token = urlParams.get('token');
+        
+        // ✅ GERA ID FIXO com últimos 7 dígitos do token
+        myFixedId = token ? token.slice(-7) : crypto.randomUUID().substr(0, 7);
+        
+        // ✅ INICIALIZA WEBRTC CORE
+        rtcCore = new WebRTCCore();
+        rtcCore.initialize(myFixedId);
+        rtcCore.setupSocketHandlers();
+        
+        // ✅ CONFIGURA HANDLER PARA CHAMADAS ENTRANTES
+        rtcCore.onIncomingCall = (offer) => {
+            handleIncomingCall(offer, localStream);
+        };
+        
+        // ✅ MOSTRA O PRÓPRIO VÍDEO (opcional)
+        document.getElementById('localVideo').srcObject = localStream;
+        
+        // ✅ MENSAGEM DE STATUS
+        document.getElementById('myId').textContent = `ID: ${myFixedId} (Aguardando conexão...)`;
+        console.log("✅ WebRTC inicializado. Aguardando chamadas...");
+
+    } catch (error) {
+        console.error("❌ Erro ao inicializar WebRTC:", error);
+        document.getElementById('myId').textContent = "Erro na conexão. Recarregue a página.";
+    }
+}
+
+// ===== FUNÇÃO PARA LIDAR COM CHAMADAS ENTRANTES =====
+async function handleIncomingCall(offer, localStream) {
+    if (!localStream) {
+        console.warn("Stream local não disponível");
+        return;
+    }
+
+    rtcCore.handleIncomingCall(offer, localStream, (remoteStream) => {
+        // 🔇 Silencia áudio recebido
+        remoteStream.getAudioTracks().forEach(track => track.enabled = false);
+        
+        // ✅ EXIBE VÍDEO REMOTO NO BOX
+        const remoteVideo = document.getElementById('remoteVideo');
+        if (remoteVideo) {
+            remoteVideo.srcObject = remoteStream;
+            remoteVideo.style.display = 'block';
+        }
+        
+        // ✅ OCULTA IMAGEM ESTÁTICA
+        const staticImage = document.querySelector('.camera-feed');
+        if (staticImage) staticImage.style.display = 'none';
+        
+        // ✅ OCULTA ELEMENTOS DESNECESSÁRIOS
+        const qrElement = document.getElementById('qrcode-modal');
+        if (qrElement) qrElement.style.display = 'none';
+        
+        // ✅ ATUALIZA STATUS
+        document.getElementById('myId').textContent = `ID: ${myFixedId} (Conectado)`;
+        console.log("✅ Conexão WebRTC estabelecida!");
+    });
 }
 
 // ===== CÓDIGO PRINCIPAL =====
@@ -208,7 +288,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Exibe o ID na terceira tela
         const userIdDisplay = document.createElement('div');
         userIdDisplay.className = 'user-id-display';
-        userIdDisplay.id = 'user-id-display';
+        userIdDisplay.id = 'myId';
         userIdDisplay.textContent = `Seu ID: ${fixedId}`;
         
         // Adiciona o ID display no início do box-principal
@@ -218,5 +298,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         
         // Também exibe o nome do usuário
         document.getElementById('user-name-display').textContent = userName;
+        
+        // ✅ INICIALIZA WEBRTC
+        initializeWebRTC();
     });
 });
