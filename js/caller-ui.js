@@ -41,6 +41,18 @@ function getLanguageFlag(langCode) {
     return '🌐';
 }
 
+// ✅ FUNÇÃO PARA ENVIAR METADADOS (nome + idioma)
+function sendUserMetadata(targetId, userName, userLang) {
+    // Envia via signaling server (WebSocket)
+    if (window.socket) {
+        window.socket.emit('user-metadata', {
+            to: targetId,
+            name: userName,
+            lang: userLang
+        });
+    }
+}
+
 const textsToTranslateWelcome = {
     "welcome-title": "Welcome!",
     "translator-label": "Live translation. No filters. No platform.",
@@ -240,6 +252,12 @@ async function setupWebRTC() {
                 return;
             }
             
+            // ✅ ENVIA METADADOS ANTES DE INICIAR CHAMADA
+            const userName = document.getElementById('user-name-display').textContent;
+            const userLang = urlParams.get('lang');
+            sendUserMetadata(targetBrowserId, userName, userLang);
+            
+            // Inicia chamada WebRTC
             rtcCore.startCall(targetBrowserId, localStream);
         });
 
