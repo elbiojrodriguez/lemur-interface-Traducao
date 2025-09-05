@@ -4,28 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EchoMeP2P - Comunicação Cruzada</title>
-    
-    <!-- ✅ SCRIPTS EXTERNOS COM DEFER -->
     <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js" defer></script>
     <script src="https://lemur-signal.onrender.com/socket.io/socket.io.js" defer></script>
-    
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <!-- Modo 1: Boas-vindas e Permissões -->
     <div class="app-mode active" id="welcome-mode">
         <div class="box-principal" id="welcome-screen">
-            <div class="loader-container" id="loader-container">
-                <div class="loader"></div>
-            </div>
-
+            <div class="loader-container" id="loader-container"><div class="loader"></div></div>
             <img src="assets/images/lemur.png" alt="Lemur Logo" class="logo">
             <h1>EchoMeP2P</h1>
             <div class="translator-label" id="translator-label">Live translation. No filters. No platform.</div>
             <h2 id="welcome-title">Welcome!</h2>
-      
             <input type="text" class="name-input" id="name-input" placeholder="Your name" />
-            
             <div class="permissions-container">
                 <div class="permission-item">
                     <div class="permission-checkbox" id="camera-checkbox"></div>
@@ -36,7 +28,6 @@
                     <div class="permission-text" id="microphone-text">Allow microphone access</div>
                 </div>
             </div>
-            
             <button class="next-button" id="next-button-welcome">Next</button>
         </div>
     </div>
@@ -61,25 +52,14 @@
     <!-- Modo 3: Comunicação WebRTC -->
     <div class="app-mode" id="communication-mode">
         <div class="box-principal">
-            <!-- ✅ ID de 7 dígitos (será adicionado dinamicamente) -->
-            
             <img src="assets/images/lemur.png" alt="Lemur Logo" class="logo">
             <h1>EchoMeP2P</h1>
             <div class="translator-label" id="translator-label-comm">Live translation. No filters. No platform.</div>   
-            
-            <!-- ✅ Elementos de vídeo (ocultos inicialmente) -->
             <video id="remoteVideo" autoplay playsinline style="display:none;"></video>
             <video id="localVideo" autoplay muted playsinline style="display:none;"></video>
-            
             <button class="btn-send" id="send-button">SEND🚀</button>
-            
-            <!-- Box Azul -->
             <div class="blue-box"></div>
-            
-            <!-- Box Vermelho -->
             <div class="red-box"></div>
-            
-            <!-- ✅ ALTERAR O BOX DE VÍDEO PARA USAR <video> EM VEZ DE <img> -->
             <div class="video-box">
                 <img src="assets/images/lemur.png" class="camera-feed" alt="Video feed">
                 <div class="overlay-info">
@@ -90,7 +70,6 @@
         </div>
     </div>
 
-    <!-- ✅ SCRIPTS LOCAIS (MANTIDOS) -->
     <script src="core/internet-config.js" defer></script>
     <script src="core/webrtc-core.js" defer></script>
     <script src="js/qr-code-utils.js" defer></script>
