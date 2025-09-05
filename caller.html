@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EchoMeP2P - Conectar</title>
     <link rel="stylesheet" href="style.css">
+    <!-- ✅ SCRIPT DO SOCKET.IO (NECESSÁRIO PARA WEBRTC) -->
+    <script src="https://lemur-signal.onrender.com/socket.io/socket.io.js"></script>
 </head>
 <body>
     <!-- ===== MODO 1: TELA DE BOAS-VINDAS ===== -->
@@ -39,20 +41,12 @@
     <!-- ===== MODO 2: TELA PRINCIPAL DO CALLER ===== -->
     <div class="app-mode" id="main-mode">
         <div class="box-principal">
-            <!-- ✅ ID DINÂMICO DO CALLER -->
-            <div class="user-id-display" id="caller-id-display">Seu ID: Carregando...</div>
-            
             <img src="assets/images/lemur.png" alt="Lemur Logo" class="logo">
             <h1>EchoMeP2P</h1>
-            <div class="translator-label" id="translator-label-main">Live translation. No filters. No platform.</div>
+            <div class="translator-label" id="translator-label">Live translation. No filters. No platform.</div>
             
-            <!-- ✅ INPUT PARA DIGITAR O ID DO RECEIVER -->
-            <div class="connection-input">
-                <input type="text" id="target-id-input" placeholder="Digite o ID da conexão" />
-                <button class="btn-connect" id="connect-button">Conectar</button>
-            </div>
-            
-            <button class="btn-send" id="send-button">SEND🚀</button>
+            <!-- ✅ BOTÃO COM ID CORRETO PARA WEBRTC -->
+            <button class="btn-send" id="callActionBtn">SEND🚀</button>
             
             <!-- Box Azul -->
             <div class="blue-box"></div>
@@ -60,13 +54,9 @@
             <!-- Box Vermelho -->
             <div class="red-box"></div>
             
-            <!-- ✅ ELEMENTOS DE VÍDEO (OCULTOS INICIALMENTE) -->
-            <video id="remoteVideo" autoplay playsinline style="display:none;"></video>
-            <video id="localVideo" autoplay muted playsinline style="display:none;"></video>
-            
-            <!-- Box de vídeo (imagem estática inicial) -->
+            <!-- ✅ BOX DE VÍDEO COM ELEMENTO VIDEO (NECESSÁRIO PARA WEBRTC) -->
             <div class="video-box">
-                <img src="assets/images/lemur.png" class="camera-feed" alt="Video feed">
+                <video id="remoteVideo" class="camera-feed" autoplay playsinline></video>
                 <div class="overlay-info">
                     <div class="user-name" id="user-name-display">Usuário</div>
                     <div class="user-language">🇧🇷</div>
@@ -75,252 +65,7 @@
         </div>
     </div>
 
-    <!-- ✅ SCRIPTS EXTERNOS -->
-    <script src="https://lemur-signal.onrender.com/socket.io/socket.io.js" defer></script>
-    
-    <!-- ✅ SCRIPT PRINCIPAL INTEGRADO -->
-    <script>
-        // ===== CONFIGURAÇÃO DE TRADUÇÃO =====
-        const TRANSLATE_ENDPOINT = 'https://chat-tradutor.onrender.com/translate';
-
-        const textsToTranslateWelcome = {
-            "welcome-title": "Welcome!",
-            "translator-label": "Live translation. No filters. No platform.",
-            "name-input": "Your name",
-            "next-button-welcome": "Next",
-            "camera-text": "Allow camera access",
-            "microphone-text": "Allow microphone access"
-        };
-
-        const textsToTranslateMain = {
-            "translator-label-main": "Live translation. No filters. No platform.",
-        };
-
-        async function translateText(text, targetLang) {
-            try {
-                if (targetLang === 'en') return text;
-                const response = await fetch(TRANSLATE_ENDPOINT, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ text, targetLang })
-                });
-                const result = await response.json();
-                return result.translatedText || text;
-            } catch (error) {
-                console.error('Erro na tradução:', error);
-                return text;
-            }
-        }
-
-        // ===== FUNÇÕES DE NAVEGAÇÃO =====
-        function switchMode(modeId) {
-            document.querySelectorAll('.app-mode').forEach(mode => {
-                mode.classList.remove('active');
-            });
-            document.getElementById(modeId).classList.add('active');
-        }
-
-        // ===== FUNÇÃO PARA SOLICITAÇÃO DE PERMISSÕES =====
-        async function requestMediaPermissions() {
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ 
-                    video: true, 
-                    audio: true 
-                });
-                stream.getTracks().forEach(track => track.stop());
-                return true;
-            } catch (error) {
-                console.error('Erro ao acessar dispositivos:', error);
-                return false;
-            }
-        }
-
-        // ===== WEBRTC INTEGRATION =====
-        let rtcCore = null;
-        let localStream = null;
-        let callerId = '';
-
-        function initializeWebRTC(userId) {
-            // Importa e inicializa o WebRTC core
-            import('./core/webrtc-core.js')
-                .then(module => {
-                    const WebRTCCore = module.default;
-                    rtcCore = new WebRTCCore();
-                    rtcCore.initialize(userId);
-                    rtcCore.setupSocketHandlers();
-
-                    // Configura callback para vídeo recebido
-                    rtcCore.setRemoteStreamCallback(stream => {
-                        // 🔇 Silencia áudio recebido
-                        stream.getAudioTracks().forEach(track => track.enabled = false);
-                        
-                        // Exibe vídeo remoto
-                        const remoteVideo = document.getElementById('remoteVideo');
-                        remoteVideo.srcObject = stream;
-                        remoteVideo.style.display = 'block';
-                        
-                        // Oculta a imagem estática
-                        document.querySelector('.camera-feed').style.display = 'none';
-                    });
-
-                    console.log(`✅ Caller registrado como: ${userId}`);
-                })
-                .catch(error => {
-                    console.error('Erro ao carregar WebRTC core:', error);
-                });
-        }
-
-        function startCall(targetId) {
-            if (!rtcCore || !localStream) {
-                console.error('WebRTC não inicializado ou stream não disponível');
-                return;
-            }
-
-            if (!targetId) {
-                alert('Por favor, digite um ID para conectar');
-                return;
-            }
-
-            console.log(`📞 Iniciando chamada para: ${targetId}`);
-            rtcCore.startCall(targetId, localStream);
-        }
-
-        // ===== CÓDIGO PRINCIPAL =====
-        document.addEventListener('DOMContentLoaded', async () => {
-            // Elementos da interface
-            const nextButtonWelcome = document.getElementById('next-button-welcome');
-            const connectButton = document.getElementById('connect-button');
-            const sendButton = document.getElementById('send-button');
-            const targetIdInput = document.getElementById('target-id-input');
-            const nameInput = document.getElementById('name-input');
-            const welcomeScreen = document.getElementById('welcome-screen');
-            const loaderContainer = document.getElementById('loader-container');
-            const cameraCheckbox = document.getElementById('camera-checkbox');
-            const microphoneCheckbox = document.getElementById('microphone-checkbox');
-            const callerIdDisplay = document.getElementById('caller-id-display');
-            
-            // Variáveis de estado
-            let cameraGranted = false;
-            let microphoneGranted = false;
-            let userName = '';
-
-            // ===== PROCESSO DE TRADUÇÃO =====
-            const browserLang = (navigator.language || 'en').split('-')[0];
-            
-            if (loaderContainer) loaderContainer.style.display = 'flex';
-
-            // Traduz textos da primeira tela
-            for (const [elementId, text] of Object.entries(textsToTranslateWelcome)) {
-                try {
-                    const translated = await translateText(text, browserLang);
-                    const element = document.getElementById(elementId);
-                    if (element) {
-                        if (elementId === 'name-input') {
-                            element.placeholder = translated;
-                        } else {
-                            element.textContent = translated;
-                        }
-                    }
-                } catch (error) {
-                    console.error(`Erro ao traduzir ${elementId}:`, error);
-                }
-            }
-
-            // Traduz textos da tela principal
-            for (const [elementId, text] of Object.entries(textsToTranslateMain)) {
-                try {
-                    const translated = await translateText(text, browserLang);
-                    const element = document.getElementById(elementId);
-                    if (element) element.textContent = translated;
-                } catch (error) {
-                    console.error(`Erro ao traduzir ${elementId}:`, error);
-                }
-            }
-
-            if (loaderContainer) loaderContainer.style.display = 'none';
-
-            // Event listeners para checkboxes
-            if (cameraCheckbox) {
-                cameraCheckbox.addEventListener('click', async () => {
-                    cameraGranted = await requestMediaPermissions();
-                    cameraCheckbox.classList.toggle('checked', cameraGranted);
-                });
-            }
-
-            if (microphoneCheckbox) {
-                microphoneCheckbox.addEventListener('click', async () => {
-                    microphoneGranted = await requestMediaPermissions();
-                    microphoneCheckbox.classList.toggle('checked', microphoneGranted);
-                });
-            }
-
-            // Event listener para o botão Next
-            if (nextButtonWelcome) {
-                nextButtonWelcome.addEventListener('click', async () => {
-                    userName = nameInput.value.trim();
-                    let hasError = false;
-
-                    if (!userName) hasError = true;
-                    if (!cameraGranted || !microphoneGranted) hasError = true;
-
-                    if (hasError) {
-                        welcomeScreen.classList.add('error-state');
-                        setTimeout(() => welcomeScreen.classList.remove('error-state'), 1000);
-                        return;
-                    }
-
-                    try {
-                        // Obtém stream da câmera
-                        localStream = await navigator.mediaDevices.getUserMedia({ 
-                            video: true, 
-                            audio: false 
-                        });
-                        
-                        // Gera ID do caller (últimos 7 dígitos do token ou random)
-                        const urlParams = new URLSearchParams(window.location.search);
-                        const token = urlParams.get('token');
-                        callerId = token ? token.slice(-7) : Math.random().toString(36).substr(2, 7);
-                        
-                        // Exibe o ID do caller
-                        if (callerIdDisplay) callerIdDisplay.textContent = `Seu ID: ${callerId}`;
-                        
-                        // Exibe o nome do usuário
-                        const userNameDisplay = document.getElementById('user-name-display');
-                        if (userNameDisplay) userNameDisplay.textContent = userName;
-                        
-                        // Inicializa WebRTC
-                        initializeWebRTC(callerId);
-                        
-                        // Muda para tela principal
-                        switchMode('main-mode');
-                        
-                    } catch (error) {
-                        console.error('Erro ao acessar câmera:', error);
-                        alert('Erro ao acessar a câmera. Por favor, recarregue a página.');
-                    }
-                });
-            }
-
-            // Event listener para o botão Conectar
-            if (connectButton) {
-                connectButton.addEventListener('click', () => {
-                    const targetId = targetIdInput.value.trim();
-                    startCall(targetId);
-                });
-            }
-
-            // Event listener para o botão SEND
-            if (sendButton) {
-                sendButton.addEventListener('click', () => {
-                    const targetId = targetIdInput.value.trim();
-                    if (targetId) {
-                        startCall(targetId);
-                    } else {
-                        alert('Digite um ID para conectar antes de enviar');
-                    }
-                });
-            }
-        });
-    </script>
+    <!-- ✅ SEU SCRIPT DE TRADUÇÃO (MANTIDO INTACTO) -->
+    <script src="js/caller-ui.js" defer></script>
 </body>
 </html>
