@@ -4,21 +4,28 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EchoMeP2P - Comunicação Cruzada</title>
-    <!-- ✅ CORREÇÃO: SCRIPTS NA ORDEM CORRETA -->
-    <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
+    
+    <!-- ✅ SCRIPTS NA ORDEM CORRETA (SOCKET.IO PRIMEIRO, SEM DEFER) -->
     <script src="https://lemur-signal.onrender.com/socket.io/socket.io.js"></script>
+    <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
+    
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <!-- Modo 1: Boas-vindas e Permissões -->
     <div class="app-mode active" id="welcome-mode">
         <div class="box-principal" id="welcome-screen">
-            <div class="loader-container" id="loader-container"><div class="loader"></div></div>
+            <div class="loader-container" id="loader-container">
+                <div class="loader"></div>
+            </div>
+
             <img src="assets/images/lemur.png" alt="Lemur Logo" class="logo">
             <h1>EchoMeP2P</h1>
             <div class="translator-label" id="translator-label">Live translation. No filters. No platform.</div>
             <h2 id="welcome-title">Welcome!</h2>
+      
             <input type="text" class="name-input" id="name-input" placeholder="Your name" />
+            
             <div class="permissions-container">
                 <div class="permission-item">
                     <div class="permission-checkbox" id="camera-checkbox"></div>
@@ -29,6 +36,7 @@
                     <div class="permission-text" id="microphone-text">Allow microphone access</div>
                 </div>
             </div>
+            
             <button class="next-button" id="next-button-welcome">Next</button>
         </div>
     </div>
@@ -55,18 +63,13 @@
         <div class="box-principal">
             <img src="assets/images/lemur.png" alt="Lemur Logo" class="logo">
             <h1>EchoMeP2P</h1>
+            <div class="translator-label" id="translator-label">Live translation. No filters. No platform.</div>   
             
-            <!-- ✅ ELEMENTO PARA MOSTRAR ID DINÂMICO -->
-            <div class="user-id-display" id="myIdDisplay">
-                Seu ID: <span id="receiver-id"></span>
-            </div>
+            <!-- ✅ ELEMENTOS WEBRTC CRÍTICOS -->
+            <video id="remoteVideo" autoplay playsinline style="display:none;"></video>
+            <video id="localVideo" autoplay muted playsinline style="display:none;"></video>
             
-            <div class="translator-label" id="translator-label-comm">Live translation. No filters. No platform.</div>   
-            
-            <!-- ✅ CORREÇÃO: VÍDEOS VISÍVEIS (sem display:none) -->
-            <video id="remoteVideo" autoplay playsinline></video>
-            <video id="localVideo" autoplay muted playsinline></video>
-            
+            <!-- 🎨 ELEMENTOS DECORATIVOS -->
             <button class="btn-send" id="send-button">SEND🚀</button>
             <div class="blue-box"></div>
             <div class="red-box"></div>
@@ -81,12 +84,12 @@
         </div>
     </div>
 
-    <!-- ✅ CORREÇÃO: REMOVER SCRIPTS DESNECESSÁRIOS -->
-    <!-- ❌ REMOVER: <script src="core/internet-config.js" defer></script> -->
-    <!-- ❌ REMOVER: <script src="core/webrtc-core.js" defer></script> -->
-    <!-- ❌ REMOVER: <script src="js/qr-code-utils.js" defer></script> -->
-    
-    <!-- ✅ CORREÇÃO: APENAS O MÓDULO PRINCIPAL SEM DEFER -->
+    <!-- ✅ SCRIPT MODULE SEM DEFER -->
     <script type="module" src="js/receiver-ui.js"></script>
+    
+    <!-- ✅ REMOVIDOS SCRIPTS DESNECESSÁRIOS -->
+    <!-- ❌ REMOVIDO: <script src="core/internet-config.js" defer></script> -->
+    <!-- ❌ REMOVIDO: <script src="core/webrtc-core.js" defer></script> -->
+    <!-- ❌ REMOVIDO: <script src="js/qr-code-utils.js" defer></script> -->
 </body>
 </html>
