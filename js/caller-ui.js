@@ -123,16 +123,22 @@ function switchMode(modeId) {
     document.getElementById(modeId).classList.add('active');
 }
 
-async function requestMediaPermissions() {
+// ===== FUNÇÃO ATUALIZADA PARA SOLICITAÇÃO DE PERMISSÕES =====
+async function requestMediaPermissions(type) {
     try {
-        const stream = await navigator.mediaDevices.getUserMedia({ 
-            video: true, 
-            audio: true 
-        });
+        const constraints = {
+            video: type === 'camera',
+            audio: type === 'microphone'
+        };
+        
+        const stream = await navigator.mediaDevices.getUserMedia(constraints);
+        
+        // ✅ FECHAR STREAM IMEDIATAMENTE (só precisamos da permissão)
         stream.getTracks().forEach(track => track.stop());
         return true;
+        
     } catch (error) {
-        console.error('Erro ao acessar dispositivos:', error);
+        console.error(`Erro ao acessar ${type}:`, error);
         return false;
     }
 }
@@ -303,8 +309,9 @@ async function initApp() {
         }
     }
 
+    // ✅ EVENT LISTENERS PARA CHECKBOXES (MANTENHA ESTES)
     cameraCheckbox.addEventListener('click', async () => {
-        cameraGranted = await requestMediaPermissions();
+        cameraGranted = await requestMediaPermissions('camera');
         if (cameraGranted) {
             cameraCheckbox.classList.add('checked');
         } else {
@@ -313,7 +320,7 @@ async function initApp() {
     });
 
     microphoneCheckbox.addEventListener('click', async () => {
-        microphoneGranted = await requestMediaPermissions();
+        microphoneGranted = await requestMediaPermissions('microphone');
         if (microphoneGranted) {
             microphoneCheckbox.classList.add('checked');
         } else {
@@ -321,6 +328,7 @@ async function initApp() {
         }
     });
 
+    // ✅ EVENT LISTENER PARA BOTÃO NEXT (AGORA SÓ VERIFICA, NÃO PEDE PERMISSÕES)
     nextButtonWelcome.addEventListener('click', async () => {
         userName = nameInput.value.trim();
         let hasError = false;
