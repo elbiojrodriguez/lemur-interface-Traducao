@@ -1,4 +1,3 @@
-
 /* ===== ESTILOS GERAIS ===== */
 html {
     height: 100%;
@@ -225,6 +224,47 @@ h1 {
 @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
+}
+
+/* ===== INDICADOR DE CONEXÃO (SEGUNDA TELA) ===== */
+.connection-status {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    z-index: 20;
+}
+
+.connection-status .loader {
+    margin: 0 auto 15px auto;
+    width: 40px;
+    height: 40px;
+    border: 5px solid #f3f3f3;
+    border-top: 5px solid #3498db;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+#connection-text {
+    color: #3498db;
+    font-weight: bold;
+    font-size: 16px;
+    margin: 0;
+}
+
+/* ✅ ESTILOS PARA CONEXÃO ESTABELECIDA */
+.connection-status.connected .loader {
+    display: none;
+}
+
+.connection-status.connected #connection-text {
+    color: #28a745;
+}
+
+/* ✅ ESTILOS PARA ERRO DE CONEXÃO */
+.connection-status.error #connection-text {
+    color: #dc3545;
 }
 
 /* ===== ESTILOS DA TELA DE QR CODE ===== */
