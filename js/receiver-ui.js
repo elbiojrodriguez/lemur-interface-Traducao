@@ -51,17 +51,18 @@ function switchMode(modeId) {
     document.getElementById(modeId).classList.add('active');
 }
 
-// ===== FUNÇÃO PARA SOLICITAÇÃO DE PERMISSÕES =====
-async function requestMediaPermissions() {
+// ===== FUNÇÃO PARA SOLICITAÇÃO DE PERMISSÕES (PADRÃO) =====
+async function requestMediaPermissions(type) {
     try {
-        const stream = await navigator.mediaDevices.getUserMedia({ 
-            video: true, 
-            audio: true 
-        });
+        const constraints = { 
+            video: type === 'camera', 
+            audio: type === 'microphone' 
+        };
+        const stream = await navigator.mediaDevices.getUserMedia(constraints);
         stream.getTracks().forEach(track => track.stop());
         return true;
     } catch (error) {
-        console.error('Erro ao acessar dispositivos:', error);
+        console.error(`Erro ao acessar ${type}:`, error);
         return false;
     }
 }
@@ -216,23 +217,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     loaderContainer.style.display = 'none';
     // ===== FIM DA TRADUÇÃO =====
 
-    // Event listener para os checkboxes
+    // Event listener para os checkboxes (PADRÃO)
     cameraCheckbox.addEventListener('click', async () => {
-        cameraGranted = await requestMediaPermissions();
-        if (cameraGranted) {
-            cameraCheckbox.classList.add('checked');
-        } else {
-            cameraCheckbox.classList.remove('checked');
-        }
+        cameraGranted = await requestMediaPermissions('camera');
+        cameraCheckbox.classList.toggle('checked', cameraGranted);
     });
 
     microphoneCheckbox.addEventListener('click', async () => {
-        microphoneGranted = await requestMediaPermissions();
-        if (microphoneGranted) {
-            microphoneCheckbox.classList.add('checked');
-        } else {
-            microphoneCheckbox.classList.remove('checked');
-        }
+        microphoneGranted = await requestMediaPermissions('microphone');
+        microphoneCheckbox.classList.toggle('checked', microphoneGranted);
     });
 
     // Event listener para o botão Next da tela de boas-vindas
@@ -257,6 +250,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         try {
+            // ✅ SOLICITA APENAS VÍDEO (igual ao primeiro arquivo)
             const stream = await navigator.mediaDevices.getUserMedia({ 
                 video: true, 
                 audio: false 
