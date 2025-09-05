@@ -136,6 +136,12 @@ async function requestMediaPermissions(type) {
 // ===== WEBRTC =====
 async function setupWebRTC() {
     try {
+        // ✅ MOSTRAR LOADER E TEXTO "Conectando..."
+        const connectionStatus = document.querySelector('.connection-status');
+        const connectionText = document.getElementById('connection-text');
+        connectionText.textContent = 'Conectando...';
+        connectionStatus.classList.remove('error', 'connected');
+        
         await loadLanguageFlags();
         
         const urlParams = new URLSearchParams(window.location.search);
@@ -185,9 +191,18 @@ async function setupWebRTC() {
             remoteStream.getAudioTracks().forEach(track => track.enabled = false);
             const remoteVideo = document.getElementById('remoteVideo');
             if (remoteVideo) remoteVideo.srcObject = remoteStream;
+            
+            // ✅ CONEXÃO ESTABELECIDA - MOSTRAR "Conectado!"
+            connectionText.textContent = 'Conectado!';
+            connectionStatus.classList.add('connected');
         });
+        
     } catch (error) {
         console.error('Erro no WebRTC:', error);
+        // ✅ ERRO NA CONEXÃO
+        const connectionText = document.getElementById('connection-text');
+        connectionText.textContent = 'Erro na conexão. Tente novamente.';
+        document.querySelector('.connection-status').classList.add('error');
     }
 }
 
@@ -244,7 +259,10 @@ async function initApp() {
 
         switchMode('main-mode');
         document.getElementById('user-name-display').textContent = userName;
-        setTimeout(setupWebRTC, 1000);
+        
+        // ✅ REMOVER: setTimeout(setupWebRTC, 1000);
+        // ✅ ADICIONAR: Iniciar WebRTC IMEDIATAMENTE
+        setupWebRTC();
     });
 }
 
