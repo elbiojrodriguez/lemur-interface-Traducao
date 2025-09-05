@@ -43,22 +43,30 @@
             <img src="assets/images/lemur.png" alt="Lemur Logo" class="logo">
             <h1>EchoMeP2P</h1>
             
+            <!-- ✅ ELEMENTO PARA MOSTRAR ID DINÂMICO -->
+            <div class="user-id-display" id="myIdDisplay" style="display: none;">
+                Conectando com ID: <span id="caller-id"></span>
+            </div>
+            
             <div class="translator-label" id="translator-label-main">Live translation. No filters. No platform.</div>
             
-            <!-- ✅ BOTÃO OCULTO -->
             <button class="btn-send" id="callActionBtn" style="display: none;">SEND🚀</button>
             
-            <!-- ✅ INDICADOR DE CONEXÃO (USANDO SEU LOADER EXISTENTE) -->
             <div class="connection-status">
-                <div class="loader"></div> <!-- ✅ MESMO LOADER DA PRIMEIRA TELA -->
+                <div class="loader"></div>
                 <p id="connection-text">Conectando...</p>
             </div>
             
             <div class="blue-box"></div>
             <div class="red-box"></div>
             
+            <!-- ✅ CORREÇÃO: ESTRUTURA DE VÍDEO CORRETA -->
             <div class="video-box">
-                <video id="remoteVideo" class="camera-feed" autoplay playsinline></video>
+                <!-- ✅ LOCAL VIDEO (seu próprio vídeo) -->
+                <video id="localVideo" autoplay muted playsinline style="display: none;"></video>
+                <!-- ✅ REMOTE VIDEO (vídeo do receiver) -->
+                <video id="remoteVideo" autoplay playsinline style="display: none;"></video>
+                
                 <div class="overlay-info">
                     <div class="user-name" id="user-name-display">Usuário</div>
                     <div class="user-language">🇧🇷</div>
@@ -67,6 +75,7 @@
         </div>
     </div>
 
+    <!-- ✅ CORREÇÃO: REMOVER DEFER DOS SCRIPTS MODULE -->
     <script type="module" src="js/caller-ui.js"></script>
 </body>
 </html>
