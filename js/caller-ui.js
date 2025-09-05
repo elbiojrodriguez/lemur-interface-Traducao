@@ -1,3 +1,7 @@
+// ✅ O caller está procurando por "browserid" (minúsculo)
+// const targetBrowserId = urlParams.get('browserid'); // ← REMOVER ESTA LINHA (está comentada mas é redundante)
+
+js/caller-ui.js 
 // ===== CÓDIGO DE TRADUÇÃO =====
 const TRANSLATE_ENDPOINT = 'https://chat-tradutor.onrender.com/translate';
 const FIREBASE_API_URL = 'https://seu-servidor-firebase.com/check-online';
@@ -209,7 +213,7 @@ async function setupWebRTC() {
         // ✅ CARREGAR BANDEIRAS PRIMEIRO
         await loadLanguageFlags();
         
-        // EXTRAIR DADOS DA URL
+        // EXTRAIR DADOS DA URL - CORREÇÃO APLICADA AQUI
         const urlParams = new URLSearchParams(window.location.search);
         const targetBrowserId = urlParams.get('browserid');
         const firebaseToken = urlParams.get('token');
