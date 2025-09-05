@@ -3,11 +3,147 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Caller - Videochamada Mobile</title>
-    <link rel="stylesheet" href="style.css" />
-    <link rel="stylesheet" href="responsivo.css" />
+    <title>Caller -echome2p2</title>
     <style>
-        /* 🔵 Estilo do box azul */
+        /* 🔵 ESTILOS GERAIS */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        html {
+            height: 100%;
+            font-size: clamp(14px, 2.5vw, 18px);
+            text-align: center;
+            transition: background-color 0.5s;
+        }
+
+        body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            font-size: 1em;
+            background: transparent;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .container {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* 🔵 ESTILOS DE VÍDEO */
+        .video-wrapper {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+
+        .remote-container {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+        }
+
+        #remoteVideo {
+            display: none;
+        }
+
+        /* Vídeo local em PIP com moldura verde */
+        .local-pip {
+            position: absolute;
+            bottom: 80px;
+            right: 20px;
+            width: 30%;
+            max-width: 138px;
+            height: 160px;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            border: 2px solid #4CAF50;
+            z-index: 10;
+        }
+
+        #localVideo {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transform: scaleX(-1);
+        }
+
+        /* 🔵 CONTROLES PRINCIPAIS */
+        .controls {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 20;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            width: 90%;
+            max-width: 300px;
+        }
+
+        .controls button {
+            width: 100%;
+            height: 45px;
+            border-radius: 999px;
+            border: none;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            backdrop-filter: blur(6px);
+            color: white;
+            background: #4CAF50;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        #callActionBtn {
+            background: #4CAF50;
+        }
+
+        #scanBtn {
+            background: #2196F3;
+            display: none;
+        }
+
+        /* 🔵 BALÕES COM BANDEIRAS */
+        .language-bubbles {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            margin-top: 15px;
+        }
+
+        .lang-btn {
+            width: 40px;
+            height: 40px;
+            font-size: 20px;
+            border-radius: 50%;
+            border: none;
+            background-color: rgba(0, 0, 0, 0.3);
+            color: white;
+            cursor: pointer;
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* 🔵 BOX AZUL CENTRALIZADO */
         .chat-input-box {
             position: absolute;
             bottom: 350px;
@@ -23,66 +159,175 @@
             padding: 10px;
         }
 
-        /* 💬 Estilo BASE para todas as mensagens */
-.phrase-box {
-    background-color: transparent;
-    padding: 1px 0;
-    margin: 0.5px 0;
-    border-radius: 0;
-    font-size: 15px;
-    line-height: 1.0;
-    border: none;
-    box-shadow: none;
-    width: 100%;
-    word-break: break-word;
-}
+        /* 🔵 OVERLAY DE INFORMAÇÕES */
+        .info-overlay {
+            position: absolute;
+            top: 20px;
+            left: 0;
+            right: 0;
+            z-index: 30;
+            color: #333;
+            text-align: center;
+            padding: 10px;
+            display: none;
+        }
 
-/* 🎯 Estilo para TEXTO TEMPORÁRIO (enquanto está falando) */
-.phrase-box.interim-box {
-    animation: fadeIn 0.3s ease-out; /* Suaviza a aparição */
-}
+        /* Container do QR Code */
+        .qrcode-container {
+            margin: 10px auto;
+            padding: 12px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+            display: inline-block;
+        }
 
-.interim-text {
-    color: #666;
-    opacity: 0.8;
-    border-bottom: 1px dotted #aaa;
-    transition: all 0.2s; /* Suaviza as atualizações de texto */
-}
+        /* Destaque visual para ID */
+        #myId {
+            display: inline-block;
+            font-size: 16px;
+            font-weight: bold;
+            background: rgba(255, 255, 255, 0.5);
+            padding: 8px 16px;
+            border-radius: 20px;
+            user-select: all;
+            cursor: pointer;
+            color: #333;
+            margin-top: 10px;
+        }
 
-/* ✅ Estilo para TEXTO FINALIZADO */
-.final-text {
-    color: inherit; /* Herda a cor do tema pai */
-    opacity: 1;
-    animation: textFinalized 0.3s ease-out;
-}
+        /* 🔵 ESTILOS DE TEXTO E CHAT */
+        .phrase-box {
+            background-color: transparent;
+            padding: 1px 0;
+            margin: 0.5px 0;
+            border-radius: 0;
+            font-size: 15px;
+            line-height: 1.0;
+            border: none;
+            box-shadow: none;
+            width: 100%;
+            word-break: break-word;
+            color: #333;
+        }
 
-/* 🎚️ Efeitos visuais */
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(2px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-/* Estilo para quando o microfone está ativo continuamente */
-.listening-mode .text-display-placeholder {
-    animation: pulseOpacity 2s infinite;
-}
+        /* 🎯 Estilo para TEXTO TEMPORÁRIO (enquanto está falando) */
+        .phrase-box.interim-box {
+            animation: fadeIn 0.3s ease-out;
+        }
 
-@keyframes pulseOpacity {
-    0% { opacity: 0.8; }
-    50% { opacity: 0.4; }
-    100% { opacity: 0.8; }
-}
-@keyframes textFinalized {
-    from { opacity: 0.5; }
-    to { opacity: 1; }
-}
+        .interim-text {
+            color: #666;
+            opacity: 0.8;
+            border-bottom: 1px dotted #aaa;
+            transition: all 0.2s;
+        }
 
-/* 📱 Melhorias para mobile */
-@media (max-width: 768px) {
-    .phrase-box {
-        font-size: 14px;
-        line-height: 1.3;
-    }
-}
+        /* ✅ Estilo para TEXTO FINALIZADO */
+        .final-text {
+            color: inherit;
+            opacity: 1;
+            animation: textFinalized 0.3s ease-out;
+        }
+
+        /* 🎚️ Animações */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(2px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Estilo para quando o microfone está ativo continuamente */
+        .listening-mode .text-display-placeholder {
+            animation: pulseOpacity 2s infinite;
+        }
+
+        @keyframes pulseOpacity {
+            0% { opacity: 0.8; }
+            50% { opacity: 0.4; }
+            100% { opacity: 0.8; }
+        }
+        
+        @keyframes textFinalized {
+            from { opacity: 0.5; }
+            to { opacity: 1; }
+        }
+
+        /* 📱 RESPONSIVIDADE */
+        @media (max-width: 768px) {
+            .phrase-box {
+                font-size: 14px;
+                line-height: 1.3;
+            }
+            
+            .chat-input-box {
+                width: 90%;
+                height: 140px;
+                bottom: 300px;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .local-pip {
+                height: 120px;
+                max-width: 100px;
+                bottom: 70px;
+                right: 15px;
+            }
+
+            .controls button {
+                height: 40px;
+                font-size: 14px;
+            }
+
+            .info-overlay {
+                padding: 8px;
+            }
+
+            .qrcode-container {
+                padding: 8px;
+                max-width: 90%;
+            }
+
+            .chat-input-box {
+                width: 85%;
+                height: 120px;
+            }
+
+            .lang-btn {
+                width: 36px;
+                height: 36px;
+                font-size: 18px;
+            }
+        }
+
+        /* Ajustes para orientação paisagem */
+        @media (max-height: 500px) and (orientation: landscape) {
+            .local-pip {
+                bottom: 60px;
+                right: 10px;
+                width: 25%;
+                height: 120px;
+            }
+            
+            .controls {
+                bottom: 10px;
+                flex-direction: row;
+                justify-content: center;
+            }
+            
+            .controls button {
+                width: 140px;
+            }
+            
+            .chat-input-box {
+                height: 100px;
+                bottom: 250px;
+            }
+            
+            .info-overlay {
+                top: 10px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -100,10 +345,20 @@
         <!-- 🔻 Controles -->
         <div class="controls">
             <button id="callActionBtn" style="display:none;">SEND 🚀</button>
+            <button id="scanBtn" style="display:none;">Scan QR Code</button>
+            <div class="language-bubbles">
+                <button class="lang-btn">🇺🇸</button>
+                <button class="lang-btn">🇪🇸</button>
+                <button class="lang-btn">🇫🇷</button>
+                <button class="lang-btn">🇩🇪</button>
+            </div>
         </div>
         
-        <div class="info-overlay" style="display: none;">
+        <div class="info-overlay">
             <span id="myId"></span>
+            <div class="qrcode-container">
+                <!-- QR Code será gerado aqui via JavaScript -->
+            </div>
         </div>
     </div>
 
