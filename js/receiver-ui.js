@@ -1,10 +1,11 @@
+
 // ===== IMPORTAÇÕES =====
 import { QRCodeGenerator } from './qr-code-utils.js';
-import WebRTCCore from '../core/webrtc-core.js';
+import WebRTCCore from '../core/webrtc-core.js'; // ✅ ADICIONAR ESTA LINHA
 
 // ===== VARIÁVEIS GLOBAIS WEBRTC =====
 let rtcCore = null;
-let myFixedId = ''; // ✅ ID FIXO (8 dígitos do token)
+let myFixedId = ''; // ✅ ID FIXO (7 dígitos do token)
 
 // ===== CONFIGURAÇÃO DE TRADUÇÃO =====
 const TRANSLATE_ENDPOINT = 'https://chat-tradutor.onrender.com/translate';
@@ -51,18 +52,17 @@ function switchMode(modeId) {
     document.getElementById(modeId).classList.add('active');
 }
 
-// ===== FUNÇÃO PARA SOLICITAÇÃO DE PERMISSÕES (PADRÃO) =====
-async function requestMediaPermissions(type) {
+// ===== FUNÇÃO PARA SOLICITAÇÃO DE PERMISSÕES =====
+async function requestMediaPermissions() {
     try {
-        const constraints = { 
-            video: type === 'camera', 
-            audio: type === 'microphone' 
-        };
-        const stream = await navigator.mediaDevices.getUserMedia(constraints);
+        const stream = await navigator.mediaDevices.getUserMedia({ 
+            video: true, 
+            audio: true 
+        });
         stream.getTracks().forEach(track => track.stop());
         return true;
     } catch (error) {
-        console.error(`Erro ao acessar ${type}:`, error);
+        console.error('Erro ao acessar dispositivos:', error);
         return false;
     }
 }
@@ -72,64 +72,63 @@ function generateQRCode(name) {
     const urlParams = new URLSearchParams(window.location.search);
     const token = urlParams.get('token');
     const browserFullLang = navigator.language || 'pt-BR';
+    const fixedId = token ? token.slice(-7) : 'unknown';
     
-    // ✅ CORREÇÃO: Usar EXATAMENTE os 8 dígitos do token (igual ao QR code)
-    myFixedId = token ? token.slice(-8) : 'unknown';
-    
-    const fullUrl = `https://lemur-interface-traducao.netlify.app/caller.html?token=${encodeURIComponent(token || '')}&browserid=${encodeURIComponent(myFixedId)}&lang=${encodeURIComponent(browserFullLang)}&name=${encodeURIComponent(name || 'User')}`;
+    // ✅ CORREÇÃO: "browserid" (com i minúsculo)
+    const fullUrl = `https://lemur-interface-traducao.netlify.app/caller.html?token=${encodeURIComponent(token || '')}&browserid=${encodeURIComponent(fixedId)}&lang=${encodeURIComponent(browserFullLang)}&name=${encodeURIComponent(name || 'User')}`;
     
     console.log("QR Code URL:", fullUrl);
-    console.log("Receiver ID:", myFixedId); // ✅ Deve ser "936ff2cd"
     
+    // ✅ CORREÇÃO: Usar QRCodeGenerator em vez de QRCode
     QRCodeGenerator.generate("qrcode-modal", fullUrl, 200);
+    
     document.getElementById('url-content-modal').textContent = fullUrl;
 }
 
 // ===== FUNÇÃO PARA INICIALIZAR WEBRTC =====
 async function initializeWebRTC() {
     try {
-        // ✅ CORREÇÃO: Inicializar WebRTC CORRETAMENTE
-        rtcCore = new WebRTCCore();
-        rtcCore.initialize(myFixedId);
-        rtcCore.setupSocketHandlers(); // ✅ CONFIGURAR HANDLERS PRIMEIRO
-        
-        // ✅ Configurar handler de chamadas entrantes
-        rtcCore.onIncomingCall = (offer) => {
-            handleIncomingCall(offer, window.authorizedStream);
-        };
-        
-        // ✅ Usar stream autorizada
+        // ✅ USA A STREAM JÁ AUTORIZADA
         const localStream = window.authorizedStream;
         
         if (!localStream) {
             throw new Error('Stream de câmera não disponível');
         }
+
+        // Obtém o token da URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const token = urlParams.get('token');
         
-        // ✅ Mostrar próprio vídeo
-        const localVideo = document.getElementById('localVideo');
-        if (localVideo) localVideo.srcObject = localStream;
+        // ✅ GERA ID FIXO com últimos 7 dígitos do token
+        myFixedId = token ? token.slice(-7) : crypto.randomUUID().substr(0, 7);
         
-        // ✅ Mensagem de status
-        const statusElement = document.getElementById('myId');
-        if (statusElement) {
-            statusElement.textContent = `ID: ${myFixedId} (Aguardando conexão...)`;
-        }
+        // ✅ INICIALIZA WEBRTC CORE
+        rtcCore = new WebRTCCore();
+        rtcCore.initialize(myFixedId);
+        rtcCore.setupSocketHandlers();
         
-        console.log("✅ WebRTC inicializado. Aguardando chamadas... ID:", myFixedId);
+        // ✅ CONFIGURA HANDLER PARA CHAMADAS ENTRANTES
+        rtcCore.onIncomingCall = (offer) => {
+            handleIncomingCall(offer, localStream);
+        };
+        
+        // ✅ MOSTRA O PRÓPRIO VÍDEO (opcional)
+        document.getElementById('localVideo').srcObject = localStream;
+        
+        // ✅ MENSAGEM DE STATUS
+        document.getElementById('myId').textContent = `ID: ${myFixedId} (Aguardando conexão...)`;
+        console.log("✅ WebRTC inicializado. Aguardando chamadas...");
 
     } catch (error) {
         console.error("❌ Erro ao inicializar WebRTC:", error);
-        const statusElement = document.getElementById('myId');
-        if (statusElement) {
-            statusElement.textContent = "Erro na conexão. Recarregue a página.";
-        }
+        document.getElementById('myId').textContent = "Erro na conexão. Recarregue a página.";
     }
 }
 
 // ===== FUNÇÃO PARA LIDAR COM CHAMADAS ENTRANTES =====
 async function handleIncomingCall(offer, localStream) {
     if (!localStream) {
-        console.error("Stream local não disponível!");
+        console.warn("Stream local não disponível");
         return;
     }
 
@@ -137,27 +136,23 @@ async function handleIncomingCall(offer, localStream) {
         // 🔇 Silencia áudio recebido
         remoteStream.getAudioTracks().forEach(track => track.enabled = false);
         
-        // ✅ Exibe vídeo remoto
+        // ✅ EXIBE VÍDEO REMOTO NO BOX
         const remoteVideo = document.getElementById('remoteVideo');
         if (remoteVideo) {
             remoteVideo.srcObject = remoteStream;
             remoteVideo.style.display = 'block';
         }
         
-        // ✅ Oculta imagem estática
+        // ✅ OCULTA IMAGEM ESTÁTICA
         const staticImage = document.querySelector('.camera-feed');
         if (staticImage) staticImage.style.display = 'none';
         
-        // ✅ Oculta QR code
+        // ✅ OCULTA ELEMENTOS DESNECESSÁRIOS
         const qrElement = document.getElementById('qrcode-modal');
         if (qrElement) qrElement.style.display = 'none';
         
-        // ✅ Atualiza status
-        const statusElement = document.getElementById('myId');
-        if (statusElement) {
-            statusElement.textContent = `ID: ${myFixedId} (Conectado)`;
-        }
-        
+        // ✅ ATUALIZA STATUS
+        document.getElementById('myId').textContent = `ID: ${myFixedId} (Conectado)`;
         console.log("✅ Conexão WebRTC estabelecida!");
     });
 }
@@ -180,6 +175,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // ===== PROCESSO DE TRADUÇÃO =====
     const browserLang = (navigator.language || 'en').split('-')[0];
+    
+    // Mostra loader durante tradução
     loaderContainer.style.display = 'flex';
 
     // Traduz textos da primeira tela
@@ -187,9 +184,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         try {
             const translated = await translateText(text, browserLang);
             const element = document.getElementById(elementId);
+
             if (element) {
                 if (elementId === 'name-input') {
                     element.placeholder = translated;
+                } else if (elementId === 'next-button-welcome') {
+                    element.textContent = translated;
                 } else {
                     element.textContent = translated;
                 }
@@ -204,35 +204,56 @@ document.addEventListener('DOMContentLoaded', async () => {
         try {
             const translated = await translateText(text, browserLang);
             const element = document.getElementById(elementId);
-            if (element) element.textContent = translated;
+
+            if (element) {
+                element.textContent = translated;
+            }
         } catch (error) {
             console.error(`Erro ao traduzir ${elementId}:`, error);
         }
     }
 
+    // Esconde o loader
     loaderContainer.style.display = 'none';
+    // ===== FIM DA TRADUÇÃO =====
 
-    // Event listeners
+    // Event listener para os checkboxes
     cameraCheckbox.addEventListener('click', async () => {
-        cameraGranted = await requestMediaPermissions('camera');
-        cameraCheckbox.classList.toggle('checked', cameraGranted);
+        cameraGranted = await requestMediaPermissions();
+        if (cameraGranted) {
+            cameraCheckbox.classList.add('checked');
+        } else {
+            cameraCheckbox.classList.remove('checked');
+        }
     });
 
     microphoneCheckbox.addEventListener('click', async () => {
-        microphoneGranted = await requestMediaPermissions('microphone');
-        microphoneCheckbox.classList.toggle('checked', microphoneGranted);
+        microphoneGranted = await requestMediaPermissions();
+        if (microphoneGranted) {
+            microphoneCheckbox.classList.add('checked');
+        } else {
+            microphoneCheckbox.classList.remove('checked');
+        }
     });
 
+    // Event listener para o botão Next da tela de boas-vindas
     nextButtonWelcome.addEventListener('click', async () => {
         userName = nameInput.value.trim();
         let hasError = false;
 
-        if (!userName) hasError = true;
-        if (!cameraGranted || !microphoneGranted) hasError = true;
+        if (!userName) {
+            hasError = true;
+        }
+
+        if (!cameraGranted || !microphoneGranted) {
+            hasError = true;
+        }
 
         if (hasError) {
             welcomeScreen.classList.add('error-state');
-            setTimeout(() => welcomeScreen.classList.remove('error-state'), 1000);
+            setTimeout(() => {
+                welcomeScreen.classList.remove('error-state');
+            }, 1000);
             return;
         }
 
@@ -243,6 +264,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
             
             window.authorizedStream = stream;
+            
             switchMode('qrcode-mode');
             generateQRCode(userName);
             
@@ -252,22 +274,30 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
+    // Event listener para o botão da tela de QR Code
     nextButtonQrcode.addEventListener('click', () => {
         switchMode('communication-mode');
         
-        // ✅ Exibir ID fixo (8 dígitos do token)
+        // ✅ GERA E EXIBE O ID DE 7 DÍGITOS
+        const urlParams = new URLSearchParams(window.location.search);
+        const token = urlParams.get('token');
+        const fixedId = token ? token.slice(-7) : 'unknown';
+        
+        // Exibe o ID na terceira tela
         const userIdDisplay = document.createElement('div');
         userIdDisplay.className = 'user-id-display';
         userIdDisplay.id = 'myId';
-        userIdDisplay.textContent = `Seu ID: ${myFixedId}`;
+        userIdDisplay.textContent = `Seu ID: ${fixedId}`;
         
+        // Adiciona o ID display no início do box-principal
         const boxPrincipal = document.querySelector('#communication-mode .box-principal');
-        if (boxPrincipal) {
-            const firstChild = boxPrincipal.firstChild;
-            boxPrincipal.insertBefore(userIdDisplay, firstChild);
-        }
+        const firstChild = boxPrincipal.firstChild;
+        boxPrincipal.insertBefore(userIdDisplay, firstChild);
         
+        // Também exibe o nome do usuário
         document.getElementById('user-name-display').textContent = userName;
+        
+        // ✅ INICIALIZA WEBRTC
         initializeWebRTC();
     });
 });
