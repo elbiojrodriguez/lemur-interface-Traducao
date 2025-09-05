@@ -4,8 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EchoMeP2P - Comunicação Cruzada</title>
-    <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js" defer></script>
-    <script src="https://lemur-signal.onrender.com/socket.io/socket.io.js" defer></script>
+    <!-- ✅ CORREÇÃO: SCRIPTS NA ORDEM CORRETA -->
+    <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
+    <script src="https://lemur-signal.onrender.com/socket.io/socket.io.js"></script>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -54,12 +55,22 @@
         <div class="box-principal">
             <img src="assets/images/lemur.png" alt="Lemur Logo" class="logo">
             <h1>EchoMeP2P</h1>
+            
+            <!-- ✅ ELEMENTO PARA MOSTRAR ID DINÂMICO -->
+            <div class="user-id-display" id="myIdDisplay">
+                Seu ID: <span id="receiver-id"></span>
+            </div>
+            
             <div class="translator-label" id="translator-label-comm">Live translation. No filters. No platform.</div>   
-            <video id="remoteVideo" autoplay playsinline style="display:none;"></video>
-            <video id="localVideo" autoplay muted playsinline style="display:none;"></video>
+            
+            <!-- ✅ CORREÇÃO: VÍDEOS VISÍVEIS (sem display:none) -->
+            <video id="remoteVideo" autoplay playsinline></video>
+            <video id="localVideo" autoplay muted playsinline></video>
+            
             <button class="btn-send" id="send-button">SEND🚀</button>
             <div class="blue-box"></div>
             <div class="red-box"></div>
+            
             <div class="video-box">
                 <img src="assets/images/lemur.png" class="camera-feed" alt="Video feed">
                 <div class="overlay-info">
@@ -70,9 +81,12 @@
         </div>
     </div>
 
-    <script src="core/internet-config.js" defer></script>
-    <script src="core/webrtc-core.js" defer></script>
-    <script src="js/qr-code-utils.js" defer></script>
-    <script type="module" src="js/receiver-ui.js" defer></script>
+    <!-- ✅ CORREÇÃO: REMOVER SCRIPTS DESNECESSÁRIOS -->
+    <!-- ❌ REMOVER: <script src="core/internet-config.js" defer></script> -->
+    <!-- ❌ REMOVER: <script src="core/webrtc-core.js" defer></script> -->
+    <!-- ❌ REMOVER: <script src="js/qr-code-utils.js" defer></script> -->
+    
+    <!-- ✅ CORREÇÃO: APENAS O MÓDULO PRINCIPAL SEM DEFER -->
+    <script type="module" src="js/receiver-ui.js"></script>
 </body>
 </html>
