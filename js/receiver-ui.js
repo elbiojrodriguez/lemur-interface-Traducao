@@ -72,10 +72,12 @@ function generateQRCode(name) {
     const urlParams = new URLSearchParams(window.location.search);
     const token = urlParams.get('token');
     const browserFullLang = navigator.language || 'pt-BR';
-    const fixedId = token ? token.slice(-7) : 'unknown';
+    
+    // ✅ CORREÇÃO 1: Usar ID consistente (igual ao caller)
+    myFixedId = crypto.randomUUID().substr(0, 8); // ✅ Igual ao caller
     
     // ✅ CORREÇÃO: "browserid" (com i minúsculo)
-    const fullUrl = `https://lemur-interface-traducao.netlify.app/caller.html?token=${encodeURIComponent(token || '')}&browserid=${encodeURIComponent(fixedId)}&lang=${encodeURIComponent(browserFullLang)}&name=${encodeURIComponent(name || 'User')}`;
+    const fullUrl = `https://lemur-interface-traducao.netlify.app/caller.html?token=${encodeURIComponent(token || '')}&browserid=${encodeURIComponent(myFixedId)}&lang=${encodeURIComponent(browserFullLang)}&name=${encodeURIComponent(name || 'User')}`;
     
     console.log("QR Code URL:", fullUrl);
     
@@ -88,29 +90,22 @@ function generateQRCode(name) {
 // ===== FUNÇÃO PARA INICIALIZAR WEBRTC =====
 async function initializeWebRTC() {
     try {
+        // ✅ CORREÇÃO 2: Garantir que os socket handlers estão configurados
+        rtcCore = new WebRTCCore();
+        rtcCore.initialize(myFixedId);
+        rtcCore.setupSocketHandlers(); // ✅ ISSO É CRÍTICO
+        
+        // ✅ Configurar o handler DEVE ser feito após setupSocketHandlers
+        rtcCore.onIncomingCall = (offer) => {
+            handleIncomingCall(offer, window.authorizedStream);
+        };
+        
         // ✅ USA A STREAM JÁ AUTORIZADA
         const localStream = window.authorizedStream;
         
         if (!localStream) {
             throw new Error('Stream de câmera não disponível');
         }
-
-        // Obtém o token da URL
-        const urlParams = new URLSearchParams(window.location.search);
-        const token = urlParams.get('token');
-        
-        // ✅ GERA ID FIXO com últimos 7 dígitos do token
-        myFixedId = token ? token.slice(-7) : crypto.randomUUID().substr(0, 7);
-        
-        // ✅ INICIALIZA WEBRTC CORE
-        rtcCore = new WebRTCCore();
-        rtcCore.initialize(myFixedId);
-        rtcCore.setupSocketHandlers();
-        
-        // ✅ CONFIGURA HANDLER PARA CHAMADAS ENTRANTES
-        rtcCore.onIncomingCall = (offer) => {
-            handleIncomingCall(offer, localStream);
-        };
         
         // ✅ MOSTRA O PRÓPRIO VÍDEO (opcional)
         document.getElementById('localVideo').srcObject = localStream;
@@ -127,8 +122,9 @@ async function initializeWebRTC() {
 
 // ===== FUNÇÃO PARA LIDAR COM CHAMADAS ENTRANTES =====
 async function handleIncomingCall(offer, localStream) {
+    // ✅ CORREÇÃO 3: Garantir que a stream está disponível
     if (!localStream) {
-        console.warn("Stream local não disponível");
+        console.error("Stream local não disponível!");
         return;
     }
 
@@ -271,16 +267,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     nextButtonQrcode.addEventListener('click', () => {
         switchMode('communication-mode');
         
-        // ✅ GERA E EXIBE O ID DE 7 DÍGITOS
-        const urlParams = new URLSearchParams(window.location.search);
-        const token = urlParams.get('token');
-        const fixedId = token ? token.slice(-7) : 'unknown';
-        
-        // Exibe o ID na terceira tela
+        // ✅ GERA E EXIBE O ID DE 8 DÍGITOS (consistente com caller)
         const userIdDisplay = document.createElement('div');
         userIdDisplay.className = 'user-id-display';
         userIdDisplay.id = 'myId';
-        userIdDisplay.textContent = `Seu ID: ${fixedId}`;
+        userIdDisplay.textContent = `Seu ID: ${myFixedId}`;
         
         // Adiciona o ID display no início do box-principal
         const boxPrincipal = document.querySelector('#communication-mode .box-principal');
