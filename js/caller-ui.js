@@ -136,6 +136,12 @@ async function requestMediaPermissions(type) {
 // ===== WEBRTC =====
 async function setupWebRTC() {
     try {
+        // ✅ CORREÇÃO 1: Importar corretamente (remover window.)
+        rtcCore = new WebRTCCore(); // ✅ SEM window.
+        const myId = crypto.randomUUID().substr(0, 8);
+        rtcCore.initialize(myId);
+        rtcCore.setupSocketHandlers(); // ✅ Configurar handlers PRIMEIRO
+        
         // ✅ MOSTRAR LOADER E TEXTO "Conectando..."
         const connectionStatus = document.querySelector('.connection-status');
         const connectionText = document.getElementById('connection-text');
@@ -158,11 +164,6 @@ async function setupWebRTC() {
         const userFlag = getLanguageFlag(userLang);
         document.getElementById('user-name-display').textContent = userName;
         document.querySelector('.user-language').textContent = userFlag;
-
-        rtcCore = new window.WebRTCCore();
-        const myId = crypto.randomUUID().substr(0, 8);
-        rtcCore.initialize(myId);
-        rtcCore.setupSocketHandlers();
 
         const localStream = await navigator.mediaDevices.getUserMedia({ 
             video: true, 
@@ -187,6 +188,7 @@ async function setupWebRTC() {
             rtcCore.startCall(targetBrowserId, localStream);
         });
 
+        // ✅ SÓ DEPOIS configurar o callback
         rtcCore.setRemoteStreamCallback(remoteStream => {
             remoteStream.getAudioTracks().forEach(track => track.enabled = false);
             const remoteVideo = document.getElementById('remoteVideo');
