@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -5,7 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EchoMeP2P - Conectar</title>
     <link rel="stylesheet" href="style.css">
-    <!-- ✅ SOCKET.IO PRIMEIRO (SEM DEFER) -->
     <script src="https://lemur-signal.onrender.com/socket.io/socket.io.js"></script>
 </head>
 <body>
@@ -18,7 +18,7 @@
 
             <img src="assets/images/lemur.png" alt="Lemur Logo" class="logo">
             <h1>EchoMeP2P</h1>
-            <div class="translator-label" id="translator-label">Live translation. No filters. No platform.</div>
+            <div class="translator-label" id="translator-label-welcome">Live translation. No filters. No platform.</div>
             <h2 id="welcome-title">Welcome!</h2>
                     
             <input type="text" class="name-input" id="name-input" placeholder="Your name" />
@@ -43,24 +43,23 @@
         <div class="box-principal">
             <img src="assets/images/lemur.png" alt="Lemur Logo" class="logo">
             <h1>EchoMeP2P</h1>
-            <div class="translator-label" id="translator-label">Live translation. No filters. No platform.</div>
             
-            <!-- ✅ BOTÃO ORIGINAL (oculto inicialmente) -->
-            <button class="btn-send" id="callActionBtn" style="display:none;">SEND🚀</button>
+            <div class="translator-label" id="translator-label-main">Live translation. No filters. No platform.</div>
             
-            <!-- ✅ ELEMENTOS WEBRTC CRÍTICOS (hidden inicialmente) -->
-            <div style="display: none;">
-                <video id="remoteVideo" autoplay playsinline></video>
-                <video id="localVideo" autoplay muted playsinline></video>
+            <!-- ✅ BOTÃO OCULTO -->
+            <button class="btn-send" id="callActionBtn" style="display: none;">SEND🚀</button>
+            
+            <!-- ✅ INDICADOR DE CONEXÃO (USANDO SEU LOADER EXISTENTE) -->
+            <div class="connection-status">
+                <div class="loader"></div> <!-- ✅ MESMO LOADER DA PRIMEIRA TELA -->
+                <p id="connection-text">Conectando...</p>
             </div>
             
-            <!-- 🎨 ELEMENTOS DECORATIVOS -->
             <div class="blue-box"></div>
             <div class="red-box"></div>
             
-            <!-- 🎨 BOX DE VÍDEO DECORATIVO -->
             <div class="video-box">
-                <img src="assets/images/lemur.png" class="camera-feed" alt="Video feed">
+                <video id="remoteVideo" class="camera-feed" autoplay playsinline></video>
                 <div class="overlay-info">
                     <div class="user-name" id="user-name-display">Usuário</div>
                     <div class="user-language">🇧🇷</div>
@@ -69,7 +68,6 @@
         </div>
     </div>
 
-    <!-- ✅ SCRIPT MODULE SEM DEFER -->
     <script type="module" src="js/caller-ui.js"></script>
 </body>
 </html>
