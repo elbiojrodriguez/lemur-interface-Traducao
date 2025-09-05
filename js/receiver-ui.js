@@ -73,16 +73,13 @@ function generateQRCode(name) {
     const browserFullLang = navigator.language || 'pt-BR';
     const fixedId = token ? token.slice(-7) : 'unknown';
     
-    const fullUrl = `https://lemur-interface-traducao.netlify.app/caller.html?token=${encodeURIComponent(token || '')}&browserId=${encodeURIComponent(fixedId)}&lang=${encodeURIComponent(browserFullLang)}&name=${encodeURIComponent(name || 'User')}`;
+    // ✅ CORREÇÃO: "browserid" (com i minúsculo)
+    const fullUrl = `https://lemur-interface-traducao.netlify.app/caller.html?token=${encodeURIComponent(token || '')}&browserid=${encodeURIComponent(fixedId)}&lang=${encodeURIComponent(browserFullLang)}&name=${encodeURIComponent(name || 'User')}`;
     
     console.log("QR Code URL:", fullUrl);
     
-    // Gera o QR code
-    new QRCode(document.getElementById("qrcode-modal"), {
-        text: fullUrl,
-        width: 200,
-        height: 200
-    });
+    // ✅ CORREÇÃO: Usar QRCodeGenerator em vez de QRCode
+    QRCodeGenerator.generate("qrcode-modal", fullUrl, 200);
     
     document.getElementById('url-content-modal').textContent = fullUrl;
 }
