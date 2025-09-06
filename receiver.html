@@ -1,28 +1,107 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Receiver - Videochamada Mobile</title>
- <link rel="stylesheet" href="novo-estilo-unificado.css" />
-  <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EchoMeP2P - Comunicação Cruzada</title>
+    
+    <!-- ✅ SCRIPTS EXTERNOS COM DEFER -->
+    <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js" defer></script>
+    <script src="https://lemur-signal.onrender.com/socket.io/socket.io.js" defer></script>
+    
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="container">
-    <div class="video-wrapper">
-      <video id="remoteVideo" autoplay playsinline></video>
+    <!-- Modo 1: Boas-vindas e Permissões -->
+    <div class="app-mode active" id="welcome-mode">
+        <div class="box-principal" id="welcome-screen">
+            <div class="loader-container" id="loader-container">
+                <div class="loader"></div>
+            </div>
+
+            <img src="assets/images/lemur.png" alt="Lemur Logo" class="logo">
+            <h1>EchoMeP2P</h1>
+            <div class="translator-label" id="translator-label">Live translation. No filters. No platform.</div>
+            <h2 id="welcome-title">Welcome!</h2>
+      
+            <input type="text" class="name-input" id="name-input" placeholder="Your name" />
+            
+            <div class="permissions-container">
+                <div class="permission-item">
+                    <div class="permission-checkbox" id="camera-checkbox"></div>
+                    <div class="permission-text" id="camera-text">Allow camera access</div>
+                </div>
+                <div class="permission-item">
+                    <div class="permission-checkbox" id="microphone-checkbox"></div>
+                    <div class="permission-text" id="microphone-text">Allow microphone access</div>
+                </div>
+            </div>
+            
+            <button class="next-button" id="next-button-welcome">Next</button>
+        </div>
     </div>
 
-    <div class="video-wrapper">
-      <video id="localVideo" autoplay muted playsinline></video>
+    <!-- Modo 2: Geração de QR Code -->
+    <div class="app-mode" id="qrcode-mode">
+        <div class="qr-screen">
+            <div class="qr-modal">
+                <h2 id="qr-modal-title">This is your online key</h2>
+                <p class="qr-modal-description" id="qr-modal-description">You can ask to scan, share or print on your business card.</p>
+                <div class="qr-modal-content">
+                    <div id="qrcode-modal" class="qrcode-container"></div>
+                    <div class="url-display" id="url-display-modal">
+                        QR Code Content: <br><span id="url-content-modal"></span>
+                    </div>
+                    <button class="mode-button" id="next-button-qrcode">Start Connection</button>
+                </div>
+            </div>
+        </div>
     </div>
 
-        <div class="info-overlay">
-      <div id="qrcode" class="qrcode-container"></div>
+    <!-- Modo 3: Comunicação WebRTC -->
+    <div class="app-mode" id="communication-mode">
+        <div class="box-principal">
+            <img src="assets/images/lemur.png" alt="Lemur Logo" class="logo">
+            <h1>EchoMeP2P</h1>
+            <div class="translator-label" id="translator-label">Live translation. No filters. No platform.</div>   
+            
+            <button class="btn-send" id="send-button">SEND🚀</button>
+            
+            <!-- Box Azul -->
+            <div class="blue-box"></div>
+            
+            <!-- Box Vermelho -->
+            <div class="red-box"></div>
+            
+            <!-- Box de vídeo -->
+            <div class="video-box">
+                <img src="assets/images/lemur.png" class="camera-feed" alt="Video feed">
+                <div class="overlay-info">
+                    <div class="user-name" id="user-name-display">Usuário</div>
+                    <div class="user-language">🇧🇷</div>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
 
-  <script src="https://lemur-signal.onrender.com/socket.io/socket.io.js"></script>
-  <script type="module" src="js/receiver-ui.js"></script>
+    <!-- ✅ SCRIPTS LOCAIS COM DEFER -->
+    <script src="core/internet-config.js" defer></script>
+    <script src="core/webrtc-core.js" defer></script>
+    <script src="js/qr-code-utils.js" defer></script>
+    <script type="module" src="js/receiver-ui.js" defer></script>
+    
+    <!-- Script do módulo 3 para tradução automática -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const nextButtonQRCode = document.getElementById('next-button-qrcode');
+            if (nextButtonQRCode) {
+                nextButtonQRCode.addEventListener('click', function() {
+                    document.getElementById('communication-mode').classList.add('active');
+                    const userName = document.getElementById('name-input').value || 'Usuário';
+                    document.getElementById('user-name-display').textContent = userName;
+                });
+            }
+        });
+    </script>
 </body>
 </html>
