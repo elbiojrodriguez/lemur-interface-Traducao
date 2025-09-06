@@ -7,7 +7,6 @@ window.onload = () => {
   rtcCore.initialize(myId);
   rtcCore.setupSocketHandlers();
 
-  const localVideo = document.getElementById('localVideo');
   const remoteVideo = document.getElementById('remoteVideo');
   let targetId = null;
   let localStream = null;
@@ -15,7 +14,7 @@ window.onload = () => {
   navigator.mediaDevices.getUserMedia({ video: true, audio: false })
     .then(stream => {
       localStream = stream;
-      remoteVideo.srcObject = stream;
+      // NÃO exibe localmente — apenas transmite
     })
     .catch(error => {
       console.error("Erro ao acessar a câmera:", error);
@@ -36,6 +35,6 @@ window.onload = () => {
 
   rtcCore.setRemoteStreamCallback(stream => {
     stream.getAudioTracks().forEach(track => track.enabled = false);
-    localVideo.srcObject = stream;
+    remoteVideo.srcObject = stream;
   });
 };
