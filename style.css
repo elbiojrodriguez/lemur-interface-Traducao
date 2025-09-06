@@ -15,8 +15,16 @@ body {
   font-family: Arial, sans-serif;
 }
 
+/* Container principal */
+.container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
 /* Containers de vídeo */
-.remote-container {
+.remote-container, .video-wrapper {
   position: absolute;
   width: 100%;
   height: 100%;
@@ -28,7 +36,7 @@ body {
 }
 
 /* Vídeo local em PIP com moldura verde */
-.local-pip {
+.local-pip, .video-wrapper:nth-child(2) {
   position: absolute;
   bottom: calc(80px + 60px);
   right: 20px;
@@ -43,7 +51,7 @@ body {
   z-index: 10;
 }
 
-#localVideo {
+#localVideo, .video-wrapper video {
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -57,6 +65,9 @@ body {
   left: 50%;
   transform: translateX(-50%);
   z-index: 20;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
 .controls button {
@@ -74,12 +85,15 @@ body {
   align-items: center;
   justify-content: center;
   padding: 0;              /* Remove espaçamento extra */
-  box-sizing: border-box; /* Garante que padding não afete tamanho */
+  box-sizing: border-box;  /* Garante que padding não afete tamanho */
 }
-
 
 #callActionBtn {
   background: #4CAF50;
+}
+
+#scanBtn {
+  background: #2196F3;
 }
 
 /* 🔻 Balões com bandeiras */
@@ -115,6 +129,17 @@ body {
   z-index: 20;
 }
 
+/* Caixa de frase */
+.phrase-box {
+  margin: 4px 0;
+  padding: 0;
+  font-size: 18px;
+  color: black;
+  background: transparent;
+  border: none;
+  word-break: break-word;
+}
+
 /* Overlay de informações */
 .info-overlay {
   position: absolute;
@@ -130,7 +155,7 @@ body {
 }
 
 /* Container do QR Code */
-.info-overlay #qrcode {
+.info-overlay #qrcode, .qrcode-container {
   margin: 10px auto;
   padding: 12px;
   background: white;
@@ -140,7 +165,7 @@ body {
 }
 
 /* Destaque visual para ID */
-.id-display {
+.id-display, #myId {
   display: inline-block;
   font-size: 16px;
   font-weight: bold;
@@ -154,23 +179,31 @@ body {
 
 /* Responsivo para telas pequenas */
 @media (max-width: 400px) {
+  .controls {
+    bottom: calc(225px + 60px);
+    left: 110px;
+  }
+  
   .controls button {
-    width: 50px;
-    height: 50px;
+    width: 100px;
+    height: 40px;
+    border-radius: 20px;
     font-size: 16px;
   }
 
-  .local-pip {
+  .local-pip, .video-wrapper:nth-child(2) {
     height: 120px;
     max-width: 100px;
     bottom: calc(60px + 60px);
+    right: 5px;
   }
 
   .info-overlay {
     padding: 8px;
+    background: transparent;
   }
 
-  .info-overlay #qrcode {
+  .info-overlay #qrcode, .qrcode-container {
     padding: 8px;
     max-width: 90%;
   }
