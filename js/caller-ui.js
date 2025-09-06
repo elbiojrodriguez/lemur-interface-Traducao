@@ -1,32 +1,41 @@
-window.onload = () => {
-  const textDisplay = document.getElementById('textDisplay');
+import WebRTCCore from '../core/webrtc-core.js';
 
-  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SpeechRecognition) {
-    textDisplay.innerHTML = '<div class="phrase-box final-text">Seu navegador não suporta reconhecimento de voz.</div>';
-    return;
+window.onload = () => {
+  const rtcCore = new WebRTCCore();
+  const myId = crypto.randomUUID().substr(0, 8);
+  document.getElementById('myId').textContent = myId;
+  rtcCore.initialize(myId);
+  rtcCore.setupSocketHandlers();
+
+  const localVideo = document.getElementById('localVideo');
+  const remoteVideo = document.getElementById('remoteVideo');
+  let targetId = null;
+  let localStream = null;
+
+  navigator.mediaDevices.getUserMedia({ video: true, audio: false })
+    .then(stream => {
+      localStream = stream;
+      remoteVideo.srcObject = stream;
+    })
+    .catch(error => {
+      console.error("Erro ao acessar a câmera:", error);
+    });
+
+  const urlParams = new URLSearchParams(window.location.search);
+  const targetIdFromUrl = urlParams.get('targetId');
+
+  if (targetIdFromUrl) {
+    targetId = targetIdFromUrl;
+    document.getElementById('callActionBtn').style.display = 'block';
   }
 
-  const recognition = new SpeechRecognition();
-  recognition.continuous = true;
-  recognition.interimResults = true;
-  recognition.lang = 'pt-BR';
-
-  recognition.onresult = (event) => {
-    textDisplay.innerHTML = ''; // Limpa antes de atualizar
-
-    for (let i = event.resultIndex; i < event.results.length; ++i) {
-      const result = event.results[i];
-      const div = document.createElement('div');
-      div.className = 'phrase-box ' + (result.isFinal ? 'final-text' : 'interim-box');
-      div.textContent = result[0].transcript;
-      textDisplay.appendChild(div);
-    }
+  document.getElementById('callActionBtn').onclick = () => {
+    if (!targetId || !localStream) return;
+    rtcCore.startCall(targetId, localStream);
   };
 
-  recognition.onerror = (event) => {
-    console.error('Erro no reconhecimento de voz:', event.error);
-  };
-
-  recognition.start();
+  rtcCore.setRemoteStreamCallback(stream => {
+    stream.getAudioTracks().forEach(track => track.enabled = false);
+    localVideo.srcObject = stream;
+  });
 };
