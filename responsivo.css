@@ -1,4 +1,4 @@
-/* Reset mobile */
+/* Reset básico para mobile */
 * {
   margin: 0;
   padding: 0;
@@ -8,11 +8,10 @@
 
 body {
   background: transparent;
-  min-height: 100vh;
-  height: 100%;
+  font-family: Arial, sans-serif;
+  height: 100vh;
   overflow: hidden;
   position: relative;
-  font-family: Arial, sans-serif;
 }
 
 /* Container principal */
@@ -23,69 +22,69 @@ body {
   overflow: hidden;
 }
 
-/* Containers de vídeo */
-.remote-container, .video-wrapper {
-  position: absolute;
+.phrase-box {
+  margin: 4px 0;
+  padding: 0;
+  font-size: 18px;
+  color: blak;
+  background: transparent;
+  border: none;
+  word-break: break-word;
+}
+
+/* Vídeos principais */
+.video-wrapper {
+  position: relative;
   width: 100%;
   height: 100%;
 }
 
-/* Oculta o vídeo remoto */
-#remoteVideo {
-  display: none;
-}
-
-/* Vídeo local em PIP com moldura verde */
-.local-pip, .video-wrapper:nth-child(2) {
-  position: absolute;
-  bottom: calc(80px + 60px);
-  right: 20px;
-  width: 34.5%;
-  max-width: 138px;
-  height: 184px;
-  transform: translateX(-17%);
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-  border: 2px solid #4CAF50;
-  z-index: 10;
-}
-
-#localVideo, .video-wrapper video {
+.video-wrapper video {
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+/* Vídeo local em PIP */
+.video-wrapper:nth-child(2) { 
+position: absolute; 
+bottom: calc(80px + 60px); 
+right: 5px; 
+width: 34.5%; 
+max-width: 138px; 
+height: 184px; 
+transform: translateX(-17%); 
+border-radius: 8px; overflow: hidden; 
+box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); 
+border: 2px solid #4CAF50; z-index: 10; 
+}
+
+.video-wrapper:nth-child(2) video {
   transform: scaleX(-1);
 }
 
-/* Controles principais: botão verde */
+/* Controles */
 .controls {
   position: absolute;
-  bottom: calc(215px + 60px);
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 20;
+  bottom: calc(225px + 60px);
+  left: 110px;
   display: flex;
   flex-direction: column;
   gap: 16px;
+  z-index: 20;
 }
 
+
 .controls button {
-  width: 120px;            /* Largura fixa */
-  height: 40px;            /* Altura fixa */
-  border-radius: 999px;    /* Cápsula garantida */
+  width: 100px;         /* Largura maior */
+  height: 40px;         /* Altura menor */
+  border-radius: 20px;  /* Metade da altura = forma oval */
   border: none;
-  font-size: 16px;
+  font-size: 18px;
   font-weight: bold;
   cursor: pointer;
   backdrop-filter: blur(6px);
   color: white;
-  background: #4CAF50;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;              /* Remove espaçamento extra */
-  box-sizing: border-box;  /* Garante que padding não afete tamanho */
 }
 
 #callActionBtn {
@@ -94,50 +93,6 @@ body {
 
 #scanBtn {
   background: #2196F3;
-}
-
-/* 🔻 Balões com bandeiras */
-.language-bubbles {
-  display: flex;
-  gap: 8px;
-  justify-content: center;
-}
-
-.lang-btn {
-  width: 40px;
-  height: 40px;
-  font-size: 20px;
-  border-radius: 50%;
-  border: none;
-  background-color: rgba(0, 0, 0, 0.3);
-  color: white;
-  cursor: pointer;
-  backdrop-filter: blur(4px);
-}
-
-/* 🔵 Box azul centralizado */
-.chat-input-box {
-  position: absolute;
-  bottom: 100px; /* Ajuste conforme a altura do PIP */
-  left: 50%;
-  transform: translateX(-50%);
-  width: 60%;
-  height: 160px; /* Altura aproximada do PIP */
-  border: 2px solid #007BFF;
-  border-radius: 12px;
-  background-color: rgba(255, 255, 255, 0.1);
-  z-index: 20;
-}
-
-/* Caixa de frase */
-.phrase-box {
-  margin: 4px 0;
-  padding: 0;
-  font-size: 18px;
-  color: black;
-  background: transparent;
-  border: none;
-  word-break: break-word;
 }
 
 /* Overlay de informações */
@@ -149,13 +104,13 @@ body {
   z-index: 30;
   color: white;
   text-align: center;
-  background: rgba(0, 0, 0, 0.5);
+  background: transparent; /* ← removido o cinza */;
   padding: 10px;
   border-radius: 0 0 10px 10px;
 }
 
-/* Container do QR Code */
-.info-overlay #qrcode, .qrcode-container {
+/* QR Code */
+.qrcode-container {
   margin: 10px auto;
   padding: 12px;
   background: white;
@@ -164,8 +119,8 @@ body {
   display: inline-block;
 }
 
-/* Destaque visual para ID */
-.id-display, #myId {
+/* ID visual opcional */
+#myId {
   display: inline-block;
   font-size: 16px;
   font-weight: bold;
@@ -177,46 +132,20 @@ body {
   color: white;
 }
 
-/* Responsivo para telas pequenas */
-@media (max-width: 400px) {
-  .controls {
-    bottom: calc(225px + 60px);
-    left: 110px;
-  }
-  
-  .controls button {
-    width: 100px;
-    height: 40px;
-    border-radius: 20px;
-    font-size: 16px;
-  }
 
-  .local-pip, .video-wrapper:nth-child(2) {
-    height: 120px;
-    max-width: 100px;
-    bottom: calc(60px + 60px);
-    right: 5px;
-  }
+  .video-wrapper:nth-child(2) {
+  .video-wrapper:nth-child(2) {
+  height: 120px;
+  max-width: 100px;
+  bottom: calc(60px + 60px);
+}
 
   .info-overlay {
     padding: 8px;
-    background: transparent;
   }
 
-  .info-overlay #qrcode, .qrcode-container {
+  .qrcode-container {
     padding: 8px;
     max-width: 90%;
-  }
-
-  .chat-input-box {
-    width: 80%;
-    height: 120px;
-    bottom: 80px;
-  }
-
-  .lang-btn {
-    width: 36px;
-    height: 36px;
-    font-size: 18px;
   }
 }
