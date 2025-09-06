@@ -1,379 +1,230 @@
-import WebRTCCore from '../core/webrtc-core.js';
+// ===== CÓDIGO DE TRADUÇÃO =====
+const TRANSLATE_ENDPOINT = 'https://chat-tradutor.onrender.com/translate';
 
-window.onload = () => {
-  const chatInputBox = document.querySelector('.chat-input-box');
-  const rtcCore = new WebRTCCore();
-  const myId = crypto.randomUUID().substr(0, 8);
-  document.getElementById('myId').textContent = myId;
-  rtcCore.initialize(myId);
-  rtcCore.setupSocketHandlers();
-
-  const localVideo = document.getElementById('localVideo');
-  const remoteVideo = document.getElementById('remoteVideo');
-  let targetId = null;
-  let localStream = null;
-
-  // Solicita acesso à câmera logo na abertura
-  navigator.mediaDevices.getUserMedia({ video: true, audio: false })
-    .then(stream => {
-      localStream = stream;
-      remoteVideo.srcObject = stream;
-    })
-    .catch(error => {
-      console.error("Erro ao acessar a câmera:", error);
-    });
-
-  // Verifica se há ID na URL
-  const urlParams = new URLSearchParams(window.location.search);
-  const targetIdFromUrl = urlParams.get('targetId');
-  
-  if (targetIdFromUrl) {
-    targetId = targetIdFromUrl;
-    document.getElementById('callActionBtn').style.display = 'block';
-  }
-
-  // Configura o botão de chamada
-  document.getElementById('callActionBtn').onclick = () => {
-    if (!targetId || !localStream) return;
-    rtcCore.startCall(targetId, localStream);
-  };
-
-  // Silencia qualquer áudio recebido
-  rtcCore.setRemoteStreamCallback(stream => {
-    stream.getAudioTracks().forEach(track => track.enabled = false);
-    localVideo.srcObject = stream;
-  });
-
-  // #############################################
-  // Controles de idioma dinâmicos
-  // #############################################
-
-  // 1. Configuração do chat (box azul)
-  const textDisplay = document.createElement('div');
-  textDisplay.className = 'text-display-placeholder';
-  textDisplay.style.padding = '10px';
-  textDisplay.style.color = 'black';
-  textDisplay.style.textAlign = 'center';
-  textDisplay.style.height = '100%';
-  textDisplay.style.display = 'flex';
-  textDisplay.style.alignItems = 'center';
-  textDisplay.style.justifyContent = 'center';
-  textDisplay.style.wordBreak = 'break-word';
-  textDisplay.style.overflowY = 'auto';
-  chatInputBox.appendChild(textDisplay);
-
-  // 2. Criação do container dos controles
-  const langControls = document.createElement('div');
-  langControls.style.position = 'fixed';
-  langControls.style.bottom = '80px';
-  langControls.style.left = '50%';
-  langControls.style.transform = 'translateX(-50%)';
-  langControls.style.marginLeft = '-70px';
-  langControls.style.zIndex = '100';
-  langControls.style.display = 'flex';
-  langControls.style.alignItems = 'center';
-  langControls.style.gap = '10px';
-  document.body.appendChild(langControls);
-
-  // 3. Balão do idioma detectado
-  const detectedLangBubble = document.createElement('div');
-  detectedLangBubble.className = 'lang-bubble';
-  detectedLangBubble.style.display = 'flex';
-  detectedLangBubble.style.alignItems = 'center';
-  detectedLangBubble.style.justifyContent = 'center';
-  detectedLangBubble.style.width = '50px';
-  detectedLangBubble.style.height = '50px';
-  detectedLangBubble.style.backgroundColor = 'white';
-  detectedLangBubble.style.borderRadius = '50%';
-  detectedLangBubble.style.boxShadow = '0 2px 5px rgba(0,0,0,0.2)';
-  detectedLangBubble.style.cursor = 'pointer';
-  detectedLangBubble.style.fontSize = '24px';
-  langControls.appendChild(detectedLangBubble);
-
-  // 4. Botão de seleção de idiomas (🌐)
-  const langSelectButton = document.createElement('button');
-  langSelectButton.className = 'lang-select-btn';
-  langSelectButton.textContent = '🌐';
-  langSelectButton.title = 'Selecionar idioma';
-  langSelectButton.style.display = 'flex';
-  langSelectButton.style.alignItems = 'center';
-  langSelectButton.style.justifyContent = 'center';
-  langSelectButton.style.width = '50px';
-  langSelectButton.style.height = '50px';
-  langSelectButton.style.backgroundColor = 'white';
-  langSelectButton.style.borderRadius = '50%';
-  langSelectButton.style.boxShadow = '0 2px 5px rgba(0,0,0,0.2)';
-  langSelectButton.style.border = 'none';
-  langSelectButton.style.cursor = 'pointer';
-  langSelectButton.style.fontSize = '24px';
-  langControls.appendChild(langSelectButton);
-
-  // 5. Menu de idiomas
-  const languageMenu = document.createElement('div');
-  languageMenu.className = 'language-menu';
-  languageMenu.style.display = 'none';
-  languageMenu.style.position = 'absolute';
-  languageMenu.style.backgroundColor = 'white';
-  languageMenu.style.borderRadius = '8px';
-  languageMenu.style.boxShadow = '0 2px 10px rgba(0,0,0,0.2)';
-  languageMenu.style.padding = '10px';
-  languageMenu.style.zIndex = '1000';
-  languageMenu.style.minWidth = '60px';
-  document.body.appendChild(languageMenu);
-
-  // 6. Idiomas disponíveis
-  const languages = [
-    { code: 'en-US', flag: '🇺🇸', speakText: 'Speak now', name: 'English' },
-    { code: 'pt-BR', flag: '🇧🇷', speakText: 'Fale agora', name: 'Português' },
-    { code: 'es-ES', flag: '🇪🇸', speakText: 'Habla agora', name: 'Español' },
-    { code: 'fr-FR', flag: '🇫🇷', speakText: 'Parlez maintenant', name: 'Français' },
-    { code: 'de-DE', flag: '🇩🇪', speakText: 'Sprechen Sie jetzt', name: 'Deutsch' },
-    { code: 'ja-JP', flag: '🇯🇵', speakText: '話してください', name: '日本語' },
-    { code: 'zh-CN', flag: '🇨🇳', speakText: '现在说话', name: '中文' },
-    { code: 'ru-RU', flag: '🇷🇺', speakText: 'Говорите сейчас', name: 'Русский' },
-    { code: 'ar-SA', flag: '🇸🇦', speakText: 'تحدث الآن', name: 'العربية' }
-  ];
-
-  // 7. Lógica de detecção de idioma
-  const browserLanguage = navigator.language;
-  let currentLang = languages.find(lang => browserLanguage.startsWith(lang.code.split('-')[0])) || languages[0];
-  detectedLangBubble.textContent = currentLang.flag;
-  detectedLangBubble.title = `Idioma atual: ${currentLang.name}`;
-
-  // 8. Popula o menu de idiomas
-  languages.forEach(lang => {
-    const langBtn = document.createElement('button');
-    langBtn.className = 'lang-option';
-    langBtn.innerHTML = `${lang.flag}`;
-    langBtn.dataset.langCode = lang.code;
-    langBtn.dataset.speakText = lang.speakText;
-    langBtn.title = lang.name;
-    langBtn.style.display = 'block';
-    langBtn.style.width = '100%';
-    langBtn.style.padding = '8px 12px';
-    langBtn.style.textAlign = 'center';
-    langBtn.style.border = 'none';
-    langBtn.style.background = 'none';
-    langBtn.style.cursor = 'pointer';
-    langBtn.style.borderRadius = '4px';
-    langBtn.style.margin = '2px 0';
-    langBtn.style.fontSize = '24px';
-    langBtn.addEventListener('mouseover', () => {
-      langBtn.style.backgroundColor = '#f0f0f0';
-    });
-    langBtn.addEventListener('mouseout', () => {
-      langBtn.style.backgroundColor = 'transparent';
-    });
-    languageMenu.appendChild(langBtn);
-  });
-
-  // 9. Controle do menu
-  langSelectButton.addEventListener('click', (e) => {
-    e.stopPropagation();
-    const rect = langSelectButton.getBoundingClientRect();
-    languageMenu.style.display = 'block';
-    languageMenu.style.top = `${rect.top - languageMenu.offsetHeight - 10}px`;
-    languageMenu.style.left = `${rect.left}px`;
-  });
-
-  document.addEventListener('click', () => {
-    languageMenu.style.display = 'none';
-  });
-
-  // 10. Configuração do reconhecimento de voz
-  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-  let recognition = null;
-  let isListening = false;
-
-  if (SpeechRecognition) {
-    recognition = new SpeechRecognition();
-    recognition.continuous = false;
-    recognition.interimResults = false;
-    recognition.lang = currentLang.code;
-
-    // Mensagem inicial no idioma correto
-    textDisplay.textContent = `${getClickToSpeakMessage(currentLang.code)}`;
-
-    // Clique na bandeira ativa/desativa o microfone
-    detectedLangBubble.addEventListener('click', () => {
-      if (!isListening) {
-        try {
-          recognition.start();
-          textDisplay.textContent = `${currentLang.speakText}...`;
-          textDisplay.style.display = 'flex'; // Garante visibilidade
-          isListening = true;
-        } catch (e) {
-          console.error('Erro ao iniciar microfone:', e);
-          textDisplay.textContent = `${getErrorMessage(currentLang.code)}`;
-          textDisplay.style.display = 'flex'; // Garante visibilidade
-        }
-      } else {
-        recognition.stop();
-        textDisplay.textContent = `${getMicOffMessage(currentLang.code)}`;
-        textDisplay.style.display = 'flex'; // MODIFICAÇÃO 1 - Garante que a mensagem apareça
-        isListening = false;
-      }
-    });
-
-    // Menu de idiomas
-    languageMenu.addEventListener('click', (e) => {
-      if (e.target.classList.contains('lang-option')) {
-        const langCode = e.target.dataset.langCode;
-        const flag = e.target.textContent;
-        const langName = e.target.title;
-
-        // MODIFICAÇÃO 2 - Limpa mensagens antigas e reseta o display
-        document.querySelectorAll('.phrase-box').forEach(el => el.remove());
-        textDisplay.style.display = 'flex';
-        textDisplay.textContent = getClickToSpeakMessage(langCode);
-
-        currentLang = languages.find(l => l.code === langCode);
-        detectedLangBubble.textContent = currentLang.flag;
-        detectedLangBubble.title = `Idioma atual: ${currentLang.name}`;
-
-        if (isListening) {
-          recognition.stop();
-          isListening = false;
-        }
-
-        recognition.lang = langCode;
-        languageMenu.style.display = 'none';
-      }
-    });
-
-// Resultado do reconhecimento - VERSÃO OTIMIZADA
-recognition.onresult = (event) => {
-  // Mantém a lógica original de esconder placeholder
-  if (textDisplay.classList.contains('text-display-placeholder')) {
-    textDisplay.style.display = 'none';
-  }
-
-  let finalTranscript = '';
-  let interimTranscript = '';
-
-  // Processamento dos resultados (original)
-  for (let i = event.resultIndex; i < event.results.length; i++) {
-    const transcript = event.results[i][0].transcript;
-    if (event.results[i].isFinal) {
-      finalTranscript += transcript;
-    } else {
-      interimTranscript += transcript;
-    }
-  }
-
-  const chatInputBox = document.querySelector('.chat-input-box');
-  
-  // COMPORTAMENTO ORIGINAL (frases finais)
-  if (finalTranscript.trim()) {
-    // Remove texto temporário se existir
-    const interimBox = document.querySelector('.interim-box');
-    if (interimBox) interimBox.remove();
-    
-    // Cria a mensagem final (como no original)
-    const phraseBox = document.createElement('div');
-    phraseBox.className = 'phrase-box';
-    phraseBox.textContent = finalTranscript; // ← Mantém formato original
-    
-    if (chatInputBox) {
-      chatInputBox.appendChild(phraseBox);
-      chatInputBox.scrollTop = chatInputBox.scrollHeight;
-      
-      // Mantém o microfone ativo visualmente (sua sugestão)
-      textDisplay.textContent = `${currentLang.speakText}...`;
-    }
-  }
-  // NOVO: Feedback em tempo real (sua sugestão)
-  else if (interimTranscript) {
-    let interimBox = document.querySelector('.interim-box');
-    
-    if (!interimBox) {
-      interimBox = document.createElement('div');
-      interimBox.className = 'interim-box'; // Classe diferente para não conflitar
-      if (chatInputBox) chatInputBox.appendChild(interimBox);
-    }
-    
-    interimBox.textContent = interimTranscript; // ← Sem formatação extra
-    if (chatInputBox) chatInputBox.scrollTop = chatInputBox.scrollHeight;
-  }
+const textsToTranslateWelcome = {
+    "welcome-title": "Welcome!",
+    "translator-label": "Live translation. No filters. No platform.",
+    "name-input": "Your name",
+    "next-button-welcome": "Next",
+    "camera-text": "Allow camera access",
+    "microphone-text": "Allow microphone access"
 };
-    // Tratamento de erros
-    recognition.onerror = (event) => {
-      console.error('Erro no reconhecimento:', event.error);
-      textDisplay.textContent = `${getErrorMessage(currentLang.code)}`;
-      textDisplay.style.display = 'flex'; // Garante visibilidade
-      isListening = false;
-    };
 
-// Reinício com delay para Android - VERSÃO ORIGINAL FUNCIONAL
-recognition.onend = () => {
-  // Mantém APENAS a verificação original do placeholder
-  if (!document.querySelector('.phrase-box')) {
-    textDisplay.style.display = 'flex';
-  }
+const textsToTranslateMain = {
+    "Instant-title": "Live translation. No filters. No platform.",
+    "send-button": "SEND🚀"
+};
 
-  // Mantém EXATAMENTE a lógica original de reinício
-  if (isListening) {
+async function translateText(text, targetLang) {
+    try {
+        if (targetLang === 'en') return text;
+
+        const response = await fetch(TRANSLATE_ENDPOINT, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ text, targetLang })
+        });
+
+        const result = await response.json();
+        return result.translatedText || text;
+
+    } catch (error) {
+        console.error('Erro na tradução:', error);
+        return text;
+    }
+}
+
+// ===== FUNÇÕES DE NAVEGAÇÃO =====
+function switchMode(modeId) {
+    document.querySelectorAll('.app-mode').forEach(mode => {
+        mode.classList.remove('active');
+    });
+    document.getElementById(modeId).classList.add('active');
+}
+
+// ===== FUNÇÃO PARA SOLICITAÇÃO DE PERMISSÕES =====
+async function requestMediaPermissions() {
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia({ 
+            video: true, 
+            audio: true 
+        });
+        
+        stream.getTracks().forEach(track => track.stop());
+        return true;
+        
+    } catch (error) {
+        console.error('Erro ao acessar dispositivos:', error);
+        return false;
+    }
+}
+
+// ===== CÓDIGO DOS ANÚNCIOS =====
+let topAdVisible = false;
+let bottomAdVisible = false;
+let topAdClosed = false;
+let bottomAdClosed = false;
+let adInterval;
+
+function startAdCycle() {
     setTimeout(() => {
-      try {
-        recognition.start();
-      } catch (e) {
-        console.error('Erro ao reiniciar:', e);
-        isListening = false;
-        textDisplay.textContent = `${getErrorMessage(currentLang.code)}`;
-        textDisplay.style.display = 'flex';
-      }
-    }, 300);
-  }
-};
-  } else {
-    textDisplay.textContent = 'Seu navegador não suporta reconhecimento de voz';
-    textDisplay.style.color = 'black';
-    console.error('API de reconhecimento de voz não suportada');
-  }
+        showAds();
+        
+        adInterval = setInterval(() => {
+            hideAds();
+            setTimeout(showAds, 2000);
+        }, 7000);
+    }, 5000);
+}
 
-  // Funções auxiliares para mensagens
-  function getClickToSpeakMessage(langCode) {
-    const messages = {
-      'en-US': 'Click flag to speak',
-      'pt-BR': 'Clique na bandeira para falar',
-      'es-ES': 'Haz clic en la bandera para hablar',
-      'fr-FR': 'Cliquez sur le drapeau pour parler',
-      'de-DE': 'Klicken Sie auf die Flagge zum Sprechen',
-      'ja-JP': '旗をクリックして話す',
-      'zh-CN': '点击旗帜说话',
-      'ru-RU': 'Нажмите на флаг, чтобы говорить',
-      'ar-SA': 'انقر على العلم للتحدث'
-    };
-    return messages[langCode] || messages['en-US'];
-  }
+function showAds() {
+    if (!topAdClosed) {
+        const topAd = document.getElementById('ad-top');
+        topAd.classList.add('visible');
+        topAdVisible = true;
+    }
+    
+    if (!bottomAdClosed) {
+        const bottomAd = document.getElementById('ad-bottom');
+        bottomAd.classList.add('visible');
+        bottomAdVisible = true;
+    }
+}
 
-  function getMicOffMessage(langCode) {
-    const messages = {
-      'en-US': 'Microphone off',
-      'pt-BR': 'Microfone desativado',
-      'es-ES': 'Micrófono desactivado',
-      'fr-FR': 'Microphone désactivé',
-      'de-DE': 'Mikrofon ausgeschaltet',
-      'ja-JP': 'マイクオフ',
-      'zh-CN': '麦克风关闭',
-      'ru-RU': 'Микрофон выключен',
-      'ar-SA': 'تم إيقاف الميكروفون'
-    };
-    return messages[langCode] || messages['en-US'];
-  }
+function hideAds() {
+    if (topAdVisible) {
+        const topAd = document.getElementById('ad-top');
+        topAd.classList.remove('visible');
+        topAdVisible = false;
+    }
+    
+    if (bottomAdVisible) {
+        const bottomAd = document.getElementById('ad-bottom');
+        bottomAd.classList.remove('visible');
+        bottomAdVisible = false;
+    }
+}
 
-  function getErrorMessage(langCode) {
-    const messages = {
-      'en-US': 'Microphone error',
-      'pt-BR': 'Erro no microfone',
-      'es-ES': 'Error de micrófono',
-      'fr-FR': 'Erreur de microphone',
-      'de-DE': 'Mikrofonfehler',
-      'ja-JP': 'マイクエラー',
-      'zh-CN': '麦克风错误',
-      'ru-RU': 'Ошибка микрофона',
-      'ar-SA': 'خطأ في الميكروفون'
-    };
-    return messages[langCode] || messages['en-US'];
-  }
-};
+function closeAd(position) {
+    if (position === 'top') {
+        const topAd = document.getElementById('ad-top');
+        topAd.classList.remove('visible');
+        topAdVisible = false;
+        topAdClosed = true;
+    } else if (position === 'bottom') {
+        const bottomAd = document.getElementById('ad-bottom');
+        bottomAd.classList.remove('visible');
+        bottomAdVisible = false;
+        bottomAdClosed = true;
+    }
+    
+    if (topAdClosed && bottomAdClosed) {
+        clearInterval(adInterval);
+    }
+}
+
+// ===== FUNÇÃO DE INICIALIZAÇÃO =====
+async function initApp() {
+    // Configurar evento do botão Next da tela de boas-vindas
+    const nextButtonWelcome = document.getElementById('next-button-welcome');
+    const nameInput = document.getElementById('name-input');
+    const welcomeScreen = document.getElementById('welcome-screen');
+    const cameraCheckbox = document.getElementById('camera-checkbox');
+    const microphoneCheckbox = document.getElementById('microphone-checkbox');
+    
+    let cameraGranted = false;
+    let microphoneGranted = false;
+    let userName = '';
+
+    // Traduzir textos da tela de boas-vindas
+    const browserLang = (navigator.language || 'en').split('-')[0];
+    
+    for (const [elementId, text] of Object.entries(textsToTranslateWelcome)) {
+        try {
+            const translated = await translateText(text, browserLang);
+            const element = document.getElementById(elementId);
+
+            if (element) {
+                if (elementId === 'name-input') {
+                    element.placeholder = translated;
+                } else {
+                    element.textContent = translated;
+                }
+            }
+        } catch (error) {
+            console.error(`Erro ao traduzir ${elementId}:`, error);
+        }
+    }
+
+    // Event listeners para checkboxes
+    cameraCheckbox.addEventListener('click', async () => {
+        cameraGranted = await requestMediaPermissions();
+        if (cameraGranted) {
+            cameraCheckbox.classList.add('checked');
+        } else {
+            cameraCheckbox.classList.remove('checked');
+        }
+    });
+
+    microphoneCheckbox.addEventListener('click', async () => {
+        microphoneGranted = await requestMediaPermissions();
+        if (microphoneGranted) {
+            microphoneCheckbox.classList.add('checked');
+        } else {
+            microphoneCheckbox.classList.remove('checked');
+        }
+    });
+
+    // Event listener para o botão Next
+    nextButtonWelcome.addEventListener('click', async () => {
+        userName = nameInput.value.trim();
+        let hasError = false;
+
+        if (!userName) {
+            hasError = true;
+        }
+
+        if (!cameraGranted || !microphoneGranted) {
+            hasError = true;
+        }
+
+        if (hasError) {
+            welcomeScreen.classList.add('error-state');
+            setTimeout(() => {
+                welcomeScreen.classList.remove('error-state');
+            }, 1000);
+            return;
+        }
+
+        // Mudar para tela principal
+        switchMode('main-mode');
+        
+        // Atualizar nome do usuário na tela principal
+        document.getElementById('user-name-display').textContent = userName;
+        
+        // Iniciar anúncios e traduzir tela principal
+        startAdCycle();
+        
+        // Traduzir textos da tela principal
+        for (const [elementId, text] of Object.entries(textsToTranslateMain)) {
+            try {
+                const translated = await translateText(text, browserLang);
+                const element = document.getElementById(elementId);
+
+                if (element) {
+                    element.textContent = translated;
+                }
+            } catch (error) {
+                console.error(`Erro ao traduzir ${elementId}:`, error);
+            }
+        }
+    });
+
+    // Configurar evento do botão SEND da tela principal
+    document.getElementById('send-button').addEventListener('click', function() {
+        alert('Mensagem enviada! (Funcionalidade será implementada)');
+    });
+}
+
+// ===== INICIAR APLICAÇÃO =====
+window.onload = initApp;
