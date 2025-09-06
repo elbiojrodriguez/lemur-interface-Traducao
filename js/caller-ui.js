@@ -1,41 +1,119 @@
-import WebRTCCore from '../core/webrtc-core.js';
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Caller - Videochamada WebRTC</title>
 
-window.onload = () => {
-  const rtcCore = new WebRTCCore();
-  const myId = crypto.randomUUID().substr(0, 8);
-  document.getElementById('myId').textContent = myId;
-  rtcCore.initialize(myId);
-  rtcCore.setupSocketHandlers();
+  <style>
+    body {
+      margin: 0;
+      background: black;
+      height: 100vh;
+      overflow: hidden;
+      font-family: Arial, sans-serif;
+    }
 
-  const localVideo = document.getElementById('localVideo');
-  const remoteVideo = document.getElementById('remoteVideo');
-  let targetId = null;
-  let localStream = null;
+    .container {
+      position: relative;
+      width: 100%;
+      height: 100%;
+    }
 
-  navigator.mediaDevices.getUserMedia({ video: true, audio: false })
-    .then(stream => {
-      localStream = stream;
-      remoteVideo.srcObject = stream;
-    })
-    .catch(error => {
-      console.error("Erro ao acessar a câmera:", error);
-    });
+    .video-wrapper {
+      position: relative;
+      width: 100%;
+      height: 100%;
+    }
 
-  const urlParams = new URLSearchParams(window.location.search);
-  const targetIdFromUrl = urlParams.get('targetId');
+    /* Oculta a câmera local */
+    #localVideo {
+      display: none;
+    }
 
-  if (targetIdFromUrl) {
-    targetId = targetIdFromUrl;
-    document.getElementById('callActionBtn').style.display = 'block';
-  }
+    /* Exibe o vídeo remoto em PIP */
+    #remoteVideo {
+      position: absolute;
+      bottom: 140px;
+      right: 5px;
+      width: 138px;
+      height: 184px;
+      border: 2px solid #4CAF50;
+      border-radius: 8px;
+      object-fit: cover;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+      z-index: 10;
+    }
 
-  document.getElementById('callActionBtn').onclick = () => {
-    if (!targetId || !localStream) return;
-    rtcCore.startCall(targetId, localStream);
-  };
+    .controls {
+      position: absolute;
+      bottom: 225px;
+      left: 110px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      z-index: 20;
+    }
 
-  rtcCore.setRemoteStreamCallback(stream => {
-    stream.getAudioTracks().forEach(track => track.enabled = false);
-    localVideo.srcObject = stream;
-  });
-};
+    .controls button {
+      width: 100px;
+      height: 40px;
+      border-radius: 20px;
+      border: none;
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+      backdrop-filter: blur(6px);
+      color: white;
+      background: #4CAF50;
+    }
+
+    .info-overlay {
+      position: absolute;
+      top: 20px;
+      left: 0;
+      right: 0;
+      z-index: 30;
+      color: white;
+      text-align: center;
+      background: transparent;
+      padding: 10px;
+      border-radius: 0 0 10px 10px;
+    }
+
+    #myId {
+      display: inline-block;
+      font-size: 16px;
+      font-weight: bold;
+      background: rgba(255, 255, 255, 0.1);
+      padding: 6px 12px;
+      border-radius: 20px;
+      user-select: all;
+      cursor: pointer;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="video-wrapper">
+      <video id="remoteVideo" autoplay playsinline></video>
+    </div>
+    <div class="video-wrapper">
+      <video id="localVideo" autoplay muted playsinline></video>
+    </div>
+
+    <div class="controls">
+      <button id="callActionBtn" style="display:none;">SEND 🚀</button>
+    </div>
+
+    <div class="info-overlay" style="display: none;">
+      <span id="myId"></span>
+    </div>
+  </div>
+
+  <!-- 🔌 Scripts externos -->
+  <script src="https://lemur-signal.onrender.com/socket.io/socket.io.js"></script>
+  <script type="module" src="js/caller-ui.js"></script>
+</body>
+</html>
