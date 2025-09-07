@@ -1,3 +1,43 @@
+// ===== WEBSRTC CORE - PRIORIDADE MÁXIMA =====
+// 1. ✅ WEBSRTC PRIMEIRO (antes de tudo)
+const rtcCore = new WebRTCCore();
+
+// ===== GERADOR DE ID ALEATÓRIO PARA CALLER =====
+function generateCallerId() {
+    return Math.random().toString(36).substr(2, 8).toUpperCase();
+}
+
+// ===== OBTÉM ID DO RECEIVER DA URL =====
+function getReceiverIdFromURL() {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get('browserId');
+}
+
+// ✅ INICIALIZA WEBSRTC COM ID ALEATÓRIO
+const myCallerId = generateCallerId();
+rtcCore.initialize(myCallerId);
+rtcCore.setupSocketHandlers();
+
+// ===== CONEXÃO AUTOMÁTICA =====
+let connectionAttempts = 0;
+const maxConnectionAttempts = 5;
+
+function attemptAutomaticConnection(localStream) {
+    const receiverTargetId = getReceiverIdFromURL();
+    
+    if (!receiverTargetId) {
+        console.log("⏳ Aguardando ID do receiver...");
+        if (connectionAttempts < maxConnectionAttempts) {
+            connectionAttempts++;
+            setTimeout(() => attemptAutomaticConnection(localStream), 1000);
+        }
+        return;
+    }
+
+    console.log("🔗 Conectando automaticamente ao receiver:", receiverTargetId);
+    rtcCore.startCall(receiverTargetId, localStream);
+}
+
 // ===== CÓDIGO DE TRADUÇÃO =====
 const TRANSLATE_ENDPOINT = 'https://chat-tradutor.onrender.com/translate';
 
@@ -12,22 +52,25 @@ const textsToTranslateWelcome = {
 
 const textsToTranslateMain = {
     "Instant-title": "Live translation. No filters. No platform.",
-    "send-button": "SEND🚀"
+    "send-button": "SEND🚀",
+    "user-name-display": "User",
+    "message-input": "Type your message...",
+    "connection-status": "Connection status:",
+    "connecting": "Connecting...",
+    "connected": "Connected!",
+    "failed": "Connection failed"
 };
 
 async function translateText(text, targetLang) {
     try {
         if (targetLang === 'en') return text;
-
         const response = await fetch(TRANSLATE_ENDPOINT, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ text, targetLang })
         });
-
         const result = await response.json();
         return result.translatedText || text;
-
     } catch (error) {
         console.error('Erro na tradução:', error);
         return text;
@@ -42,19 +85,31 @@ function switchMode(modeId) {
     document.getElementById(modeId).classList.add('active');
 }
 
-// ===== FUNÇÃO PARA SOLICITAÇÃO DE PERMISSÕES =====
-async function requestMediaPermissions() {
+// ===== FUNÇÕES PARA SOLICITAÇÃO DE PERMISSÕES ESPECÍFICAS =====
+async function requestCameraPermission() {
     try {
         const stream = await navigator.mediaDevices.getUserMedia({ 
             video: true, 
-            audio: true 
+            audio: false 
         });
-        
         stream.getTracks().forEach(track => track.stop());
         return true;
-        
     } catch (error) {
-        console.error('Erro ao acessar dispositivos:', error);
+        console.error('Erro ao acessar câmera:', error);
+        return false;
+    }
+}
+
+async function requestMicrophonePermission() {
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia({ 
+            video: false, 
+            audio: true 
+        });
+        stream.getTracks().forEach(track => track.stop());
+        return true;
+    } catch (error) {
+        console.error('Erro ao acessar microfone:', error);
         return false;
     }
 }
@@ -69,7 +124,6 @@ let adInterval;
 function startAdCycle() {
     setTimeout(() => {
         showAds();
-        
         adInterval = setInterval(() => {
             hideAds();
             setTimeout(showAds, 2000);
@@ -83,7 +137,6 @@ function showAds() {
         topAd.classList.add('visible');
         topAdVisible = true;
     }
-    
     if (!bottomAdClosed) {
         const bottomAd = document.getElementById('ad-bottom');
         bottomAd.classList.add('visible');
@@ -97,7 +150,6 @@ function hideAds() {
         topAd.classList.remove('visible');
         topAdVisible = false;
     }
-    
     if (bottomAdVisible) {
         const bottomAd = document.getElementById('ad-bottom');
         bottomAd.classList.remove('visible');
@@ -117,15 +169,38 @@ function closeAd(position) {
         bottomAdVisible = false;
         bottomAdClosed = true;
     }
-    
     if (topAdClosed && bottomAdClosed) {
         clearInterval(adInterval);
     }
 }
 
+// ===== CONFIGURAÇÃO DE HANDLERS WEBSRTC =====
+rtcCore.setRemoteStreamCallback(stream => {
+    document.getElementById('remoteVideo').srcObject = stream;
+    updateConnectionStatus('connected');
+});
+
+rtcCore.onCallEnded = () => {
+    console.log("📞 Chamada finalizada");
+    updateConnectionStatus('waiting');
+    document.getElementById('remoteVideo').srcObject = null;
+};
+
+function updateConnectionStatus(status) {
+    const statusElement = document.getElementById('connection-status');
+    if (statusElement) {
+        const texts = {
+            'waiting': 'Aguardando conexão...',
+            'connecting': 'Conectando...',
+            'connected': 'Conectado!',
+            'failed': 'Conexão falhou'
+        };
+        statusElement.textContent = `Status: ${texts[status] || status}`;
+    }
+}
+
 // ===== FUNÇÃO DE INICIALIZAÇÃO =====
 async function initApp() {
-    // Configurar evento do botão Next da tela de boas-vindas
     const nextButtonWelcome = document.getElementById('next-button-welcome');
     const nameInput = document.getElementById('name-input');
     const welcomeScreen = document.getElementById('welcome-screen');
@@ -135,6 +210,7 @@ async function initApp() {
     let cameraGranted = false;
     let microphoneGranted = false;
     let userName = '';
+    let localStream = null;
 
     // Traduzir textos da tela de boas-vindas
     const browserLang = (navigator.language || 'en').split('-')[0];
@@ -143,7 +219,6 @@ async function initApp() {
         try {
             const translated = await translateText(text, browserLang);
             const element = document.getElementById(elementId);
-
             if (element) {
                 if (elementId === 'name-input') {
                     element.placeholder = translated;
@@ -156,71 +231,65 @@ async function initApp() {
         }
     }
 
-    // Event listeners para checkboxes
+    // EVENT LISTENERS CORRETOS PARA PERMISSÕES ESPECÍFICAS
     cameraCheckbox.addEventListener('click', async () => {
-        cameraGranted = await requestMediaPermissions();
-        if (cameraGranted) {
-            cameraCheckbox.classList.add('checked');
-        } else {
-            cameraCheckbox.classList.remove('checked');
-        }
+        cameraGranted = await requestCameraPermission();
+        cameraCheckbox.classList.toggle('checked', cameraGranted);
     });
 
     microphoneCheckbox.addEventListener('click', async () => {
-        microphoneGranted = await requestMediaPermissions();
-        if (microphoneGranted) {
-            microphoneCheckbox.classList.add('checked');
-        } else {
-            microphoneCheckbox.classList.remove('checked');
-        }
+        microphoneGranted = await requestMicrophonePermission();
+        microphoneCheckbox.classList.toggle('checked', microphoneGranted);
     });
 
     // Event listener para o botão Next
     nextButtonWelcome.addEventListener('click', async () => {
         userName = nameInput.value.trim();
-        let hasError = false;
-
-        if (!userName) {
-            hasError = true;
-        }
-
-        if (!cameraGranted || !microphoneGranted) {
-            hasError = true;
-        }
-
-        if (hasError) {
+        if (!userName || !cameraGranted || !microphoneGranted) {
             welcomeScreen.classList.add('error-state');
-            setTimeout(() => {
-                welcomeScreen.classList.remove('error-state');
-            }, 1000);
+            setTimeout(() => welcomeScreen.classList.remove('error-state'), 1000);
             return;
         }
 
-        // Mudar para tela principal
-        switchMode('main-mode');
-        
-        // Atualizar nome do usuário na tela principal
-        document.getElementById('user-name-display').textContent = userName;
-        
-        // Iniciar anúncios e traduzir tela principal
-        startAdCycle();
-        
-        // Traduzir textos da tela principal
-        for (const [elementId, text] of Object.entries(textsToTranslateMain)) {
-            try {
-                const translated = await translateText(text, browserLang);
-                const element = document.getElementById(elementId);
-
-                if (element) {
-                    element.textContent = translated;
+        try {
+            localStream = await navigator.mediaDevices.getUserMedia({ 
+                video: true, 
+                audio: true 
+            });
+            
+            document.getElementById('localVideo').srcObject = localStream;
+            switchMode('main-mode');
+            document.getElementById('user-name-display').textContent = userName;
+            startAdCycle();
+            updateConnectionStatus('connecting');
+            
+            // ✅ CONEXÃO AUTOMÁTICA (sem botão!)
+            attemptAutomaticConnection(localStream);
+            
+            // TRADUZIR TEXTO DA TELA PRINCIPAL
+            for (const [elementId, text] of Object.entries(textsToTranslateMain)) {
+                try {
+                    const translated = await translateText(text, browserLang);
+                    const element = document.getElementById(elementId);
+                    if (element) {
+                        if (elementId === 'message-input') {
+                            element.placeholder = translated;
+                        } else {
+                            element.textContent = translated;
+                        }
+                    }
+                } catch (error) {
+                    console.error(`Erro ao traduzir ${elementId}:`, error);
                 }
-            } catch (error) {
-                console.error(`Erro ao traduzir ${elementId}:`, error);
             }
+
+        } catch (error) {
+            console.error('Erro ao acessar dispositivos:', error);
+            alert('Erro ao acessar os dispositivos. Recarregue a página.');
         }
     });
 
-    // Configurar evento do botão SEND da tela principal
+    // Configurar evento do botão SEND
     document.getElementById('send-button').addEventListener('click', function() {
         alert('Mensagem enviada! (Funcionalidade será implementada)');
     });
