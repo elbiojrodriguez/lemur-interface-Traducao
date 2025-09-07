@@ -4,26 +4,12 @@ import { QRCodeGenerator } from './qr-code-utils.js';
 // ===== IDENTIFICAÇÃO IMEDIATA DO HTML VIA TOKEN =====
 const urlParams = new URLSearchParams(window.location.search);
 const token = urlParams.get('token');
-const fixedId = token ? token.slice(-8) : 'unknown';
-window.fixedId = fixedId;
+window.fixedId = token ? token.slice(-8) : 'unknown';
 
-console.log("🆔 ID fixo gerado na carga:", fixedId);
+console.log("🆔 ID fixo gerado:", window.fixedId);
 
-// ===== WEBSRTC CORE - EM SEGUNDO PLANO =====
-// ✅ Agora não bloqueia a interface!
+// ===== WEBSRTC - SOMENTE DECLARAÇÃO (INICIA SOMENTE QUANDO PRECISAR) =====
 let rtcCore = null;
-
-function initializeWebRTCInBackground() {
-    return new Promise((resolve) => {
-        setTimeout(() => {
-            rtcCore = new WebRTCCore();
-            rtcCore.initialize(window.fixedId);
-            rtcCore.setupSocketHandlers();
-            console.log("✅ WebRTC inicializado em background");
-            resolve(rtcCore);
-        }, 100); // Pequeno delay para não bloquear a UI
-    });
-}
 
 // ===== CÓDIGO DE TRADUÇÃO =====
 const TRANSLATE_ENDPOINT = 'https://chat-tradutor.onrender.com/translate';
@@ -117,25 +103,31 @@ function generateQRCode(name) {
     document.getElementById('url-content-modal').textContent = fullUrl;
 }
 
-// ===== CONFIGURAÇÃO DE HANDLERS WEBSRTC =====
-function setupWebRTCHandlers() {
-    if (!rtcCore) return;
-    
-    rtcCore.onIncomingCall = (offer) => {
-        console.log("📞 Chamada recebida!");
-        updateConnectionStatus('connected');
+// ===== FUNÇÃO PARA INICIAR WEBSRTC (SOMENTE QUANDO NECESSÁRIO) =====
+function initializeWebRTC() {
+    if (!rtcCore) {
+        console.log("🚀 Iniciando WebRTC...");
+        rtcCore = new WebRTCCore();
+        rtcCore.initialize(window.fixedId);
+        rtcCore.setupSocketHandlers();
         
-        rtcCore.handleIncomingCall(offer, window.authorizedStream, (remoteStream) => {
-            document.getElementById('remoteVideo').srcObject = remoteStream;
-            console.log("✅ Conexão estabelecida com sucesso!");
-        });
-    };
+        rtcCore.onIncomingCall = (offer) => {
+            console.log("📞 Chamada recebida!");
+            updateConnectionStatus('connected');
+            
+            rtcCore.handleIncomingCall(offer, window.authorizedStream, (remoteStream) => {
+                document.getElementById('remoteVideo').srcObject = remoteStream;
+                console.log("✅ Conexão estabelecida com sucesso!");
+            });
+        };
 
-    rtcCore.onCallEnded = () => {
-        console.log("📞 Chamada finalizada");
-        updateConnectionStatus('waiting');
-        document.getElementById('remoteVideo').srcObject = null;
-    };
+        rtcCore.onCallEnded = () => {
+            console.log("📞 Chamada finalizada");
+            updateConnectionStatus('waiting');
+            document.getElementById('remoteVideo').srcObject = null;
+        };
+    }
+    return rtcCore;
 }
 
 function updateConnectionStatus(status) {
@@ -163,11 +155,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     let cameraGranted = false;
     let microphoneGranted = false;
     let userName = '';
-
-    // ✅ INICIALIZA WEBSRTC EM SEGUNDO PLANO (não bloqueia)
-    initializeWebRTCInBackground().then(() => {
-        setupWebRTCHandlers();
-    });
 
     // Processo de tradução inicial
     const browserLang = (navigator.language || 'en').split('-')[0];
@@ -214,7 +201,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         microphoneCheckbox.classList.toggle('checked', microphoneGranted);
     });
 
-    // Event listener para o botão Next
+    // Event listener para o botão Next (Tela 1 → Tela 2)
     nextButtonWelcome.addEventListener('click', async () => {
         userName = nameInput.value.trim();
         if (!userName || !cameraGranted || !microphoneGranted) {
@@ -239,11 +226,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
+    // Event listener para o botão Start Connection (Tela 2 → Tela 3)
     nextButtonQrcode.addEventListener('click', () => {
         switchMode('communication-mode');
         document.getElementById('localVideo').srcObject = window.authorizedStream;
         document.getElementById('myId').textContent = `ID: ${window.fixedId}`;
         updateConnectionStatus('waiting');
+        
+        // ✅ WEBSRTC SÓ INICIA AQUI - QUANDO USUÁRIO CLICA!
+        initializeWebRTC();
         
         // Traduzir elementos da tela WebRTC
         translateWebRTCTexts();
