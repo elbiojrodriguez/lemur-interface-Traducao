@@ -5,9 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Receiver - Videochamada Mobile</title>
   
-  <!-- Usando o CSS otimizado que unifica style.css e responsivo.css -->
   <style>
-    /* Reset unificado e variáveis CSS */
+    /* Variáveis CSS */
     :root {
       --cor-primaria: #4CAF50;
       --cor-secundaria: #2196F3;
@@ -41,21 +40,8 @@
       overflow: hidden;
     }
 
-    /* Estilos de vídeo unificados */
-    .video-wrapper {
-      position: relative;
-      width: 100%;
-      height: 100%;
-    }
-
-    .video-wrapper video {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    /* PIP - Picture in Picture (segundo vídeo) */
-    .video-wrapper:nth-child(2) {
+    /* Box Video Remoto (PIP com borda verde) */
+    .box-video.remoto {
       position: absolute;
       bottom: calc(80px + 60px);
       right: 5px;
@@ -70,8 +56,11 @@
       z-index: 10;
     }
 
-    .video-wrapper:nth-child(2) video {
+    .box-video.remoto video {
       transform: scaleX(-1);
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
     }
 
     /* Controles */
@@ -142,7 +131,7 @@
 
     /* Responsividade */
     @media (max-width: 400px) {
-      .video-wrapper:nth-child(2) {
+      .box-video.remoto {
         height: 120px;
         max-width: 100px;
         bottom: calc(60px + 60px);
@@ -159,29 +148,24 @@
     }
   </style>
   
-  <!-- Biblioteca QR Code correta (igual ao HTML 01) -->
+  <!-- Biblioteca QR Code correta -->
   <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
 </head>
 <body>
   <div class="container">
-    <div class="video-wrapper">
-      <video id="remoteVideo" autoplay playsinline></video>
-    </div>
-
-    <div class="video-wrapper">
+    <!-- Box Video Remoto (PIP com borda verde) -->
+    <div class="box-video remoto">
       <video id="localVideo" autoplay muted playsinline></video>
     </div>
 
-    <!-- Estrutura de QR Code igual ao HTML 01 -->
+    <!-- Estrutura de QR Code -->
     <div class="info-overlay">
       <div id="qrcode" class="qrcode-container"></div>
     </div>
   </div>
 
-  <!-- Scripts externos (igual ao HTML 01) -->
+  <!-- Scripts externos -->
   <script src="https://lemur-signal.onrender.com/socket.io/socket.io.js"></script>
   <script type="module" src="js/receiver-ui.js"></script>
-  
-  <!-- Removi as referências aos scripts adicionais que não estavam no HTML 01 -->
 </body>
 </html>
