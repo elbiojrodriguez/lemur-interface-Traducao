@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Receiver - Videochamada Mobile</title>
   
+  <!-- Usando o CSS otimizado que unifica style.css e responsivo.css -->
   <style>
     /* Reset unificado e variáveis CSS */
     :root {
@@ -14,9 +15,6 @@
       --sombra-padrao: 0 0 10px rgba(0, 0, 0, 0.5);
       --borda-arredondada: 8px;
       --tamanho-botao: 40px;
-      --pip-width: 34.5%;       /* LARGURA DO PIP - ALTERE AQUI */
-      --pip-max-width: 138px;   /* LARGURA MÁXIMA DO PIP - ALTERE AQUI */
-      --pip-height: 184px;      /* ALTURA DO PIP - ALTERE AQUI */
     }
     
     * {
@@ -27,7 +25,7 @@
     }
 
     body {
-      background: #2c3e50;
+      background: transparent;
       font-family: Arial, sans-serif;
       height: 100vh;
       overflow: hidden;
@@ -48,7 +46,6 @@
       position: relative;
       width: 100%;
       height: 100%;
-      background: #1a2530;
     }
 
     .video-wrapper video {
@@ -57,14 +54,14 @@
       object-fit: cover;
     }
 
-    /* PIP - Picture in Picture (segundo vídeo) - ELEMENTO COM BORDA VERDE */
+    /* PIP - Picture in Picture (segundo vídeo) */
     .video-wrapper:nth-child(2) {
       position: absolute;
       bottom: calc(80px + 60px);
       right: 5px;
-      width: var(--pip-width);
-      max-width: var(--pip-max-width);
-      height: var(--pip-height);
+      width: 34.5%;
+      max-width: 138px;
+      height: 184px;
       transform: translateX(-17%);
       border-radius: var(--borda-arredondada);
       overflow: hidden;
@@ -75,6 +72,37 @@
 
     .video-wrapper:nth-child(2) video {
       transform: scaleX(-1);
+    }
+
+    /* Controles */
+    .controls {
+      position: absolute;
+      bottom: calc(225px + 60px);
+      left: 110px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      z-index: 20;
+    }
+
+    .controls button {
+      width: 100px;
+      height: var(--tamanho-botao);
+      border-radius: 20px;
+      border: none;
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+      backdrop-filter: blur(6px);
+      color: var(--cor-texto);
+    }
+
+    #callActionBtn {
+      background: var(--cor-primaria);
+    }
+
+    #scanBtn {
+      background: var(--cor-secundaria);
     }
 
     /* Overlay de informações */
@@ -112,36 +140,6 @@
       cursor: pointer;
     }
 
-    /* Painel de controle para experimentos */
-    .size-controls {
-      position: fixed;
-      bottom: 20px;
-      left: 20px;
-      background: rgba(0, 0, 0, 0.7);
-      padding: 15px;
-      border-radius: 10px;
-      z-index: 1000;
-    }
-    
-    .size-controls h3 {
-      margin: 0 0 10px 0;
-      font-size: 14px;
-    }
-    
-    .control-group {
-      margin-bottom: 10px;
-    }
-    
-    .control-group label {
-      display: block;
-      margin-bottom: 5px;
-      font-size: 12px;
-    }
-    
-    .control-group input {
-      width: 100%;
-    }
-
     /* Responsividade */
     @media (max-width: 400px) {
       .video-wrapper:nth-child(2) {
@@ -158,16 +156,10 @@
         padding: 8px;
         max-width: 90%;
       }
-      
-      .size-controls {
-        bottom: 10px;
-        left: 10px;
-        right: 10px;
-        padding: 10px;
-      }
     }
   </style>
   
+  <!-- Biblioteca QR Code correta (igual ao HTML 01) -->
   <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
 </head>
 <body>
@@ -180,82 +172,16 @@
       <video id="localVideo" autoplay muted playsinline></video>
     </div>
 
+    <!-- Estrutura de QR Code igual ao HTML 01 -->
     <div class="info-overlay">
       <div id="qrcode" class="qrcode-container"></div>
     </div>
   </div>
 
-  <!-- Painel de controle para ajustar o tamanho do PIP -->
-  <div class="size-controls">
-    <h3>Controle de Tamanho do PIP</h3>
-    
-    <div class="control-group">
-      <label for="pipWidth">Largura (%): <span id="widthValue">34.5</span></label>
-      <input type="range" id="pipWidth" min="20" max="50" step="0.5" value="34.5">
-    </div>
-    
-    <div class="control-group">
-      <label for="pipMaxWidth">Largura Máxima (px): <span id="maxWidthValue">138</span></label>
-      <input type="range" id="pipMaxWidth" min="80" max="200" step="2" value="138">
-    </div>
-    
-    <div class="control-group">
-      <label for="pipHeight">Altura (px): <span id="heightValue">184</span></label>
-      <input type="range" id="pipHeight" min="100" max="250" step="2" value="184">
-    </div>
-    
-    <button onclick="resetSize()">Redefinir Tamanho Padrão</button>
-  </div>
-
-  <script>
-    // Script para gerar QR Code (exemplo)
-    document.addEventListener('DOMContentLoaded', function() {
-      // Gerar um ID aleatório para demonstração
-      const randomId = Math.random().toString(36).substring(2, 10).toUpperCase();
-      
-      // Gerar QR Code
-      new QRCode(document.getElementById("qrcode"), {
-        text: `https://videocall.example.com/join/${randomId}`,
-        width: 100,
-        height: 100,
-        colorDark : "#000000",
-        colorLight : "#ffffff",
-        correctLevel : QRCode.CorrectLevel.H
-      });
-      
-      // Configurar controles de tamanho
-      const pipWidth = document.getElementById('pipWidth');
-      const pipMaxWidth = document.getElementById('pipMaxWidth');
-      const pipHeight = document.getElementById('pipHeight');
-      
-      pipWidth.addEventListener('input', updateSize);
-      pipMaxWidth.addEventListener('input', updateSize);
-      pipHeight.addEventListener('input', updateSize);
-      
-      function updateSize() {
-        document.documentElement.style.setProperty('--pip-width', pipWidth.value + '%');
-        document.documentElement.style.setProperty('--pip-max-width', pipMaxWidth.value + 'px');
-        document.documentElement.style.setProperty('--pip-height', pipHeight.value + 'px');
-        
-        document.getElementById('widthValue').textContent = pipWidth.value;
-        document.getElementById('maxWidthValue').textContent = pipMaxWidth.value;
-        document.getElementById('heightValue').textContent = pipHeight.value;
-      }
-    });
-    
-    function resetSize() {
-      document.getElementById('pipWidth').value = 34.5;
-      document.getElementById('pipMaxWidth').value = 138;
-      document.getElementById('pipHeight').value = 184;
-      
-      document.documentElement.style.setProperty('--pip-width', '34.5%');
-      document.documentElement.style.setProperty('--pip-max-width', '138px');
-      document.documentElement.style.setProperty('--pip-height', '184px');
-      
-      document.getElementById('widthValue').textContent = '34.5';
-      document.getElementById('maxWidthValue').textContent = '138';
-      document.getElementById('heightValue').textContent = '184';
-    }
-  </script>
+  <!-- Scripts externos (igual ao HTML 01) -->
+  <script src="https://lemur-signal.onrender.com/socket.io/socket.io.js"></script>
+  <script type="module" src="js/receiver-ui.js"></script>
+  
+  <!-- Removi as referências aos scripts adicionais que não estavam no HTML 01 -->
 </body>
 </html>
