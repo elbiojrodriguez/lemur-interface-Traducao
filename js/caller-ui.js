@@ -1,53 +1,18 @@
-// ===== WEBSRTC CORE - EM SEGUNDO PLANO =====
+// ===== IDENTIFICAÇÃO IMEDIATA DO HTML VIA URL =====
+const urlParams = new URLSearchParams(window.location.search);
+window.receiverTargetId = urlParams.get('browserId'); // ID do Receiver
+window.callerName = urlParams.get('name') || 'User';
+window.callerLang = urlParams.get('lang') || navigator.language;
+
+console.log("🎯 Receiver ID:", window.receiverTargetId);
+console.log("👤 Caller Name:", window.callerName);
+
+// ===== WEBSRTC - SOMENTE DECLARAÇÃO (INICIA SOMENTE QUANDO PRECISAR) =====
 let rtcCore = null;
-let connectionAttempts = 0;
-const maxConnectionAttempts = 5;
 
 // ===== GERADOR DE ID ALEATÓRIO PARA CALLER =====
 function generateCallerId() {
     return Math.random().toString(36).substr(2, 8).toUpperCase();
-}
-
-// ===== OBTÉM ID DO RECEIVER DA URL =====
-function getReceiverIdFromURL() {
-    const urlParams = new URLSearchParams(window.location.search);
-    return urlParams.get('browserId');
-}
-
-function initializeWebRTCInBackground() {
-    return new Promise((resolve) => {
-        setTimeout(() => {
-            rtcCore = new WebRTCCore();
-            const myCallerId = generateCallerId();
-            rtcCore.initialize(myCallerId);
-            rtcCore.setupSocketHandlers();
-            console.log("✅ WebRTC inicializado em background");
-            resolve(rtcCore);
-        }, 100);
-    });
-}
-
-// ===== CONEXÃO AUTOMÁTICA =====
-function attemptAutomaticConnection(localStream) {
-    if (!rtcCore) {
-        console.log("⏳ WebRTC ainda não inicializado...");
-        setTimeout(() => attemptAutomaticConnection(localStream), 500);
-        return;
-    }
-
-    const receiverTargetId = getReceiverIdFromURL();
-    
-    if (!receiverTargetId) {
-        console.log("⏳ Aguardando ID do receiver...");
-        if (connectionAttempts < maxConnectionAttempts) {
-            connectionAttempts++;
-            setTimeout(() => attemptAutomaticConnection(localStream), 1000);
-        }
-        return;
-    }
-
-    console.log("🔗 Conectando automaticamente ao receiver:", receiverTargetId);
-    rtcCore.startCall(receiverTargetId, localStream);
 }
 
 // ===== CÓDIGO DE TRADUÇÃO =====
@@ -56,7 +21,7 @@ const TRANSLATE_ENDPOINT = 'https://chat-tradutor.onrender.com/translate';
 const textsToTranslateWelcome = {
     "welcome-title": "Welcome!",
     "translator-label": "Live translation. No filters. No platform.",
-    "name-input": "Your name",
+    "name-input": "Your name", 
     "next-button-welcome": "Next",
     "camera-text": "Allow camera access",
     "microphone-text": "Allow microphone access"
@@ -186,20 +151,35 @@ function closeAd(position) {
     }
 }
 
-// ===== CONFIGURAÇÃO DE HANDLERS WEBSRTC =====
-function setupWebRTCHandlers() {
-    if (!rtcCore) return;
-    
-    rtcCore.setRemoteStreamCallback(stream => {
-        document.getElementById('remoteVideo').srcObject = stream;
-        updateConnectionStatus('connected');
-    });
+// ===== FUNÇÃO PARA INICIAR WEBSRTC (SOMENTE QUANDO NECESSÁRIO) =====
+function initializeAndStartWebRTC(localStream) {
+    if (!rtcCore) {
+        console.log("🚀 Iniciando WebRTC...");
+        rtcCore = new WebRTCCore();
+        rtcCore.initialize(generateCallerId());
+        rtcCore.setupSocketHandlers();
+        
+        rtcCore.setRemoteStreamCallback(stream => {
+            document.getElementById('remoteVideo').srcObject = stream;
+            updateConnectionStatus('connected');
+        });
 
-    rtcCore.onCallEnded = () => {
-        console.log("📞 Chamada finalizada");
-        updateConnectionStatus('waiting');
-        document.getElementById('remoteVideo').srcObject = null;
-    };
+        rtcCore.onCallEnded = () => {
+            console.log("📞 Chamada finalizada");
+            updateConnectionStatus('waiting');
+            document.getElementById('remoteVideo').srcObject = null;
+        };
+    }
+    
+    // ✅ INICIA CHAMADA PARA O RECEIVER
+    if (window.receiverTargetId) {
+        console.log("🔗 Conectando ao receiver:", window.receiverTargetId);
+        rtcCore.startCall(window.receiverTargetId, localStream);
+        updateConnectionStatus('connecting');
+    } else {
+        console.error("❌ ID do receiver não encontrado");
+        updateConnectionStatus('failed');
+    }
 }
 
 function updateConnectionStatus(status) {
@@ -228,10 +208,11 @@ async function initApp() {
     let userName = '';
     let localStream = null;
 
-    // ✅ INICIALIZA WEBSRTC EM SEGUNDO PLANO
-    initializeWebRTCInBackground().then(() => {
-        setupWebRTCHandlers();
-    });
+    // Preenche nome da URL se disponível
+    if (window.callerName && window.callerName !== 'User') {
+        nameInput.value = window.callerName;
+        userName = window.callerName;
+    }
 
     // Traduzir textos da tela de boas-vindas
     const browserLang = (navigator.language || 'en').split('-')[0];
@@ -263,9 +244,9 @@ async function initApp() {
         microphoneCheckbox.classList.toggle('checked', microphoneGranted);
     });
 
-    // Event listener para o botão Next
+    // Event listener para o botão Next (Tela 1 → Tela 2)
     nextButtonWelcome.addEventListener('click', async () => {
-        userName = nameInput.value.trim();
+        userName = nameInput.value.trim() || window.callerName;
         if (!userName || !cameraGranted || !microphoneGranted) {
             welcomeScreen.classList.add('error-state');
             setTimeout(() => welcomeScreen.classList.remove('error-state'), 1000);
@@ -282,10 +263,9 @@ async function initApp() {
             switchMode('main-mode');
             document.getElementById('user-name-display').textContent = userName;
             startAdCycle();
-            updateConnectionStatus('connecting');
             
-            // ✅ CONEXÃO AUTOMÁTICA (agora não bloqueia!)
-            attemptAutomaticConnection(localStream);
+            // ✅ WEBSRTC SÓ INICIA AQUI - QUANDO USUÁRIO CLICA EM "NEXT"!
+            initializeAndStartWebRTC(localStream);
             
             // TRADUZIR TEXTO DA TELA PRINCIPAL
             for (const [elementId, text] of Object.entries(textsToTranslateMain)) {
