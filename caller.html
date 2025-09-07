@@ -4,10 +4,65 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Caller - Videochamada Mobile</title>
-    <link rel="stylesheet" href="style.css" />
-    <link rel="stylesheet" href="responsivo.css" />
     <style>
-        /* 🔵 Estilo do box azul */
+        /* 🔵 Variáveis CSS */
+        :root {
+            --cor-primaria: #4CAF50;
+            --cor-secundaria: #2196F3;
+            --cor-texto: white;
+            --sombra-padrao: 0 0 10px rgba(0, 0, 0, 0.5);
+            --borda-arredondada: 8px;
+        }
+        
+        /* 🔵 Reset básico */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: transparent;
+            font-family: Arial, sans-serif;
+            height: 100vh;
+            overflow: hidden;
+            position: relative;
+            color: var(--cor-texto);
+        }
+
+        /* 🔵 Container principal */
+        .container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        /* 🔵 Box Video Remoto (PIP com borda verde) */
+        .box-video.remoto {
+            position: absolute;
+            bottom: calc(80px + 60px);
+            right: 5px;
+            width: 34.5%;
+            max-width: 138px;
+            height: 184px;
+            transform: translateX(-17%);
+            border-radius: var(--borda-arredondada);
+            overflow: hidden;
+            box-shadow: var(--sombra-padrao);
+            border: 2px solid var(--cor-primaria);
+            z-index: 10;
+        }
+
+        .box-video.remoto video {
+            transform: scaleX(-1);
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* 🔵 Box azul centralizado (chat) */
         .chat-input-box {
             position: absolute;
             bottom: 350px;
@@ -23,91 +78,150 @@
             padding: 10px;
         }
 
-        /* 💬 Estilo BASE para todas as mensagens */
-.phrase-box {
-    background-color: transparent;
-    padding: 1px 0;
-    margin: 0.5px 0;
-    border-radius: 0;
-    font-size: 15px;
-    line-height: 1.0;
-    border: none;
-    box-shadow: none;
-    width: 100%;
-    word-break: break-word;
-}
+        /* 🔵 Estilo para mensagens */
+        .phrase-box {
+            background-color: transparent;
+            padding: 1px 0;
+            margin: 0.5px 0;
+            border-radius: 0;
+            font-size: 15px;
+            line-height: 1.0;
+            border: none;
+            box-shadow: none;
+            width: 100%;
+            word-break: break-word;
+        }
 
-/* 🎯 Estilo para TEXTO TEMPORÁRIO (enquanto está falando) */
-.phrase-box.interim-box {
-    animation: fadeIn 0.3s ease-out; /* Suaviza a aparição */
-}
+        .phrase-box.interim-box {
+            animation: fadeIn 0.3s ease-out;
+        }
 
-.interim-text {
-    color: #666;
-    opacity: 0.8;
-    border-bottom: 1px dotted #aaa;
-    transition: all 0.2s; /* Suaviza as atualizações de texto */
-}
+        .interim-text {
+            color: #666;
+            opacity: 0.8;
+            border-bottom: 1px dotted #aaa;
+            transition: all 0.2s;
+        }
 
-/* ✅ Estilo para TEXTO FINALIZADO */
-.final-text {
-    color: inherit; /* Herda a cor do tema pai */
-    opacity: 1;
-    animation: textFinalized 0.3s ease-out;
-}
+        .final-text {
+            color: inherit;
+            opacity: 1;
+            animation: textFinalized 0.3s ease-out;
+        }
 
-/* 🎚️ Efeitos visuais */
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(2px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-/* Estilo para quando o microfone está ativo continuamente */
-.listening-mode .text-display-placeholder {
-    animation: pulseOpacity 2s infinite;
-}
+        /* 🔵 Controles */
+        .controls {
+            position: absolute;
+            bottom: calc(225px + 60px);
+            left: 110px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            z-index: 20;
+        }
 
-@keyframes pulseOpacity {
-    0% { opacity: 0.8; }
-    50% { opacity: 0.4; }
-    100% { opacity: 0.8; }
-}
-@keyframes textFinalized {
-    from { opacity: 0.5; }
-    to { opacity: 1; }
-}
+        .controls button {
+            width: 100px;
+            height: 40px;
+            border-radius: 20px;
+            border: none;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            backdrop-filter: blur(6px);
+            color: var(--cor-texto);
+        }
 
-/* 📱 Melhorias para mobile */
-@media (max-width: 768px) {
-    .phrase-box {
-        font-size: 14px;
-        line-height: 1.3;
-    }
-}
+        #callActionBtn {
+            background: var(--cor-primaria);
+            display: none;
+        }
+
+        /* 🔵 Overlay de informações */
+        .info-overlay {
+            position: absolute;
+            top: 20px;
+            left: 0;
+            right: 0;
+            z-index: 30;
+            text-align: center;
+            background: transparent;
+            padding: 10px;
+            border-radius: 0 0 10px 10px;
+            display: none;
+        }
+
+        #myId {
+            display: inline-block;
+            font-size: 16px;
+            font-weight: bold;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 6px 12px;
+            border-radius: 20px;
+            user-select: all;
+            cursor: pointer;
+        }
+
+        /* 🔵 Animações */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(2px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes textFinalized {
+            from { opacity: 0.5; }
+            to { opacity: 1; }
+        }
+
+        /* 🔵 Responsividade */
+        @media (max-width: 400px) {
+            .box-video.remoto {
+                height: 120px;
+                max-width: 100px;
+                bottom: calc(60px + 60px);
+            }
+
+            .chat-input-box {
+                width: 90%;
+                height: 160px;
+                bottom: 300px;
+            }
+
+            .controls {
+                bottom: calc(180px + 60px);
+                left: 50%;
+                transform: translateX(-50%);
+            }
+
+            .controls button {
+                width: 120px;
+                height: 40px;
+                font-size: 16px;
+            }
+        }
     </style>
 </head>
 <body>
-    <!-- 🔹 Box azul centralizado com ID para JS -->
+    <!-- 🔵 Box azul centralizado com ID para JS -->
     <div class="chat-input-box" id="textDisplay"></div>
 
     <div class="container">
-        <div class="video-wrapper">
-            <video id="remoteVideo" autoplay playsinline></video>
-        </div>
-        <div class="video-wrapper">
+        <!-- 🔵 Box Video Remoto (PIP com borda verde) -->
+        <div class="box-video remoto">
             <video id="localVideo" autoplay muted playsinline></video>
         </div>
         
-        <!-- 🔻 Controles -->
+        <!-- 🔵 Controles -->
         <div class="controls">
-            <button id="callActionBtn" style="display:none;">SEND 🚀</button>
+            <button id="callActionBtn">SEND 🚀</button>
         </div>
         
-        <div class="info-overlay" style="display: none;">
+        <div class="info-overlay">
             <span id="myId"></span>
         </div>
     </div>
 
-    <!-- 🔌 Scripts -->
+    <!-- 🔌 Scripts externos (mantidos como estavam) -->
     <script src="https://lemur-signal.onrender.com/socket.io/socket.io.js"></script>
     <script type="module" src="js/caller-ui.js"></script>
 </body>
