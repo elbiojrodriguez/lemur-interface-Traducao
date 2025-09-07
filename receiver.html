@@ -4,167 +4,104 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Receiver - Videochamada Mobile</title>
-  
   <style>
-    /* Variáveis CSS */
-    :root {
-      --cor-primaria: #4CAF50;
-      --cor-secundaria: #2196F3;
-      --cor-texto: white;
-      --sombra-padrao: 0 0 10px rgba(0, 0, 0, 0.5);
-      --borda-arredondada: 8px;
-      --tamanho-botao: 40px;
-    }
-    
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      -webkit-tap-highlight-color: transparent;
+    /* ===== SEU PADRÃO ===== */
+    html {
+      height: 100%;
+      font-size: clamp(14px, 2.5vw, 18px);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      text-align: center;
+      background: #2c3e50;
     }
 
     body {
-      background: transparent;
-      font-family: Arial, sans-serif;
-      height: 100vh;
-      overflow: hidden;
-      position: relative;
-      color: var(--cor-texto);
-    }
-
-    /* Container principal */
-    .container {
-      position: relative;
-      width: 100%;
       height: 100%;
+      margin: 0;
+      padding: 0;
+      font-size: 1em;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .box-principal {
+      width: 100%;
+      max-width: 600px;
+      height: 100%;
+      margin: 0 auto;
+      padding: 2vh 2vw;
+      box-sizing: border-box;
+      background-color: #1a2530;
+      position: relative;
       overflow: hidden;
     }
 
-    /* Box Video Remoto (PIP com borda verde) */
-    .box-video.remoto {
+    /* ===== ESTILOS DO VIDEO ===== */
+    .box-video {
       position: absolute;
       bottom: calc(80px + 60px);
-      right: 5px;
+      right: 5%;
       width: 34.5%;
       max-width: 138px;
       height: 184px;
-      transform: translateX(-17%);
-      border-radius: var(--borda-arredondada);
+      border-radius: 8px;
       overflow: hidden;
-      box-shadow: var(--sombra-padrao);
-      border: 2px solid var(--cor-primaria);
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+      border: 2px solid #4CAF50;
       z-index: 10;
     }
 
-    .box-video.remoto video {
-      transform: scaleX(-1);
+    .box-video video {
       width: 100%;
       height: 100%;
       object-fit: cover;
+      transform: scaleX(-1);
     }
 
-    /* Controles */
-    .controls {
-      position: absolute;
-      bottom: calc(225px + 60px);
-      left: 110px;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-      z-index: 20;
-    }
-
-    .controls button {
-      width: 100px;
-      height: var(--tamanho-botao);
-      border-radius: 20px;
-      border: none;
-      font-size: 18px;
-      font-weight: bold;
-      cursor: pointer;
-      backdrop-filter: blur(6px);
-      color: var(--cor-texto);
-    }
-
-    #callActionBtn {
-      background: var(--cor-primaria);
-    }
-
-    #scanBtn {
-      background: var(--cor-secundaria);
-    }
-
-    /* Overlay de informações */
-    .info-overlay {
+    /* ===== QR CODE ===== */
+    .qrcode-container {
       position: absolute;
       top: 20px;
-      left: 0;
-      right: 0;
-      z-index: 30;
-      text-align: center;
-      background: transparent;
-      padding: 10px;
-      border-radius: 0 0 10px 10px;
-    }
-
-    /* QR Code - Container principal */
-    .qrcode-container {
-      margin: 10px auto;
+      left: 50%;
+      transform: translateX(-50%);
       padding: 12px;
       background: white;
       border-radius: 12px;
       box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-      display: inline-block;
+      z-index: 20;
     }
 
-    /* ID visual */
-    #myId {
-      display: inline-block;
-      font-size: 16px;
-      font-weight: bold;
-      background: rgba(255, 255, 255, 0.1);
-      padding: 6px 12px;
-      border-radius: 20px;
-      user-select: all;
-      cursor: pointer;
-    }
-
-    /* Responsividade */
+    /* ===== RESPONSIVIDADE ===== */
     @media (max-width: 400px) {
-      .box-video.remoto {
+      .box-video {
         height: 120px;
         max-width: 100px;
         bottom: calc(60px + 60px);
       }
-
-      .info-overlay {
-        padding: 8px;
-      }
-
+      
       .qrcode-container {
         padding: 8px;
         max-width: 90%;
       }
     }
   </style>
-  
-  <!-- Biblioteca QR Code correta -->
   <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
 </head>
 <body>
-  <div class="container">
-    <!-- Box Video Remoto (PIP com borda verde) -->
-    <div class="box-video remoto">
+  <!-- SEU BOX PRINCIPAL -->
+  <div class="box-principal">
+    <!-- Box do Vídeo -->
+    <div class="box-video">
       <video id="localVideo" autoplay muted playsinline></video>
     </div>
 
-    <!-- Estrutura de QR Code -->
-    <div class="info-overlay">
-      <div id="qrcode" class="qrcode-container"></div>
+    <!-- QR Code -->
+    <div class="qrcode-container">
+      <div id="qrcode"></div>
     </div>
   </div>
 
-  <!-- Scripts externos -->
+  <!-- Scripts (mantidos iguais) -->
   <script src="https://lemur-signal.onrender.com/socket.io/socket.io.js"></script>
   <script type="module" src="js/receiver-ui.js"></script>
 </body>
