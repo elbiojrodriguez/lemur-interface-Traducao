@@ -128,19 +128,6 @@
       display: inline-block;
     }
 
-    /* Estilo para o QR code gerado */
-    #qrcode {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-    
-    #qrcode canvas, #qrcode img {
-      max-width: 100%;
-      height: auto;
-      border-radius: 4px;
-    }
-
     /* ID visual */
     #myId {
       display: inline-block;
@@ -171,6 +158,9 @@
       }
     }
   </style>
+  
+  <!-- Biblioteca QR Code correta (igual ao HTML 01) -->
+  <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
 </head>
 <body>
   <div class="container">
@@ -182,22 +172,16 @@
       <video id="localVideo" autoplay muted playsinline></video>
     </div>
 
+    <!-- Estrutura de QR Code igual ao HTML 01 -->
     <div class="info-overlay">
-      <div class="qrcode-container">
-        <div id="qrcode"></div>
-      </div>
+      <div id="qrcode" class="qrcode-container"></div>
     </div>
   </div>
 
-  <!-- Scripts externos -->
+  <!-- Scripts externos (igual ao HTML 01) -->
   <script src="https://lemur-signal.onrender.com/socket.io/socket.io.js"></script>
-  
-  <!-- Scripts locais da aplicação -->
   <script type="module" src="js/receiver-ui.js"></script>
-  <script type="module" src="js/qr-code-utils.js"></script>
   
-  <!-- Scripts do core -->
-  <script type="module" src="core/webrtc-core.js"></script>
-  <script type="module" src="core/internet-config.js"></script>
+  <!-- Removi as referências aos scripts adicionais que não estavam no HTML 01 -->
 </body>
 </html>
