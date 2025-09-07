@@ -2,17 +2,16 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>Receiver - Videochamada Mobile</title>
   
   <style>
-    /* ===== SEU PADRÃO CSS ===== */
+    /* ===== SEU PADRÃO CSS CORRIGIDO ===== */
     html {
         height: 100%;
         font-size: clamp(14px, 2.5vw, 18px);
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         text-align: center;
-        transition: background-color 0.5s;
     }
 
     body {
@@ -20,7 +19,8 @@
         margin: 0;
         padding: 0;
         font-size: 1em;
-        background-color: #aee2ff;
+        background: white; /* FUNDO BRANCO CORRIGIDO */
+        position: relative;
     }
 
     .box-principal {
@@ -32,9 +32,10 @@
         box-sizing: border-box;
         position: relative;
         overflow-y: auto;
+        /* REMOVIDO background-color: #aee2ff */
     }
 
-    /* ===== ESTILOS ADAPTADOS - APENAS O NECESSÁRIO ===== */
+    /* ===== ESTILOS ORIGINAIS ===== */
     :root {
       --cor-primaria: #4CAF50;
       --cor-secundaria: #2196F3;
@@ -52,7 +53,7 @@
     /* Box Video Remoto */
     .box-video.remoto {
       position: absolute;
-      bottom: 20px;
+      bottom: 80px; /* AJUSTADO para não ficar em cima dos controles */
       right: 20px;
       width: 30%;
       max-width: 138px;
@@ -74,7 +75,7 @@
     /* Controles */
     .controls {
       position: absolute;
-      bottom: 30px;
+      bottom: 20px; /* POSIÇÃO CORRIGIDA */
       left: 0;
       right: 0;
       display: flex;
@@ -124,41 +125,17 @@
       display: inline-block;
     }
 
-    /* ID visual */
-    #myId {
-      display: inline-block;
-      font-size: 16px;
-      font-weight: bold;
-      background: rgba(255, 255, 255, 0.8);
-      padding: 8px 16px;
-      border-radius: 20px;
-      user-select: all;
-      cursor: pointer;
-      color: #333;
-      margin-top: 10px;
-    }
-
-    /* Responsividade */
+    /* Responsividade com safe-area-inset para controles naturais */
     @media (max-width: 400px) {
       .box-video.remoto {
         height: 120px;
         max-width: 100px;
-        bottom: 15px;
-        right: 15px;
+        bottom: 70px; /* AJUSTADO com safe area */
       }
 
-      .info-overlay {
-        padding: 5px;
-      }
-
-      .qrcode-container {
-        padding: 8px;
-        max-width: 90%;
-      }
-      
       .controls {
-        bottom: 20px;
-        gap: 15px;
+        bottom: max(20px, env(safe-area-inset-bottom)); /* RESPEITA área segura */
+        padding: 0 10px;
       }
       
       .controls button {
@@ -166,16 +143,22 @@
         font-size: 14px;
       }
     }
+
+    /* Prevenir que elementos fiquem sob os controles do celular */
+    @supports(padding: max(0px)) {
+      .box-principal {
+        padding-left: max(2vw, env(safe-area-inset-left));
+        padding-right: max(2vw, env(safe-area-inset-right));
+        padding-bottom: max(2vh, env(safe-area-inset-bottom));
+      }
+    }
   </style>
   
-  <!-- Biblioteca QR Code correta -->
   <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
 </head>
 <body>
-  <!-- SEU BOX-PRINCIPAL COMO ÚNICO CONTAINER -->
   <div class="box-principal">
-    <!-- CONTEÚDO DIRETO DENTRO DO BOX-PRINCIPAL -->
-    <!-- Box Video Remoto (PIP com borda verde) -->
+    <!-- Box Video Remoto -->
     <div class="box-video remoto">
       <video id="localVideo" autoplay muted playsinline></video>
     </div>
@@ -184,9 +167,14 @@
     <div class="info-overlay">
       <div id="qrcode" class="qrcode-container"></div>
     </div>
+
+    <!-- Controles -->
+    <div class="controls">
+      <button id="callActionBtn">Chamar</button>
+      <button id="scanBtn">Escanear</button>
+    </div>
   </div>
 
-  <!-- Scripts externos (MANTIDOS EXATAMENTE COMO ESTAVAM) -->
   <script src="https://lemur-signal.onrender.com/socket.io/socket.io.js"></script>
   <script type="module" src="js/receiver-ui.js"></script>
 </body>
