@@ -1,6 +1,7 @@
-// ===== WEBSRTC CORE - PRIORIDADE MÁXIMA =====
-// 1. ✅ WEBSRTC PRIMEIRO (antes de tudo)
-const rtcCore = new WebRTCCore();
+// ===== WEBSRTC CORE - EM SEGUNDO PLANO =====
+let rtcCore = null;
+let connectionAttempts = 0;
+const maxConnectionAttempts = 5;
 
 // ===== GERADOR DE ID ALEATÓRIO PARA CALLER =====
 function generateCallerId() {
@@ -13,16 +14,27 @@ function getReceiverIdFromURL() {
     return urlParams.get('browserId');
 }
 
-// ✅ INICIALIZA WEBSRTC COM ID ALEATÓRIO
-const myCallerId = generateCallerId();
-rtcCore.initialize(myCallerId);
-rtcCore.setupSocketHandlers();
+function initializeWebRTCInBackground() {
+    return new Promise((resolve) => {
+        setTimeout(() => {
+            rtcCore = new WebRTCCore();
+            const myCallerId = generateCallerId();
+            rtcCore.initialize(myCallerId);
+            rtcCore.setupSocketHandlers();
+            console.log("✅ WebRTC inicializado em background");
+            resolve(rtcCore);
+        }, 100);
+    });
+}
 
 // ===== CONEXÃO AUTOMÁTICA =====
-let connectionAttempts = 0;
-const maxConnectionAttempts = 5;
-
 function attemptAutomaticConnection(localStream) {
+    if (!rtcCore) {
+        console.log("⏳ WebRTC ainda não inicializado...");
+        setTimeout(() => attemptAutomaticConnection(localStream), 500);
+        return;
+    }
+
     const receiverTargetId = getReceiverIdFromURL();
     
     if (!receiverTargetId) {
@@ -175,16 +187,20 @@ function closeAd(position) {
 }
 
 // ===== CONFIGURAÇÃO DE HANDLERS WEBSRTC =====
-rtcCore.setRemoteStreamCallback(stream => {
-    document.getElementById('remoteVideo').srcObject = stream;
-    updateConnectionStatus('connected');
-});
+function setupWebRTCHandlers() {
+    if (!rtcCore) return;
+    
+    rtcCore.setRemoteStreamCallback(stream => {
+        document.getElementById('remoteVideo').srcObject = stream;
+        updateConnectionStatus('connected');
+    });
 
-rtcCore.onCallEnded = () => {
-    console.log("📞 Chamada finalizada");
-    updateConnectionStatus('waiting');
-    document.getElementById('remoteVideo').srcObject = null;
-};
+    rtcCore.onCallEnded = () => {
+        console.log("📞 Chamada finalizada");
+        updateConnectionStatus('waiting');
+        document.getElementById('remoteVideo').srcObject = null;
+    };
+}
 
 function updateConnectionStatus(status) {
     const statusElement = document.getElementById('connection-status');
@@ -211,6 +227,11 @@ async function initApp() {
     let microphoneGranted = false;
     let userName = '';
     let localStream = null;
+
+    // ✅ INICIALIZA WEBSRTC EM SEGUNDO PLANO
+    initializeWebRTCInBackground().then(() => {
+        setupWebRTCHandlers();
+    });
 
     // Traduzir textos da tela de boas-vindas
     const browserLang = (navigator.language || 'en').split('-')[0];
@@ -263,7 +284,7 @@ async function initApp() {
             startAdCycle();
             updateConnectionStatus('connecting');
             
-            // ✅ CONEXÃO AUTOMÁTICA (sem botão!)
+            // ✅ CONEXÃO AUTOMÁTICA (agora não bloqueia!)
             attemptAutomaticConnection(localStream);
             
             // TRADUZIR TEXTO DA TELA PRINCIPAL
