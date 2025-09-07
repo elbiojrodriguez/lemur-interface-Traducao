@@ -4,8 +4,158 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Receiver - Videochamada Mobile</title>
-  <link rel="stylesheet" href="style.css" />
-  <link rel="stylesheet" href="responsivo.css" />
+  <style>
+    /* Reset unificado e variáveis CSS */
+    :root {
+      --cor-primaria: #4CAF50;
+      --cor-secundaria: #2196F3;
+      --cor-texto: white;
+      --sombra-padrao: 0 0 10px rgba(0, 0, 0, 0.5);
+      --borda-arredondada: 8px;
+      --tamanho-botao: 40px;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background: transparent;
+      font-family: Arial, sans-serif;
+      height: 100vh;
+      overflow: hidden;
+      position: relative;
+      color: var(--cor-texto);
+    }
+
+    /* Container principal */
+    .container {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    /* Estilos de vídeo unificados */
+    .video-wrapper {
+      position: relative;
+      width: 100%;
+      height: 100%;
+    }
+
+    .video-wrapper video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    /* PIP - Picture in Picture (segundo vídeo) */
+    .video-wrapper:nth-child(2) {
+      position: absolute;
+      bottom: calc(80px + 60px);
+      right: 5px;
+      width: 34.5%;
+      max-width: 138px;
+      height: 184px;
+      transform: translateX(-17%);
+      border-radius: var(--borda-arredondada);
+      overflow: hidden;
+      box-shadow: var(--sombra-padrao);
+      border: 2px solid var(--cor-primaria);
+      z-index: 10;
+    }
+
+    .video-wrapper:nth-child(2) video {
+      transform: scaleX(-1);
+    }
+
+    /* Controles */
+    .controls {
+      position: absolute;
+      bottom: calc(225px + 60px);
+      left: 110px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      z-index: 20;
+    }
+
+    .controls button {
+      width: 100px;
+      height: var(--tamanho-botao);
+      border-radius: 20px;
+      border: none;
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+      backdrop-filter: blur(6px);
+      color: var(--cor-texto);
+    }
+
+    #callActionBtn {
+      background: var(--cor-primaria);
+    }
+
+    #scanBtn {
+      background: var(--cor-secundaria);
+    }
+
+    /* Overlay de informações */
+    .info-overlay {
+      position: absolute;
+      top: 20px;
+      left: 0;
+      right: 0;
+      z-index: 30;
+      text-align: center;
+      background: transparent;
+      padding: 10px;
+      border-radius: 0 0 10px 10px;
+    }
+
+    /* QR Code */
+    .qrcode-container {
+      margin: 10px auto;
+      padding: 12px;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+      display: inline-block;
+    }
+
+    /* ID visual */
+    #myId {
+      display: inline-block;
+      font-size: 16px;
+      font-weight: bold;
+      background: rgba(255, 255, 255, 0.1);
+      padding: 6px 12px;
+      border-radius: 20px;
+      user-select: all;
+      cursor: pointer;
+    }
+
+    /* Responsividade */
+    @media (max-width: 400px) {
+      .video-wrapper:nth-child(2) {
+        height: 120px;
+        max-width: 100px;
+        bottom: calc(60px + 60px);
+      }
+
+      .info-overlay {
+        padding: 8px;
+      }
+
+      .qrcode-container {
+        padding: 8px;
+        max-width: 90%;
+      }
+    }
+  </style>
   <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
 </head>
 <body>
@@ -18,12 +168,30 @@
       <video id="localVideo" autoplay muted playsinline></video>
     </div>
 
-        <div class="info-overlay">
+    <div class="info-overlay">
       <div id="qrcode" class="qrcode-container"></div>
     </div>
   </div>
 
   <script src="https://lemur-signal.onrender.com/socket.io/socket.io.js"></script>
   <script type="module" src="js/receiver-ui.js"></script>
+  
+  <script>
+    // Script para gerar QR Code (exemplo)
+    document.addEventListener('DOMContentLoaded', function() {
+      // Gerar um ID aleatório para demonstração
+      const randomId = Math.random().toString(36).substring(2, 10).toUpperCase();
+      
+      // Gerar QR Code
+      new QRCode(document.getElementById("qrcode"), {
+        text: `https://videocall.example.com/join/${randomId}`,
+        width: 100,
+        height: 100,
+        colorDark : "#000000",
+        colorLight : "#ffffff",
+        correctLevel : QRCode.CorrectLevel.H
+      });
+    });
+  </script>
 </body>
 </html>
