@@ -11,7 +11,7 @@
             font-size: clamp(14px, 2.5vw, 18px);
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             text-align: center;
-            background: #2c3e50;
+            transition: background-color 0.5s;
         }
 
         body {
@@ -22,6 +22,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
+            background: white;
         }
 
         .box-principal {
@@ -31,38 +32,21 @@
             margin: 0 auto;
             padding: 2vh 2vw;
             box-sizing: border-box;
-            background-color: #1a2530;
+            background-color: #aee2ff;
             position: relative;
-            overflow: hidden;
-        }
-
-        /* ===== BOX AZUL (CHAT) ===== */
-        .chat-input-box {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 80%;
-            height: 200px;
-            border: 2px solid #007BFF;
-            border-radius: 12px;
-            background-color: rgba(255, 255, 255, 0.1);
-            z-index: 20;
             overflow-y: auto;
-            padding: 10px;
         }
 
-        /* ===== BOX VIDEO ===== */
+        /* ===== ESTILOS DO CALLER ===== */
         .box-video {
             position: absolute;
-            bottom: 80px;
-            right: 5%;
-            width: 30%;
-            max-width: 120px;
+            bottom: 100px;
+            right: 20px;
+            width: 120px;
             height: 160px;
             border-radius: 8px;
             overflow: hidden;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
             border: 2px solid #4CAF50;
             z-index: 10;
         }
@@ -74,10 +58,51 @@
             transform: scaleX(-1);
         }
 
-        /* ===== BOTÃO ===== */
+        /* Box Azul (Chat) */
+        .chat-input-box {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80%;
+            height: 200px;
+            border: 2px solid #007BFF;
+            border-radius: 12px;
+            background-color: rgba(255, 255, 255, 0.9);
+            z-index: 15;
+            overflow-y: auto;
+            padding: 15px;
+            color: #333;
+        }
+
+        /* Mensagens */
+        .phrase-box {
+            background-color: transparent;
+            padding: 1px 0;
+            margin: 0.5px 0;
+            font-size: 15px;
+            line-height: 1.0;
+            border: none;
+            width: 100%;
+            word-break: break-word;
+            color: #333;
+        }
+
+        .interim-text {
+            color: #666;
+            opacity: 0.8;
+            border-bottom: 1px dotted #aaa;
+        }
+
+        .final-text {
+            color: #000;
+            opacity: 1;
+        }
+
+        /* Botões */
         #callActionBtn {
             position: absolute;
-            bottom: 20px;
+            bottom: 30px;
             left: 50%;
             transform: translateX(-50%);
             width: 120px;
@@ -92,36 +117,59 @@
             display: none;
         }
 
-        /* ===== MENSAGENS ===== */
-        .phrase-box {
-            background-color: transparent;
-            padding: 1px 0;
-            margin: 0.5px 0;
-            font-size: 15px;
-            line-height: 1.0;
-            border: none;
-            width: 100%;
-            word-break: break-word;
-            color: white;
+        /* Bandeeiras */
+        .language-bubbles {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 8px;
+            z-index: 20;
         }
 
-        /* ===== RESPONSIVIDADE ===== */
+        .lang-btn {
+            width: 40px;
+            height: 40px;
+            font-size: 20px;
+            border-radius: 50%;
+            border: none;
+            background-color: rgba(255, 255, 255, 0.9);
+            color: #333;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        /* Responsividade */
         @media (max-width: 400px) {
             .box-video {
-                height: 120px;
-                max-width: 100px;
-                bottom: 70px;
+                width: 100px;
+                height: 130px;
+                bottom: 80px;
+                right: 15px;
             }
             
             .chat-input-box {
                 width: 90%;
                 height: 180px;
+                padding: 10px;
+            }
+            
+            #callActionBtn {
+                bottom: 20px;
+                width: 110px;
+                height: 35px;
+                font-size: 14px;
+            }
+            
+            .lang-btn {
+                width: 35px;
+                height: 35px;
+                font-size: 18px;
             }
         }
     </style>
 </head>
 <body>
-    <!-- SEU BOX PRINCIPAL -->
     <div class="box-principal">
         <!-- Box Azul (Chat) -->
         <div class="chat-input-box" id="textDisplay"></div>
@@ -131,11 +179,17 @@
             <video id="localVideo" autoplay muted playsinline></video>
         </div>
         
-        <!-- Botão -->
+        <!-- Botão Send -->
         <button id="callActionBtn">SEND 🚀</button>
+        
+        <!-- Bandeiras -->
+        <div class="language-bubbles">
+            <button class="lang-btn">🇺🇸</button>
+            <button class="lang-btn">🇪🇸</button>
+            <button class="lang-btn">🇫🇷</button>
+        </div>
     </div>
 
-    <!-- Scripts (mantidos iguais) -->
     <script src="https://lemur-signal.onrender.com/socket.io/socket.io.js"></script>
     <script type="module" src="js/caller-ui.js"></script>
 </body>
