@@ -11,7 +11,7 @@
       font-size: clamp(14px, 2.5vw, 18px);
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       text-align: center;
-      background: #2c3e50;
+      transition: background-color 0.5s;
     }
 
     body {
@@ -22,6 +22,7 @@
       display: flex;
       justify-content: center;
       align-items: center;
+      background: white;
     }
 
     .box-principal {
@@ -31,22 +32,21 @@
       margin: 0 auto;
       padding: 2vh 2vw;
       box-sizing: border-box;
-      background-color: #1a2530;
+      background-color: #aee2ff;
       position: relative;
-      overflow: hidden;
+      overflow-y: auto;
     }
 
-    /* ===== ESTILOS DO VIDEO ===== */
+    /* ===== ESTILOS DO RECEIVER ===== */
     .box-video {
       position: absolute;
-      bottom: calc(80px + 60px);
-      right: 5%;
-      width: 34.5%;
-      max-width: 138px;
-      height: 184px;
+      bottom: 100px;
+      right: 20px;
+      width: 120px;
+      height: 160px;
       border-radius: 8px;
       overflow: hidden;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
       border: 2px solid #4CAF50;
       z-index: 10;
     }
@@ -58,7 +58,7 @@
       transform: scaleX(-1);
     }
 
-    /* ===== QR CODE ===== */
+    /* QR Code */
     .qrcode-container {
       position: absolute;
       top: 20px;
@@ -67,28 +67,83 @@
       padding: 12px;
       background: white;
       border-radius: 12px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
       z-index: 20;
     }
 
-    /* ===== RESPONSIVIDADE ===== */
+    /* Botões */
+    .controls {
+      position: absolute;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 15px;
+      z-index: 20;
+    }
+
+    .controls button {
+      width: 100px;
+      height: 40px;
+      border-radius: 20px;
+      border: none;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      color: white;
+    }
+
+    #callActionBtn {
+      background: #4CAF50;
+    }
+
+    #scanBtn {
+      background: #2196F3;
+    }
+
+    /* ID visual */
+    #myId {
+      position: absolute;
+      top: 15px;
+      left: 15px;
+      font-size: 14px;
+      font-weight: bold;
+      background: rgba(255, 255, 255, 0.9);
+      padding: 6px 12px;
+      border-radius: 15px;
+      user-select: all;
+      cursor: pointer;
+      color: #333;
+      z-index: 20;
+    }
+
+    /* Responsividade */
     @media (max-width: 400px) {
       .box-video {
-        height: 120px;
-        max-width: 100px;
-        bottom: calc(60px + 60px);
+        width: 100px;
+        height: 130px;
+        bottom: 80px;
+        right: 15px;
       }
       
       .qrcode-container {
         padding: 8px;
-        max-width: 90%;
+      }
+      
+      .controls {
+        bottom: 20px;
+      }
+      
+      .controls button {
+        width: 90px;
+        height: 35px;
+        font-size: 14px;
       }
     }
   </style>
   <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
 </head>
 <body>
-  <!-- SEU BOX PRINCIPAL -->
   <div class="box-principal">
     <!-- Box do Vídeo -->
     <div class="box-video">
@@ -99,9 +154,17 @@
     <div class="qrcode-container">
       <div id="qrcode"></div>
     </div>
+
+    <!-- ID da Sessão -->
+    <span id="myId"></span>
+
+    <!-- Botões -->
+    <div class="controls">
+      <button id="callActionBtn">Chamar</button>
+      <button id="scanBtn">Escanear</button>
+    </div>
   </div>
 
-  <!-- Scripts (mantidos iguais) -->
   <script src="https://lemur-signal.onrender.com/socket.io/socket.io.js"></script>
   <script type="module" src="js/receiver-ui.js"></script>
 </body>
