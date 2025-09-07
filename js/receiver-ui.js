@@ -5,17 +5,25 @@ import { QRCodeGenerator } from './qr-code-utils.js';
 const urlParams = new URLSearchParams(window.location.search);
 const token = urlParams.get('token');
 const fixedId = token ? token.slice(-8) : 'unknown';
-
-// ✅ Torna o ID acessível globalmente
 window.fixedId = fixedId;
 
 console.log("🆔 ID fixo gerado na carga:", fixedId);
 
-// ===== WEBSRTC CORE - PRIORIDADE MÁXIMA =====
-// 1. ✅ WEBSRTC PRIMEIRO (antes de tudo)
-const rtcCore = new WebRTCCore();
-rtcCore.initialize(window.fixedId);
-rtcCore.setupSocketHandlers();
+// ===== WEBSRTC CORE - EM SEGUNDO PLANO =====
+// ✅ Agora não bloqueia a interface!
+let rtcCore = null;
+
+function initializeWebRTCInBackground() {
+    return new Promise((resolve) => {
+        setTimeout(() => {
+            rtcCore = new WebRTCCore();
+            rtcCore.initialize(window.fixedId);
+            rtcCore.setupSocketHandlers();
+            console.log("✅ WebRTC inicializado em background");
+            resolve(rtcCore);
+        }, 100); // Pequeno delay para não bloquear a UI
+    });
+}
 
 // ===== CÓDIGO DE TRADUÇÃO =====
 const TRANSLATE_ENDPOINT = 'https://chat-tradutor.onrender.com/translate';
@@ -110,21 +118,25 @@ function generateQRCode(name) {
 }
 
 // ===== CONFIGURAÇÃO DE HANDLERS WEBSRTC =====
-rtcCore.onIncomingCall = (offer) => {
-    console.log("📞 Chamada recebida!");
-    updateConnectionStatus('connected');
+function setupWebRTCHandlers() {
+    if (!rtcCore) return;
     
-    rtcCore.handleIncomingCall(offer, window.authorizedStream, (remoteStream) => {
-        document.getElementById('remoteVideo').srcObject = remoteStream;
-        console.log("✅ Conexão estabelecida com sucesso!");
-    });
-};
+    rtcCore.onIncomingCall = (offer) => {
+        console.log("📞 Chamada recebida!");
+        updateConnectionStatus('connected');
+        
+        rtcCore.handleIncomingCall(offer, window.authorizedStream, (remoteStream) => {
+            document.getElementById('remoteVideo').srcObject = remoteStream;
+            console.log("✅ Conexão estabelecida com sucesso!");
+        });
+    };
 
-rtcCore.onCallEnded = () => {
-    console.log("📞 Chamada finalizada");
-    updateConnectionStatus('waiting');
-    document.getElementById('remoteVideo').srcObject = null;
-};
+    rtcCore.onCallEnded = () => {
+        console.log("📞 Chamada finalizada");
+        updateConnectionStatus('waiting');
+        document.getElementById('remoteVideo').srcObject = null;
+    };
+}
 
 function updateConnectionStatus(status) {
     const statusElement = document.getElementById('connection-status');
@@ -151,6 +163,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     let cameraGranted = false;
     let microphoneGranted = false;
     let userName = '';
+
+    // ✅ INICIALIZA WEBSRTC EM SEGUNDO PLANO (não bloqueia)
+    initializeWebRTCInBackground().then(() => {
+        setupWebRTCHandlers();
+    });
 
     // Processo de tradução inicial
     const browserLang = (navigator.language || 'en').split('-')[0];
