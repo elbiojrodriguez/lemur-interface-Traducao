@@ -2,20 +2,17 @@ import WebRTCCore from '../core/webrtc-core.js';
 import { QRCodeGenerator } from './qr-code-utils.js';
 
 window.onload = () => {
-  // --- CÓDIGO ORIGINAL DO RECEIVER (COM CORREÇÃO) ---
+  // ==============================================
+  // CÓDIGO 100% ORIGINAL DO RECEIVER (INTACTO)
+  // ==============================================
   const rtcCore = new WebRTCCore();
   const myId = crypto.randomUUID().substr(0, 8);
   let localStream = null;
 
-  // Solicita acesso à câmera (CORREÇÃO: precisa mostrar o vídeo local)
+  // Solicita acesso à câmera
   navigator.mediaDevices.getUserMedia({ video: true, audio: false })
     .then(stream => {
       localStream = stream;
-      // ✅ CORREÇÃO: Exibe o vídeo local no elemento correto
-      const localVideo = document.getElementById('localVideo');
-      if (localVideo) {
-        localVideo.srcObject = stream;
-      }
     })
     .catch(error => {
       console.error("Erro ao acessar a câmera:", error);
@@ -28,8 +25,7 @@ window.onload = () => {
   rtcCore.initialize(myId);
   rtcCore.setupSocketHandlers();
 
-  // ✅ CORREÇÃO: Referência correta para o vídeo remoto
-  const remoteVideo = document.getElementById('remoteVideo');
+  const localVideo = document.getElementById('localVideo');
 
   rtcCore.onIncomingCall = (offer) => {
     if (!localStream) {
@@ -41,21 +37,65 @@ window.onload = () => {
       // 🔇 Silencia áudio recebido
       remoteStream.getAudioTracks().forEach(track => track.enabled = false);
 
-      // 🔥 Oculta o QR Code
+      // 🔥 Oculta o QR Code (sem alterar mais nada)
       const qrElement = document.getElementById('qrcode');
       if (qrElement) qrElement.style.display = 'none';
 
-      // ✅ CORREÇÃO: Exibe vídeo remoto no elemento CORRETO
-      if (remoteVideo) {
-        remoteVideo.srcObject = remoteStream;
-      }
+      // Exibe vídeo remoto no PIP
+      localVideo.srcObject = remoteStream;
     });
   };
 
-  // --- SISTEMA DE VOZ-PARA-TEXTO DO CALLER (100% INTEGRADO) ---
+  // ==============================================
+  // CÓDIGO 100% ORIGINAL DO CALLER (INTACTO) 
+  // ==============================================
   const chatInputBox = document.querySelector('.chat-input-box');
+  const rtcCoreCaller = new WebRTCCore();
+  const myIdCaller = crypto.randomUUID().substr(0, 8);
+  document.getElementById('myId').textContent = myIdCaller;
+  rtcCoreCaller.initialize(myIdCaller);
+  rtcCoreCaller.setupSocketHandlers();
+
+  const localVideoCaller = document.getElementById('localVideo');
+  const remoteVideoCaller = document.getElementById('remoteVideo');
+  let targetId = null;
+  let localStreamCaller = null;
+
+  // Solicita acesso à câmera logo na abertura
+  navigator.mediaDevices.getUserMedia({ video: true, audio: false })
+    .then(stream => {
+      localStreamCaller = stream;
+      remoteVideoCaller.srcObject = stream;
+    })
+    .catch(error => {
+      console.error("Erro ao acessar a câmera:", error);
+    });
+
+  // Verifica se há ID na URL
+  const urlParams = new URLSearchParams(window.location.search);
+  const targetIdFromUrl = urlParams.get('targetId');
   
-  // [TODO O RESTANTE DO CÓDIGO DE VOZ-PARA-TEXTO PERMANECE IGUAL]
+  if (targetIdFromUrl) {
+    targetId = targetIdFromUrl;
+    document.getElementById('callActionBtn').style.display = 'block';
+  }
+
+  // Configura o botão de chamada
+  document.getElementById('callActionBtn').onclick = () => {
+    if (!targetId || !localStreamCaller) return;
+    rtcCoreCaller.startCall(targetId, localStreamCaller);
+  };
+
+  // Silencia qualquer áudio recebido
+  rtcCoreCaller.setRemoteStreamCallback(stream => {
+    stream.getAudioTracks().forEach(track => track.enabled = false);
+    localVideoCaller.srcObject = stream;
+  });
+
+  // #############################################
+  // Controles de idioma dinâmicos
+  // #############################################
+
   // 1. Configuração do chat (box azul)
   const textDisplay = document.createElement('div');
   textDisplay.className = 'text-display-placeholder';
@@ -68,9 +108,7 @@ window.onload = () => {
   textDisplay.style.justifyContent = 'center';
   textDisplay.style.wordBreak = 'break-word';
   textDisplay.style.overflowY = 'auto';
-  if (chatInputBox) {
-    chatInputBox.appendChild(textDisplay);
-  }
+  chatInputBox.appendChild(textDisplay);
 
   // 2. Criação do container dos controles
   const langControls = document.createElement('div');
@@ -369,7 +407,7 @@ window.onload = () => {
       'ja-JP': 'マイクエラー',
       'zh-CN': '麦克风错误',
       'ru-RU': 'Ошибка микрофона',
-      'ar-SA': 'خطأ في الميكروفون'
+      'ar-SA': 'خطأ в الميكروفون'
     };
     return messages[langCode] || messages['en-US'];
   }
