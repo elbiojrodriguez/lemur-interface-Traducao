@@ -8,7 +8,7 @@
   <link rel="stylesheet" href="responsivo.css" />
   <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
   <style>
-    /* 🔵 ESTILO DO BOX AZUL (IDÊNTICO AO CALLER) */
+    /* 🔵 ESTILO DO BOX AZUL (100% DO CALLER) */
     .chat-input-box {
         position: absolute;
         bottom: 350px;
@@ -24,7 +24,7 @@
         padding: 10px;
     }
 
-    /* 💬 ESTILO BASE PARA MENSAGENS */
+    /* 💬 ESTILO BASE PARA MENSAGENS (100% DO CALLER) */
     .phrase-box {
         background-color: transparent;
         padding: 1px 0;
@@ -38,7 +38,7 @@
         word-break: break-word;
     }
 
-    /* 🎯 TEXTO TEMPORÁRIO */
+    /* 🎯 TEXTO TEMPORÁRIO (100% DO CALLER) */
     .phrase-box.interim-box {
         animation: fadeIn 0.3s ease-out;
     }
@@ -50,14 +50,14 @@
         transition: all 0.2s;
     }
 
-    /* ✅ TEXTO FINALIZADO */
+    /* ✅ TEXTO FINALIZADO (100% DO CALLER) */
     .final-text {
         color: inherit;
         opacity: 1;
         animation: textFinalized 0.3s ease-out;
     }
 
-    /* 🎚️ ANIMAÇÕES */
+    /* 🎚️ ANIMAÇÕES (100% DO CALLER) */
     @keyframes fadeIn {
         from { opacity: 0; transform: translateY(2px); }
         to { opacity: 1; transform: translateY(0); }
@@ -68,7 +68,7 @@
         to { opacity: 1; }
     }
 
-    /* 📱 RESPONSIVIDADE */
+    /* 📱 RESPONSIVIDADE (100% DO CALLER) */
     @media (max-width: 768px) {
         .phrase-box {
             font-size: 14px;
@@ -78,10 +78,10 @@
   </style>
 </head>
 <body>
-  <!-- 🔵 BOX AZUL PARA VOZ-PARA-TEXTO (ADICIONADO) -->
+  <!-- 🔵 BOX AZUL (100% DO CALLER) -->
   <div class="chat-input-box" id="textDisplay"></div>
 
-  <!-- ✅ ESTRUTURA ORIGINAL DO RECEIVER (100% PRESERVADA) -->
+  <!-- ✅ ESTRUTURA DO RECEIVER (100% ORIGINAL) -->
   <div class="container">
     <div class="video-wrapper">
       <video id="remoteVideo" autoplay playsinline></video>
@@ -94,6 +94,17 @@
     <div class="info-overlay">
       <div id="qrcode" class="qrcode-container"></div>
     </div>
+  </div>
+
+  <!-- ✅ ELEMENTOS DO CALLER QUE PRECISAM EXISTIR NO HTML -->
+  <!-- 🔻 Controles (100% do Caller - mesmo que não usemos o botão) -->
+  <div class="controls" style="display: none;">
+    <button id="callActionBtn" style="display:none;">SEND 🚀</button>
+  </div>
+  
+  <!-- 🔹 Info overlay (100% do Caller - mesmo que não mostremos o ID) -->
+  <div class="info-overlay" style="display: none;">
+    <span id="myId"></span>
   </div>
 
   <!-- ✅ SCRIPTS ORIGINAIS (100% PRESERVADOS) -->
