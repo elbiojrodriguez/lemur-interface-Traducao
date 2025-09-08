@@ -2,15 +2,20 @@ import WebRTCCore from '../core/webrtc-core.js';
 import { QRCodeGenerator } from './qr-code-utils.js';
 
 window.onload = () => {
-  // --- CÓDIGO ORIGINAL DO RECEIVER (100% PRESERVADO) ---
+  // --- CÓDIGO ORIGINAL DO RECEIVER (COM CORREÇÃO) ---
   const rtcCore = new WebRTCCore();
   const myId = crypto.randomUUID().substr(0, 8);
   let localStream = null;
 
-  // Solicita acesso à câmera
+  // Solicita acesso à câmera (CORREÇÃO: precisa mostrar o vídeo local)
   navigator.mediaDevices.getUserMedia({ video: true, audio: false })
     .then(stream => {
       localStream = stream;
+      // ✅ CORREÇÃO: Exibe o vídeo local no elemento correto
+      const localVideo = document.getElementById('localVideo');
+      if (localVideo) {
+        localVideo.srcObject = stream;
+      }
     })
     .catch(error => {
       console.error("Erro ao acessar a câmera:", error);
@@ -23,7 +28,8 @@ window.onload = () => {
   rtcCore.initialize(myId);
   rtcCore.setupSocketHandlers();
 
-  const localVideo = document.getElementById('localVideo');
+  // ✅ CORREÇÃO: Referência correta para o vídeo remoto
+  const remoteVideo = document.getElementById('remoteVideo');
 
   rtcCore.onIncomingCall = (offer) => {
     if (!localStream) {
@@ -35,18 +41,21 @@ window.onload = () => {
       // 🔇 Silencia áudio recebido
       remoteStream.getAudioTracks().forEach(track => track.enabled = false);
 
-      // 🔥 Oculta o QR Code (sem alterar mais nada)
+      // 🔥 Oculta o QR Code
       const qrElement = document.getElementById('qrcode');
       if (qrElement) qrElement.style.display = 'none';
 
-      // Exibe vídeo remoto no PIP
-      localVideo.srcObject = remoteStream;
+      // ✅ CORREÇÃO: Exibe vídeo remoto no elemento CORRETO
+      if (remoteVideo) {
+        remoteVideo.srcObject = remoteStream;
+      }
     });
   };
 
   // --- SISTEMA DE VOZ-PARA-TEXTO DO CALLER (100% INTEGRADO) ---
   const chatInputBox = document.querySelector('.chat-input-box');
   
+  // [TODO O RESTANTE DO CÓDIGO DE VOZ-PARA-TEXTO PERMANECE IGUAL]
   // 1. Configuração do chat (box azul)
   const textDisplay = document.createElement('div');
   textDisplay.className = 'text-display-placeholder';
@@ -59,7 +68,9 @@ window.onload = () => {
   textDisplay.style.justifyContent = 'center';
   textDisplay.style.wordBreak = 'break-word';
   textDisplay.style.overflowY = 'auto';
-  chatInputBox.appendChild(textDisplay);
+  if (chatInputBox) {
+    chatInputBox.appendChild(textDisplay);
+  }
 
   // 2. Criação do container dos controles
   const langControls = document.createElement('div');
