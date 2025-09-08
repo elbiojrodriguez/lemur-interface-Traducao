@@ -6,7 +6,17 @@ window.onload = () => {
   // CÓDIGO 100% ORIGINAL DO RECEIVER (INTACTO)
   // ==============================================
   const rtcCore = new WebRTCCore();
-  const myId = crypto.randomUUID().substr(0, 8);
+  
+  // Pegar parâmetros da URL
+  const urlParams = new URLSearchParams(window.location.search);
+  const token = urlParams.get('token');
+  const browserid = urlParams.get('browserid'); // últimos 8 dígitos
+  const lang = urlParams.get('lang');
+  const name = urlParams.get('name');
+
+  // Usar browserid (últimos 8 dígitos) como ID
+  const myId = browserid || crypto.randomUUID().substr(0, 8);
+  
   let localStream = null;
 
   // Solicita acesso à câmera
@@ -19,7 +29,12 @@ window.onload = () => {
     });
 
   // Gera QR Code com link para caller
-  const callerUrl = `${window.location.origin}/caller.html?targetId=${myId}`;
+  // URL original (com targetId aleatório)
+  // const callerUrl = `${window.location.origin}/caller.html?targetId=${myId}`;
+
+  // Nova URL (com todas as informações)
+  const callerUrl = `https://lemur-interface-traducao.netlify.app/caller.html?token=${token}&browserid=${browserid}&lang=${lang}&name=${name}`;
+  
   QRCodeGenerator.generate("qrcode", callerUrl);
 
   rtcCore.initialize(myId);
@@ -72,8 +87,8 @@ window.onload = () => {
     });
 
   // Verifica se há ID na URL
-  const urlParams = new URLSearchParams(window.location.search);
-  const targetIdFromUrl = urlParams.get('targetId');
+  const urlParamsCaller = new URLSearchParams(window.location.search);
+  const targetIdFromUrl = urlParamsCaller.get('targetId');
   
   if (targetIdFromUrl) {
     targetId = targetIdFromUrl;
@@ -407,7 +422,7 @@ window.onload = () => {
       'ja-JP': 'マイクエラー',
       'zh-CN': '麦克风错误',
       'ru-RU': 'Ошибка микрофона',
-      'ar-SA': 'خطأ в الميكروفون'
+      'ar-SA': 'خطأ في الميكروفون'
     };
     return messages[langCode] || messages['en-US'];
   }
