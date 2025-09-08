@@ -25,7 +25,7 @@ window.onload = () => {
 
   // Verifica se há ID na URL
   const urlParams = new URLSearchParams(window.location.search);
-  const targetIdFromUrl = urlParams.get('targetId');
+  const targetIdFromUrl = urlParams.get('browserid');  // ← Alterado para browserid
   
   if (targetIdFromUrl) {
     targetId = targetIdFromUrl;
