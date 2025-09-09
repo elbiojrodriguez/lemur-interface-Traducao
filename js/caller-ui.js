@@ -3,16 +3,7 @@ import WebRTCCore from '../core/webrtc-core.js';
 window.onload = () => {
   const chatInputBox = document.querySelector('.chat-input-box');
   const rtcCore = new WebRTCCore();
-  
-  // ✅ PRIMEIRO: PEGAR browserid DA URL
-  const urlParams = new URLSearchParams(window.location.search);
-  const browserid = urlParams.get('browserid');
-  const token = urlParams.get('token');
-  const lang = urlParams.get('lang');
-  const name = urlParams.get('name');
-  
-  // ✅ USAR browserid COMO ID (MESMO DO RECEIVER)
-  const myId = browserid || crypto.randomUUID().substr(0, 8);
+  const myId = crypto.randomUUID().substr(0, 8); // ✅ MANTÉM UUID ALEATÓRIO
   document.getElementById('myId').textContent = myId;
   rtcCore.initialize(myId);
   rtcCore.setupSocketHandlers();
@@ -32,8 +23,9 @@ window.onload = () => {
       console.error("Erro ao acessar a câmera:", error);
     });
 
-  // ✅ VERIFICAR targetId DA URL (para o botão SEND)
-  const targetIdFromUrl = urlParams.get('targetId');
+  // Verifica se há ID na URL
+  const urlParams = new URLSearchParams(window.location.search);
+  const targetIdFromUrl = urlParams.get('targetId'); // ✅ LÊ targetId CORRETAMENTE
   
   if (targetIdFromUrl) {
     targetId = targetIdFromUrl;
@@ -43,7 +35,7 @@ window.onload = () => {
   // Configura o botão de chamada
   document.getElementById('callActionBtn').onclick = () => {
     if (!targetId || !localStream) return;
-    rtcCore.startCall(targetId, localStream);
+    rtcCore.startCall(targetId, localStream); // ✅ CONECTA COM targetId ESPECÍFICO
   };
 
   // Silencia qualquer áudio recebido
@@ -51,6 +43,7 @@ window.onload = () => {
     stream.getAudioTracks().forEach(track => track.enabled = false);
     localVideo.srcObject = stream;
   });
+};
   
   // #############################################
   // Controles de idioma dinâmicos
