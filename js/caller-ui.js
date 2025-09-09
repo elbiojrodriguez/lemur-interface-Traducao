@@ -1,18 +1,9 @@
-import WebRTCCore from '../core/webrtc-core.js';
+rescreve esta parte corretmnte: import WebRTCCore from '../core/webrtc-core.js';
 
 window.onload = () => {
   const chatInputBox = document.querySelector('.chat-input-box');
   const rtcCore = new WebRTCCore();
-  
-  // PEGA OS PARÂMETROS DA URL PRIMEIRO
-  const urlParams = new URLSearchParams(window.location.search);
-  const browserid = urlParams.get('browserid');
-  const token = urlParams.get('token');
-  const lang = urlParams.get('lang');
-  const name = urlParams.get('name');
-  
-  // USA O BROWSERID COMO ID DO WEBRTC (MESMO DO RECEIVER)
-  const myId = browserid || crypto.randomUUID().substr(0, 8);
+  const myId = crypto.randomUUID().substr(0, 8);
   document.getElementById('myId').textContent = myId;
   rtcCore.initialize(myId);
   rtcCore.setupSocketHandlers();
@@ -32,8 +23,9 @@ window.onload = () => {
       console.error("Erro ao acessar a câmera:", error);
     });
 
-  // VERIFICA SE HÁ TARGETID NA URL (para o botão SEND)
-  const targetIdFromUrl = urlParams.get('targetId');
+  // Verifica se há ID na URL
+  const urlParams = new URLSearchParams(window.location.search);
+  const targetIdFromUrl = urlParams.get('browserid');  // ← Alterado para browserid
   
   if (targetIdFromUrl) {
     targetId = targetIdFromUrl;
