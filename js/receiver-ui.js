@@ -4,15 +4,15 @@ import { QRCodeGenerator } from './qr-code-utils.js';
 window.onload = () => {
   const rtcCore = new WebRTCCore();
 
-  const urlParams = new URLSearchParams(window.location.search);
-  const token = urlParams.get('token');
-  const browserid = urlParams.get('browserid');
-  const lang = urlParams.get('lang');
-  const name = urlParams.get('name');
+  // 🔒 ID fixo disfarçado de aleatório
+  const fakeRandomUUID = (fixedValue) => ({
+    substr: (start, length) => fixedValue.substr(start, length)
+  });
+  const myId = fakeRandomUUID("elbiojorge").substr(0, 8); // Resultado: "elbiojor"
 
-  const myId = browserid;
   let localStream = null;
 
+  // Solicita acesso à câmera
   navigator.mediaDevices.getUserMedia({ video: true, audio: false })
     .then(stream => {
       localStream = stream;
@@ -21,7 +21,8 @@ window.onload = () => {
       console.error("Erro ao acessar a câmera:", error);
     });
 
-  const callerUrl = `https://lemur-interface-traducao.netlify.app/caller.html?targetId=${browserid}&token=${token}&lang=${lang}&name=${name}`;
+  // Gera QR Code com link para caller
+  const callerUrl = `${window.location.origin}/caller.html?targetId=${myId}`;
   QRCodeGenerator.generate("qrcode", callerUrl);
 
   rtcCore.initialize(myId);
@@ -36,61 +37,19 @@ window.onload = () => {
     }
 
     rtcCore.handleIncomingCall(offer, localStream, (remoteStream) => {
+      // 🔇 Silencia áudio recebido
+      remoteStream.getAudioTracks().forEach(track => track.enabled = false);
+
+      // 🔥 Oculta o QR Code (sem alterar mais nada)
       const qrElement = document.getElementById('qrcode');
       if (qrElement) qrElement.style.display = 'none';
+
+      // Exibe vídeo remoto no PIP
       localVideo.srcObject = remoteStream;
     });
   };
+};
 
-  rtcCore.setRemoteStreamCallback(stream => {
-    localVideo.srcObject = stream;
-  });
-
-  // ==============================================
-  // CÓDIGO 100% ORIGINAL DO CALLER (INTACTO) 
-  // ==============================================
-  const chatInputBox = document.querySelector('.chat-input-box');
-  const rtcCoreCaller = new WebRTCCore();
-  const myIdCaller = crypto.randomUUID().substr(0, 8);
-  document.getElementById('myId').textContent = myIdCaller;
-  rtcCoreCaller.initialize(myIdCaller);
-  rtcCoreCaller.setupSocketHandlers();
-
-  const localVideoCaller = document.getElementById('localVideo');
-  const remoteVideoCaller = document.getElementById('remoteVideo');
-  let targetId = null;
-  let localStreamCaller = null;
-
-  // Solicita acesso à câmera logo na abertura
-  navigator.mediaDevices.getUserMedia({ video: true, audio: false })
-    .then(stream => {
-      localStreamCaller = stream;
-      remoteVideoCaller.srcObject = stream;
-    })
-    .catch(error => {
-      console.error("Erro ao acessar a câmera:", error);
-    });
-
-  // Verifica se há ID na URL
-  const urlParamsCaller = new URLSearchParams(window.location.search);
-  const targetIdFromUrl = urlParamsCaller.get('targetId');
-  
-  if (targetIdFromUrl) {
-    targetId = targetIdFromUrl;
-    document.getElementById('callActionBtn').style.display = 'block';
-  }
-
-  // Configura o botão de chamada
-  document.getElementById('callActionBtn').onclick = () => {
-    if (!targetId || !localStreamCaller) return;
-    rtcCoreCaller.startCall(targetId, localStreamCaller);
-  };
-
-  // Silencia qualquer áudio recebido
-  rtcCoreCaller.setRemoteStreamCallback(stream => {
-    stream.getAudioTracks().forEach(track => track.enabled = false);
-    localVideoCaller.srcObject = stream;
-  });
 
   // #############################################
   // Controles de idioma dinâmicos
