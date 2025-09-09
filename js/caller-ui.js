@@ -3,26 +3,14 @@ import WebRTCCore from '../core/webrtc-core.js';
 window.onload = () => {
   const chatInputBox = document.querySelector('.chat-input-box');
   const rtcCore = new WebRTCCore();
-  
-  // PEGA OS PARÂMETROS DA URL PRIMEIRO
-  const urlParams = new URLSearchParams(window.location.search);
-  const browserid = urlParams.get('browserid');
-  const token = urlParams.get('token');
-  const lang = urlParams.get('lang');
-  const name = urlParams.get('name');
-  
-  // ID DO CALLER DEVE SER DIFERENTE DO RECEIVER
   const myId = crypto.randomUUID().substr(0, 8);
   document.getElementById('myId').textContent = myId;
-  
-  // TARGET ID DEVE SER O BROWSERID DO RECEIVER
-  const targetId = browserid;
-  
   rtcCore.initialize(myId);
   rtcCore.setupSocketHandlers();
 
   const localVideo = document.getElementById('localVideo');
   const remoteVideo = document.getElementById('remoteVideo');
+  let targetId = null;
   let localStream = null;
 
   // Solicita acesso à câmera logo na abertura
@@ -30,33 +18,34 @@ window.onload = () => {
     .then(stream => {
       localStream = stream;
       remoteVideo.srcObject = stream;
-      
-      // HABILITA O BOTÃO DE CHAMADA APÓS OBTER A STREAM
-      document.getElementById('callActionBtn').style.display = 'block';
     })
     .catch(error => {
       console.error("Erro ao acessar a câmera:", error);
     });
 
+  // Verifica se há ID na URL
+  const urlParams = new URLSearchParams(window.location.search);
+  const targetIdFromUrl = urlParams.get('targetId');
+  
+  if (targetIdFromUrl) {
+    targetId = targetIdFromUrl;
+    document.getElementById('callActionBtn').style.display = 'block';
+  }
+
   // Configura o botão de chamada
   document.getElementById('callActionBtn').onclick = () => {
-    if (!targetId || !localStream) {
-      console.error("Target ID ou stream local não disponível");
-      return;
-    }
-    console.log("Iniciando chamada para:", targetId);
+    if (!targetId || !localStream) return;
     rtcCore.startCall(targetId, localStream);
   };
 
   // Silencia qualquer áudio recebido
   rtcCore.setRemoteStreamCallback(stream => {
-    console.log("Stream remoto recebido no caller");
     stream.getAudioTracks().forEach(track => track.enabled = false);
     localVideo.srcObject = stream;
   });
 
   // #############################################
-  // Controles de idioma dinâmicos (MANTIDO ORIGINAL)
+  // Controles de idioma dinâmicos
   // #############################################
 
   // 1. Configuração do chat (box azul)
@@ -211,17 +200,17 @@ window.onload = () => {
         try {
           recognition.start();
           textDisplay.textContent = `${currentLang.speakText}...`;
-          textDisplay.style.display = 'flex';
+          textDisplay.style.display = 'flex'; // Garante visibilidade
           isListening = true;
         } catch (e) {
           console.error('Erro ao iniciar microfone:', e);
           textDisplay.textContent = `${getErrorMessage(currentLang.code)}`;
-          textDisplay.style.display = 'flex';
+          textDisplay.style.display = 'flex'; // Garante visibilidade
         }
       } else {
         recognition.stop();
         textDisplay.textContent = `${getMicOffMessage(currentLang.code)}`;
-        textDisplay.style.display = 'flex';
+        textDisplay.style.display = 'flex'; // MODIFICAÇÃO 1 - Garante que a mensagem apareça
         isListening = false;
       }
     });
@@ -233,6 +222,7 @@ window.onload = () => {
         const flag = e.target.textContent;
         const langName = e.target.title;
 
+        // MODIFICAÇÃO 2 - Limpa mensagens antigas e reseta o display
         document.querySelectorAll('.phrase-box').forEach(el => el.remove());
         textDisplay.style.display = 'flex';
         textDisplay.textContent = getClickToSpeakMessage(langCode);
@@ -251,78 +241,90 @@ window.onload = () => {
       }
     });
 
-    recognition.onresult = (event) => {
-      if (textDisplay.classList.contains('text-display-placeholder')) {
-        textDisplay.style.display = 'none';
-      }
+// Resultado do reconhecimento - VERSÃO OTIMIZADA
+recognition.onresult = (event) => {
+  // Mantém a lógica original de esconder placeholder
+  if (textDisplay.classList.contains('text-display-placeholder')) {
+    textDisplay.style.display = 'none';
+  }
 
-      let finalTranscript = '';
-      let interimTranscript = '';
+  let finalTranscript = '';
+  let interimTranscript = '';
 
-      for (let i = event.resultIndex; i < event.results.length; i++) {
-        const transcript = event.results[i][0].transcript;
-        if (event.results[i].isFinal) {
-          finalTranscript += transcript;
-        } else {
-          interimTranscript += transcript;
-        }
-      }
+  // Processamento dos resultados (original)
+  for (let i = event.resultIndex; i < event.results.length; i++) {
+    const transcript = event.results[i][0].transcript;
+    if (event.results[i].isFinal) {
+      finalTranscript += transcript;
+    } else {
+      interimTranscript += transcript;
+    }
+  }
 
-      const chatInputBox = document.querySelector('.chat-input-box');
+  const chatInputBox = document.querySelector('.chat-input-box');
+  
+  // COMPORTAMENTO ORIGINAL (frases finais)
+  if (finalTranscript.trim()) {
+    // Remove texto temporário se existir
+    const interimBox = document.querySelector('.interim-box');
+    if (interimBox) interimBox.remove();
+    
+    // Cria a mensagem final (como no original)
+    const phraseBox = document.createElement('div');
+    phraseBox.className = 'phrase-box';
+    phraseBox.textContent = finalTranscript; // ← Mantém formato original
+    
+    if (chatInputBox) {
+      chatInputBox.appendChild(phraseBox);
+      chatInputBox.scrollTop = chatInputBox.scrollHeight;
       
-      if (finalTranscript.trim()) {
-        const interimBox = document.querySelector('.interim-box');
-        if (interimBox) interimBox.remove();
-        
-        const phraseBox = document.createElement('div');
-        phraseBox.className = 'phrase-box';
-        phraseBox.textContent = finalTranscript;
-        
-        if (chatInputBox) {
-          chatInputBox.appendChild(phraseBox);
-          chatInputBox.scrollTop = chatInputBox.scrollHeight;
-          textDisplay.textContent = `${currentLang.speakText}...`;
-        }
-      }
-      else if (interimTranscript) {
-        let interimBox = document.querySelector('.interim-box');
-        
-        if (!interimBox) {
-          interimBox = document.createElement('div');
-          interimBox.className = 'interim-box';
-          if (chatInputBox) chatInputBox.appendChild(interimBox);
-        }
-        
-        interimBox.textContent = interimTranscript;
-        if (chatInputBox) chatInputBox.scrollTop = chatInputBox.scrollHeight;
-      }
-    };
-
+      // Mantém o microfone ativo visualmente (sua sugestão)
+      textDisplay.textContent = `${currentLang.speakText}...`;
+    }
+  }
+  // NOVO: Feedback em tempo real (sua sugestão)
+  else if (interimTranscript) {
+    let interimBox = document.querySelector('.interim-box');
+    
+    if (!interimBox) {
+      interimBox = document.createElement('div');
+      interimBox.className = 'interim-box'; // Classe diferente para não conflitar
+      if (chatInputBox) chatInputBox.appendChild(interimBox);
+    }
+    
+    interimBox.textContent = interimTranscript; // ← Sem formatação extra
+    if (chatInputBox) chatInputBox.scrollTop = chatInputBox.scrollHeight;
+  }
+};
+    // Tratamento de erros
     recognition.onerror = (event) => {
       console.error('Erro no reconhecimento:', event.error);
       textDisplay.textContent = `${getErrorMessage(currentLang.code)}`;
-      textDisplay.style.display = 'flex';
+      textDisplay.style.display = 'flex'; // Garante visibilidade
       isListening = false;
     };
 
-    recognition.onend = () => {
-      if (!document.querySelector('.phrase-box')) {
+// Reinício com delay para Android - VERSÃO ORIGINAL FUNCIONAL
+recognition.onend = () => {
+  // Mantém APENAS a verificação original do placeholder
+  if (!document.querySelector('.phrase-box')) {
+    textDisplay.style.display = 'flex';
+  }
+
+  // Mantém EXATAMENTE a lógica original de reinício
+  if (isListening) {
+    setTimeout(() => {
+      try {
+        recognition.start();
+      } catch (e) {
+        console.error('Erro ao reiniciar:', e);
+        isListening = false;
+        textDisplay.textContent = `${getErrorMessage(currentLang.code)}`;
         textDisplay.style.display = 'flex';
       }
-
-      if (isListening) {
-        setTimeout(() => {
-          try {
-            recognition.start();
-          } catch (e) {
-            console.error('Erro ao reiniciar:', e);
-            isListening = false;
-            textDisplay.textContent = `${getErrorMessage(currentLang.code)}`;
-            textDisplay.style.display = 'flex';
-          }
-        }, 300);
-      }
-    };
+    }, 300);
+  }
+};
   } else {
     textDisplay.textContent = 'Seu navegador não suporta reconhecimento de voz';
     textDisplay.style.color = 'black';
@@ -352,7 +354,7 @@ window.onload = () => {
       'es-ES': 'Micrófono desactivado',
       'fr-FR': 'Microphone désactivé',
       'de-DE': 'Mikrofon ausgeschaltet',
-      'ja-JP': 'マイクオф',
+      'ja-JP': 'マイクオフ',
       'zh-CN': '麦克风关闭',
       'ru-RU': 'Микрофон выключен',
       'ar-SA': 'تم إيقاف الميكروفون'
