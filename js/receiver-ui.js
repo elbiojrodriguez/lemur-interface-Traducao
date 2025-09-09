@@ -45,7 +45,6 @@ window.onload = () => {
   rtcCore.setRemoteStreamCallback(stream => {
     localVideo.srcObject = stream;
   });
-};
 
   // ==============================================
   // CÓDIGO 100% ORIGINAL DO CALLER (INTACTO) 
