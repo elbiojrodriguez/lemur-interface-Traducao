@@ -2,20 +2,17 @@ import WebRTCCore from '../core/webrtc-core.js';
 import { QRCodeGenerator } from './qr-code-utils.js';
 
 window.onload = () => {
-  // ==============================================
-  // CÓDIGO 100% ORIGINAL DO RECEIVER (INTACTO)
-  // ==============================================
   const rtcCore = new WebRTCCore();
   
-  // Pegar parâmetros da URL
+  // PEGA PARÂMETROS DA URL DO APPLICATIVO
   const urlParams = new URLSearchParams(window.location.search);
   const token = urlParams.get('token');
-  const browserid = urlParams.get('browserid'); // últimos 8 dígitos
+  const browserid = urlParams.get('browserid'); // últimos 8 dígitos do token
   const lang = urlParams.get('lang');
   const name = urlParams.get('name');
 
-  // Usar browserid (últimos 8 dígitos) como ID
-  const myId = browserid || crypto.randomUUID().substr(0, 8);
+  // ✅ USA browserid COMO ID DO WEBRTC (FIXO/ESPECÍFICO)
+  const myId = browserid; // SEM UUID ALEATÓRIO!
   
   let localStream = null;
 
@@ -28,16 +25,11 @@ window.onload = () => {
       console.error("Erro ao acessar a câmera:", error);
     });
 
-  // Gera QR Code com link para caller
-  // URL original (com targetId aleatório)
-  // const callerUrl = `${window.location.origin}/caller.html?targetId=${myId}`;
+  // ✅ GERA QR Code com targetId ESPECÍFICO (browserid)
+  const callerUrl = `https://lemur-interface-traducao.netlify.app/caller.html?targetId=${browserid}&token=${token}&lang=${lang}&name=${name}`;
+  QRCodeGenerator.generate("qrcode", callerUrl);
 
-  // Nova URL (com todas as informações)
-
-    const callerUrl = `https://lemur-interface-traducao.netlify.app/caller.html?targetId=${browserid}&token=${token}&lang=${lang}&name=${name}`;
-    QRCodeGenerator.generate("qrcode", callerUrl);
-
-  rtcCore.initialize(myId);
+  rtcCore.initialize(myId); // ✅ Registra com ID ESPECÍFICO
   rtcCore.setupSocketHandlers();
 
   const localVideo = document.getElementById('localVideo');
@@ -52,7 +44,7 @@ window.onload = () => {
       // 🔇 Silencia áudio recebido
       remoteStream.getAudioTracks().forEach(track => track.enabled = false);
 
-      // 🔥 Oculta o QR Code (sem alterar mais nada)
+      // 🔥 Oculta o QR Code
       const qrElement = document.getElementById('qrcode');
       if (qrElement) qrElement.style.display = 'none';
 
@@ -60,6 +52,7 @@ window.onload = () => {
       localVideo.srcObject = remoteStream;
     });
   };
+};
 
   // ==============================================
   // CÓDIGO 100% ORIGINAL DO CALLER (INTACTO) 
