@@ -44,7 +44,6 @@ window.onload = () => {
     rtcCore.handleIncomingCall(offer, localStream, (remoteStream) => {
       remoteVideo.srcObject = remoteStream;
     });
-  };
   
   // #############################################
   // Controles de idioma dinâmicos
