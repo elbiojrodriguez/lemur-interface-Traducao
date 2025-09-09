@@ -3,7 +3,7 @@ import { QRCodeGenerator } from './qr-code-utils.js';
 
 window.onload = () => {
   // ==============================================
-  // CÓDIGO 100% ORIGINAL DO RECEIVER (INTACTO)
+  // CÓDIGO DO RECEIVER (APENAS UMA INSTÂNCIA WebRTCCore)
   // ==============================================
   const rtcCore = new WebRTCCore();
   
@@ -29,10 +29,6 @@ window.onload = () => {
     });
 
   // Gera QR Code com link para caller
-  // URL original (com targetId aleatório)
-  // const callerUrl = `${window.location.origin}/caller.html?targetId=${myId}`;
-
-  // Nova URL (com todas as informações)
   const callerUrl = `https://lemur-interface-traducao.netlify.app/caller.html?token=${token}&browserid=${browserid}&lang=${lang}&name=${name}`;
   
   QRCodeGenerator.generate("qrcode", callerUrl);
@@ -43,6 +39,7 @@ window.onload = () => {
   const localVideo = document.getElementById('localVideo');
 
   rtcCore.onIncomingCall = (offer) => {
+    console.log("Chamada recebida:", offer);
     if (!localStream) {
       console.warn("Stream local não disponível");
       return;
@@ -58,58 +55,14 @@ window.onload = () => {
 
       // Exibe vídeo remoto no PIP
       localVideo.srcObject = remoteStream;
+      console.log("Stream remoto configurado no receiver");
     });
   };
 
   // ==============================================
-  // CÓDIGO 100% ORIGINAL DO CALLER (INTACTO) 
+  // Controles de idioma dinâmicos (MANTIDO ORIGINAL)
   // ==============================================
   const chatInputBox = document.querySelector('.chat-input-box');
-  const rtcCoreCaller = new WebRTCCore();
-  const myIdCaller = crypto.randomUUID().substr(0, 8);
-  document.getElementById('myId').textContent = myIdCaller;
-  rtcCoreCaller.initialize(myIdCaller);
-  rtcCoreCaller.setupSocketHandlers();
-
-  const localVideoCaller = document.getElementById('localVideo');
-  const remoteVideoCaller = document.getElementById('remoteVideo');
-  let targetId = null;
-  let localStreamCaller = null;
-
-  // Solicita acesso à câmera logo na abertura
-  navigator.mediaDevices.getUserMedia({ video: true, audio: false })
-    .then(stream => {
-      localStreamCaller = stream;
-      remoteVideoCaller.srcObject = stream;
-    })
-    .catch(error => {
-      console.error("Erro ao acessar a câmera:", error);
-    });
-
-  // Verifica se há ID na URL
-  const urlParamsCaller = new URLSearchParams(window.location.search);
-  const targetIdFromUrl = urlParamsCaller.get('targetId');
-  
-  if (targetIdFromUrl) {
-    targetId = targetIdFromUrl;
-    document.getElementById('callActionBtn').style.display = 'block';
-  }
-
-  // Configura o botão de chamada
-  document.getElementById('callActionBtn').onclick = () => {
-    if (!targetId || !localStreamCaller) return;
-    rtcCoreCaller.startCall(targetId, localStreamCaller);
-  };
-
-  // Silencia qualquer áudio recebido
-  rtcCoreCaller.setRemoteStreamCallback(stream => {
-    stream.getAudioTracks().forEach(track => track.enabled = false);
-    localVideoCaller.srcObject = stream;
-  });
-
-  // #############################################
-  // Controles de idioma dinâmicos
-  // #############################################
 
   // 1. Configuração do chat (box azul)
   const textDisplay = document.createElement('div');
