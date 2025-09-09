@@ -3,7 +3,16 @@ import WebRTCCore from '../core/webrtc-core.js';
 window.onload = () => {
   const chatInputBox = document.querySelector('.chat-input-box');
   const rtcCore = new WebRTCCore();
-  const myId = crypto.randomUUID().substr(0, 8);
+  
+  // ✅ PRIMEIRO: PEGAR browserid DA URL
+  const urlParams = new URLSearchParams(window.location.search);
+  const browserid = urlParams.get('browserid');
+  const token = urlParams.get('token');
+  const lang = urlParams.get('lang');
+  const name = urlParams.get('name');
+  
+  // ✅ USAR browserid COMO ID (MESMO DO RECEIVER)
+  const myId = browserid || crypto.randomUUID().substr(0, 8);
   document.getElementById('myId').textContent = myId;
   rtcCore.initialize(myId);
   rtcCore.setupSocketHandlers();
@@ -23,8 +32,7 @@ window.onload = () => {
       console.error("Erro ao acessar a câmera:", error);
     });
 
-  // Verifica se há ID na URL
-  const urlParams = new URLSearchParams(window.location.search);
+  // ✅ VERIFICAR targetId DA URL (para o botão SEND)
   const targetIdFromUrl = urlParams.get('targetId');
   
   if (targetIdFromUrl) {
@@ -43,6 +51,9 @@ window.onload = () => {
     stream.getAudioTracks().forEach(track => track.enabled = false);
     localVideo.srcObject = stream;
   });
+
+  // ... (resto do código de voz permanece igual)
+};
 
   // #############################################
   // Controles de idioma dinâmicos
