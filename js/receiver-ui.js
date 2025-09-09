@@ -47,9 +47,6 @@ window.onload = () => {
       // Exibe vídeo remoto no PIP
       localVideo.srcObject = remoteStream;
     });
-  };
-};
-
 
   // #############################################
   // Controles de idioma dinâmicos
