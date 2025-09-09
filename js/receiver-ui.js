@@ -3,7 +3,13 @@ import { QRCodeGenerator } from './qr-code-utils.js';
 
 window.onload = () => {
   const rtcCore = new WebRTCCore();
-  const myId = crypto.randomUUID().substr(0, 8);
+
+  // 🔒 ID fixo disfarçado de aleatório
+  const fakeRandomUUID = (fixedValue) => ({
+    substr: (start, length) => fixedValue.substr(start, length)
+  });
+  const myId = fakeRandomUUID("elbiojorge").substr(0, 8); // Resultado: "elbiojor"
+
   let localStream = null;
 
   // Solicita acesso à câmera
