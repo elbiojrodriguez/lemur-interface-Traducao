@@ -3,20 +3,16 @@ import { QRCodeGenerator } from './qr-code-utils.js';
 
 window.onload = () => {
   const rtcCore = new WebRTCCore();
-  
-  // PEGA PARÂMETROS DA URL DO APPLICATIVO
+
   const urlParams = new URLSearchParams(window.location.search);
   const token = urlParams.get('token');
-  const browserid = urlParams.get('browserid'); // últimos 8 dígitos do token
+  const browserid = urlParams.get('browserid');
   const lang = urlParams.get('lang');
   const name = urlParams.get('name');
 
-  // ✅ USA browserid COMO ID DO WEBRTC (FIXO/ESPECÍFICO)
-  const myId = browserid; // SEM UUID ALEATÓRIO!
-  
+  const myId = browserid;
   let localStream = null;
 
-  // Solicita acesso à câmera
   navigator.mediaDevices.getUserMedia({ video: true, audio: false })
     .then(stream => {
       localStream = stream;
@@ -25,11 +21,10 @@ window.onload = () => {
       console.error("Erro ao acessar a câmera:", error);
     });
 
-  // ✅ GERA QR Code com targetId ESPECÍFICO (browserid)
   const callerUrl = `https://lemur-interface-traducao.netlify.app/caller.html?targetId=${browserid}&token=${token}&lang=${lang}&name=${name}`;
   QRCodeGenerator.generate("qrcode", callerUrl);
 
-  rtcCore.initialize(myId); // ✅ Registra com ID ESPECÍFICO
+  rtcCore.initialize(myId);
   rtcCore.setupSocketHandlers();
 
   const localVideo = document.getElementById('localVideo');
@@ -41,17 +36,15 @@ window.onload = () => {
     }
 
     rtcCore.handleIncomingCall(offer, localStream, (remoteStream) => {
-      // 🔇 Silencia áudio recebido
-      remoteStream.getAudioTracks().forEach(track => track.enabled = false);
-
-      // 🔥 Oculta o QR Code
       const qrElement = document.getElementById('qrcode');
       if (qrElement) qrElement.style.display = 'none';
-
-      // Exibe vídeo remoto no PIP
       localVideo.srcObject = remoteStream;
     });
   };
+
+  rtcCore.setRemoteStreamCallback(stream => {
+    localVideo.srcObject = stream;
+  });
 };
 
   // ==============================================
