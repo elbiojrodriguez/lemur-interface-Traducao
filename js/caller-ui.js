@@ -52,9 +52,6 @@ window.onload = () => {
     localVideo.srcObject = stream;
   });
 
-  // ... (o resto do código de voz-para-texto permanece igual)
-};
-
   // #############################################
   // Controles de idioma dinâmicos
   // #############################################
