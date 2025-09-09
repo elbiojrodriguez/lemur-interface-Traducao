@@ -24,66 +24,73 @@
         }
 
         /* 💬 Estilo BASE para todas as mensagens */
-.phrase-box {
-    background-color: transparent;
-    padding: 1px 0;
-    margin: 0.5px 0;
-    border-radius: 0;
-    font-size: 15px;
-    line-height: 1.0;
-    border: none;
-    box-shadow: none;
-    width: 100%;
-    word-break: break-word;
-}
+        .phrase-box {
+            background-color: transparent;
+            padding: 1px 0;
+            margin: 0.5px 0;
+            border-radius: 0;
+            font-size: 15px;
+            line-height: 1.0;
+            border: none;
+            box-shadow: none;
+            width: 100%;
+            word-break: break-word;
+        }
 
-/* 🎯 Estilo para TEXTO TEMPORÁRIO (enquanto está falando) */
-.phrase-box.interim-box {
-    animation: fadeIn 0.3s ease-out; /* Suaviza a aparição */
-}
+        /* 🎯 Estilo para TEXTO TEMPORÁRIO (enquanto está falando) */
+        .phrase-box.interim-box {
+            animation: fadeIn 0.3s ease-out;
+        }
 
-.interim-text {
-    color: #666;
-    opacity: 0.8;
-    border-bottom: 1px dotted #aaa;
-    transition: all 0.2s; /* Suaviza as atualizações de texto */
-}
+        .interim-text {
+            color: #666;
+            opacity: 0.8;
+            border-bottom: 1px dotted #aaa;
+            transition: all 0.2s;
+        }
 
-/* ✅ Estilo para TEXTO FINALIZADO */
-.final-text {
-    color: inherit; /* Herda a cor do tema pai */
-    opacity: 1;
-    animation: textFinalized 0.3s ease-out;
-}
+        /* ✅ Estilo para TEXTO FINALIZADO */
+        .final-text {
+            color: inherit;
+            opacity: 1;
+            animation: textFinalized 0.3s ease-out;
+        }
 
-/* 🎚️ Efeitos visuais */
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(2px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-/* Estilo para quando o microfone está ativo continuamente */
-.listening-mode .text-display-placeholder {
-    animation: pulseOpacity 2s infinite;
-}
+        /* 🎚️ Efeitos visuais */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(2px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
-@keyframes pulseOpacity {
-    0% { opacity: 0.8; }
-    50% { opacity: 0.4; }
-    100% { opacity: 0.8; }
-}
-@keyframes textFinalized {
-    from { opacity: 0.5; }
-    to { opacity: 1; }
-}
+        @keyframes textFinalized {
+            from { opacity: 0.5; }
+            to { opacity: 1; }
+        }
 
-/* 📱 Melhorias para mobile */
-@media (max-width: 768px) {
-    .phrase-box {
-        font-size: 14px;
-        line-height: 1.3;
-    }
-}
+        /* 📱 Melhorias para mobile */
+        @media (max-width: 768px) {
+            .phrase-box {
+                font-size: 14px;
+                line-height: 1.3;
+            }
+        }
     </style>
+    
+    <!-- ✅ SCRIPT PARA MOSTRAR BOTÃO QUANDO HÁ PARÂMETROS -->
+    <script>
+        // Verifica se há parâmetros na URL e mostra o botão SEND
+        window.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const hasParams = urlParams.toString().length > 0;
+            
+            if (hasParams) {
+                const button = document.getElementById('callActionBtn');
+                if (button) {
+                    button.style.display = 'block';
+                }
+            }
+        });
+    </script>
 </head>
 <body>
     <!-- 🔹 Box azul centralizado com ID para JS -->
