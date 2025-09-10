@@ -8,7 +8,7 @@ window.onload = () => {
   rtcCore.initialize(myId);
   rtcCore.setupSocketHandlers();
  
-  const video-quadro-verde video = document.getElementById('video-quadro-verde');
+  const localVideo = document.getElementById('localVideo');
   let targetId = null;
   let localStream = null;
 
