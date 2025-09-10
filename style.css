@@ -16,64 +16,60 @@ body {
     overflow: hidden;
 }
 
-.box-principal {
-    width: 100%;
-    max-width: 600px;
-    height: 100%;
-    margin: 0 auto;
-    padding: 2vh 2vw;
-    box-sizing: border-box;
-    background-color: #aee2ff;
+.container {
     position: relative;
+    width: 100%;
+    height: 100%;
     overflow: hidden;
 }
 
-/* ===== VÍDEO PRINCIPAL (TELA GRANDE) ===== */
-.video-tela-grande {
+/* ===== VÍDEOS ===== */
+.video-wrapper {
+    position: relative;
     width: 100%;
-    height: 70%;
-    margin: 0 auto;
+    height: 100%;
 }
 
-.video-tela-grande video {
+.video-wrapper video {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    border-radius: 12px;
 }
 
-/* ===== VÍDEO PEQUENO (QUADRO VERDE) ===== */
-.video-quadro-verde {
+/* ===== CALLER - VÍDEO LOCAL COMO QUADRO VERDE ===== */
+body.caller-page .video-wrapper:nth-child(2) {
     position: absolute;
-    bottom: 15%;
-    right: 5%;
-    width: 30%;
-    height: 20%;
+    bottom: 140px;
+    right: 20px;
+    width: 120px;
+    height: 160px;
     border-radius: 8px;
-    border: 2px solid #4CAF50;
-    box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
     overflow: hidden;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    border: 2px solid #4CAF50;
     z-index: 10;
 }
 
-.video-quadro-verde video {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transform: scaleX(-1); /* Espelha a câmera */
+body.caller-page .video-wrapper:nth-child(2) video {
+    transform: scaleX(-1);
+}
+
+/* ===== RECEIVER - ESCONDE VÍDEO LOCAL ===== */
+body.receiver-page .video-wrapper:nth-child(2) {
+    display: none !important;
 }
 
 /* ===== CAIXA DE TEXTO AZUL ===== */
 .chat-input-box {
     position: absolute;
-    bottom: 40%;
+    bottom: 350px;
     left: 50%;
     transform: translateX(-50%);
-    width: 90%;
-    height: 20%;
+    width: 80%;
+    height: 200px;
     border: 2px solid #007BFF;
     border-radius: 12px;
-    background-color: rgba(255, 255, 255, 0.2);
+    background-color: rgba(255, 255, 255, 0.1);
     z-index: 20;
     overflow-y: auto;
     padding: 10px;
@@ -82,11 +78,11 @@ body {
 /* ===== ESTILOS DO TEXTO ===== */
 .phrase-box {
     background-color: transparent;
-    padding: 0.5vh 0;
-    margin: 0.3vh 0;
+    padding: 1px 0;
+    margin: 0.5px 0;
     border-radius: 0;
-    font-size: 1em;
-    line-height: 1.2;
+    font-size: 15px;
+    line-height: 1.0;
     border: none;
     box-shadow: none;
     width: 100%;
@@ -97,41 +93,37 @@ body {
     color: #666;
     opacity: 0.8;
     border-bottom: 1px dotted #aaa;
+    transition: all 0.2s;
 }
 
 .final-text {
-    color: #000;
+    color: inherit;
     opacity: 1;
+    animation: textFinalized 0.3s ease-out;
 }
 
 /* ===== CONTROLES ===== */
 .controls {
     position: absolute;
-    bottom: 8%;
+    bottom: 60px;
     left: 50%;
     transform: translateX(-50%);
     display: flex;
     flex-direction: column;
-    gap: 2vh;
+    gap: 16px;
     z-index: 20;
-    width: 80%;
 }
 
 .controls button {
-    width: 100%;
-    height: 6vh;
-    border-radius: 3vh;
+    width: 120px;
+    height: 40px;
+    border-radius: 20px;
     border: none;
-    font-size: 1.1em;
+    font-size: 18px;
     font-weight: bold;
     cursor: pointer;
-    background: #4CAF50;
+    backdrop-filter: blur(6px);
     color: white;
-    transition: transform 0.2s;
-}
-
-.controls button:active {
-    transform: scale(0.95);
 }
 
 #callActionBtn {
@@ -143,66 +135,43 @@ body {
     background: #2196F3;
 }
 
-/* ===== INFORMAÇÕES E QR CODE ===== */
+/* ===== INFORMAÇÕES ===== */
 .info-overlay {
     position: absolute;
-    top: 3%;
-    left: 50%;
-    transform: translateX(-50%);
+    top: 20px;
+    left: 0;
+    right: 0;
     z-index: 30;
-    color: #333;
+    color: white;
     text-align: center;
     background: transparent;
-    width: 90%;
+    padding: 10px;
 }
 
 .qrcode-container {
-    margin: 1vh auto;
-    padding: 1.5vh;
+    margin: 10px auto;
+    padding: 12px;
     background: white;
     border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
     display: inline-block;
 }
 
 #myId {
     display: inline-block;
-    font-size: 0.9em;
+    font-size: 16px;
     font-weight: bold;
-    background: rgba(255, 255, 255, 0.3);
-    padding: 1vh 2vh;
-    border-radius: 2vh;
-    color: #333;
-}
-
-/* ===== BOLHAS DE IDIOMA ===== */
-.language-bubbles {
-    display: flex;
-    gap: 1vh;
-    justify-content: center;
-    margin-top: 1vh;
-    flex-wrap: wrap;
-}
-
-.lang-btn {
-    width: 6vh;
-    height: 6vh;
-    font-size: 1em;
-    border-radius: 50%;
-    border: none;
-    background-color: rgba(0, 0, 0, 0.1);
-    color: #333;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 6px 12px;
+    border-radius: 20px;
+    user-select: all;
     cursor: pointer;
-    transition: background-color 0.2s;
-}
-
-.lang-btn:active {
-    background-color: rgba(0, 0, 0, 0.2);
+    color: white;
 }
 
 /* ===== ANIMAÇÕES ===== */
 @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(1vh); }
+    from { opacity: 0; transform: translateY(2px); }
     to { opacity: 1; transform: translateY(0); }
 }
 
@@ -215,71 +184,21 @@ body {
     animation: fadeIn 0.3s ease-out;
 }
 
-/* ===== RESPONSIVIDADE AUTOMÁTICA ===== */
+/* ===== RESPONSIVO ===== */
 @media (max-width: 768px) {
-    .box-principal {
-        padding: 1.5vh 3vw;
-    }
-    
-    .video-wrapper {
-        height: 65%;
-    }
-    
-    .video-wrapper:nth-child(2) {
-        width: 25%;
-        height: 18%;
-        bottom: 18%;
+    body.caller-page .video-wrapper:nth-child(2) {
+        bottom: 120px;
+        right: 10px;
+        width: 100px;
+        height: 140px;
     }
     
     .chat-input-box {
-        height: 18%;
-        bottom: 42%;
+        bottom: 300px;
+        height: 180px;
     }
     
     .controls {
-        bottom: 6%;
-        gap: 1.5vh;
-    }
-    
-    .controls button {
-        height: 5.5vh;
-        font-size: 1em;
-    }
-}
-
-@media (max-width: 480px) {
-    .box-principal {
-        padding: 1vh 4vw;
-    }
-    
-    .video-wrapper {
-        height: 60%;
-    }
-    
-    .video-wrapper:nth-child(2) {
-        width: 22%;
-        height: 16%;
-        bottom: 20%;
-        right: 4%;
-    }
-    
-    .chat-input-box {
-        height: 16%;
-        bottom: 44%;
-        width: 92%;
-    }
-    
-    .controls {
-        bottom: 5%;
-        width: 85%;
-    }
-    
-    .controls button {
-        height: 5vh;
-        font-size: 0.95em;
-    }
-    
-    .info-overlay {
-        top: 2%;
+        bottom: 40px;
     }
 }
