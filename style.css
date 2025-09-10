@@ -1,0 +1,283 @@
+/* ===== ESTILOS GERAIS ===== */
+html {
+    height: 100%;
+    font-size: clamp(14px, 2.5vw, 18px);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    text-align: center;
+    transition: background-color 0.5s;
+}
+
+body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    font-size: 1em;
+    background: transparent;
+    overflow: hidden;
+}
+
+.box-principal {
+    width: 100%;
+    max-width: 600px;
+    height: 100%;
+    margin: 0 auto;
+    padding: 2vh 2vw;
+    box-sizing: border-box;
+    background-color: #aee2ff;
+    position: relative;
+    overflow: hidden;
+}
+
+/* ===== VÍDEOS DENTRO DO BOX PRINCIPAL ===== */
+.video-wrapper {
+    position: relative;
+    width: 100%;
+    height: 70%; /* Ocupa 70% da altura do box */
+    margin: 0 auto;
+}
+
+.video-wrapper video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 12px;
+}
+
+/* Vídeo local (PIP - Picture in Picture) */
+.video-wrapper:nth-child(2) {
+    position: absolute;
+    bottom: 15%;
+    right: 5%;
+    width: 30%;
+    height: 20%;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+    border: 2px solid #4CAF50;
+    z-index: 10;
+}
+
+.video-wrapper:nth-child(2) video {
+    transform: scaleX(-1);
+}
+
+/* ===== CAIXA DE TEXTO AZUL ===== */
+.chat-input-box {
+    position: absolute;
+    bottom: 40%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    height: 20%;
+    border: 2px solid #007BFF;
+    border-radius: 12px;
+    background-color: rgba(255, 255, 255, 0.2);
+    z-index: 20;
+    overflow-y: auto;
+    padding: 10px;
+}
+
+/* ===== ESTILOS DO TEXTO ===== */
+.phrase-box {
+    background-color: transparent;
+    padding: 0.5vh 0;
+    margin: 0.3vh 0;
+    border-radius: 0;
+    font-size: 1em;
+    line-height: 1.2;
+    border: none;
+    box-shadow: none;
+    width: 100%;
+    word-break: break-word;
+}
+
+.interim-text {
+    color: #666;
+    opacity: 0.8;
+    border-bottom: 1px dotted #aaa;
+}
+
+.final-text {
+    color: #000;
+    opacity: 1;
+}
+
+/* ===== CONTROLES ===== */
+.controls {
+    position: absolute;
+    bottom: 8%;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 2vh;
+    z-index: 20;
+    width: 80%;
+}
+
+.controls button {
+    width: 100%;
+    height: 6vh;
+    border-radius: 3vh;
+    border: none;
+    font-size: 1.1em;
+    font-weight: bold;
+    cursor: pointer;
+    background: #4CAF50;
+    color: white;
+    transition: transform 0.2s;
+}
+
+.controls button:active {
+    transform: scale(0.95);
+}
+
+#callActionBtn {
+    background: #4CAF50;
+    display: none;
+}
+
+#scanBtn {
+    background: #2196F3;
+}
+
+/* ===== INFORMAÇÕES E QR CODE ===== */
+.info-overlay {
+    position: absolute;
+    top: 3%;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 30;
+    color: #333;
+    text-align: center;
+    background: transparent;
+    width: 90%;
+}
+
+.qrcode-container {
+    margin: 1vh auto;
+    padding: 1.5vh;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    display: inline-block;
+}
+
+#myId {
+    display: inline-block;
+    font-size: 0.9em;
+    font-weight: bold;
+    background: rgba(255, 255, 255, 0.3);
+    padding: 1vh 2vh;
+    border-radius: 2vh;
+    color: #333;
+}
+
+/* ===== BOLHAS DE IDIOMA ===== */
+.language-bubbles {
+    display: flex;
+    gap: 1vh;
+    justify-content: center;
+    margin-top: 1vh;
+    flex-wrap: wrap;
+}
+
+.lang-btn {
+    width: 6vh;
+    height: 6vh;
+    font-size: 1em;
+    border-radius: 50%;
+    border: none;
+    background-color: rgba(0, 0, 0, 0.1);
+    color: #333;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.lang-btn:active {
+    background-color: rgba(0, 0, 0, 0.2);
+}
+
+/* ===== ANIMAÇÕES ===== */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(1vh); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes textFinalized {
+    from { opacity: 0.5; }
+    to { opacity: 1; }
+}
+
+.phrase-box.interim-box {
+    animation: fadeIn 0.3s ease-out;
+}
+
+/* ===== RESPONSIVIDADE AUTOMÁTICA ===== */
+@media (max-width: 768px) {
+    .box-principal {
+        padding: 1.5vh 3vw;
+    }
+    
+    .video-wrapper {
+        height: 65%;
+    }
+    
+    .video-wrapper:nth-child(2) {
+        width: 25%;
+        height: 18%;
+        bottom: 18%;
+    }
+    
+    .chat-input-box {
+        height: 18%;
+        bottom: 42%;
+    }
+    
+    .controls {
+        bottom: 6%;
+        gap: 1.5vh;
+    }
+    
+    .controls button {
+        height: 5.5vh;
+        font-size: 1em;
+    }
+}
+
+@media (max-width: 480px) {
+    .box-principal {
+        padding: 1vh 4vw;
+    }
+    
+    .video-wrapper {
+        height: 60%;
+    }
+    
+    .video-wrapper:nth-child(2) {
+        width: 22%;
+        height: 16%;
+        bottom: 20%;
+        right: 4%;
+    }
+    
+    .chat-input-box {
+        height: 16%;
+        bottom: 44%;
+        width: 92%;
+    }
+    
+    .controls {
+        bottom: 5%;
+        width: 85%;
+    }
+    
+    .controls button {
+        height: 5vh;
+        font-size: 0.95em;
+    }
+    
+    .info-overlay {
+        top: 2%;
+    }
+}
