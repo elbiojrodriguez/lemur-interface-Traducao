@@ -43,7 +43,7 @@ body {
 }
 
 /* ===== VÍDEO PEQUENO (QUADRO VERDE) ===== */
-.video-quadro-verde {
+.remoteVideo {
     position: absolute;
     bottom: 15%;
     right: 5%;
