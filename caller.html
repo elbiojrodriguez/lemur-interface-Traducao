@@ -88,12 +88,14 @@
     <!-- 🔹 Box azul centralizado com ID para JS -->
     <div class="chat-input-box" id="textDisplay"></div>
 
-    <div class="container">
-        <div class="video-wrapper">
-            <video id="remoteVideo" autoplay playsinline></video>
-        </div>
-        <div class="video-wrapper">
-            <video id="localVideo" autoplay muted playsinline></video>
+    <div class="box-principal">
+  <!-- Apenas o vídeo remoto é visível -->
+  <div class="video-wrapper">
+    <video id="remoteVideo" autoplay playsinline></video>
+  </div>
+
+  <!-- O vídeo local é invisível, usado só para capturar -->
+  <video id="localVideo" style="display: none;"></video>
         </div>
         
         <!-- 🔻 Controles -->
