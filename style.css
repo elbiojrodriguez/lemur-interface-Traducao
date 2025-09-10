@@ -28,37 +28,39 @@ body {
     overflow: hidden;
 }
 
-/* ===== VÍDEOS DENTRO DO BOX PRINCIPAL ===== */
-.video-wrapper {
-    position: relative;
+/* ===== VÍDEO PRINCIPAL (TELA GRANDE) ===== */
+.video-tela-grande {
     width: 100%;
-    height: 70%; /* Ocupa 70% da altura do box */
+    height: 70%;
     margin: 0 auto;
 }
 
-.video-wrapper video {
+.video-tela-grande video {
     width: 100%;
     height: 100%;
     object-fit: cover;
     border-radius: 12px;
 }
 
-/* Vídeo local (PIP - Picture in Picture) */
-.video-wrapper:nth-child(2) {
+/* ===== VÍDEO PEQUENO (QUADRO VERDE) ===== */
+.video-quadro-verde {
     position: absolute;
     bottom: 15%;
     right: 5%;
     width: 30%;
     height: 20%;
     border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
     border: 2px solid #4CAF50;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
     z-index: 10;
 }
 
-.video-wrapper:nth-child(2) video {
-    transform: scaleX(-1);
+.video-quadro-verde video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transform: scaleX(-1); /* Espelha a câmera */
 }
 
 /* ===== CAIXA DE TEXTO AZUL ===== */
