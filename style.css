@@ -220,17 +220,7 @@ body {
     .box-principal {
         padding: 1.5vh 3vw;
     }
-    
-    .video-wrapper {
-        height: 65%;
-    }
-    
-    .video-wrapper:nth-child(2) {
-        width: 25%;
-        height: 18%;
-        bottom: 18%;
-    }
-    
+           
     .chat-input-box {
         height: 18%;
         bottom: 42%;
@@ -250,17 +240,6 @@ body {
 @media (max-width: 480px) {
     .box-principal {
         padding: 1vh 4vw;
-    }
-    
-    .video-wrapper {
-        height: 60%;
-    }
-    
-    .video-wrapper:nth-child(2) {
-        width: 22%;
-        height: 16%;
-        bottom: 20%;
-        right: 4%;
     }
     
     .chat-input-box {
