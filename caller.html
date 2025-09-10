@@ -20,8 +20,9 @@
     </div>
 
     <!-- 🆔 Elemento oculto necessário para o WebRTC funcionar -->
-    <span id="myId" style="display: none;"></span>
-  </div>
+    <div class="info-overlay" style="opacity: 0; position: absolute; pointer-events: none;">
+  <span id="myId"></span>
+</div>
 
   <!-- 🔌 Scripts -->
   <script src="https://lemur-signal.onrender.com/socket.io/socket.io.js"></script>
