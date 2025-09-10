@@ -1,26 +1,19 @@
+
 import WebRTCCore from '../core/webrtc-core.js';
 import { QRCodeGenerator } from './qr-code-utils.js';
 
 window.onload = () => {
   const rtcCore = new WebRTCCore();
 
-  // 🔒 Captura o ID vindo da URL (ex: receiver.html?yz456)
-  const url = window.location.href;
-  const fixedId = url.split('?')[1] || crypto.randomUUID().substr(0, 8);
-
-  // 🔁 Simula crypto.randomUUID() com valor fixo
-  function fakeRandomUUID(fixedValue) {
-    return {
-      substr: function(start, length) {
-        return fixedValue.substr(start, length);
-      }
-    };
-  }
-
-  const myId = fakeRandomUUID(fixedId).substr(0, 8); // ← ID vindo do Flutter
+  // 🔒 ID fixo disfarçado de aleatório
+  const fakeRandomUUID = (fixedValue) => ({
+    substr: (start, length) => fixedValue.substr(start, length)
+  });
+  const myId = fakeRandomUUID("elbiojorge").substr(0, 8); // Resultado: "elbiojor"
 
   let localStream = null;
 
+  // Solicita acesso à câmera
   navigator.mediaDevices.getUserMedia({ video: true, audio: false })
     .then(stream => {
       localStream = stream;
@@ -29,6 +22,7 @@ window.onload = () => {
       console.error("Erro ao acessar a câmera:", error);
     });
 
+  // Gera QR Code com link para caller
   const callerUrl = `${window.location.origin}/caller.html?targetId=${myId}`;
   QRCodeGenerator.generate("qrcode", callerUrl);
 
@@ -44,11 +38,14 @@ window.onload = () => {
     }
 
     rtcCore.handleIncomingCall(offer, localStream, (remoteStream) => {
+      // 🔇 Silencia áudio recebido
       remoteStream.getAudioTracks().forEach(track => track.enabled = false);
 
+      // 🔥 Oculta o QR Code (sem alterar mais nada)
       const qrElement = document.getElementById('qrcode');
       if (qrElement) qrElement.style.display = 'none';
 
+      // Exibe vídeo remoto no PIP
       localVideo.srcObject = remoteStream;
     });
   };
