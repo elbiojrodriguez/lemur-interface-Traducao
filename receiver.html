@@ -4,26 +4,179 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Receiver - Videochamada Mobile</title>
-  <link rel="stylesheet" href="style.css" />
-  <link rel="stylesheet" href="responsivo.css" />
   <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
+  <script src="https://lemur-signal.onrender.com/socket.io/socket.io.js"></script>
+  <style>
+    /* ===== ESTILOS CONSOLIDADOS ===== */
+    
+    /* Reset mobile */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background: transparent;
+      min-height: 100vh;
+      height: 100%;
+      overflow: hidden;
+      position: relative;
+      font-family: Arial, sans-serif;
+    }
+
+    /* Container principal */
+    .container {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    /* Vídeo remoto (oculto conforme sua configuração) */
+    #remoteVideo {
+      display: none;
+    }
+
+    /* Vídeo local em PIP com moldura verde - SEU ELEMENTO PRINCIPAL */
+    .local-pip {
+      position: absolute;
+      bottom: calc(80px + 60px);
+      right: 20px;
+      width: 34.5%;
+      max-width: 138px;
+      height: 184px;
+      transform: translateX(-17%);
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+      border: 2px solid #4CAF50; /* BORDA VERDE */
+      z-index: 10;
+    }
+
+    #localVideo {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transform: scaleX(-1); /* Espelhamento para modo selfie */
+    }
+
+    /* Overlay de informações */
+    .info-overlay {
+      position: absolute;
+      top: 20px;
+      left: 0;
+      right: 0;
+      z-index: 30;
+      color: white;
+      text-align: center;
+      background: rgba(0, 0, 0, 0.5);
+      padding: 10px;
+      border-radius: 0 0 10px 10px;
+    }
+
+    /* Container do QR Code */
+    .qrcode-container {
+      margin: 10px auto;
+      padding: 12px;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+      display: inline-block;
+    }
+
+    /* Responsivo para telas pequenas */
+    @media (max-width: 400px) {
+      .local-pip {
+        height: 120px;
+        max-width: 100px;
+        bottom: calc(60px + 60px);
+      }
+
+      .info-overlay {
+        padding: 8px;
+      }
+
+      .qrcode-container {
+        padding: 8px;
+        max-width: 90%;
+      }
+    }
+  </style>
 </head>
 <body>
   <div class="container">
-    <div class="video-wrapper">
-      <video id="remoteVideo" autoplay playsinline></video>
-    </div>
+    <!-- Vídeo remoto (oculto) -->
+    <video id="remoteVideo" autoplay playsinline></video>
 
-    <div class="video-wrapper">
+    <!-- SEU ELEMENTO PIP COM BORDA VERDE -->
+    <div class="local-pip">
       <video id="localVideo" autoplay muted playsinline></video>
     </div>
 
-        <div class="info-overlay">
+    <div class="info-overlay">
       <div id="qrcode" class="qrcode-container"></div>
     </div>
   </div>
 
-  <script src="https://lemur-signal.onrender.com/socket.io/socket.io.js"></script>
-  <script type="module" src="js/receiver-ui.js"></script>
+  <script type="module">
+    // Seu código JavaScript permanece inalterado
+    import WebRTCCore from '../core/webrtc-core.js';
+    import { QRCodeGenerator } from './qr-code-utils.js';
+
+    window.onload = () => {
+      const rtcCore = new WebRTCCore();
+
+      // 🔒 Captura o ID vindo da URL (ex: receiver.html?yz456)
+      const url = window.location.href;
+      const fixedId = url.split('?')[1] || crypto.randomUUID().substr(0, 8);
+
+      // 🔁 Simula crypto.randomUUID() com valor fixo
+      function fakeRandomUUID(fixedValue) {
+        return {
+          substr: function(start, length) {
+            return fixedValue.substr(start, length);
+          }
+        };
+      }
+
+      const myId = fakeRandomUUID(fixedId).substr(0, 8); // ← ID vindo do Flutter
+
+      let localStream = null;
+
+      navigator.mediaDevices.getUserMedia({ video: true, audio: false })
+        .then(stream => {
+          localStream = stream;
+        })
+        .catch(error => {
+          console.error("Erro ao acessar a câmera:", error);
+        });
+
+      const callerUrl = `${window.location.origin}/caller.html?targetId=${myId}`;
+      QRCodeGenerator.generate("qrcode", callerUrl);
+
+      rtcCore.initialize(myId);
+      rtcCore.setupSocketHandlers();
+
+      const localVideo = document.getElementById('localVideo');
+
+      rtcCore.onIncomingCall = (offer) => {
+        if (!localStream) {
+          console.warn("Stream local não disponível");
+          return;
+        }
+
+        rtcCore.handleIncomingCall(offer, localStream, (remoteStream) => {
+          remoteStream.getAudioTracks().forEach(track => track.enabled = false);
+
+          const qrElement = document.getElementById('qrcode');
+          if (qrElement) qrElement.style.display = 'none';
+
+          localVideo.srcObject = remoteStream;
+        });
+      };
+    };
+  </script>
 </body>
 </html>
