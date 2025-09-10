@@ -1,3 +1,4 @@
+
 import WebRTCCore from '../core/webrtc-core.js';
 
 window.onload = () => {
@@ -7,8 +8,8 @@ window.onload = () => {
   document.getElementById('myId').textContent = myId;
   rtcCore.initialize(myId);
   rtcCore.setupSocketHandlers();
- 
- const localVideo = document.getElementById('localVideo');
+
+  const localVideo = document.getElementById('localVideo');
   const remoteVideo = document.getElementById('remoteVideo');
   let targetId = null;
   let localStream = null;
