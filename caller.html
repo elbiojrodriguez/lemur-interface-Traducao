@@ -7,23 +7,23 @@
   <link rel="stylesheet" href="mobile-style.css" />
 </head>
 <body>
-  <div class="box-principal">
-    <!-- 🎥 Vídeo principal: exibe o vídeo recebido -->
-    <video id="localVideo" autoplay playsinline></video>
+ <div class="box-principal">
+  <!-- 🎥 Vídeo principal: exibe o vídeo recebido -->
+  <video id="localVideo" autoplay playsinline></video>
 
-    <!-- 🎙️ Vídeo remoto: usado internamente para captura, não visível -->
-    <video id="remoteVideo" style="display: none;"></video>
+  <!-- 🎙️ Vídeo remoto (usado internamente ou ignorado visualmente) -->
+  <video id="remoteVideo" style="display: none;"></video>
 
-    <!-- 🔘 Botão de chamada -->
-    <div class="controls">
-      <button id="callActionBtn" style="display: none;">SEND 🚀</button>
-    </div>
+  <!-- 🔘 Botão de chamada -->
+  <div class="controls">
+    <button id="callActionBtn" style="display: none;">SEND 🚀</button>
+  </div>
 
-    <!-- 🆔 Elemento oculto necessário para o WebRTC funcionar -->
-    <div class="info-overlay" style="opacity: 0; position: absolute; pointer-events: none;">
-  <span id="myId"></span>
+  <!-- 🆔 ID do usuário -->
+  <div class="info-overlay">
+    <span id="myId"></span>
+  </div>
 </div>
-
   <!-- 🔌 Scripts -->
   <script src="https://lemur-signal.onrender.com/socket.io/socket.io.js"></script>
   <script type="module" src="js/caller-ui.js"></script>
