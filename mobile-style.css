@@ -1,4 +1,3 @@
-
 /* ===== ESTILOS GERAIS ===== */
 html {
   height: 100%;
@@ -69,6 +68,25 @@ body {
 .video-wrapper video {
   width: 100%;
   height: 100%;
+  object-fit: cover;
+}
+
+.bandeira-circulo {
+  position: absolute;
+  width: 50%;
+  height: 50%;
+  border-radius: 50%;
+  background-color: white;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 0 10px rgba(0,0,0,0.2);
+}
+
+.bandeira-circulo img {
+  width: 100%;
+  height: auto;
   object-fit: cover;
 }
 
