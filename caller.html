@@ -1,17 +1,20 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<p lang="en">Welcome to the app!</p>
+<p lang="pt-BR">Olá, Elbio!</p>
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Caller - Videochamada Mobile</title>
+  <title>Lemur-EchoMeP2P-Caller</title>
   <link rel="stylesheet" href="mobile-style.css" />
 </head>
 <body>
   <div class="box-principal">
+    <!-- 🎥 Vídeo remoto -->
     <div class="video-wrapper">
       <video id="remoteVideo" autoplay playsinline></video>
     </div>
 
+    <!-- 🎥 Vídeo local (mutado) -->
     <div class="video-wrapper">
       <video id="localVideo" autoplay muted playsinline></video>
     </div>
@@ -20,11 +23,7 @@
   <div class="controls">
     <button id="callActionBtn" style="display: none;">SEND 🚀</button>
   </div>
-
-  <!-- 🆔 ID do usuário -->
-  <div class="info-overlay" style="opacity: 0; position: absolute; pointer-events: none;">
-  <span id="myId"></span>
-</div>
+ 
 </div>
   <!-- 🔌 Scripts -->
   <script src="https://lemur-signal.onrender.com/socket.io/socket.io.js"></script>
