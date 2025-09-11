@@ -51,9 +51,9 @@ body {
 /* Controles */
 .controls {
   position: absolute;
-  bottom: 60px;
-  left: 50%;
-  transform: translateX(-50%);
+  bottom: 150px;         /* sobe o botão */
+  left: 40px;            /* aproxima da esquerda */
+  transform: none;       /* remove centralização */
   display: flex;
   gap: 12px;
   z-index: 20;
