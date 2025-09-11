@@ -106,9 +106,9 @@ body {
 /* ===== OVERLAY DE QR CODE ===== */
 .info-overlay {
   position: absolute;
-  top: 30%;                  /* distância do topo da box */
-  left: 50%;
-  transform: translateX(-50%);
+  top: 30%;
+  left: 0;
+  width: 100%;
   z-index: 30;
   text-align: center;
   background: transparent;
