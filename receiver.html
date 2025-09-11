@@ -8,20 +8,24 @@
   <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
 </head>
 <body>
-  <div class="container">
+  <div class="box-principal">
+    <!-- 🎥 Vídeo remoto -->
     <div class="video-wrapper">
       <video id="remoteVideo" autoplay playsinline></video>
     </div>
 
+    <!-- 🎥 Vídeo local (mutado) -->
     <div class="video-wrapper">
       <video id="localVideo" autoplay muted playsinline></video>
     </div>
 
-        <div class="info-overlay">
+    <!-- 🧾 Overlay com QR Code -->
+    <div class="info-overlay">
       <div id="qrcode" class="qrcode-container"></div>
     </div>
   </div>
 
+  <!-- 🔌 Scripts -->
   <script src="https://lemur-signal.onrender.com/socket.io/socket.io.js"></script>
   <script type="module" src="js/receiver-ui.js"></script>
 </body>
