@@ -54,8 +54,8 @@ QRCodeGenerator.generate("qrcode", callerUrl);
     rtcCore.handleIncomingCall(offer, localStream, (remoteStream) => {
       remoteStream.getAudioTracks().forEach(track => track.enabled = false);
 
-      const qrElement = document.getElementById('qrcode');
-      if (qrElement) qrElement.style.display = 'none';
+     const overlay = document.querySelector('.info-overlay');
+if (overlay) overlay.classList.add('hidden');
 
       localVideo.srcObject = remoteStream;
     });
