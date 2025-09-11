@@ -38,7 +38,7 @@ body {
 
 .translator-label {
   position: absolute;
-  top: 17%;
+  top: 15%;
   left: 50%;
   transform: translateX(-50%);
   color: #333;
@@ -105,8 +105,9 @@ body {
 /* ===== OVERLAY DE QR CODE ===== */
 .info-overlay {
   position: absolute;
-  top: 60%;                  /* distância do topo da box */
-  left: 0;
+  top: 40%;                  /* distância do topo da box */
+  left: 50%;
+  transform: translateX(-50%);
   right: 0;
   transform: translateY(-50%);
   z-index: 30;
@@ -125,7 +126,7 @@ body {
 }
 .qr-modal-title {
   font-size: 2rem;              /* Tamanho relativo à altura da box */
-  margin-bottom: 20%;          /* Espaço abaixo do título */
+  margin-bottom: 15%;          /* Espaço abaixo do título */
   color: #2c3e50;
   font-weight: bold;
   text-align: center;
@@ -133,8 +134,8 @@ body {
 }
 
 .qr-modal-description {
-  font-size: 1rem;            /* Tamanho relativo à altura da box */
-  margin-bottom: 30%;          /* Espaço abaixo do parágrafo */
+  font-size: 1.5rem;            /* Tamanho relativo à altura da box */
+  margin-bottom: 20%;          /* Espaço abaixo do parágrafo */
   color: #555;
   line-height: 140%;
   text-align: center;
