@@ -83,7 +83,7 @@ body {
 /* Overlay de informações */
 .info-overlay {
   position: absolute;                      /* Flutua sobre o layout */
-  top: 50%;
+  top: 40px;
   transform: translateY(-50%);             /* Fica centralizado do contêiner pai */
   left: 0;
   right: 0;                                /* Estica horizontalmente */
