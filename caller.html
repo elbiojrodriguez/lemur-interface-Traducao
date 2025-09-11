@@ -1,6 +1,6 @@
 <!DOCTYPE html>
-<p lang="en">Welcome to the app!</p>
-<p lang="pt-BR">Olá, Elbio!</p>
+<html lang="en">
+<html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -18,6 +18,11 @@
     <div class="video-wrapper">
       <video id="localVideo" autoplay muted playsinline></video>
     </div>
+
+    <!-- 🆔 ID do usuário -->
+  <div class="info-overlay" style="opacity: 0; position: absolute; pointer-events: none;">
+  <span id="myId"></span>
+</div>
 
   <!-- 🔘 Botão de chamada -->
   <div class="controls">
