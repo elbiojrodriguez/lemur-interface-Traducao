@@ -1,3 +1,4 @@
+
 /* ===== ESTILOS GERAIS ===== */
 html {
   height: 100%;
@@ -105,17 +106,19 @@ body {
 /* ===== OVERLAY DE QR CODE ===== */
 .info-overlay {
   position: absolute;
-  top: 20%;                  /* distância do topo da box */
+  top: 40%;                  /* distância do topo da box */
   left: 50%;
   transform: translateX(-50%);
+  right: 0;
+  transform: translateY(-50%);
   z-index: 30;
   text-align: center;
   background: transparent;
 }
 
 .qrcode-container {
-  margin: 3% auto;           /* centraliza e espaça verticalmente */
-  padding: 4%;               /* espaçamento interno relativo */
+  margin: 2% auto;           /* centraliza e espaça verticalmente */
+  padding: 3%;               /* espaçamento interno relativo */
   max-width: 90%;
   background: white;
   border-radius: 12px;
@@ -124,7 +127,7 @@ body {
 }
 .qr-modal-title {
   font-size: 2rem;              /* Tamanho relativo à altura da box */
-  margin-bottom: 5%;          /* Espaço abaixo do título */
+  margin-bottom: 15%;          /* Espaço abaixo do título */
   color: #2c3e50;
   font-weight: bold;
   text-align: center;
@@ -133,7 +136,7 @@ body {
 
 .qr-modal-description {
   font-size: 1.5rem;            /* Tamanho relativo à altura da box */
-  margin-bottom: 1%;          /* Espaço abaixo do parágrafo */
+  margin-bottom: 20%;          /* Espaço abaixo do parágrafo */
   color: #555;
   line-height: 140%;
   text-align: center;
@@ -148,4 +151,3 @@ body {
   opacity: 0;
   pointer-events: none;
 }
-
