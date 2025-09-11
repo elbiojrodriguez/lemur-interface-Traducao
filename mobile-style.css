@@ -1,26 +1,32 @@
-html, body {
-  height: 100%;
-  margin: 0;
-  padding: 0;
-  font-family: 'Segoe UI', Tahoma, sans-serif;
-  background-color: #aee2ff;
-  font-size: clamp(14px, 2.5vw, 18px);
-  text-align: center;
-  overflow: hidden;
+/* ===== ESTILOS GERAIS ===== */
+html {
+    height: 100%;
+    font-size: clamp(14px, 2.5vw, 18px);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    text-align: center;
+    transition: background-color 0.5s;
+}
+
+body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    font-size: 1em;
 }
 
 .box-principal {
-  width: 100%;
-  max-width: 600px;
-  height: 100%;
-  margin: 0 auto;
-  padding: 2vh 2vw;
-  box-sizing: border-box;
-  position: relative;
-  overflow: hidden;
+    width: 100%;
+    max-width: 600px;
+    height: 100%;
+    margin: 0 auto;
+    padding: 2vh 2vw;
+    box-sizing: border-box;
+    background-color: #aee2ff;
+    position: relative;
+    overflow-y: auto;
 }
 
-/* Vídeo remoto ocupa toda a tela */
+/* Vídeo remoto  */
 .video-wrapper {
  position: absolute;
   bottom: calc(80px + 60px);
@@ -87,13 +93,65 @@ html, body {
   border-radius: 0 0 10px 10px;
 }
 
+/* ===== ESTILOS DA TELA DE QR CODE ===== */
+.qr-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.9);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.qr-modal {
+    background-color: #aee2ff;
+    border-radius: 20px;
+    padding: 40px 30px;
+    width: 80%;
+    max-width: 400px;
+    text-align: center;
+    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.5);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.qr-modal-title {
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+    color: #2c3e50;
+    font-weight: bold;
+    text-align: center;
+    width: 100%;
+}
+
+.qr-modal-description {
+    font-size: 1rem;
+    margin-bottom: 25px;
+    color: #555;
+    line-height: 1.4;
+    text-align: center;
+    width: 100%;
+}
+
+.qr-modal-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    width: 100%;
+}
+
 .qrcode-container {
-  margin: 10px auto;
-  padding: 12px;
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-  display: inline-block;
+    padding: 15px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    margin: 0 auto;
 }
 
 #myId {
