@@ -26,6 +26,29 @@ body {
   overflow-y: auto;
 }
 
+.logo {
+  position: absolute;
+  top: 7%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 35%;
+  max-width: 200px;
+  height: auto;
+}
+
+.translator-label {
+  position: absolute;
+  top: 17%;
+  left: 50%;
+  transform: translateX(-50%);
+  color: #333;
+  font-size: 5vw;
+  text-align: center;
+  width: 80%;
+  max-width: 90%;
+  margin: 0;
+}
+
 /* ===== VÍDEO REMOTO ===== */
 .video-wrapper {
   position: absolute;
