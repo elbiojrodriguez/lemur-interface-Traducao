@@ -29,15 +29,16 @@ window.onload = () => {
       console.error("Erro ao acessar a câmera:", error);
     });
 
-  // 🔗 Captura os parâmetros adicionais da URL
-  const params = new URLSearchParams(window.location.search);
-  const token = params.get('token') || '';
-  const lang = params.get('lang') || '';
-  const name = params.get('name') || '';
+ // 🔗 Captura os parâmetros reais da URL
+const params = new URLSearchParams(window.location.search);
+const token = params.get('token') || '';
+const lang = params.get('lang') || '';
 
-  // 📦 Monta a URL completa com todos os parâmetros
-  const callerUrl = `${window.location.origin}/caller.html?targetId=${myId}&token=${encodeURIComponent(token)}&lang=${encodeURIComponent(lang)}&name=${encodeURIComponent(name)}`;
-  QRCodeGenerator.generate("qrcode", callerUrl);
+// 📦 Monta a URL final que será usada no QR Code
+const callerUrl = `${window.location.origin}/caller.html?targetId=${myId}&token=${encodeURIComponent(token)}&lang=${encodeURIComponent(lang)}`;
+
+// 🧾 Gera o QR Code com essa URL
+QRCodeGenerator.generate("qrcode", callerUrl);
 
   rtcCore.initialize(myId);
   rtcCore.setupSocketHandlers();
