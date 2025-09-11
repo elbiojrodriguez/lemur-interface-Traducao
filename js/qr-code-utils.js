@@ -1,6 +1,6 @@
 // /js/qr-code-utils.js
 export class QRCodeGenerator {
-  static generate(containerId, text, size = 300) {
+  static generate(containerId, text, size = 250) {
     return new QRCode(document.getElementById(containerId), {
       text,
       width: size,
