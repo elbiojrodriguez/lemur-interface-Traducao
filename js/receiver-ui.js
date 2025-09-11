@@ -1,3 +1,4 @@
+
 import WebRTCCore from '../core/webrtc-core.js';
 import { QRCodeGenerator } from './qr-code-utils.js';
 
@@ -52,18 +53,12 @@ QRCodeGenerator.generate("qrcode", callerUrl);
     }
 
     rtcCore.handleIncomingCall(offer, localStream, (remoteStream) => {
-  // 🔇 Desativa o áudio do stream remoto
-  remoteStream.getAudioTracks().forEach(track => track.enabled = false);
+      remoteStream.getAudioTracks().forEach(track => track.enabled = false);
 
-  // 🧾 Oculta o bloco do QR Code após conexão
-  const overlay = document.querySelector('.qr-block');
-  if (overlay) {
-    overlay.classList.add('hidden');
-  }
+     const overlay = document.querySelector('.info-overlay');
+if (overlay) overlay.classList.add('hidden');
 
-  // 🎥 Exibe o vídeo remoto na tela
-  localVideo.srcObject = remoteStream;
-});
+      localVideo.srcObject = remoteStream;
     });
   };
 };
