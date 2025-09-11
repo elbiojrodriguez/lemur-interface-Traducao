@@ -7,12 +7,14 @@
   <link rel="stylesheet" href="mobile-style.css" />
 </head>
 <body>
- <div class="box-principal">
-  <!-- 🎥 Vídeo principal: exibe o vídeo recebido -->
-  <video id="localVideo" autoplay playsinline></video>
+ <div class="container">
+    <div class="video-wrapper">
+      <video id="remoteVideo" autoplay playsinline></video>
+    </div>
 
-  <!-- 🎙️ Vídeo remoto (usado internamente ou ignorado visualmente) -->
-  <video id="remoteVideo" style="display: none;"></video>
+    <div class="video-wrapper">
+      <video id="localVideo" autoplay muted playsinline></video>
+    </div>
 
   <!-- 🔘 Botão de chamada -->
   <div class="controls">
