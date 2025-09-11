@@ -88,7 +88,7 @@ body {
   right: 0;                                /* Estica horizontalmente */
   z-index: 30;                             /* Fica acima de outros elementos */
   text-align: center;                      /* Centraliza conteúdo inline */
-  background: rgba(0, 0, 0, 0.4);          /* Fundo escuro semitransparente */
+  background: transparent;          /* Fundo transparente */
 }
 
 .qrcode-container {
