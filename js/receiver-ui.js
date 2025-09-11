@@ -52,12 +52,18 @@ QRCodeGenerator.generate("qrcode", callerUrl);
     }
 
     rtcCore.handleIncomingCall(offer, localStream, (remoteStream) => {
-      remoteStream.getAudioTracks().forEach(track => track.enabled = false);
+  // 🔇 Desativa o áudio do stream remoto
+  remoteStream.getAudioTracks().forEach(track => track.enabled = false);
 
-     const overlay = document.querySelector('.info-overlay');
-if (overlay) overlay.classList.add('hidden');
+  // 🧾 Oculta o bloco do QR Code após conexão
+  const overlay = document.querySelector('.info-overlay');
+  if (overlay) {
+    overlay.classList.add('hidden');
+  }
 
-      localVideo.srcObject = remoteStream;
+  // 🎥 Exibe o vídeo remoto na tela
+  localVideo.srcObject = remoteStream;
+});
     });
   };
 };
