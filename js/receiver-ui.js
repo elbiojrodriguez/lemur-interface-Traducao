@@ -56,7 +56,7 @@ QRCodeGenerator.generate("qrcode", callerUrl);
   remoteStream.getAudioTracks().forEach(track => track.enabled = false);
 
   // 🧾 Oculta o bloco do QR Code após conexão
-  const overlay = document.querySelector('.info-overlay');
+  const overlay = document.querySelector('.qr-block');
   if (overlay) {
     overlay.classList.add('hidden');
   }
