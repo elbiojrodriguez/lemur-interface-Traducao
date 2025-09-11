@@ -29,7 +29,14 @@ window.onload = () => {
       console.error("Erro ao acessar a câmera:", error);
     });
 
-  const callerUrl = `${window.location.origin}/caller.html?targetId=${myId}`;
+  // 🔗 Captura os parâmetros adicionais da URL
+  const params = new URLSearchParams(window.location.search);
+  const token = params.get('token') || '';
+  const lang = params.get('lang') || '';
+  const name = params.get('name') || '';
+
+  // 📦 Monta a URL completa com todos os parâmetros
+  const callerUrl = `${window.location.origin}/caller.html?targetId=${myId}&token=${encodeURIComponent(token)}&lang=${encodeURIComponent(lang)}&name=${encodeURIComponent(name)}`;
   QRCodeGenerator.generate("qrcode", callerUrl);
 
   rtcCore.initialize(myId);
