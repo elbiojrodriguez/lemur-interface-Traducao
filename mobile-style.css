@@ -140,3 +140,13 @@ body {
   text-align: center;
   width: 100%;
 }
+.info-overlay {
+  transition: opacity 0.5s ease;
+  opacity: 1;
+}
+
+.info-overlay.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
