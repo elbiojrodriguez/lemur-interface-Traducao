@@ -15,10 +15,7 @@
     <div class="translator-label" id="translator-label">
     Live translation. No filters. No platform.
     </div>
-
-    <h2 id="qr-modal-title">This is your online key</h2>
-      <p class="qr-modal-description" id="qr-modal-description">You can ask to scan, share or print on your business card.</p>
-
+ 
     <!-- 🎥 Vídeo remoto -->
     <div class="video-wrapper">
       <video id="remoteVideo" autoplay playsinline></video>
@@ -30,10 +27,13 @@
     </div>
 
     <!-- 🧾 Overlay com QR Code -->
-    <div class="info-overlay">
-      <div id="qrcode" class="qrcode-container"></div>
-    </div>
-  </div>
+<div class="info-overlay"> 
+  <h2 id="qr-modal-title">This is your online key</h2>
+  <p class="qr-modal-description" id="qr-modal-description">
+    You can ask to scan, share or print on your business card.
+  </p>
+  <div id="qrcode" class="qrcode-container"></div>
+</div>
 
   <!-- 🔌 Scripts -->
   <script src="https://lemur-signal.onrender.com/socket.io/socket.io.js"></script>
