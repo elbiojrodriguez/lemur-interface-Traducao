@@ -79,29 +79,26 @@ body {
   background: #2196F3;
 }
 
+/* ===== ESTILOS DA TELA DE QR CODE ===== */
 /* Overlay de informações */
 .info-overlay {
-  position: absolute;
-  top: 10px;
+  position: absolute;                      /* Flutua sobre o layout */
+  top: 10px;                               /* Fica 10px abaixo do topo do contêiner pai */
   left: 0;
-  right: 0;
-  z-index: 30;
-  color: white;
-  text-align: center;
-  padding: 10px;
-  background: rgba(0, 0, 0, 0.4);
-  border-radius: 0 0 10px 10px;
+  right: 0;                                /* Estica horizontalmente */
+  z-index: 30;                             /* Fica acima de outros elementos */
+  text-align: center;                      /* Centraliza conteúdo inline */
+  background: rgba(0, 0, 0, 0.4);          /* Fundo escuro semitransparente */
 }
 
-/* ===== ESTILOS DA TELA DE QR CODE ===== */
-{
-  position: relative;
-  margin: 10px auto;
-  padding: 12px;
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-  display: inline-block;
+.qrcode-container {
+  margin: 10px auto;                       /* Centraliza horizontalmente */
+  padding: 12px;                           /* Espaçamento interno */
+  max-width: 90%;                          /* Responsivo em telas menores */
+  background: white;                       /* Fundo branco para contraste */
+  border-radius: 12px;                     /* Bordas arredondadas */
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2); /* Sombra suave */
+  display: inline-block;                   /* Permite centralização com text-align */
 }
 
 #myId {
