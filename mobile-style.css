@@ -124,12 +124,11 @@ body {
   display: inline-block;
 }
 .qr-modal-title {
-  font-size: 2rem;              /* Tamanho relativo à altura da box */
-  margin-bottom: 15%;          /* Espaço abaixo do título */
-  color: #2c3e50;
-  font-weight: bold;
+  font-size: clamp(1rem, 5vw, 2rem); /* mínimo 1rem, ideal 5% da largura da viewport, máximo 2rem */
+  white-space: nowrap;
   text-align: center;
   width: 100%;
+  font-weight: bold; /* Negrito ativado */
 }
 
 .qr-modal-description {
