@@ -133,7 +133,7 @@ body {
 
 .qr-modal-description {
   font-size: 1.5rem;            /* Tamanho relativo à altura da box */
-  margin-bottom: 5%;          /* Espaço abaixo do parágrafo */
+  margin-bottom: 1%;          /* Espaço abaixo do parágrafo */
   color: #555;
   line-height: 140%;
   text-align: center;
