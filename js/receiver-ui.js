@@ -104,7 +104,7 @@ window.onload = () => {
   // 🏳️ Função para carregar bandeira com base no idioma
   async function aplicarBandeira(langCode) {
     try {
-      const response = await fetch('lemur-interface-Traducao/assets/bandeiras/language-flags.json');
+      const response = await fetch('./assets/bandeiras/language-flags.json');
       const flags = await response.json();
       const bandeira = flags[langCode] || '🏳️'; // fallback se idioma não existir
 
