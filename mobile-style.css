@@ -108,9 +108,9 @@ body {
 /* microfone sobreposto */
 .local-mic {
   position: absolute;
-  top: 70%;
-  left: 75%;
-  width: 15%;
+  top: 69%;
+  left: 73%;
+  width: 20%;
   aspect-ratio: 1 / 1;
   font-size: 10vw;
   display: flex;
