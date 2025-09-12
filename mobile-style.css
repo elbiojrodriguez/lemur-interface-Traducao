@@ -39,7 +39,7 @@ body {
 .translator-label {
   position: absolute;
   top: 15%;
-  left: 50%;
+  left: 70%;
   transform: translateX(-50%);
   color: #333;
   font-size: 5vw;
@@ -111,7 +111,7 @@ body {
 
 .remoter-Lang {
   position: absolute;
-  top: 50%;
+  top: 70%;
   left: 70%;
   width: 15%;
   aspect-ratio: 1 / 1;
