@@ -1,7 +1,9 @@
+
 import WebRTCCore from '../core/webrtc-core.js';
 
 window.onload = () => {
   const rtcCore = new WebRTCCore();
+  const chatInputBox = document.querySelector('.chat-input-box');
   const localVideo = document.getElementById('localVideo'); // ← usado como tela principal
   const myId = crypto.randomUUID().substr(0, 8);
   let localStream = null;
@@ -45,7 +47,7 @@ window.onload = () => {
     stream.getAudioTracks().forEach(track => track.enabled = false);
     localVideo.srcObject = stream; // ← ESSENCIAL no seu projeto
   });
-};
+
  // #############################################
   // Controles de idioma dinâmicos
   // #############################################
@@ -377,5 +379,5 @@ recognition.onend = () => {
       'ar-SA': 'خطأ في الميكروفون'
     };
     return messages[langCode] || messages['en-US'];
-  }
-};
+  } // Fecha o if (SpeechRecognition)
+}); // Fecha o window.onload
