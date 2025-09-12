@@ -45,7 +45,7 @@ window.onload = () => {
     stream.getAudioTracks().forEach(track => track.enabled = false);
     localVideo.srcObject = stream; // ← ESSENCIAL no seu projeto
   });
-};
+
  // #############################################
   // Controles de idioma dinâmicos
   // #############################################
