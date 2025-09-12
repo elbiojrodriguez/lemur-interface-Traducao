@@ -377,5 +377,5 @@ recognition.onend = () => {
       'ar-SA': 'خطأ في الميكروفون'
     };
     return messages[langCode] || messages['en-US'];
-  }
-};
+  } // Fecha o if (SpeechRecognition)
+}); // Fecha o window.onload
