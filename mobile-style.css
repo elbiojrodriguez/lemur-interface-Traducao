@@ -169,17 +169,15 @@ body {
 /* ===== CONTROLES ===== */
 .controls {
   position: absolute;
-  bottom: 25%;               /* sobe o botão em relação à altura da box */
-  left: 10%;                 /* aproxima da esquerda em relação à largura da box */
-  transform: none;
+  bottom: 25%;
+  left: 10%;
   display: flex;
-  gap: 4%;                   /* espaçamento entre botões relativo à largura */
   z-index: 20;
 }
 
-.controls button {
-  width: 50%;                /* largura relativa à box */
-  height: 6%;                /* altura relativa à box */
+#callActionBtn {
+  width: 60%;
+  height: 6%;
   border-radius: 50px;
   border: none;
   font-size: 1em;
@@ -187,14 +185,7 @@ body {
   color: white;
   cursor: pointer;
   backdrop-filter: blur(6px);
-}
-
-#callActionBtn {
   background: #4CAF50;
-}
-
-#scanBtn {
-  background: #2196F3;
 }
 
 /* ===== OVERLAY DE QR CODE ===== */
