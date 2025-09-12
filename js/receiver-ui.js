@@ -101,21 +101,23 @@ window.onload = () => {
     }
   })();
 
-  // 🏳️ Função para carregar bandeira com base no idioma
-  async function aplicarBandeira(langCode) {
-    try {
-      const response = await fetch('./assets/bandeiras/language-flags.json');
-      const flags = await response.json();
-      const bandeira = flags[langCode] || '🏳️'; // fallback se idioma não existir
+  // 🏳️ Função para carregar bandeira com fallback inteligente
+async function aplicarBandeira(langCode) {
+  try {
+    const response = await fetch('./assets/bandeiras/language-flags.json');
+    const flags = await response.json();
 
-      const localLangElement = document.querySelector('.local-mic-Lang');
-      if (localLangElement) {
-        localLangElement.textContent = bandeira;
-      }
-    } catch (error) {
-      console.error('Erro ao carregar bandeira:', error);
+    // Tenta código completo, depois só o prefixo (ex: "es-MX" → "es")
+    const bandeira = flags[langCode] || flags[langCode.split('-')[0]] || '🏳️';
+
+    const localLangElement = document.querySelector('.local-mic-Lang');
+    if (localLangElement) {
+      localLangElement.textContent = bandeira;
     }
+  } catch (error) {
+    console.error('Erro ao carregar bandeira:', error);
   }
+}
 
   // 🧭 Aplica a bandeira com base no idioma da URL
   aplicarBandeira(lang);
