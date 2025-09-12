@@ -93,6 +93,20 @@ body {
   height: auto;
   object-fit: cover;
 }
+/* microfone sobreposto */
+.icone-mic {
+  position: absolute;
+  top: 70%;
+  left: 80%;
+  width: 15%;
+  aspect-ratio: 1 / 1;
+  font-size: 4vw;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1;
+  pointer-events: none; /* evita que o microfone bloqueie cliques na bandeira */
+}
 
 /* ===== CONTROLES ===== */
 .controls {
