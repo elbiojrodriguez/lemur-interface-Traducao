@@ -178,7 +178,7 @@ body {
 }
 
 .controls button {
-  width: 20%;                /* largura relativa à box */
+  width: 50%;                /* largura relativa à box */
   height: 6%;                /* altura relativa à box */
   border-radius: 50px;
   border: none;
