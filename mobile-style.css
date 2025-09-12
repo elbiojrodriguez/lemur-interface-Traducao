@@ -96,7 +96,7 @@ body {
   object-fit: cover;
 }
 /* microfone sobreposto */
-.icone-mic {
+.Local-mic {
   position: absolute;
   top: 70%;
   left: 70%;
@@ -133,7 +133,7 @@ body {
   object-fit: cover;
 }
 /* microfone sobreposto */
-.icone-mic {
+.remoter-mic {
   position: absolute;
   top: 70%;
   left: 70%;
