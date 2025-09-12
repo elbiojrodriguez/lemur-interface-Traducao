@@ -73,7 +73,7 @@ body {
 }
 
 /* ===== CIRCULO DA BAMDEIRA ===== */
-.local-Lang {
+.local-mic-Lang {
   position: absolute;
   top: 70%;
   left: 70%;
@@ -132,19 +132,27 @@ body {
   height: auto;
   object-fit: cover;
 }
-/* microfone sobreposto */
-.remoter-mic {
+.local-Lang {
   position: absolute;
-  top: 60%;
+  top: 50%;
   left: 70%;
   width: 15%;
   aspect-ratio: 1 / 1;
+  border-radius: 50%;
+  background-color: white;
   font-size: 10vw;
+  line-height: 1;
+  text-align: center;
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1;
-  pointer-events: none; /* evita que o microfone bloqueie cliques na bandeira */
+  z-index: 0; /* Fica atrás de tudo */
+}
+
+.bandeira-circulo img {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
 }
 
 /* ===== CONTROLES ===== */
