@@ -91,7 +91,7 @@ body {
   aspect-ratio: 1 / 1;
   border-radius: 50%;
   background-color: white;
-  font-size: 14vw;
+  font-size: 12vw;
   line-height: 1;
   text-align: center;
   display: flex;
@@ -112,7 +112,7 @@ body {
   left: 73%;
   width: 20%;
   aspect-ratio: 1 / 1;
-  font-size: 10vw;
+  font-size: 14vw;
   display: flex;
   justify-content: center;
   align-items: center;
