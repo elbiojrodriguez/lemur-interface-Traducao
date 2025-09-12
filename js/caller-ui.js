@@ -4,7 +4,6 @@ import WebRTCCore from '../core/webrtc-core.js';
 window.onload = () => {
   const chatInputBox = document.querySelector('.chat-input-box');
   const rtcCore = new WebRTCCore();
-  const localVideo = document.getElementById('localVideo'); // ← usado como tela principal
   const myId = crypto.randomUUID().substr(0, 8);
   let localStream = null;
   let targetId = null;
