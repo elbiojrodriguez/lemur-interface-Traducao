@@ -1,4 +1,5 @@
 
+
 import WebRTCCore from '../core/webrtc-core.js';
 import { QRCodeGenerator } from './qr-code-utils.js';
 
@@ -52,9 +53,6 @@ async function translateText(text, targetLang) {
   }
 }
 
-// 🧭 Chama a função com o idioma vindo da URL
-aplicarBandeira(lang);
-
 // 🧾 Frases e elementos a traduzir
 const frasesParaTraduzir = {
   "translator-label": "Live translation. No filters. No platform.",
@@ -75,6 +73,7 @@ const frasesParaTraduzir = {
     }
   }
 })();
+
 
  // 🔗 Captura os parâmetros reais da URL
 const params = new URLSearchParams(window.location.search);
