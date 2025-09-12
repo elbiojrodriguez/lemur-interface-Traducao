@@ -52,6 +52,25 @@ async function translateText(text, targetLang) {
   }
 }
 
+// 🏳️ Função para carregar bandeira com base no idioma
+async function aplicarBandeira(langCode) {
+  try {
+    const response = await fetch('assets/bandeiras/language-flags.json');
+    const flags = await response.json();
+    const bandeira = flags[langCode] || '🏳️'; // fallback se idioma não existir
+
+    const localLangElement = document.querySelector('.local-Lang');
+    if (localLangElement) {
+      localLangElement.textContent = bandeira;
+    }
+  } catch (error) {
+    console.error('Erro ao carregar bandeira:', error);
+  }
+}
+
+// 🧭 Chama a função com o idioma vindo da URL
+aplicarBandeira(lang);
+
 // 🧾 Frases e elementos a traduzir
 const frasesParaTraduzir = {
   "translator-label": "Live translation. No filters. No platform.",
