@@ -110,14 +110,23 @@ async function aplicarBandeira(langCode) {
     // Tenta código completo, depois só o prefixo (ex: "es-MX" → "es")
     const bandeira = flags[langCode] || flags[langCode.split('-')[0]] || '🏳️';
 
+    // Aplica em .local-mic-Lang
     const localLangElement = document.querySelector('.local-mic-Lang');
     if (localLangElement) {
       localLangElement.textContent = bandeira;
     }
+
+    // Aplica em .remoter-Lang
+    const remoteLangElement = document.querySelector('.remoter-Lang');
+    if (remoteLangElement) {
+      remoteLangElement.textContent = bandeira;
+    }
+
   } catch (error) {
     console.error('Erro ao carregar bandeira:', error);
   }
 }
+
 
   // 🧭 Aplica a bandeira com base no idioma da URL
   aplicarBandeira(lang);
