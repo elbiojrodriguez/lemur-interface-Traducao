@@ -14,6 +14,28 @@ window.onload = () => {
   rtcCore.initialize(myId);
   rtcCore.setupSocketHandlers();
 
+  // 🌍 ENDPOINT DE TRADUÇÃO (adicionado do arquivo1)
+  const TRANSLATE_ENDPOINT = 'https://chat-tradutor.onrender.com/translate';
+
+  // 🔁 FUNÇÃO DE TRADUÇÃO (adicionada do arquivo1)
+  async function translateText(text, targetLang) {
+    try {
+      if (targetLang === 'en') return text; // Não traduzir se já for inglês
+
+      const response = await fetch(TRANSLATE_ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text, targetLang })
+      });
+
+      const result = await response.json();
+      return result.translatedText || text;
+    } catch (error) {
+      console.error('Erro na tradução:', error);
+      return text;
+    }
+  }
+
   // Captura da câmera (sem áudio)
   navigator.mediaDevices.getUserMedia({ video: true, audio: false })
     .then(stream => {
@@ -45,6 +67,7 @@ window.onload = () => {
     stream.getAudioTracks().forEach(track => track.enabled = false);
     localVideo.srcObject = stream; // ← ESSENCIAL no seu projeto
   });
+  
 // #############################################
   // Controles de idioma dinâmicos
   // #############################################
