@@ -104,7 +104,7 @@ window.onload = () => {
   // 🏳️ Função para carregar bandeira com fallback inteligente
 async function aplicarBandeira(langCode) {
   try {
-    const response = await fetch('./assets/bandeiras/language-flags.json');
+    const response = await fetch('assets/bandeiras/language-flags.json');
     const flags = await response.json();
 
     // Tenta código completo, depois só o prefixo (ex: "es-MX" → "es")
