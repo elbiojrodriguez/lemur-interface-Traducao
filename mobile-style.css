@@ -1,3 +1,4 @@
+
 /* ===== ESTILOS GERAIS ===== */
 html {
   height: 100%;
@@ -39,7 +40,7 @@ body {
 .translator-label {
   position: absolute;
   top: 15%;
-  left: 70%;
+  left: 50%;
   transform: translateX(-50%);
   color: #333;
   font-size: 5vw;
@@ -134,7 +135,7 @@ body {
 /* microfone sobreposto */
 .icone-mic {
   position: absolute;
-  top: 50%;
+  top: 70%;
   left: 70%;
   width: 15%;
   aspect-ratio: 1 / 1;
