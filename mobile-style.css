@@ -1,4 +1,5 @@
 
+
 /* ===== ESTILOS GERAIS ===== */
 html {
   height: 100%;
@@ -176,7 +177,7 @@ body {
   z-index: 20;
 }
 
-.callActionBtn {
+.controls button {
   width: 20%;                /* largura relativa à box */
   height: 6%;                /* altura relativa à box */
   border-radius: 50px;
