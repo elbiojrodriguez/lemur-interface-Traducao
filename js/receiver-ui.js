@@ -108,7 +108,7 @@ window.onload = () => {
       const flags = await response.json();
       const bandeira = flags[langCode] || '🏳️'; // fallback se idioma não existir
 
-      const localLangElement = document.querySelector('.local-Lang');
+      const localLangElement = document.querySelector('.local-mic-Lang');
       if (localLangElement) {
         localLangElement.textContent = bandeira;
       }
