@@ -71,11 +71,11 @@ body {
   object-fit: cover;
 }
 
-.bandeira-circulo {
+.local-Lang {
   position: absolute;
-  top: 89%;
+  top: 70%;
   left: 70%;
-  width: 15%;
+  width: 5%;
   aspect-ratio: 1 / 1;
   border-radius: 50%;
   background-color: white;
