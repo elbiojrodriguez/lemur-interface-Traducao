@@ -4,16 +4,11 @@ window.onload = () => {
   const chatInputBox = document.querySelector('.chat-input-box');
   const rtcCore = new WebRTCCore();
   const myId = crypto.randomUUID().substr(0, 8);
-  document.getElementById('myId').textContent = myId;
   rtcCore.initialize(myId);
   rtcCore.setupSocketHandlers();
   rtcCore.setupDataChannel();
 
-  const localVideo = document.getElementById('localVideo');
-  const remoteVideo = document.getElementById('remoteVideo');
-  let targetId = null;
-  let localStream = null;
-
+  
   // 🌍 SEU ENDPOINT DE TRADUÇÃO
   const TRANSLATE_ENDPOINT = 'https://chat-tradutor.onrender.com/translate';
 
