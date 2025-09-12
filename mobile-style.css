@@ -65,7 +65,7 @@ body {
 .video-wrapper {
   position: absolute;
   bottom: 20%;               /* 20% da altura da box */
-  right: 5%;                 /* 5% da largura da box */
+  right: 50%;                 /* 5% da largura da box */
   width: 35%;                /* largura relativa à box */
   height: 30%;               /* altura relativa à box */
   transform: translateX(-17%);
@@ -82,7 +82,7 @@ body {
   object-fit: cover;
 }
 
-/* ===== CIRCULO DA BAMDEIRA ===== */
+/* ===== CIRCULO DA BANDEIRA ===== */
 .local-mic-Lang {
   position: absolute;
   top: 70%;
@@ -122,8 +122,8 @@ body {
 
 .remoter-Lang {
   position: absolute;
-  top: 60%;
-  left: 70%;
+  top: 40%;
+  left: 40%;
   width: 15%;
   aspect-ratio: 1 / 1;
   border-radius: 50%;
@@ -144,8 +144,8 @@ body {
 }
 .local-Lang {
   position: absolute;
-  top: 50%;
-  left: 70%;
+  top: 40%;
+  left: 60%;
   width: 15%;
   aspect-ratio: 1 / 1;
   border-radius: 50%;
