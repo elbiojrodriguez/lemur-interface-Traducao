@@ -85,8 +85,8 @@ body {
 /* ===== CIRCULO DA BANDEIRA ===== */
 .local-mic-Lang {
   position: absolute;
-  top: 75%;
-  left: 75%;
+  top: 70%;
+  left: 73%;
   width: 20%;
   aspect-ratio: 1 / 1;
   border-radius: 50%;
@@ -145,7 +145,7 @@ body {
 .local-Lang {
   position: absolute;
   top: 31%;
-  left: 65%;
+  left: 70%;
   width: 8%;
   aspect-ratio: 1 / 1;
   border-radius: 50%;
