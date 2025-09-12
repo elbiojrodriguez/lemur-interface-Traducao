@@ -85,13 +85,8 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 0;
-  margin: 0;
-  border: none;
-  box-shadow: none;
-  z-index: 2;
+  z-index: 0; /* Fica atrás de tudo */
 }
-
 
 .bandeira-circulo img {
   width: 100%;
