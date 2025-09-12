@@ -1,52 +1,73 @@
-
 import WebRTCCore from '../core/webrtc-core.js';
 
 window.onload = () => {
   const chatInputBox = document.querySelector('.chat-input-box');
   const rtcCore = new WebRTCCore();
   const myId = crypto.randomUUID().substr(0, 8);
-  let localStream = null;
-  let targetId = null;
-
-  // Exibe o ID na interface
   document.getElementById('myId').textContent = myId;
-
-  // Inicializa WebRTC
   rtcCore.initialize(myId);
   rtcCore.setupSocketHandlers();
+  rtcCore.setupDataChannel();
 
-  // Captura da câmera (sem áudio)
+  const localVideo = document.getElementById('localVideo');
+  const remoteVideo = document.getElementById('remoteVideo');
+  let targetId = null;
+  let localStream = null;
+
+  // 🌍 SEU ENDPOINT DE TRADUÇÃO
+  const TRANSLATE_ENDPOINT = 'https://chat-tradutor.onrender.com/translate';
+
+  // 🔁 SUA FUNÇÃO DE TRADUÇÃO (modificada)
+  async function translateText(text, targetLang) {
+    try {
+      if (targetLang === 'en') return text; // Não traduzir se já for inglês
+
+      const response = await fetch(TRANSLATE_ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text, targetLang })
+      });
+
+      const result = await response.json();
+      return result.translatedText || text;
+    } catch (error) {
+      console.error('Erro na tradução:', error);
+      return text;
+    }
+  }
+
+  // Solicita acesso à câmera
   navigator.mediaDevices.getUserMedia({ video: true, audio: false })
     .then(stream => {
       localStream = stream;
-      // Não mostramos o vídeo local — ele é usado apenas para envio
+      remoteVideo.srcObject = stream;
     })
     .catch(error => {
       console.error("Erro ao acessar a câmera:", error);
     });
 
-  // Verifica se há targetId na URL
+  // Verifica se há ID na URL
   const urlParams = new URLSearchParams(window.location.search);
   const targetIdFromUrl = urlParams.get('targetId');
-
+  
   if (targetIdFromUrl) {
     targetId = targetIdFromUrl;
     document.getElementById('callActionBtn').style.display = 'block';
-
-    // Botão de chamada
-    document.getElementById('callActionBtn').onclick = () => {
-      if (localStream) {
-        rtcCore.startCall(targetId, localStream);
-      }
-    };
   }
 
-  // Quando receber vídeo remoto, exibe no localVideo
+  // Configura o botão de chamada
+  document.getElementById('callActionBtn').onclick = () => {
+    if (!targetId || !localStream) return;
+    rtcCore.startCall(targetId, localStream);
+  };
+
+  // Silencia qualquer áudio recebido
   rtcCore.setRemoteStreamCallback(stream => {
     stream.getAudioTracks().forEach(track => track.enabled = false);
-    localVideo.srcObject = stream; // ← ESSENCIAL no seu projeto
+    localVideo.srcObject = stream;
   });
-// #############################################
+
+  // #############################################
   // Controles de idioma dinâmicos
   // #############################################
 
@@ -64,7 +85,19 @@ window.onload = () => {
   textDisplay.style.overflowY = 'auto';
   chatInputBox.appendChild(textDisplay);
 
-  // 2. Criação do container dos controles
+  // 2. INPUT INVISÍVEL para controlar teclado
+  const hiddenInput = document.createElement('input');
+  hiddenInput.type = 'text';
+  hiddenInput.style.position = 'absolute';
+  hiddenInput.style.opacity = '0';
+  hiddenInput.style.height = '0';
+  hiddenInput.style.width = '0';
+  hiddenInput.style.border = 'none';
+  hiddenInput.style.padding = '0';
+  hiddenInput.style.margin = '0';
+  document.body.appendChild(hiddenInput);
+
+  // 3. Criação do container dos controles
   const langControls = document.createElement('div');
   langControls.style.position = 'fixed';
   langControls.style.bottom = '80px';
@@ -77,22 +110,24 @@ window.onload = () => {
   langControls.style.gap = '10px';
   document.body.appendChild(langControls);
 
-  // 3. Balão do idioma detectado
+  // 4. Balão do idioma detectado (botão de pressionar)
   const detectedLangBubble = document.createElement('div');
   detectedLangBubble.className = 'lang-bubble';
   detectedLangBubble.style.display = 'flex';
   detectedLangBubble.style.alignItems = 'center';
   detectedLangBubble.style.justifyContent = 'center';
-  detectedLangBubble.style.width = '50px';
-  detectedLangBubble.style.height = '50px';
+  detectedLangBubble.style.width = '60px';
+  detectedLangBubble.style.height = '60px';
   detectedLangBubble.style.backgroundColor = 'white';
   detectedLangBubble.style.borderRadius = '50%';
-  detectedLangBubble.style.boxShadow = '0 2px 5px rgba(0,0,0,0.2)';
+  detectedLangBubble.style.boxShadow = '0 4px 8px rgba(0,0,0,0.3)';
   detectedLangBubble.style.cursor = 'pointer';
-  detectedLangBubble.style.fontSize = '24px';
+  detectedLangBubble.style.fontSize = '28px';
+  detectedLangBubble.style.transition = 'all 0.2s ease';
+  detectedLangBubble.title = 'Pressione e segure para falar';
   langControls.appendChild(detectedLangBubble);
 
-  // 4. Botão de seleção de idiomas (🌐)
+  // 5. Botão de seleção de idiomas (🌐)
   const langSelectButton = document.createElement('button');
   langSelectButton.className = 'lang-select-btn';
   langSelectButton.textContent = '🌐';
@@ -110,7 +145,7 @@ window.onload = () => {
   langSelectButton.style.fontSize = '24px';
   langControls.appendChild(langSelectButton);
 
-  // 5. Menu de idiomas
+  // 6. Menu de idiomas
   const languageMenu = document.createElement('div');
   languageMenu.className = 'language-menu';
   languageMenu.style.display = 'none';
@@ -123,32 +158,31 @@ window.onload = () => {
   languageMenu.style.minWidth = '60px';
   document.body.appendChild(languageMenu);
 
-  // 6. Idiomas disponíveis
+  // 7. Idiomas disponíveis (agora com códigos simplificados)
   const languages = [
-    { code: 'en-US', flag: '🇺🇸', speakText: 'Speak now', name: 'English' },
-    { code: 'pt-BR', flag: '🇧🇷', speakText: 'Fale agora', name: 'Português' },
-    { code: 'es-ES', flag: '🇪🇸', speakText: 'Habla agora', name: 'Español' },
-    { code: 'fr-FR', flag: '🇫🇷', speakText: 'Parlez maintenant', name: 'Français' },
-    { code: 'de-DE', flag: '🇩🇪', speakText: 'Sprechen Sie jetzt', name: 'Deutsch' },
-    { code: 'ja-JP', flag: '🇯🇵', speakText: '話してください', name: '日本語' },
-    { code: 'zh-CN', flag: '🇨🇳', speakText: '现在说话', name: '中文' },
-    { code: 'ru-RU', flag: '🇷🇺', speakText: 'Говорите сейчас', name: 'Русский' },
-    { code: 'ar-SA', flag: '🇸🇦', speakText: 'تحدث الآن', name: 'العربية' }
+    { code: 'en', flag: '🇺🇸', speakText: 'Speak now', name: 'English' },
+    { code: 'pt', flag: '🇧🇷', speakText: 'Fale agora', name: 'Português' },
+    { code: 'es', flag: '🇪🇸', speakText: 'Habla agora', name: 'Español' },
+    { code: 'fr', flag: '🇫🇷', speakText: 'Parlez maintenant', name: 'Français' },
+    { code: 'de', flag: '🇩🇪', speakText: 'Sprechen Sie agora', name: 'Deutsch' },
+    { code: 'ja', flag: '🇯🇵', speakText: '話してください', name: '日本語' },
+    { code: 'zh', flag: '🇨🇳', speakText: '现在说话', name: '中文' },
+    { code: 'ru', flag: '🇷🇺', speakText: 'Говорите сейчас', name: 'Русский' },
+    { code: 'ar', flag: '🇸🇦', speakText: 'تحدث الآن', name: 'العربية' }
   ];
 
-  // 7. Lógica de detecção de idioma
+  // 8. Lógica de detecção de idioma
   const browserLanguage = navigator.language;
-  let currentLang = languages.find(lang => browserLanguage.startsWith(lang.code.split('-')[0])) || languages[0];
+  let currentLang = languages.find(lang => browserLanguage.startsWith(lang.code)) || languages[0];
   detectedLangBubble.textContent = currentLang.flag;
-  detectedLangBubble.title = `Idioma atual: ${currentLang.name}`;
+  detectedLangBubble.title = `Idioma atual: ${currentLang.name}\nPressione e segure para falar`;
 
-  // 8. Popula o menu de idiomas
+  // 9. Popula o menu de idiomas
   languages.forEach(lang => {
     const langBtn = document.createElement('button');
     langBtn.className = 'lang-option';
     langBtn.innerHTML = `${lang.flag}`;
     langBtn.dataset.langCode = lang.code;
-    langBtn.dataset.speakText = lang.speakText;
     langBtn.title = lang.name;
     langBtn.style.display = 'block';
     langBtn.style.width = '100%';
@@ -169,7 +203,7 @@ window.onload = () => {
     languageMenu.appendChild(langBtn);
   });
 
-  // 9. Controle do menu
+  // 10. Controle do menu
   langSelectButton.addEventListener('click', (e) => {
     e.stopPropagation();
     const rect = langSelectButton.getBoundingClientRect();
@@ -182,201 +216,236 @@ window.onload = () => {
     languageMenu.style.display = 'none';
   });
 
-  // 10. Configuração do reconhecimento de voz
+  // 11. Configuração do reconhecimento de voz
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   let recognition = null;
   let isListening = false;
+  let lastRecognizedText = '';
+  let pressTimer = null;
+  let isPressing = false;
+
+  // ✅ Configurar callback para receber mensagens
+  rtcCore.setTranslatedTextCallback((data) => {
+    try {
+      const message = JSON.parse(data);
+      showTranslatedText(message.text, false);
+    } catch (e) {
+      console.error('Erro ao processar mensagem:', e);
+    }
+  });
 
   if (SpeechRecognition) {
     recognition = new SpeechRecognition();
     recognition.continuous = false;
-    recognition.interimResults = false;
-    recognition.lang = currentLang.code;
+    recognition.interimResults = true;
+    recognition.lang = currentLang.code === 'pt' ? 'pt-BR' : currentLang.code + '-' + currentLang.code.toUpperCase();
 
-    // Mensagem inicial no idioma correto
-    textDisplay.textContent = `${getClickToSpeakMessage(currentLang.code)}`;
+    // Mensagem inicial
+    textDisplay.textContent = 'Pressione e segure a bandeira para falar';
 
-    // Clique na bandeira ativa/desativa o microfone
-    detectedLangBubble.addEventListener('click', () => {
-      if (!isListening) {
-        try {
-          recognition.start();
-          textDisplay.textContent = `${currentLang.speakText}...`;
-          textDisplay.style.display = 'flex'; // Garante visibilidade
-          isListening = true;
-        } catch (e) {
-          console.error('Erro ao iniciar microfone:', e);
-          textDisplay.textContent = `${getErrorMessage(currentLang.code)}`;
-          textDisplay.style.display = 'flex'; // Garante visibilidade
-        }
-      } else {
-        recognition.stop();
-        textDisplay.textContent = `${getMicOffMessage(currentLang.code)}`;
-        textDisplay.style.display = 'flex'; // MODIFICAÇÃO 1 - Garante que a mensagem apareça
-        isListening = false;
+    // ✅ SISTEMA DE PRESSIONAR E SEGURAR
+    const startPress = () => {
+      if (isListening) return;
+      isPressing = true;
+      pressTimer = setTimeout(() => {
+        startVoiceRecognition();
+      }, 300);
+    };
+
+    const endPress = () => {
+      if (!isPressing) return;
+      isPressing = false;
+      clearTimeout(pressTimer);
+      
+      if (isListening) {
+        stopVoiceRecognition();
+        translateAndSendPhrase();
       }
+    };
+
+    detectedLangBubble.addEventListener('mousedown', startPress);
+    detectedLangBubble.addEventListener('mouseup', endPress);
+    detectedLangBubble.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      startPress();
+    });
+    detectedLangBubble.addEventListener('touchend', (e) => {
+      e.preventDefault();
+      endPress();
     });
 
-    // Menu de idiomas
+    // ✅ Menu de idiomas
     languageMenu.addEventListener('click', (e) => {
       if (e.target.classList.contains('lang-option')) {
         const langCode = e.target.dataset.langCode;
-        const flag = e.target.textContent;
         const langName = e.target.title;
 
-        // MODIFICAÇÃO 2 - Limpa mensagens antigas e reseta o display
         document.querySelectorAll('.phrase-box').forEach(el => el.remove());
         textDisplay.style.display = 'flex';
-        textDisplay.textContent = getClickToSpeakMessage(langCode);
+        textDisplay.textContent = 'Pressione e segure a bandeira para falar';
 
         currentLang = languages.find(l => l.code === langCode);
         detectedLangBubble.textContent = currentLang.flag;
-        detectedLangBubble.title = `Idioma atual: ${currentLang.name}`;
+        detectedLangBubble.title = `Idioma atual: ${currentLang.name}\nPressione e segure para falar`;
 
         if (isListening) {
           recognition.stop();
           isListening = false;
         }
 
-        recognition.lang = langCode;
+        recognition.lang = langCode === 'pt' ? 'pt-BR' : langCode + '-' + langCode.toUpperCase();
         languageMenu.style.display = 'none';
       }
     });
 
-// Resultado do reconhecimento - VERSÃO OTIMIZADA
-recognition.onresult = (event) => {
-  // Mantém a lógica original de esconder placeholder
-  if (textDisplay.classList.contains('text-display-placeholder')) {
-    textDisplay.style.display = 'none';
-  }
-
-  let finalTranscript = '';
-  let interimTranscript = '';
-
-  // Processamento dos resultados (original)
-  for (let i = event.resultIndex; i < event.results.length; i++) {
-    const transcript = event.results[i][0].transcript;
-    if (event.results[i].isFinal) {
-      finalTranscript += transcript;
-    } else {
-      interimTranscript += transcript;
-    }
-  }
-
-  const chatInputBox = document.querySelector('.chat-input-box');
-  
-  // COMPORTAMENTO ORIGINAL (frases finais)
-  if (finalTranscript.trim()) {
-    // Remove texto temporário se existir
-    const interimBox = document.querySelector('.interim-box');
-    if (interimBox) interimBox.remove();
-    
-    // Cria a mensagem final (como no original)
-    const phraseBox = document.createElement('div');
-    phraseBox.className = 'phrase-box';
-    phraseBox.textContent = finalTranscript; // ← Mantém formato original
-    
-    if (chatInputBox) {
-      chatInputBox.appendChild(phraseBox);
-      chatInputBox.scrollTop = chatInputBox.scrollHeight;
+    // ✅ Resultado do reconhecimento
+    recognition.onresult = (event) => {
+      let finalTranscript = '';
       
-      // Mantém o microfone ativo visualmente (sua sugestão)
-      textDisplay.textContent = `${currentLang.speakText}...`;
-    }
-  }
-  // NOVO: Feedback em tempo real (sua sugestão)
-  else if (interimTranscript) {
-    let interimBox = document.querySelector('.interim-box');
-    
-    if (!interimBox) {
-      interimBox = document.createElement('div');
-      interimBox.className = 'interim-box'; // Classe diferente para não conflitar
-      if (chatInputBox) chatInputBox.appendChild(interimBox);
-    }
-    
-    interimBox.textContent = interimTranscript; // ← Sem formatação extra
-    if (chatInputBox) chatInputBox.scrollTop = chatInputBox.scrollHeight;
-  }
-};
-    // Tratamento de erros
-    recognition.onerror = (event) => {
-      console.error('Erro no reconhecimento:', event.error);
-      textDisplay.textContent = `${getErrorMessage(currentLang.code)}`;
-      textDisplay.style.display = 'flex'; // Garante visibilidade
-      isListening = false;
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        if (event.results[i].isFinal) {
+          finalTranscript += event.results[i][0].transcript;
+        }
+      }
+
+      if (finalTranscript.trim()) {
+        lastRecognizedText = finalTranscript;
+      }
     };
 
-// Reinício com delay para Android - VERSÃO ORIGINAL FUNCIONAL
-recognition.onend = () => {
-  // Mantém APENAS a verificação original do placeholder
-  if (!document.querySelector('.phrase-box')) {
-    textDisplay.style.display = 'flex';
-  }
+    recognition.onerror = (event) => {
+      console.error('Erro no reconhecimento:', event.error);
+      textDisplay.textContent = 'Erro no microfone. Clique para tentar novamente.';
+      textDisplay.style.display = 'flex';
+      isListening = false;
+      resetBubbleStyle();
+    };
 
-  // Mantém EXATAMENTE a lógica original de reinício
-  if (isListening) {
-    setTimeout(() => {
-      try {
-        recognition.start();
-      } catch (e) {
-        console.error('Erro ao reiniciar:', e);
-        isListening = false;
-        textDisplay.textContent = `${getErrorMessage(currentLang.code)}`;
-        textDisplay.style.display = 'flex';
+    recognition.onend = () => {
+      if (isListening) {
+        setTimeout(() => {
+          try {
+            recognition.start();
+          } catch (e) {
+            console.error('Erro ao reiniciar:', e);
+            isListening = false;
+            textDisplay.textContent = 'Erro no microfone';
+            textDisplay.style.display = 'flex';
+            resetBubbleStyle();
+          }
+        }, 300);
       }
-    }, 300);
-  }
-};
+    };
   } else {
     textDisplay.textContent = 'Seu navegador não suporta reconhecimento de voz';
     textDisplay.style.color = 'black';
-    console.error('API de reconhecimento de voz não suportada');
   }
 
-  // Funções auxiliares para mensagens
-  function getClickToSpeakMessage(langCode) {
-    const messages = {
-      'en-US': 'Click flag to speak',
-      'pt-BR': 'Clique na bandeira para falar',
-      'es-ES': 'Haz clic en la bandera para hablar',
-      'fr-FR': 'Cliquez sur le drapeau pour parler',
-      'de-DE': 'Klicken Sie auf die Flagge zum Sprechen',
-      'ja-JP': '旗をクリックして話す',
-      'zh-CN': '点击旗帜说话',
-      'ru-RU': 'Нажмите на флаг, чтобы говорить',
-      'ar-SA': 'انقر على العلم للتحدث'
-    };
-    return messages[langCode] || messages['en-US'];
+  // ✅ FUNÇÕES AUXILIARES
+  function startVoiceRecognition() {
+    try {
+      hiddenInput.focus();
+      recognition.start();
+      textDisplay.textContent = 'Falando...';
+      textDisplay.style.display = 'flex';
+      isListening = true;
+      
+      // Feedback visual
+      detectedLangBubble.style.backgroundColor = '#ff4444';
+      detectedLangBubble.style.color = 'white';
+      detectedLangBubble.style.transform = 'scale(1.1)';
+    } catch (e) {
+      console.error('Erro ao iniciar microfone:', e);
+      textDisplay.textContent = 'Erro ao acessar o microfone';
+      textDisplay.style.display = 'flex';
+    }
   }
 
-  function getMicOffMessage(langCode) {
-    const messages = {
-      'en-US': 'Microphone off',
-      'pt-BR': 'Microfone desativado',
-      'es-ES': 'Micrófono desactivado',
-      'fr-FR': 'Microphone désactivé',
-      'de-DE': 'Mikrofon ausgeschaltet',
-      'ja-JP': 'マイクオフ',
-      'zh-CN': '麦克风关闭',
-      'ru-RU': 'Микрофон выключен',
-      'ar-SA': 'تم إيقاف الميكروفون'
-    };
-    return messages[langCode] || messages['en-US'];
+  function stopVoiceRecognition() {
+    recognition.stop();
+    isListening = false;
+    resetBubbleStyle();
   }
 
-  function getErrorMessage(langCode) {
-    const messages = {
-      'en-US': 'Microphone error',
-      'pt-BR': 'Erro no microfone',
-      'es-ES': 'Error de micrófono',
-      'fr-FR': 'Erreur de microphone',
-      'de-DE': 'Mikrofonfehler',
-      'ja-JP': 'マイクエラー',
-      'zh-CN': '麦克风错误',
-      'ru-RU': 'Ошибка микрофона',
-      'ar-SA': 'خطأ في الميكروفون'
-    };
-    return messages[langCode] || messages['en-US'];
+  function resetBubbleStyle() {
+    detectedLangBubble.style.backgroundColor = 'white';
+    detectedLangBubble.style.color = 'black';
+    detectedLangBubble.style.transform = 'scale(1)';
   }
+
+  async function translateAndSendPhrase() {
+    if (!lastRecognizedText.trim()) {
+      textDisplay.textContent = 'Pressione e segure a bandeira para falar';
+      return;
+    }
+    
+    textDisplay.textContent = 'Traduzindo...';
+    
+    try {
+      // ✅ USA SUA API DE TRADUÇÃO
+      const translatedText = await translateText(lastRecognizedText, 'en');
+      
+      // ✅ ENVIAR via WebRTC
+      if (rtcCore.dataChannel && rtcCore.dataChannel.readyState === 'open') {
+        rtcCore.dataChannel.send(JSON.stringify({
+          text: translatedText,
+          originalLang: currentLang.code,
+          timestamp: new Date().toISOString()
+        }));
+      }
+      
+      // ✅ MOSTRAR localmente
+      showTranslatedText(translatedText, true);
+      textDisplay.style.display = 'none';
+      
+    } catch (error) {
+      console.error('Erro na tradução:', error);
+      textDisplay.textContent = 'Erro na tradução';
+    }
+    
+    lastRecognizedText = '';
+  }
+
+  function showTranslatedText(text, isOutgoing) {
+    const phraseBox = document.createElement('div');
+    phraseBox.className = 'phrase-box';
+    phraseBox.textContent = text;
+    
+    if (isOutgoing) {
+      phraseBox.style.background = '#DCF8C6';
+      phraseBox.style.alignSelf = 'flex-end';
+      phraseBox.style.marginLeft = 'auto';
+      phraseBox.style.marginRight = '10px';
+    } else {
+      phraseBox.style.background = '#FFFFFF';
+      phraseBox.style.alignSelf = 'flex-start';
+      phraseBox.style.marginLeft = '10px';
+    }
+    
+    phraseBox.style.padding = '10px';
+    phraseBox.style.marginBottom = '5px';
+    phraseBox.style.borderRadius = '10px';
+    phraseBox.style.maxWidth = '70%';
+    phraseBox.style.wordBreak = 'break-word';
+    
+    chatInputBox.appendChild(phraseBox);
+    chatInputBox.scrollTop = chatInputBox.scrollHeight;
+  }
+
+  // 🚀 Traduz elementos da interface (seu código)
+  const frasesParaTraduzir = {
+    "translator-label": "Live translation. No filters. No platform.",
+    "qr-modal-title": "This is your online key",
+    "qr-modal-description": "You can ask to scan, share or print on your business card."
+  };
+
+  (async () => {
+    for (const [id, texto] of Object.entries(frasesParaTraduzir)) {
+      const el = document.getElementById(id);
+      if (el) {
+        const traduzido = await translateText(texto, currentLang.code);
+        el.textContent = traduzido;
+      }
+    }
+  })();
 };
-
