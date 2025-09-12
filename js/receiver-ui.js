@@ -1,5 +1,3 @@
-
-
 import WebRTCCore from '../core/webrtc-core.js';
 import { QRCodeGenerator } from './qr-code-utils.js';
 
@@ -31,60 +29,16 @@ window.onload = () => {
       console.error("Erro ao acessar a câmera:", error);
     });
 
-  // 🌍 Endpoint de tradução
-const TRANSLATE_ENDPOINT = 'https://chat-tradutor.onrender.com/translate';
-
-// 🔁 Função de tradução
-async function translateText(text, targetLang) {
-  try {
-    if (targetLang === 'en') return text;
-
-    const response = await fetch(TRANSLATE_ENDPOINT, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ text, targetLang })
-    });
-
-    const result = await response.json();
-    return result.translatedText || text;
-  } catch (error) {
-    console.error('Erro na tradução:', error);
-    return text;
-  }
-}
-
-// 🧾 Frases e elementos a traduzir
-const frasesParaTraduzir = {
-  "translator-label": "Live translation. No filters. No platform.",
-  "qr-modal-title": "This is your online key",
-  "qr-modal-description": "You can ask to scan, share or print on your business card.",
- };
-
-// 🚀 Traduz e aplica na interface usando o idioma da URL
-(async () => {
+  // 🔗 Captura os parâmetros reais da URL
   const params = new URLSearchParams(window.location.search);
+  const token = params.get('token') || '';
   const lang = params.get('lang') || 'en';
 
-  for (const [id, texto] of Object.entries(frasesParaTraduzir)) {
-    const el = document.getElementById(id);
-    if (el) {
-      const traduzido = await translateText(texto, lang);
-      el.textContent = traduzido;
-    }
-  }
-})();
+  // 📦 Monta a URL final que será usada no QR Code
+  const callerUrl = `${window.location.origin}/caller.html?targetId=${myId}&token=${encodeURIComponent(token)}&lang=${encodeURIComponent(lang)}`;
 
-
- // 🔗 Captura os parâmetros reais da URL
-const params = new URLSearchParams(window.location.search);
-const token = params.get('token') || '';
-const lang = params.get('lang') || '';
-
-// 📦 Monta a URL final que será usada no QR Code
-const callerUrl = `${window.location.origin}/caller.html?targetId=${myId}&token=${encodeURIComponent(token)}&lang=${encodeURIComponent(lang)}`;
-
-// 🧾 Gera o QR Code com essa URL
-QRCodeGenerator.generate("qrcode", callerUrl);
+  // 🧾 Gera o QR Code com essa URL
+  QRCodeGenerator.generate("qrcode", callerUrl);
 
   rtcCore.initialize(myId);
   rtcCore.setupSocketHandlers();
@@ -100,10 +54,69 @@ QRCodeGenerator.generate("qrcode", callerUrl);
     rtcCore.handleIncomingCall(offer, localStream, (remoteStream) => {
       remoteStream.getAudioTracks().forEach(track => track.enabled = false);
 
-     const overlay = document.querySelector('.info-overlay');
-if (overlay) overlay.classList.add('hidden');
+      const overlay = document.querySelector('.info-overlay');
+      if (overlay) overlay.classList.add('hidden');
 
       localVideo.srcObject = remoteStream;
     });
   };
+
+  // 🌍 Endpoint de tradução
+  const TRANSLATE_ENDPOINT = 'https://chat-tradutor.onrender.com/translate';
+
+  // 🔁 Função de tradução
+  async function translateText(text, targetLang) {
+    try {
+      if (targetLang === 'en') return text;
+
+      const response = await fetch(TRANSLATE_ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text, targetLang })
+      });
+
+      const result = await response.json();
+      return result.translatedText || text;
+    } catch (error) {
+      console.error('Erro na tradução:', error);
+      return text;
+    }
+  }
+
+  // 🧾 Frases e elementos a traduzir
+  const frasesParaTraduzir = {
+    "translator-label": "Live translation. No filters. No platform.",
+    "qr-modal-title": "This is your online key",
+    "qr-modal-description": "You can ask to scan, share or print on your business card."
+  };
+
+  // 🚀 Traduz e aplica na interface
+  (async () => {
+    for (const [id, texto] of Object.entries(frasesParaTraduzir)) {
+      const el = document.getElementById(id);
+      if (el) {
+        const traduzido = await translateText(texto, lang);
+        el.textContent = traduzido;
+      }
+    }
+  })();
+
+  // 🏳️ Função para carregar bandeira com base no idioma
+  async function aplicarBandeira(langCode) {
+    try {
+      const response = await fetch('assets/bandeiras/language-flags.json');
+      const flags = await response.json();
+      const bandeira = flags[langCode] || '🏳️'; // fallback se idioma não existir
+
+      const localLangElement = document.querySelector('.local-Lang');
+      if (localLangElement) {
+        localLangElement.textContent = bandeira;
+      }
+    } catch (error) {
+      console.error('Erro ao carregar bandeira:', error);
+    }
+  }
+
+  // 🧭 Aplica a bandeira com base no idioma da URL
+  aplicarBandeira(lang);
 };
