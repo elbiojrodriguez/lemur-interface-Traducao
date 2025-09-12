@@ -30,6 +30,52 @@ window.onload = () => {
       console.error("Erro ao acessar a câmera:", error);
     });
 
+  // 🌍 Endpoint de tradução
+const TRANSLATE_ENDPOINT = 'https://chat-tradutor.onrender.com/translate';
+
+// 🔁 Função de tradução
+async function translateText(text, targetLang) {
+  try {
+    if (targetLang === 'en') return text;
+
+    const response = await fetch(TRANSLATE_ENDPOINT, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text, targetLang })
+    });
+
+    const result = await response.json();
+    return result.translatedText || text;
+  } catch (error) {
+    console.error('Erro na tradução:', error);
+    return text;
+  }
+}
+
+// 🧾 Frases e elementos a traduzir
+const frasesParaTraduzir = {
+  "translator-label": "Live translation. No filters. No platform.",
+  "qr-modal-title": "This is your online key",
+  "qr-modal-description": "You can ask to scan, share or print on your business card.",
+  "custom-box-1": "Welcome to Lemur!",
+  "custom-box-2": "Start your secure connection now."
+};
+
+// 🚀 Traduz e aplica na interface usando o idioma da URL
+(async () => {
+  const params = new URLSearchParams(window.location.search);
+  const lang = params.get('lang') || 'en';
+
+  for (const [id, texto] of Object.entries(frasesParaTraduzir)) {
+    const el = document.getElementById(id);
+    if (el) {
+      const traduzido = await translateText(texto, lang);
+      el.textContent = traduzido;
+    }
+  }
+})();
+
+
  // 🔗 Captura os parâmetros reais da URL
 const params = new URLSearchParams(window.location.search);
 const token = params.get('token') || '';
