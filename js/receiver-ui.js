@@ -57,9 +57,7 @@ const frasesParaTraduzir = {
   "translator-label": "Live translation. No filters. No platform.",
   "qr-modal-title": "This is your online key",
   "qr-modal-description": "You can ask to scan, share or print on your business card.",
-  "custom-box-1": "Welcome to Lemur!",
-  "custom-box-2": "Start your secure connection now."
-};
+ };
 
 // 🚀 Traduz e aplica na interface usando o idioma da URL
 (async () => {
