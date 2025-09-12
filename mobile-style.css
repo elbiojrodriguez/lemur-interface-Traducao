@@ -72,16 +72,17 @@ body {
 }
 
 .bandeira-circulo {
-  position: absolute;
-  width: 50%;
-  height: 50%;
+  width: 20%;
+  aspect-ratio: 1 / 1;
   border-radius: 50%;
   background-color: white;
-  overflow: hidden;
+  position: absolute;
+  top: 10%;
+  left: 70%;
   display: flex;
   justify-content: center;
   align-items: center;
-  box-shadow: 0 0 10px rgba(0,0,0,0.2);
+  font-size: 5vw;
 }
 
 .bandeira-circulo img {
