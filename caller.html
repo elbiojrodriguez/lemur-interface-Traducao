@@ -1,493 +1,114 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Transcrição de Fala com Frases Independentes</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Caller - Videochamada Mobile</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="responsivo.css" />
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        
-        body {
-            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 20px;
-            color: white;
-        }
-        
-        .container {
-            width: 100%;
-            max-width: 800px;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            margin-top: 20px;
-        }
-        
-        h1 {
-            text-align: center;
-            margin-bottom: 30px;
-            font-size: 2.5rem;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-        }
-        
-        .description {
-            text-align: center;
-            margin-bottom: 30px;
-            font-size: 1.2rem;
-            line-height: 1.6;
-        }
-        
+        /* 🔵 Estilo do box azul */
         .chat-input-box {
-            width: 100%;
+            position: absolute;
+            bottom: 350px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80%;
             height: 200px;
             border: 2px solid #007BFF;
             border-radius: 12px;
-            background-color: rgba(255, 255, 255, 0.9);
+            background-color: rgba(255, 255, 255, 0.1);
+            z-index: 20;
             overflow-y: auto;
-            padding: 15px;
-            margin-bottom: 30px;
-            color: #333;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
+            padding: 10px;
         }
-        
-        .text-display-placeholder {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 100%;
-            text-align: center;
-            color: #666;
-            font-size: 18px;
-        }
-        
-        .phrase-box {
-            background-color: rgba(240, 240, 240, 0.9);
-            padding: 10px 15px;
-            border-radius: 18px;
-            font-size: 16px;
-            line-height: 1.4;
-            max-width: 90%;
-            align-self: flex-start;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            animation: fadeIn 0.3s ease-out;
-            position: relative;
-        }
-        
-        .phrase-box.user {
-            align-self: flex-end;
-            background-color: rgba(220, 240, 255, 0.9);
-        }
-        
-        .interim-box {
-            background-color: rgba(250, 250, 210, 0.9);
-            color: #666;
-            border-left: 3px solid #ffcc00;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(5px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .lang-controls {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 30px;
-            flex-wrap: wrap;
-        }
-        
-        .lang-bubble {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 60px;
-            height: 60px;
-            background-color: white;
-            border-radius: 50%;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-            cursor: pointer;
-            font-size: 30px;
-            transition: transform 0.2s;
-        }
-        
-        .lang-bubble:hover {
-            transform: scale(1.1);
-        }
-        
-        .lang-bubble.listening {
-            background-color: #ff4d4d;
-            animation: listeningPulse 1s infinite;
-        }
-        
-        @keyframes listeningPulse {
-            0% { box-shadow: 0 0 0 0 rgba(255, 77, 77, 0.7); }
-            70% { box-shadow: 0 0 0 15px rgba(255, 77, 77, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(255, 77, 77, 0); }
-        }
-        
-        .lang-select-btn {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 50px;
-            height: 50px;
-            background-color: white;
-            border-radius: 50%;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-            border: none;
-            cursor: pointer;
-            font-size: 24px;
-            transition: transform 0.2s;
-        }
-        
-        .lang-select-btn:hover {
-            transform: scale(1.1);
-        }
-        
-        .language-menu {
-            display: none;
-            position: absolute;
-            background-color: white;
-            border-radius: 12px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-            padding: 15px;
-            z-index: 1000;
-            min-width: 80px;
-            transform: translateY(10px);
-        }
-        
-        .lang-option {
-            display: block;
-            width: 100%;
-            padding: 10px 15px;
-            text-align: center;
-            border: none;
-            background: none;
-            cursor: pointer;
-            border-radius: 6px;
-            margin: 5px 0;
-            font-size: 24px;
-            transition: background-color 0.2s;
-        }
-        
-        .lang-option:hover {
-            background-color: #f0f0f0;
-        }
-        
-        .status {
-            text-align: center;
-            margin-top: 20px;
-            font-size: 1.1rem;
-            min-height: 30px;
-        }
-        
-        .instructions {
-            margin-top: 30px;
-            background: rgba(255, 255, 255, 0.1);
-            padding: 20px;
-            border-radius: 12px;
-            text-align: center;
-        }
-        
-        .instructions h2 {
-            margin-bottom: 15px;
-            font-size: 1.5rem;
-        }
-        
-        .instructions ul {
-            text-align: left;
-            max-width: 600px;
-            margin: 0 auto;
-        }
-        
-        .instructions li {
-            margin-bottom: 10px;
-            line-height: 1.5;
-        }
-        
-        @media (max-width: 768px) {
-            .container {
-                padding: 20px;
-            }
-            
-            h1 {
-                font-size: 2rem;
-            }
-            
-            .chat-input-box {
-                height: 180px;
-            }
-            
-            .lang-bubble {
-                width: 50px;
-                height: 50px;
-                font-size: 24px;
-            }
-            
-            .phrase-box {
-                max-width: 85%;
-                font-size: 15px;
-                padding: 8px 12px;
-            }
-        }
+
+        /* 💬 Estilo BASE para todas as mensagens */
+.phrase-box {
+    background-color: transparent;
+    padding: 1px 0;
+    margin: 0.5px 0;
+    border-radius: 0;
+    font-size: 15px;
+    line-height: 1.0;
+    border: none;
+    box-shadow: none;
+    width: 100%;
+    word-break: break-word;
+}
+
+/* 🎯 Estilo para TEXTO TEMPORÁRIO (enquanto está falando) */
+.phrase-box.interim-box {
+    animation: fadeIn 0.3s ease-out; /* Suaviza a aparição */
+}
+
+.interim-text {
+    color: #666;
+    opacity: 0.8;
+    border-bottom: 1px dotted #aaa;
+    transition: all 0.2s; /* Suaviza as atualizações de texto */
+}
+
+/* ✅ Estilo para TEXTO FINALIZADO */
+.final-text {
+    color: inherit; /* Herda a cor do tema pai */
+    opacity: 1;
+    animation: textFinalized 0.3s ease-out;
+}
+
+/* 🎚️ Efeitos visuais */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(2px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+/* Estilo para quando o microfone está ativo continuamente */
+.listening-mode .text-display-placeholder {
+    animation: pulseOpacity 2s infinite;
+}
+
+@keyframes pulseOpacity {
+    0% { opacity: 0.8; }
+    50% { opacity: 0.4; }
+    100% { opacity: 0.8; }
+}
+@keyframes textFinalized {
+    from { opacity: 0.5; }
+    to { opacity: 1; }
+}
+
+/* 📱 Melhorias para mobile */
+@media (max-width: 768px) {
+    .phrase-box {
+        font-size: 14px;
+        line-height: 1.3;
+    }
+}
     </style>
 </head>
 <body>
-    <h1>Transcrição com Frases Independentes</h1>
-    
-    <p class="description">Sistema de reconhecimento de voz com caixas independentes para cada frase</p>
-    
+    <!-- 🔹 Box azul centralizado com ID para JS -->
+    <div class="chat-input-box" id="textDisplay"></div>
+
     <div class="container">
-        <div class="chat-input-box" id="chatInputBox">
-            <div class="text-display-placeholder">Clique na bandeira para começar a falar</div>
+        <div class="video-wrapper">
+            <video id="remoteVideo" autoplay playsinline></video>
+        </div>
+        <div class="video-wrapper">
+            <video id="localVideo" autoplay muted playsinline></video>
         </div>
         
-        <div class="lang-controls">
-            <div class="lang-bubble" id="detectedLangBubble">🇧🇷</div>
-            <button class="lang-select-btn" id="langSelectButton">🌐</button>
+        <!-- 🔻 Controles -->
+        <div class="controls">
+            <button id="callActionBtn" style="display:none;">SEND 🚀</button>
         </div>
         
-        <div class="status" id="statusMessage"></div>
-    </div>
-    
-    <div class="instructions">
-        <h2>Como usar</h2>
-        <ul>
-            <li>Clique na bandeira para iniciar o reconhecimento de voz</li>
-            <li>Fale uma frase e aguarde o processamento</li>
-            <li>Cada frase aparecerá em uma caixa independente</li>
-            <li>Clique no globo (🌐) para selecionar outro idioma</li>
-            <li>Clique novamente na bandeira para parar o reconhecimento</li>
-        </ul>
+        <div class="info-overlay" style="display: none;">
+            <span id="myId"></span>
+        </div>
     </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const chatInputBox = document.getElementById('chatInputBox');
-            const detectedLangBubble = document.getElementById('detectedLangBubble');
-            const langSelectButton = document.getElementById('langSelectButton');
-            const statusMessage = document.getElementById('statusMessage');
-            
-            // Idiomas disponíveis
-            const languages = [
-                { code: 'en-US', flag: '🇺🇸', speakText: 'Speak now', name: 'English' },
-                { code: 'pt-BR', flag: '🇧🇷', speakText: 'Fale agora', name: 'Português' },
-                { code: 'es-ES', flag: '🇪🇸', speakText: 'Habla agora', name: 'Español' },
-                { code: 'fr-FR', flag: '🇫🇷', speakText: 'Parlez maintenant', name: 'Français' },
-                { code: 'de-DE', flag: '🇩🇪', speakText: 'Sprechen Sie jetzt', name: 'Deutsch' },
-                { code: 'ja-JP', flag: '🇯🇵', speakText: '話してください', name: '日本語' },
-                { code: 'zh-CN', flag: '🇨🇳', speakText: '现在说话', name: '中文' },
-                { code: 'ru-RU', flag: '🇷🇺', speakText: 'Говорите сейчас', name: 'Русский' },
-                { code: 'ar-SA', flag: '🇸🇦', speakText: 'تحدث الآن', name: 'العربية' }
-            ];
-            
-            // Detectar idioma do navegador
-            const browserLanguage = navigator.language;
-            let currentLang = languages.find(lang => browserLanguage.startsWith(lang.code.split('-')[0])) || languages[0];
-            detectedLangBubble.textContent = currentLang.flag;
-            detectedLangBubble.title = `Idioma atual: ${currentLang.name}`;
-            
-            // Configuração do reconhecimento de voz
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            let recognition = null;
-            let isListening = false;
-            let placeholder = chatInputBox.querySelector('.text-display-placeholder');
-            
-            if (SpeechRecognition) {
-                recognition = new SpeechRecognition();
-                recognition.continuous = false;  // Modo frase-a-frase
-                recognition.interimResults = true; // Resultados provisórios
-                recognition.lang = currentLang.code;
-                
-                // Evento de resultado
-                recognition.onresult = (event) => {
-                    let finalTranscript = '';
-                    let interimTranscript = '';
-                    
-                    for (let i = event.resultIndex; i < event.results.length; i++) {
-                        const transcript = event.results[i][0].transcript;
-                        if (event.results[i].isFinal) {
-                            finalTranscript += transcript;
-                        } else {
-                            interimTranscript += transcript;
-                        }
-                    }
-                    
-                    // Remover placeholder se necessário
-                    if (placeholder && (finalTranscript || interimTranscript)) {
-                        placeholder.style.display = 'none';
-                    }
-                    
-                    // Remover caixa de texto provisório se existir
-                    const oldInterimBox = chatInputBox.querySelector('.interim-box');
-                    if (oldInterimBox) {
-                        chatInputBox.removeChild(oldInterimBox);
-                    }
-                    
-                    // Adicionar texto interim (provisório) se existir
-                    if (interimTranscript) {
-                        const interimBox = document.createElement('div');
-                        interimBox.className = 'phrase-box interim-box';
-                        interimBox.textContent = interimTranscript;
-                        chatInputBox.appendChild(interimBox);
-                        chatInputBox.scrollTop = chatInputBox.scrollHeight;
-                    }
-                    
-                    // Adicionar texto final
-                    if (finalTranscript) {
-                        const phraseBox = document.createElement('div');
-                        phraseBox.className = 'phrase-box user';
-                        phraseBox.textContent = finalTranscript;
-                        chatInputBox.appendChild(phraseBox);
-                        chatInputBox.scrollTop = chatInputBox.scrollHeight;
-                        
-                        // Restaurar placeholder após adicionar frase final
-                        if (placeholder) {
-                            placeholder.style.display = 'flex';
-                        }
-                    }
-                };
-                
-                // Evento de fim
-                recognition.onend = () => {
-                    // Remover caixa de texto provisório se existir
-                    const interimBox = chatInputBox.querySelector('.interim-box');
-                    if (interimBox) {
-                        chatInputBox.removeChild(interimBox);
-                    }
-                    
-                    if (isListening) {
-                        // Se ainda deveria estar escutando, reinicia (para Android)
-                        setTimeout(() => {
-                            try {
-                                recognition.start();
-                                statusMessage.textContent = `${currentLang.speakText}...`;
-                            } catch (e) {
-                                console.error('Erro ao reiniciar:', e);
-                                isListening = false;
-                                detectedLangBubble.classList.remove('listening');
-                                statusMessage.textContent = getErrorMessage(currentLang.code);
-                            }
-                        }, 300);
-                    } else {
-                        statusMessage.textContent = getMicOffMessage(currentLang.code);
-                    }
-                };
-                
-                // Evento de erro
-                recognition.onerror = (event) => {
-                    console.error('Erro no reconhecimento:', event.error);
-                    isListening = false;
-                    detectedLangBubble.classList.remove('listening');
-                    statusMessage.textContent = getErrorMessage(currentLang.code);
-                    
-                    // Restaurar placeholder em caso de erro
-                    if (placeholder) {
-                        placeholder.style.display = 'flex';
-                    }
-                };
-                
-                // Clique na bandeira para iniciar/parar
-                detectedLangBubble.addEventListener('click', () => {
-                    if (!isListening) {
-                        try {
-                            recognition.start();
-                            isListening = true;
-                            detectedLangBubble.classList.add('listening');
-                            statusMessage.textContent = `${currentLang.speakText}...`;
-                            
-                            // Esconder placeholder ao iniciar
-                            if (placeholder) {
-                                placeholder.style.display = 'none';
-                            }
-                        } catch (e) {
-                            console.error('Erro ao iniciar microfone:', e);
-                            statusMessage.textContent = getErrorMessage(currentLang.code);
-                        }
-                    } else {
-                        recognition.stop();
-                        isListening = false;
-                        detectedLangBubble.classList.remove('listening');
-                        statusMessage.textContent = getMicOffMessage(currentLang.code);
-                        
-                        // Mostrar placeholder ao parar
-                        if (placeholder && chatInputBox.querySelectorAll('.phrase-box').length === 0) {
-                            placeholder.style.display = 'flex';
-                        }
-                    }
-                });
-            } else {
-                // Navegador não suporta reconhecimento de voz
-                placeholder.textContent = 'Seu navegador não suporta reconhecimento de voz. Tente usar Chrome ou Edge.';
-                placeholder.style.color = '#ff6b6b';
-                statusMessage.textContent = 'Funcionalidade não suportada';
-            }
-            
-            // Funções auxiliares para mensagens
-            function getClickToSpeakMessage(langCode) {
-                const messages = {
-                    'en-US': 'Click flag to speak',
-                    'pt-BR': 'Clique na bandeira para falar',
-                    'es-ES': 'Haz clic en la bandera para hablar',
-                    'fr-FR': 'Cliquez sur le drapeau pour parler',
-                    'de-DE': 'Klicken Sie auf die Flagge zum Sprechen',
-                    'ja-JP': '旗をクリックして話す',
-                    'zh-CN': '点击旗帜说话',
-                    'ru-RU': 'Нажмите на флаг, чтобы говорить',
-                    'ar-SA': 'انقر على العلم للتحدث'
-                };
-                return messages[langCode] || messages['en-US'];
-            }
-
-            function getMicOffMessage(langCode) {
-                const messages = {
-                    'en-US': 'Microphone off',
-                    'pt-BR': 'Microfone desativado',
-                    'es-ES': 'Micrófono desactivado',
-                    'fr-FR': 'Microphone désactivé',
-                    'de-DE': 'Mikrofon ausgeschaltet',
-                    'ja-JP': 'マイクオフ',
-                    'zh-CN': '麦克风关闭',
-                    'ru-RU': 'Микрофон выключен',
-                    'ar-SA': 'تم إيقاف الميكروفون'
-                };
-                return messages[langCode] || messages['en-US'];
-            }
-
-            function getErrorMessage(langCode) {
-                const messages = {
-                    'en-US': 'Microphone error',
-                    'pt-BR': 'Erro no microfone',
-                    'es-ES': 'Error de micrófono',
-                    'fr-FR': 'Erreur de microphone',
-                    'de-DE': 'Mikrofonfehler',
-                    'ja-JP': 'マイクエラー',
-                    'zh-CN': '麦克风错误',
-                    'ru-RU': 'Ошибка микрофона',
-                    'ar-SA': 'خطأ في الميكروفون'
-                };
-                return messages[langCode] || messages['en-US'];
-            }
-            
-            // Implementação básica do menu de idiomas (para demonstração)
-            langSelectButton.addEventListener('click', () => {
-                alert('Menu de seleção de idiomas seria aberto aqui. No código original, isso mostra várias bandeiras para escolha.');
-            });
-        });
-    </script>
+    <!-- 🔌 Scripts -->
+    <script src="https://lemur-signal.onrender.com/socket.io/socket.io.js"></script>
+    <script type="module" src="js/caller-ui.js"></script>
 </body>
 </html>
