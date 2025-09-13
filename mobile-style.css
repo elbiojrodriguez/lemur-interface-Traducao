@@ -46,8 +46,8 @@ body {
   border-radius: 8px;
   overflow: hidden;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-  border: 0.3vw solid #4CAF50;
-  z-index: 10;
+  border: 0.4vw solid #4CAF50;
+  z-index: 5;
 }
 
 .translator-label {
@@ -76,7 +76,7 @@ body {
   overflow: hidden;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
   border: 0.3vw solid #4CAF50;
-  z-index: 10;
+  z-index: 5;
 }
 
 .video-wrapper video {
@@ -126,18 +126,10 @@ body {
 .remoter-Lang {
   position: absolute;
   top: 31%;
-  left: 5%;
-  width: 8%;
-  aspect-ratio: 1 / 1;
-  border-radius: 50%;
-  background-color: white;
-  font-size: 3vw;
+  left: 75%;
+  font-size: 5vw;       /* controla o tamanho do emoji */
   line-height: 1;
-  text-align: center;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 0; /* Fica atrás de tudo */
+  z-index: 10;
 }
 
 .bandeira-circulo img {
