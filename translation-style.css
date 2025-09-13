@@ -1,0 +1,135 @@
+/* ===== ESTILOS DA TRADUÇÃO POR VOZ ===== */
+.translation-section {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90%;
+  max-width: 500px;
+  z-index: 10;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 15px;
+  padding: 15px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.translation-section h2 {
+  color: #5c6bc0;
+  margin-bottom: 12px;
+  font-size: 1.2rem;
+  text-align: center;
+}
+
+.translation-box {
+  background: #f5f5f5;
+  border-radius: 10px;
+  padding: 12px;
+  margin-bottom: 12px;
+}
+
+.text-display {
+  padding: 10px;
+  background: white;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.text-display h3 {
+  color: #5c6bc0;
+  margin-bottom: 6px;
+  font-size: 0.9rem;
+}
+
+.text-content {
+  font-size: 0.95rem;
+  color: #333;
+  min-height: 20px;
+}
+
+.record-btn {
+  background: #ff5722;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  font-size: 1.4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(255, 87, 34, 0.4);
+  transition: all 0.3s ease;
+}
+
+.record-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 15px rgba(255, 87, 34, 0.5);
+}
+
+.record-btn.recording {
+  background: #f44336;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+.btn-label {
+  text-align: center;
+  font-weight: 500;
+  color: #555;
+  margin-top: 8px;
+  font-size: 0.85rem;
+}
+
+/* ===== RESPONSIVIDADE ===== */
+@media (max-width: 768px) {
+  .translation-section {
+    width: 95%;
+    bottom: 15px;
+    padding: 12px;
+  }
+  
+  .translation-section h2 {
+    font-size: 1.1rem;
+  }
+  
+  .record-btn {
+    width: 55px;
+    height: 55px;
+    font-size: 1.2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .translation-section {
+    width: 98%;
+    bottom: 10px;
+    padding: 10px;
+  }
+  
+  .translation-section h2 {
+    font-size: 1rem;
+    margin-bottom: 8px;
+  }
+  
+  .text-content {
+    font-size: 0.9rem;
+  }
+  
+  .record-btn {
+    width: 50px;
+    height: 50px;
+    font-size: 1.1rem;
+  }
+  
+  .btn-label {
+    font-size: 0.8rem;
+  }
+}
