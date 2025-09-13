@@ -1,16 +1,5 @@
 /* ===== ESTILOS DA TRADUÇÃO POR VOZ ===== */
 
-.translation-box {
-  position: absolute; /* liberdade para mover */
-  top: 20%;           /* ajuste conforme necessário */
-  left: 50%;
-  transform: translateX(-50%);
-  background: transparent;
-  border-radius: 10px;
-  padding: 12px;
-  margin-bottom: 12px;
-}
-
 .text-display {
   position: absolute; /* liberdade para mover */
   top: 80%;           /* ajuste conforme necessário */
