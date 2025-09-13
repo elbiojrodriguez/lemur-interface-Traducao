@@ -1,24 +1,4 @@
 /* ===== ESTILOS DA TRADUÇÃO POR VOZ ===== */
-.translation-section {
-  position: absolute;
-  top:50%; /* você pode ajustar livremente */
-  left: 50%;
-  transform: translateX(-50%);
-  width: 90%;
-  max-width: 500px;
-  z-index: 10;
-  background: white;
-  border-radius: 15px;
-  padding: 15px;
-  box-shadow: none;
-}
-
-.translation-section h2 {
-  color: #5c6bc0;
-  margin-bottom: 12px;
-  font-size: 1.2rem;
-  text-align: center;
-}
 
 .translation-box {
   position: absolute; /* liberdade para mover */
