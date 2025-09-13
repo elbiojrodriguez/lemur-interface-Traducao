@@ -7,10 +7,10 @@
   width: 90%;
   max-width: 500px;
   z-index: 10;
-  background: rgba(255, 255, 255, 0.9);
+  background: transparent; /* fundo removido */
   border-radius: 15px;
   padding: 15px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  box-shadow: none; /* sombra removida */
 }
 
 .translation-section h2 {
@@ -21,7 +21,7 @@
 }
 
 .translation-box {
-  background: #f5f5f5;
+  background: transparent; /* fundo removido */
   border-radius: 10px;
   padding: 12px;
   margin-bottom: 12px;
@@ -29,7 +29,7 @@
 
 .text-display {
   padding: 10px;
-  background: white;
+  background: white; /* fundo mantido */
   border-radius: 8px;
   margin-bottom: 10px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
@@ -48,9 +48,9 @@
 }
 
 .record-btn {
-  background: #ff5722;
-  color: white;
-  border: none;
+  background: transparent; /* fundo removido */
+  color: #ff5722; /* cor do ícone/texto mantida */
+  border: 2px solid #ff5722; /* contorno para manter visibilidade */
   border-radius: 50%;
   width: 60px;
   height: 60px;
@@ -60,17 +60,19 @@
   justify-content: center;
   margin: 0 auto;
   cursor: pointer;
-  box-shadow: 0 4px 10px rgba(255, 87, 34, 0.4);
+  box-shadow: none; /* sombra removida */
   transition: all 0.3s ease;
 }
 
 .record-btn:hover {
   transform: scale(1.05);
-  box-shadow: 0 6px 15px rgba(255, 87, 34, 0.5);
+  box-shadow: none; /* sombra removida */
 }
 
 .record-btn.recording {
-  background: #f44336;
+  background: transparent; /* fundo removido */
+  border-color: #f44336; /* borda vermelha para indicar gravação */
+  color: #f44336;
   animation: pulse 1.5s infinite;
 }
 
@@ -95,11 +97,11 @@
     bottom: 15px;
     padding: 12px;
   }
-  
+
   .translation-section h2 {
     font-size: 1.1rem;
   }
-  
+
   .record-btn {
     width: 55px;
     height: 55px;
@@ -113,22 +115,22 @@
     bottom: 10px;
     padding: 10px;
   }
-  
+
   .translation-section h2 {
     font-size: 1rem;
     margin-bottom: 8px;
   }
-  
+
   .text-content {
     font-size: 0.9rem;
   }
-  
+
   .record-btn {
     width: 50px;
     height: 50px;
     font-size: 1.1rem;
   }
-  
+
   .btn-label {
     font-size: 0.8rem;
   }
