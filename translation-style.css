@@ -48,9 +48,9 @@
 }
 
 .record-btn {
-  background: transparent; /* fundo removido */
-  color: #ff5722; /* cor do ícone/texto mantida */
-  border: 2px solid #ff5722; /* contorno para manter visibilidade */
+  background: #ff5722;
+  color: white;
+  border: none;
   border-radius: 50%;
   width: 60px;
   height: 60px;
@@ -60,19 +60,17 @@
   justify-content: center;
   margin: 0 auto;
   cursor: pointer;
-  box-shadow: none; /* sombra removida */
+  box-shadow: 0 4px 10px rgba(255, 87, 34, 0.4);
   transition: all 0.3s ease;
 }
 
 .record-btn:hover {
   transform: scale(1.05);
-  box-shadow: none; /* sombra removida */
+  box-shadow: 0 6px 15px rgba(255, 87, 34, 0.5);
 }
 
 .record-btn.recording {
-  background: transparent; /* fundo removido */
-  border-color: #f44336; /* borda vermelha para indicar gravação */
-  color: #f44336;
+  background: #f44336;
   animation: pulse 1.5s infinite;
 }
 
