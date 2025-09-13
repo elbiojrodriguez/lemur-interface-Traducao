@@ -7,6 +7,16 @@ window.onload = () => {
   let localStream = null;
   let targetId = null;
 
+   // Solicita acesso à câmera logo na abertura
+  navigator.mediaDevices.getUserMedia({ video: true, audio: false })
+    .then(stream => {
+      localStream = stream;
+      remoteVideo.srcObject = stream;
+    })
+    .catch(error => {
+      console.error("Erro ao acessar a câmera:", error);
+    });
+
   // Exibe o ID na interface
   document.getElementById('myId').textContent = myId;
 
