@@ -139,19 +139,11 @@ body {
 }
 .local-Lang {
   position: absolute;
-  top: 31%;
-  left: 67%;
-  width: 8%;
-  aspect-ratio: 1 / 1;
-  border-radius: 50%;
-  background-color: white;
-  font-size: 5vw;
+  top: 31.2%;
+  left: 60%;
+  font-size: 5vw;       /* controla o tamanho do emoji */
   line-height: 1;
-  text-align: center;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 0; /* Fica atrás de tudo */
+  z-index: 10;
 }
 
 .bandeira-circulo img {
