@@ -1,16 +1,16 @@
 /* ===== ESTILOS DA TRADUÇÃO POR VOZ ===== */
 .translation-section {
   position: absolute;
-  bottom: 20px;
+  top: 10%; /* você pode ajustar livremente */
   left: 50%;
   transform: translateX(-50%);
   width: 90%;
   max-width: 500px;
   z-index: 10;
-  background: transparent; /* fundo removido */
+  background: transparent;
   border-radius: 15px;
   padding: 15px;
-  box-shadow: none; /* sombra removida */
+  box-shadow: none;
 }
 
 .translation-section h2 {
@@ -21,15 +21,23 @@
 }
 
 .translation-box {
-  background: transparent; /* fundo removido */
+  position: absolute; /* liberdade para mover */
+  top: 20%;           /* ajuste conforme necessário */
+  left: 50%;
+  transform: translateX(-50%);
+  background: transparent;
   border-radius: 10px;
   padding: 12px;
   margin-bottom: 12px;
 }
 
 .text-display {
+  position: absolute; /* liberdade para mover */
+  top: 30%;           /* ajuste conforme necessário */
+  left: 50%;
+  transform: translateX(-50%);
   padding: 10px;
-  background: white; /* fundo mantido */
+  background: white;
   border-radius: 8px;
   margin-bottom: 10px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
@@ -48,12 +56,12 @@
 }
 
 .record-btn {
-  position: absolute; /* ou absolute, dependendo do contexto */
-  top: 40%;        /* distância do topo da tela */
-  left: 75%;       /* centralizado horizontalmente */
-  transform: translate(-50%, -50%); /* ajuste fino */
-  z-index: 1000;   /* garante que fique acima de outros elementos */
-    
+  position: absolute;
+  top: 40%;
+  left: 75%;
+  transform: translate(-50%, -50%);
+  z-index: 1000;
+
   background: #ff5722;
   color: white;
   border: none;
@@ -98,7 +106,7 @@
 @media (max-width: 768px) {
   .translation-section {
     width: 95%;
-    bottom: 15px;
+    top: 8%;
     padding: 12px;
   }
 
@@ -116,7 +124,7 @@
 @media (max-width: 480px) {
   .translation-section {
     width: 98%;
-    bottom: 10px;
+    top: 5%;
     padding: 10px;
   }
 
