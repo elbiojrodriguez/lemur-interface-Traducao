@@ -48,7 +48,6 @@
 }
 
 .record-btn {
-  .record-btn {
   position: fixed; /* ou absolute, dependendo do contexto */
   top: 80%;        /* distância do topo da tela */
   left: 50%;       /* centralizado horizontalmente */
