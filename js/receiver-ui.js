@@ -1,3 +1,4 @@
+
 import WebRTCCore from '../core/webrtc-core.js';
 import { QRCodeGenerator } from './qr-code-utils.js';
 
@@ -20,7 +21,15 @@ window.onload = () => {
   const myId = fakeRandomUUID(fixedId).substr(0, 8); // ← ID vindo do Flutter
 
   let localStream = null;
-  
+
+  navigator.mediaDevices.getUserMedia({ video: true, audio: false })
+    .then(stream => {
+      localStream = stream;
+    })
+    .catch(error => {
+      console.error("Erro ao acessar a câmera:", error);
+    });
+
   // 🔗 Captura os parâmetros reais da URL
   const params = new URLSearchParams(window.location.search);
   const token = params.get('token') || '';
