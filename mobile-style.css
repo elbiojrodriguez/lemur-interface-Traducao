@@ -268,13 +268,13 @@ body {
   position: absolute;
   bottom: 30%;               /* 20% da altura da box */
   right: 50%;                 /* 5% da largura da box */
-  width: 35%;                /* largura relativa à box */
+  width: 50%;                /* largura relativa à box */
   height: 30%;               /* altura relativa à box */
   transform: translateX(-17%);
   border-radius: 8px;
   overflow: hidden;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-  border: 0.3vw solid #4CAF50;
+  border: 3px solid #2196f3;
   z-index: 10;
 }
 
