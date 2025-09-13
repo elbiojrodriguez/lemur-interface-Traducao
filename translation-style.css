@@ -33,9 +33,11 @@ body {
   left: 5%;
   width: 90%;
   padding: 10px;
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  background-color: white !important; /* força o fundo branco */
+  border: 3px solid #4caf50; /* borda verde */
+  border-radius: 50px; /* formato oval/bola */
+  box-shadow: 0 0 10px rgba(76, 175, 80, 0.4); /* sombra verde */
+  z-index: 10;
 }
 
 /* === 🌍 Bloco de texto em inglês === */
@@ -45,9 +47,11 @@ body {
   left: 5%;
   width: 90%;
   padding: 10px;
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  background-color: white !important; /* força o fundo branco */
+  border: 3px solid #2196f3; /* borda azul */
+  border-radius: 12px; /* borda suave */
+  box-shadow: 0 0 10px rgba(33, 150, 243, 0.4); /* sombra azul */
+  z-index: 10;
 }
 
 /* === 📝 Estilo interno dos blocos === */
