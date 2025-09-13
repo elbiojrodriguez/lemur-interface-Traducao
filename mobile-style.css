@@ -254,7 +254,7 @@ body {
 /* === 🗣️ Bloco de texto em português === */
 .bloco-portugues {
   position: absolute;
-  bottom: 20%;
+  bottom: 7%;
   left: 50%;                      /* centraliza horizontalmente */
   transform: translateX(-50%);    /* ajusta para o centro real */
   width: 80%;                     /* limite máximo de largura */
@@ -272,10 +272,10 @@ body {
 /* === 🌍 Bloco de texto em inglês === */
 .bloco-ingles {
   position: absolute;
-  bottom: 40%;
+  bottom: 30%;
   left: 50%;                      /* centraliza horizontalmente */
   transform: translateX(-50%);    /* ajusta para o centro real */
-  width: 80%;                     /* limite máximo de largura */
+  width: 78%;                     /* limite máximo de largura */
   height: auto;                   /* altura automática conforme conteúdo */
   padding: 10px;
   background-color: white;
