@@ -63,7 +63,7 @@ body {
 /* ===== VÍDEO REMOTO ===== */
 .video-wrapper {
   position: absolute;
-  bottom: 20%;               /* 20% da altura da box */
+  bottom: 60%;               /* 20% da altura da box */
   right: 50%;                 /* 5% da largura da box */
   width: 35%;                /* largura relativa à box */
   height: 30%;               /* altura relativa à box */
@@ -266,14 +266,15 @@ body {
 /* === 🗣️ Bloco de texto em português === */
 .bloco-portugues {
   position: absolute;
-  top: 10%;
-  left: 5%;
-  width: 90%;
-  padding: 10px;
-  background-color: white !important; /* força o fundo branco */
-  border: 3px solid #4caf50; /* borda verde */
-  border-radius: 50px; /* formato oval/bola */
-  box-shadow: 0 0 10px rgba(76, 175, 80, 0.4); /* sombra verde */
+  bottom: 30%;               /* 20% da altura da box */
+  right: 50%;                 /* 5% da largura da box */
+  width: 35%;                /* largura relativa à box */
+  height: 30%;               /* altura relativa à box */
+  transform: translateX(-17%);
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+  border: 0.3vw solid #4CAF50;
   z-index: 10;
 }
 
