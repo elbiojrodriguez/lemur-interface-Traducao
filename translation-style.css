@@ -1,48 +1,56 @@
-/* ===== ESTILOS DA TRADUÇÃO POR VOZ ===== */
-.translation-section {
-  position: absolute;
-  top:50%; /* você pode ajustar livremente */
-  left: 50%;
-  transform: translateX(-50%);
-  width: 90%;
-  max-width: 500px;
-  z-index: 10;
-  background: white;
-  border-radius: 15px;
-  padding: 15px;
-  box-shadow: none;
-}
-
-.translation-section h2 {
-  color: #5c6bc0;
-  margin-bottom: 12px;
-  font-size: 1.2rem;
+/* === ESTILOS GERAIS === */
+html {
+  height: 100%;
+  font-size: clamp(14px, 2.5vw, 18px);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   text-align: center;
+  transition: background-color 0.5s;
 }
 
-.translation-box {
-  position: absolute; /* liberdade para mover */
-  top: 20%;           /* ajuste conforme necessário */
-  left: 50%;
-  transform: translateX(-50%);
-  background: transparent;
-  border-radius: 10px;
-  padding: 12px;
-  margin-bottom: 12px;
+body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  font-size: 1em;
 }
 
-.text-display {
-  position: absolute; /* liberdade para mover */
-  top: 30%;           /* ajuste conforme necessário */
-  left: 50%;
-  transform: translateX(-50%);
+.box-principal {
+  width: 100%;
+  max-width: 600px;
+  height: 100%;
+  margin: 0 auto;
+  padding: 2vh 2vw;
+  box-sizing: border-box;
+  background-color: #aee2ff;
+  position: relative;
+  overflow-y: auto;
+}
+
+/* === 🗣️ Bloco de texto em português === */
+.bloco-portugues {
+  position: absolute;
+  top: 10%;
+  left: 5%;
+  width: 90%;
   padding: 10px;
   background: white;
   border-radius: 8px;
-  margin-bottom: 10px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
+/* === 🌍 Bloco de texto em inglês === */
+.bloco-ingles {
+  position: absolute;
+  top: 30%;
+  left: 5%;
+  width: 90%;
+  padding: 10px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+/* === 📝 Estilo interno dos blocos === */
 .text-display h3 {
   color: #5c6bc0;
   margin-bottom: 6px;
@@ -55,13 +63,13 @@
   min-height: 20px;
 }
 
+/* === 🎙️ Botão de gravação === */
 .record-btn {
   position: absolute;
-  top: 40%;
-  left: 75%;
+  top: 60%;
+  left: 50%;
   transform: translate(-50%, -50%);
   z-index: 1000;
-
   background: #ff5722;
   color: white;
   border: none;
@@ -72,7 +80,6 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 0 auto;
   cursor: pointer;
   box-shadow: 0 4px 10px rgba(255, 87, 34, 0.4);
   transition: all 0.3s ease;
@@ -94,6 +101,7 @@
   100% { transform: scale(1); }
 }
 
+/* === 🏷️ Rótulo do botão === */
 .btn-label {
   text-align: center;
   font-weight: 500;
@@ -102,18 +110,8 @@
   font-size: 0.85rem;
 }
 
-/* ===== RESPONSIVIDADE ===== */
+/* === 📱 Responsividade === */
 @media (max-width: 768px) {
-  .translation-section {
-    width: 95%;
-    top: 8%;
-    padding: 12px;
-  }
-
-  .translation-section h2 {
-    font-size: 1.1rem;
-  }
-
   .record-btn {
     width: 55px;
     height: 55px;
@@ -122,17 +120,6 @@
 }
 
 @media (max-width: 480px) {
-  .translation-section {
-    width: 98%;
-    top: 5%;
-    padding: 10px;
-  }
-
-  .translation-section h2 {
-    font-size: 1rem;
-    margin-bottom: 8px;
-  }
-
   .text-content {
     font-size: 0.9rem;
   }
