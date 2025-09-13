@@ -339,12 +339,17 @@ body {
 
 /* === 🏷️ Rótulo do botão === */
 .btn-label {
+  position: absolute;         /* permite posicionamento livre */
+  top: 68%;                   /* ajuste vertical */
+  left: 60%;                  /* ajuste horizontal */
+  transform: translate(-50%, -50%);
   text-align: center;
   font-weight: 500;
   color: #555;
-  margin-top: 8px;
   font-size: 0.85rem;
+  z-index: 1000;
 }
+
 
 /* === 📱 Responsividade === */
 @media (max-width: 768px) {
