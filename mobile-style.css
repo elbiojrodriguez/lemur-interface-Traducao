@@ -38,12 +38,16 @@ body {
 
 .ponte {
   position: absolute;
-  top: 35%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 35%;
-  max-width: 200px;
-  height: auto;
+  bottom: 60%;               /* 20% da altura da box */
+  right: 60%;                 /* 5% da largura da box */
+  width: 35%;                /* largura relativa à box */
+  height: 30%;               /* altura relativa à box */
+  transform: translateX(-17%);
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+  border: 0.3vw solid #4CAF50;
+  z-index: 10;
 }
 
 .translator-label {
