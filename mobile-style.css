@@ -125,9 +125,9 @@ body {
 
 .remoter-Lang {
   position: absolute;
-  top: 31.2%;
-  left: 83.8%;
-  font-size: 5vw;       /* controla o tamanho do emoji */
+  top: 31%;
+  left: 84%;
+  font-size: 6vw;       /* controla o tamanho do emoji */
   line-height: 1;
   z-index: 10;
 }
@@ -139,9 +139,9 @@ body {
 }
 .local-Lang {
   position: absolute;
-  top: 31.2%;
-  left: 58.5%;
-  font-size: 5vw;       /* controla o tamanho do emoji */
+  top: 31%;
+  left: 58%;
+  font-size: 6vw;       /* controla o tamanho do emoji */
   line-height: 1;
   z-index: 10;
 }
