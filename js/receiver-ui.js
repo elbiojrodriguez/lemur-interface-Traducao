@@ -20,25 +20,7 @@ window.onload = () => {
   const myId = fakeRandomUUID(fixedId).substr(0, 8); // ← ID vindo do Flutter
 
   let localStream = null;
-
-   // Solicita acesso à câmera logo na abertura
-  navigator.mediaDevices.getUserMedia({ video: true, audio: false })
-    .then(stream => {
-      localStream = stream;
-      remoteVideo.srcObject = stream;
-    })
-    .catch(error => {
-      console.error("Erro ao acessar a câmera:", error);
-    });
   
-  navigator.mediaDevices.getUserMedia({ video: true, audio: false })
-    .then(stream => {
-      localStream = stream;
-    })
-    .catch(error => {
-      console.error("Erro ao acessar a câmera:", error);
-    });
-
   // 🔗 Captura os parâmetros reais da URL
   const params = new URLSearchParams(window.location.search);
   const token = params.get('token') || '';
