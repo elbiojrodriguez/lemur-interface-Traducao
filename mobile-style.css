@@ -63,7 +63,7 @@ body {
 /* ===== VÍDEO REMOTO ===== */
 .video-wrapper {
   position: absolute;
-  bottom: 50%;               /* 20% da altura da box */
+  bottom: 40%;               /* 20% da altura da box */
   right: 50%;                 /* 5% da largura da box */
   width: 35%;                /* largura relativa à box */
   height: 30%;               /* altura relativa à box */
@@ -284,14 +284,17 @@ body {
 /* === 🌍 Bloco de texto em inglês === */
 .bloco-ingles {
   position: absolute;
-  top: 30%;
-  left: 5%;
-  width: 90%;
+  bottom: 40%;
+  left: 50%;                      /* centraliza horizontalmente */
+  transform: translateX(-50%);    /* ajusta para o centro real */
+  width: 80%;                     /* limite máximo de largura */
+  height: auto;                   /* altura automática conforme conteúdo */
   padding: 10px;
-  background-color: white !important; /* força o fundo branco */
-  border: 3px solid #2196f3; /* borda azul */
-  border-radius: 12px; /* borda suave */
-  box-shadow: 0 0 10px rgba(33, 150, 243, 0.4); /* sombra azul */
+  background-color: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+  border: 3px solid #2196f3;
   z-index: 10;
 }
 
