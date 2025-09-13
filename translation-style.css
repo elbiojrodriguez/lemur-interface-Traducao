@@ -48,6 +48,13 @@
 }
 
 .record-btn {
+  .record-btn {
+  position: fixed; /* ou absolute, dependendo do contexto */
+  top: 80%;        /* distância do topo da tela */
+  left: 50%;       /* centralizado horizontalmente */
+  transform: translate(-50%, -50%); /* ajuste fino */
+  z-index: 1000;   /* garante que fique acima de outros elementos */
+    
   background: #ff5722;
   color: white;
   border: none;
