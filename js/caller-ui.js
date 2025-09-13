@@ -1,27 +1,28 @@
-
 import WebRTCCore from '../core/webrtc-core.js';
 
-window.onload = () => {
+window.onload = async () => {
+  try {
+    await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+  } catch (error) {
+    console.error("Erro ao solicitar acesso à câmera e microfone:", error);
+  }
+
   const chatInputBox = document.querySelector('.chat-input-box');
   const rtcCore = new WebRTCCore();
   const myId = crypto.randomUUID().substr(0, 8);
   let localStream = null;
   let targetId = null;
 
-  // Exibe o ID na interface
   document.getElementById('myId').textContent = myId;
 
-  // Inicializa WebRTC
   rtcCore.initialize(myId);
   rtcCore.setupSocketHandlers();
 
-  // 🌍 ENDPOINT DE TRADUÇÃO (adicionado do arquivo1)
   const TRANSLATE_ENDPOINT = 'https://chat-tradutor.onrender.com/translate';
 
-  // 🔁 FUNÇÃO DE TRADUÇÃO (adicionada do arquivo1)
   async function translateText(text, targetLang) {
     try {
-      if (targetLang === 'en') return text; // Não traduzir se já for inglês
+      if (targetLang === 'en') return text;
 
       const response = await fetch(TRANSLATE_ENDPOINT, {
         method: 'POST',
@@ -37,17 +38,14 @@ window.onload = () => {
     }
   }
 
-  // Captura da câmera (sem áudio)
   navigator.mediaDevices.getUserMedia({ video: true, audio: false })
     .then(stream => {
       localStream = stream;
-      // Não mostramos o vídeo local — ele é usado apenas para envio
     })
     .catch(error => {
       console.error("Erro ao acessar a câmera:", error);
     });
 
-  // Verifica se há targetId na URL
   const urlParams = new URLSearchParams(window.location.search);
   const targetIdFromUrl = urlParams.get('targetId');
 
@@ -55,7 +53,6 @@ window.onload = () => {
     targetId = targetIdFromUrl;
     document.getElementById('callActionBtn').style.display = 'block';
 
-    // Botão de chamada
     document.getElementById('callActionBtn').onclick = () => {
       if (localStream) {
         rtcCore.startCall(targetId, localStream);
@@ -63,12 +60,11 @@ window.onload = () => {
     };
   }
 
-  // Quando receber vídeo remoto, exibe no localVideo
   rtcCore.setRemoteStreamCallback(stream => {
     stream.getAudioTracks().forEach(track => track.enabled = false);
-    localVideo.srcObject = stream; // ← ESSENCIAL no seu projeto
+    localVideo.srcObject = stream;
   });
-
+};
   // #############################################
   // Controles de idioma dinâmicos
   // #############################################
