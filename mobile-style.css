@@ -38,7 +38,7 @@ body {
 
 .ponte {
   position: absolute;
-  bottom: 61%;               /* 20% da altura da box */
+  bottom: 60.5%;               /* 20% da altura da box */
   right:2%;                 /* 5% da largura da box */
   width: 35%;                /* largura relativa à box */
   height: 15%;               /* altura relativa à box */
@@ -126,7 +126,7 @@ body {
 .remoter-Lang {
   position: absolute;
   top: 31%;
-  left: 80%;
+  left: 82%;
   font-size: 5.5vw;       /* controla o tamanho do emoji */
   line-height: 1;
   z-index: 10;
