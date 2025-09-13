@@ -1,8 +1,39 @@
 /* ===== ESTILOS DA TRADUÇÃO POR VOZ ===== */
+.translation-section {
+  position: absolute;
+  top:50%; /* você pode ajustar livremente */
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90%;
+  max-width: 500px;
+  z-index: 10;
+  background: white;
+  border-radius: 15px;
+  padding: 15px;
+  box-shadow: none;
+}
+
+.translation-section h2 {
+  color: #5c6bc0;
+  margin-bottom: 12px;
+  font-size: 1.2rem;
+  text-align: center;
+}
+
+.translation-box {
+  position: absolute; /* liberdade para mover */
+  top: 20%;           /* ajuste conforme necessário */
+  left: 50%;
+  transform: translateX(-50%);
+  background: transparent;
+  border-radius: 10px;
+  padding: 12px;
+  margin-bottom: 12px;
+}
 
 .text-display {
   position: absolute; /* liberdade para mover */
-  top: 80%;           /* ajuste conforme necessário */
+  top: 30%;           /* ajuste conforme necessário */
   left: 50%;
   transform: translateX(-50%);
   padding: 10px;
@@ -79,6 +110,10 @@
     padding: 12px;
   }
 
+  .translation-section h2 {
+    font-size: 1.1rem;
+  }
+
   .record-btn {
     width: 55px;
     height: 55px;
@@ -91,6 +126,11 @@
     width: 98%;
     top: 5%;
     padding: 10px;
+  }
+
+  .translation-section h2 {
+    font-size: 1rem;
+    margin-bottom: 8px;
   }
 
   .text-content {
