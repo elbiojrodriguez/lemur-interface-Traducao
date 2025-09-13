@@ -39,9 +39,9 @@ body {
 .ponte {
   position: absolute;
   bottom: 60%;               /* 20% da altura da box */
-  right: 60%;                 /* 5% da largura da box */
+  right:5%;                 /* 5% da largura da box */
   width: 35%;                /* largura relativa à box */
-  height: 30%;               /* altura relativa à box */
+  height: 15%;               /* altura relativa à box */
   transform: translateX(-17%);
   border-radius: 8px;
   overflow: hidden;
