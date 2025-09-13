@@ -1,123 +1,388 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Lemur-EchoMeP2P-Caller</title>
-  <link rel="stylesheet" href="mobile-style.css" />
-  <!-- 🔵 ESTILOS DO TRADUTOR DE VOZ (AGORA NO LUGAR CORRETO) -->
-   <style>
-        /* 🔵 Estilo do box azul */
-        .chat-input-box {
-            position: absolute;
-            bottom: 350px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 80%;
-            height: 200px;
-            border: 2px solid #007BFF;
-            border-radius: 12px;
-            background-color: rgba(255, 255, 255, 0.1);
-            z-index: 20;
-            overflow-y: auto;
-            padding: 10px;
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tradução por Voz - Correto</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-
-        /* 💬 Estilo BASE para todas as mensagens */
-.phrase-box {
-    background-color: transparent;
-    padding: 1px 0;
-    margin: 0.5px 0;
-    border-radius: 0;
-    font-size: 15px;
-    line-height: 1.0;
-    border: none;
-    box-shadow: none;
-    width: 100%;
-    word-break: break-word;
-}
-
-/* 🎯 Estilo para TEXTO TEMPORÁRIO (enquanto está falando) */
-.phrase-box.interim-box {
-    animation: fadeIn 0.3s ease-out; /* Suaviza a aparição */
-}
-
-.interim-text {
-    color: #666;
-    opacity: 0.8;
-    border-bottom: 1px dotted #aaa;
-    transition: all 0.2s; /* Suaviza as atualizações de texto */
-}
-
-/* ✅ Estilo para TEXTO FINALIZADO */
-.final-text {
-    color: inherit; /* Herda a cor do tema pai */
-    opacity: 1;
-    animation: textFinalized 0.3s ease-out;
-}
-
-/* 🎚️ Efeitos visuais */
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(2px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-/* Estilo para quando o microfone está ativo continuamente */
-.listening-mode .text-display-placeholder {
-    animation: pulseOpacity 2s infinite;
-}
-
-@keyframes pulseOpacity {
-    0% { opacity: 0.8; }
-    50% { opacity: 0.4; }
-    100% { opacity: 0.8; }
-}
-@keyframes textFinalized {
-    from { opacity: 0.5; }
-    to { opacity: 1; }
-}
-
-/* 📱 Melhorias para mobile */
-@media (max-width: 768px) {
-    .phrase-box {
-        font-size: 14px;
-        line-height: 1.3;
-    }
-}
+        
+        body {
+            background: linear-gradient(135deg, #6e8efb, #a777e3);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 800px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+            margin-top: 20px;
+        }
+        
+        header {
+            background: #5c6bc0;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        h1 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        
+        .description {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        
+        .process-flow {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 15px;
+            background: #e8eaf6;
+            gap: 10px;
+        }
+        
+        .process-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            font-size: 12px;
+            width: 80px;
+        }
+        
+        .process-step .icon {
+            background: #5c6bc0;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 5px;
+        }
+        
+        .arrow {
+            font-size: 20px;
+            color: #5c6bc0;
+        }
+        
+        .main-content {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .instruction {
+            text-align: center;
+            font-size: 18px;
+            color: #5c6bc0;
+            font-weight: 500;
+            margin: 10px 0;
+        }
+        
+        .translation-box {
+            background: #f5f5f5;
+            border-radius: 12px;
+            padding: 15px;
+            min-height: 150px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .text-display {
+            padding: 15px;
+            background: white;
+            border-radius: 10px;
+            min-height: 60px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+        
+        .text-display h3 {
+            color: #5c6bc0;
+            margin-bottom: 8px;
+            font-size: 16px;
+        }
+        
+        .text-content {
+            font-size: 18px;
+            color: #333;
+            min-height: 24px;
+        }
+        
+        .record-btn {
+            background: #ff5722;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 80px;
+            height: 80px;
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 20px auto;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(255, 87, 34, 0.4);
+            transition: all 0.3s ease;
+        }
+        
+        .record-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 15px rgba(255, 87, 34, 0.5);
+        }
+        
+        .record-btn.recording {
+            background: #f44336;
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        .btn-label {
+            text-align: center;
+            font-weight: 500;
+            color: #555;
+            margin-top: 5px;
+        }
+        
+        .language-info {
+            text-align: center;
+            padding: 15px;
+            background: #e8eaf6;
+            border-radius: 10px;
+            margin-top: 10px;
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: #777;
+            font-size: 14px;
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                border-radius: 15px;
+            }
+            
+            h1 {
+                font-size: 20px;
+            }
+            
+            .instruction {
+                font-size: 16px;
+            }
+            
+            .record-btn {
+                width: 70px;
+                height: 70px;
+            }
+            
+            .process-flow {
+                flex-wrap: wrap;
+            }
+            
+            .arrow {
+                display: none;
+            }
+        }
     </style>
 </head>
 <body>
-  <div class="box-principal">    
-    <img src="assets/images/Lemur2P2.png" alt="Lemur Logo" class="logo">
-    <div class="translator-label" id="translator-label">
-      Live translation. No filters. No platform.
-    </div>
-    
-    <!-- 🎥 Vídeo remoto -->
-    <div class="video-wrapper">
-      <video id="remoteVideo" autoplay playsinline></video>
+    <div class="container">
+        <header>
+            <h1>Sistema de Tradução por Voz</h1>
+            <p class="description">Seu áudio vira texto, que é traduzido pela Microsoft</p>
+        </header>
+        
+        <div class="process-flow">
+            <div class="process-step">
+                <div class="icon">🎤</div>
+                <div>Voz</div>
+            </div>
+            <div class="arrow">→</div>
+            <div class="process-step">
+                <div class="icon">A</div>
+                <div>Texto (PT)</div>
+            </div>
+            <div class="arrow">→</div>
+            <div class="process-step">
+                <div class="icon">🌐</div>
+                <div>Microsoft</div>
+            </div>
+            <div class="arrow">→</div>
+            <div class="process-step">
+                <div class="icon">B</div>
+                <div>Texto (EN)</div>
+            </div>
+        </div>
+        
+        <div class="main-content">
+            <p class="instruction">Pressione o botão e segure para falar</p>
+            
+            <div class="translation-box">
+                <div class="text-display">
+                    <h3>Texto Reconhecido (Português)</h3>
+                    <div id="originalText" class="text-content">Aguardando entrada de voz...</div>
+                </div>
+                
+                <div class="text-display">
+                    <h3>Texto Traduzido (Inglês)</h3>
+                    <div id="translatedText" class="text-content">A tradução aparecerá aqui</div>
+                </div>
+            </div>
+            
+            <div class="record-btn" id="recordButton">
+                🎤
+            </div>
+            <p class="btn-label">Pressione e segure para falar</p>
+            
+            <div class="language-info">
+                <p>Reconhecimento de voz → Texto em <strong>Português</strong> → API Microsoft → Texto em <strong>Inglês</strong></p>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>Seu áudio é convertido localmente em texto antes de ser enviado para tradução</p>
+        </div>
     </div>
 
-    <!-- 🎥 Vídeo local (mutado) -->
-    <div class="video-wrapper">
-      <video id="localVideo" autoplay muted playsinline></video>
-    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const recordButton = document.getElementById('recordButton');
+            const originalText = document.getElementById('originalText');
+            const translatedText = document.getElementById('translatedText');
+            
+            // ENDPOINT da sua API de tradução
+            const TRANSLATE_ENDPOINT = 'https://chat-tradutor.onrender.com/translate';
+            
+            // Verificar se o navegador suporta reconhecimento de voz
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRecognition) {
+                originalText.textContent = "Seu navegador não suporta reconhecimento de voz. Tente usar Chrome ou Edge.";
+                recordButton.style.display = 'none';
+                return;
+            }
+            
+            const recognition = new SpeechRecognition();
+            recognition.lang = 'pt-BR';
+            recognition.continuous = false;
+            
+            let isRecording = false;
+            let pressTimer;
+            
+            // Função de tradução usando sua API
+            async function translateText(text, targetLang) {
+                try {
+                    const response = await fetch(TRANSLATE_ENDPOINT, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ text, targetLang })
+                    });
 
-    <!-- 🆔 ID do usuário -->
-    <div class="info-overlay" style="opacity: 0; position: absolute; pointer-events: none;">
-      <span id="myId"></span>
-    </div>
-
-    <!-- 🔘 Botão de chamada -->
-    <div class="controls">
-      <button id="callActionBtn" style="display: none;">SEND 🚀</button>
-    </div>
-
-    <!-- ✅ CAIXA DE TEXTO PARA O TRADUTOR (AGORA PRESENTE) -->
-    <div class="chat-input-box"></div> 
-  </div>
-  
-  <!-- 🔌 Scripts -->
-  <script src="https://lemur-signal.onrender.com/socket.io/socket.io.js"></script>
-  <script type="module" src="js/caller-ui.js"></script>
+                    const result = await response.json();
+                    return result.translatedText || text;
+                } catch (error) {
+                    console.error('Erro na tradução:', error);
+                    return "Erro na tradução. Verifique o console para detalhes.";
+                }
+            }
+            
+            // Iniciar gravação quando o botão for pressionado
+            recordButton.addEventListener('mousedown', function() {
+                pressTimer = setTimeout(function() {
+                    startRecording();
+                }, 300); // Delay de 300ms para evitar ativações acidentais
+            });
+            
+            // Parar gravação quando o botão for solto
+            recordButton.addEventListener('mouseup', function() {
+                clearTimeout(pressTimer);
+                if (isRecording) {
+                    stopRecording();
+                }
+            });
+            
+            // Também para touch events para dispositivos móveis
+            recordButton.addEventListener('touchstart', function(e) {
+                e.preventDefault();
+                pressTimer = setTimeout(function() {
+                    startRecording();
+                }, 300);
+            });
+            
+            recordButton.addEventListener('touchend', function(e) {
+                e.preventDefault();
+                clearTimeout(pressTimer);
+                if (isRecording) {
+                    stopRecording();
+                }
+            });
+            
+            function startRecording() {
+                try {
+                    recognition.start();
+                    recordButton.classList.add('recording');
+                    isRecording = true;
+                    originalText.textContent = "Ouvindo...";
+                    translatedText.textContent = "Aguardando para traduzir...";
+                } catch (error) {
+                    console.error('Erro ao iniciar gravação:', error);
+                    originalText.textContent = "Erro ao acessar o microfone";
+                }
+            }
+            
+            function stopRecording() {
+                recognition.stop();
+                recordButton.classList.remove('recording');
+                isRecording = false;
+            }
+            
+            recognition.onresult = function(event) {
+                const transcript = event.results[0][0].transcript;
+                originalText.textContent = transcript;
+                translatedText.textContent = "Traduzindo...";
+                
+                // Usar sua API para traduzir o texto
+                translateText(transcript, 'en').then(translation => {
+                    translatedText.textContent = translation;
+                });
+            };
+            
+            recognition.onerror = function(event) {
+                console.error('Erro no reconhecimento de voz:', event.error);
+                originalText.textContent = "Erro: " + event.error;
+                stopRecording();
+            };
+            
+            recognition.onend = function() {
+                stopRecording();
+            };
+        });
+    </script>
 </body>
 </html>
