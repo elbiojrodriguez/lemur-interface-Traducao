@@ -110,7 +110,7 @@ window.onload = async () => {
         localLangElement.textContent = bandeira;
       }
 
-      const remoteLangElement = document.querySelector('.remoter-Lang');
+      const remoteLangElement = document.querySelector('.local-Lang');
       if (remoteLangElement) {
         remoteLangElement.textContent = bandeira;
       }
