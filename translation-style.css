@@ -1,7 +1,7 @@
 /* ===== ESTILOS DA TRADUÇÃO POR VOZ ===== */
 .translation-section {
   position: absolute;
-  top: 10%; /* você pode ajustar livremente */
+  top:50%; /* você pode ajustar livremente */
   left: 50%;
   transform: translateX(-50%);
   width: 90%;
