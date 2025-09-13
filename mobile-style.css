@@ -126,12 +126,12 @@ body {
 .remoter-Lang {
   position: absolute;
   top: 31%;
-  left: 25%;
+  left: 5%;
   width: 8%;
   aspect-ratio: 1 / 1;
   border-radius: 50%;
   background-color: white;
-  font-size: 5vw;
+  font-size: 3vw;
   line-height: 1;
   text-align: center;
   display: flex;
