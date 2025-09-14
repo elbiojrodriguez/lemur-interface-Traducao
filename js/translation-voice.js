@@ -4,10 +4,12 @@ document.addEventListener('DOMContentLoaded', function () {
   const translatedText = document.getElementById('translatedText');
   const flagElement = document.querySelector('.local-mic-Lang');
 
-  // Obter idiomas da URL
+  // Obter idioma de origem da URL
   const params = new URLSearchParams(window.location.search);
-  const sourceLang = params.get('lang') || 'pt-BR'; // idioma de origem
-  const targetLang = params.get('target') || 'es';   // idioma de destino
+  const sourceLang = params.get('lang') || 'pt-BR'; // idioma local (receiver)
+
+  // Idioma de destino: prioridade para o que veio do caller via WebRTC
+  const targetLang = window.targetTranslationLang || params.get('target') || 'es';
 
   // ENDPOINT da API de tradução
   const TRANSLATE_ENDPOINT = 'https://chat-tradutor.onrender.com/translate';
@@ -20,7 +22,7 @@ document.addEventListener('DOMContentLoaded', function () {
     return;
   }
 
-  // Aplicar bandeira do idioma
+  // Aplicar bandeira do idioma local
   async function aplicarBandeira(langCode) {
     try {
       const response = await fetch('assets/bandeiras/language-flags.json');
