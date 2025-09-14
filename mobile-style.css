@@ -272,7 +272,7 @@ body {
 /* === 🌍 Bloco de texto em inglês === */
 .bloco-ingles {
   position: absolute;
-  bottom: 30%;
+  bottom: 20%;
   left: 50%;                      /* centraliza horizontalmente */
   transform: translateX(-50%);    /* ajusta para o centro real */
   width: 78%;                     /* limite máximo de largura */
