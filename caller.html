@@ -8,6 +8,42 @@
   
 </head>
 <body>
+  <!-- 🎙️ Botão principal com bandeira -->
+<div class="record-container">
+  <button class="record-btn" id="recordButton">
+    🎤 <span id="langFlag">🇧🇷</span>
+  </button>
+</div>
+
+<!-- 🌐 Janela interativa -->
+<div class="voice-popup" id="voicePopup">
+  <button class="language-btn" id="languageToggle">🌐</button>
+  <div class="language-list" id="languageList">
+    <button data-lang="pt-BR">🇧🇷 Português</button>
+    <button data-lang="en">🇺🇸 English</button>
+    <button data-lang="de">🇩🇪 Deutsch</button>
+    <button data-lang="es">🇪🇸 Español</button>
+    <button data-lang="fr">🇫🇷 Français</button>
+    <button data-lang="it">🇮🇹 Italiano</button>
+    <button data-lang="ja">🇯🇵 日本語</button>
+  </div>
+  <div class="wave-visual"></div>
+  <button class="finish-btn" id="finishRecording">➤ Finalizar gravação</button>
+</div>
+
+<!-- 🗣️ Área de texto -->
+<div class="translation-box">
+  <div class="text-display bloco-portugues">
+    <h3 id="originalTitle">Texto em Português</h3>
+    <div id="originalText" class="text-content">Aguardando entrada de voz...</div>
+  </div>
+
+  <div class="text-display bloco-ingles">
+    <h3 id="translatedTitle">Tradução em Inglês</h3>
+    <div id="translatedText" class="text-content">A tradução aparecerá aqui</div>
+  </div>
+</div>
+
   <div class="box-principal">  
   
         <!-- círculo com a bandeira -->
