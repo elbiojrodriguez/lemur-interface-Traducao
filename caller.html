@@ -10,24 +10,21 @@
 
   <!-- 🔹 BLOCO 1: Botão de gravação com bandeira e seletor de idioma -->
   <div class="record-container">
-    <!-- Botão principal de gravação -->
     <button class="record-btn" id="recordButton">
       🎤 <span id="langFlag">🇧🇷</span>
     </button>
-
-    <!-- Botão para abrir lista de idiomas -->
     <button class="language-btn" id="languageToggle">🌐</button>
   </div>
 
   <!-- 🔹 BLOCO 2: Lista de idiomas (aparece ao clicar no 🌐) -->
   <div class="language-list" id="languageList">
-    <button data-lang="pt-BR">🇧🇷 Português</button>
-    <button data-lang="en">🇺🇸 English</button>
-    <button data-lang="de">🇩🇪 Deutsch</button>
-    <button data-lang="es">🇪🇸 Español</button>
-    <button data-lang="fr">🇫🇷 Français</button>
-    <button data-lang="it">🇮🇹 Italiano</button>
-    <button data-lang="ja">🇯🇵 日本語</button>
+    <button data-lang="pt-BR">🇧🇷</button>
+    <button data-lang="en">🇺🇸</button>
+    <button data-lang="de">🇩🇪</button>
+    <button data-lang="es">🇪🇸</button>
+    <button data-lang="fr">🇫🇷</button>
+    <button data-lang="it">🇮🇹</button>
+    <button data-lang="ja">🇯🇵</button>
   </div>
 
   <!-- 🔹 BLOCO 3: Janela flutuante que aparece durante a gravação -->
@@ -39,13 +36,10 @@
 
   <!-- 🔹 BLOCO 4: Área de texto com o que foi falado e a tradução -->
   <div class="translation-box">
-    <!-- Texto original reconhecido -->
     <div class="text-display bloco-portugues">
       <h3 id="originalTitle">Texto reconhecido</h3>
       <div id="originalText" class="text-content">Aguardando entrada de voz...</div>
     </div>
-
-    <!-- Tradução gerada -->
     <div class="text-display bloco-ingles">
       <h3 id="translatedTitle">Tradução</h3>
       <div id="translatedText" class="text-content">A tradução aparecerá aqui</div>
@@ -54,33 +48,22 @@
 
   <!-- 🔹 BLOCO 5: Elementos visuais do seu projeto Lemur -->
   <div class="box-principal">
-    <!-- Logos -->
     <img src="assets/images/Lemur2P2.png" alt="Lemur Logo" class="logo">
     <img src="assets/images/Bridg.png" alt="ponte" class="ponte">
-
-    <!-- Subtítulo -->
     <div class="translator-label" id="translator-label">
       Live translation. No filters. No platform.
     </div>
-
-    <!-- Bandeiras de origem e destino -->
     <div class="remoter-Lang">🇺🇾</div>
     <div class="local-Lang">🏳️</div>
-
-    <!-- Vídeos -->
     <div class="video-wrapper">
       <video id="remoteVideo" autoplay playsinline></video>
     </div>
     <div class="video-wrapper">
       <video id="localVideo" autoplay muted playsinline></video>
     </div>
-
-    <!-- ID do usuário -->
     <div class="info-overlay" style="opacity: 0; position: absolute; pointer-events: none;">
       <span id="myId"></span>
     </div>
-
-    <!-- Botão de chamada -->
     <div class="controls">
       <button id="callActionBtn" style="display: none;">SEND 🚀</button>
     </div>
