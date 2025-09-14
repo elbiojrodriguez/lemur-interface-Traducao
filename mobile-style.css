@@ -302,8 +302,8 @@ body {
 /* === 🎙️ Botão de gravação === */
 .record-btn {
   position: absolute;
-  top: 60%;
-  left: 50%;
+  top: 45%;
+  left: 35%;
   transform: translate(-50%, -50%);
   z-index: 1000;
   background: #ff5722;
@@ -340,13 +340,13 @@ body {
 /* === 🏷️ Rótulo do botão === */
 .btn-label {
   position: absolute;         /* permite posicionamento livre */
-  top: 68%;                   /* ajuste vertical */
-  left: 60%;                  /* ajuste horizontal */
+  top: 50%;                   /* ajuste vertical */
+  left: 50%;                  /* ajuste horizontal */
   transform: translate(-50%, -50%);
   text-align: center;
   font-weight: 500;
   color: #555;
-  font-size: 0.85rem;
+  font-size: 1rem;
   z-index: 1000;
 }
 
