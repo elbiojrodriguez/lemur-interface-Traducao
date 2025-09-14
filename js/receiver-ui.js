@@ -112,7 +112,7 @@ window.onload = async () => {
       const response = await fetch('assets/bandeiras/language-flags.json');
       const flags = await response.json();
 
-      const bandeira = flags[langCode] || flags[langCode.split('-')[0]] || '🏳️';
+      const bandeira = flags[langCode] || flags[langCode.split('-')[0]] || '🔴';
 
       const localLangElement = document.querySelector('.local-mic-Lang');
       if (localLangElement) {
@@ -135,7 +135,7 @@ window.onload = async () => {
       const response = await fetch('assets/bandeiras/language-flags.json');
       const flags = await response.json();
 
-      const bandeira = flags[langCode] || flags[langCode.split('-')[0]] || '🏳️';
+      const bandeira = flags[langCode] || flags[langCode.split('-')[0]] || '🔴';
 
       const remoteLangElement = document.querySelector('.remoter-Lang');
       if (remoteLangElement) {
