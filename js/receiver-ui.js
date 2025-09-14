@@ -24,6 +24,7 @@ window.onload = async () => {
   const myId = fakeRandomUUID(fixedId).substr(0, 8);
 
   let localStream = null;
+  let callerLang = 'en'; // valor padrão
 
   navigator.mediaDevices.getUserMedia({ video: true, audio: false })
     .then(stream => {
@@ -35,10 +36,9 @@ window.onload = async () => {
 
   const params = new URLSearchParams(window.location.search);
   const token = params.get('token') || '';
-  const lang = params.get('lang') || 'en';
+  const lang = params.get('lang') || 'pt-BR'; // idioma do receiver
 
   const callerUrl = `${window.location.origin}/caller.html?targetId=${myId}&token=${encodeURIComponent(token)}&lang=${encodeURIComponent(lang)}`;
-
   QRCodeGenerator.generate("qrcode", callerUrl);
 
   rtcCore.initialize(myId);
@@ -46,11 +46,13 @@ window.onload = async () => {
 
   const localVideo = document.getElementById('localVideo');
 
-  rtcCore.onIncomingCall = (offer) => {
+  rtcCore.onIncomingCall = (offer, receivedCallerLang) => {
     if (!localStream) {
       console.warn("Stream local não disponível");
       return;
     }
+
+    callerLang = receivedCallerLang || 'en'; // idioma do caller recebido
 
     rtcCore.handleIncomingCall(offer, localStream, (remoteStream) => {
       remoteStream.getAudioTracks().forEach(track => track.enabled = false);
@@ -59,6 +61,9 @@ window.onload = async () => {
       if (overlay) overlay.classList.add('hidden');
 
       localVideo.srcObject = remoteStream;
+
+      // ✅ Salvar idioma do caller para tradução
+      window.targetTranslationLang = callerLang;
     });
   };
 
@@ -66,7 +71,7 @@ window.onload = async () => {
 
   async function translateText(text, targetLang) {
     try {
-      if (targetLang === 'en') return text;
+      if (targetLang === lang) return text;
 
       const response = await fetch(TRANSLATE_ENDPOINT, {
         method: 'POST',
