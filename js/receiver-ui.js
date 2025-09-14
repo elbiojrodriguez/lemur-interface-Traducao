@@ -52,7 +52,7 @@ window.onload = async () => {
       return;
     }
 
-    callerLang = receivedCallerLang || 'en'; // idioma do caller recebido
+    callerLang = receivedCallerLang || 'en';
 
     rtcCore.handleIncomingCall(offer, localStream, (remoteStream) => {
       remoteStream.getAudioTracks().forEach(track => track.enabled = false);
@@ -62,8 +62,11 @@ window.onload = async () => {
 
       localVideo.srcObject = remoteStream;
 
-      // ✅ Salvar idioma do caller para tradução
+      // ✅ Define idioma de destino para tradução
       window.targetTranslationLang = callerLang;
+
+      // ✅ Aplica bandeira do caller
+      aplicarBandeiraRemota(callerLang);
     });
   };
 
@@ -103,6 +106,7 @@ window.onload = async () => {
     }
   })();
 
+  // ✅ Aplica bandeira do receiver (local)
   async function aplicarBandeira(langCode) {
     try {
       const response = await fetch('assets/bandeiras/language-flags.json');
@@ -115,13 +119,31 @@ window.onload = async () => {
         localLangElement.textContent = bandeira;
       }
 
-      const remoteLangElement = document.querySelector('.local-Lang');
+      const localLangDisplay = document.querySelector('.local-Lang');
+      if (localLangDisplay) {
+        localLangDisplay.textContent = bandeira;
+      }
+
+    } catch (error) {
+      console.error('Erro ao carregar bandeira local:', error);
+    }
+  }
+
+  // ✅ Aplica bandeira do caller (remoto)
+  async function aplicarBandeiraRemota(langCode) {
+    try {
+      const response = await fetch('assets/bandeiras/language-flags.json');
+      const flags = await response.json();
+
+      const bandeira = flags[langCode] || flags[langCode.split('-')[0]] || '🏳️';
+
+      const remoteLangElement = document.querySelector('.remoter-Lang');
       if (remoteLangElement) {
         remoteLangElement.textContent = bandeira;
       }
 
     } catch (error) {
-      console.error('Erro ao carregar bandeira:', error);
+      console.error('Erro ao carregar bandeira remota:', error);
     }
   }
 
