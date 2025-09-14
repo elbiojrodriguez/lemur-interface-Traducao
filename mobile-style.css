@@ -254,7 +254,7 @@ body {
 /* === 🗣️ Bloco de texto em português === */
 .bloco-portugues {
   position: absolute;
-  bottom: 7%;
+  bottom: 5%;
   left: 50%;                      /* centraliza horizontalmente */
   transform: translateX(-50%);    /* ajusta para o centro real */
   width: 80%;                     /* limite máximo de largura */
@@ -302,7 +302,7 @@ body {
 /* === 🎙️ Botão de gravação === */
 .record-btn {
   position: absolute;
-  top: 48%;
+  top: 49%;
   left: 73%;
   transform: translate(-50%, -50%);
   z-index: 10;
@@ -312,7 +312,7 @@ body {
   border-radius: 50%;
   width: 100px;
   height: 100px;
-  font-size: 2rem;
+  font-size: 4rem;
   display: flex;
   align-items: center;
   justify-content: center;
