@@ -300,12 +300,16 @@ body {
 }
 
 /* === 🎙️ Botão de gravação === */
-.record-btn {
+.record-container {
   position: absolute;
-  top: 49%;
+  top: 50%;
   left: 73%;
   transform: translate(-50%, -50%);
+  text-align: center;
   z-index: 10;
+}
+
+.record-btn {
   background: #ff5722;
   color: white;
   border: none;
@@ -320,17 +324,12 @@ body {
   transition: all 0.3s ease;
 }
 
-/* === 🏷️ Frase abaixo do botão === */
 .btn-label {
-  position: absolute;
-  top: 53%;                   /* mais abaixo do botão */
-  left: 73%;                  /* alinhado com o botão */
-  transform: translate(-50%, -50%);
+  margin-top: 8px;
   font-size: 1.2rem;
   font-weight: 500;
   color: black;
-  white-space: nowrap;        /* impede quebra de linha */
-  z-index: 10;
+  white-space: nowrap;
 }
 
 /* === 📱 Responsividade === */
