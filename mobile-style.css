@@ -302,7 +302,7 @@ body {
 /* === 🎙️ Botão de gravação === */
 .record-btn {
   position: absolute;
-  top: 58%;
+  top: 48%;
   left: 73%;
   transform: translate(-50%, -50%);
   z-index: 10;
@@ -323,7 +323,7 @@ body {
 /* === 🏷️ Frase abaixo do botão === */
 .btn-label {
   position: absolute;
-  top: 52%;                   /* mais abaixo do botão */
+  top: 53%;                   /* mais abaixo do botão */
   left: 73%;                  /* alinhado com o botão */
   transform: translate(-50%, -50%);
   font-size: 1.2rem;
