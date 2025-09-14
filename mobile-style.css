@@ -320,21 +320,19 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
+  margin: 0 auto; /* garante centralização */
   box-shadow: 0 4px 10px rgba(255, 87, 34, 0.4);
   transition: all 0.3s ease;
 }
 
 .btn-label {
-  position: absolute;
-  top: 62%;         /* ajusta verticalmente */
-  left: 60%;        /* ajusta horizontalmente */
-  transform: translate(-50%, -50%);
+  margin-top: 8px;           /* espaço abaixo do botão */
   font-size: 1rem;
   font-weight: 500;
   color: black;
   white-space: nowrap;
-  z-index: 10;
 }
+
 
 
 /* === 📱 Responsividade === */
