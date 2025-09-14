@@ -302,7 +302,7 @@ body {
 /* === 🎙️ Botão de gravação === */
 .record-container {
   position: absolute;
-  top: 50%;
+  top: 49%;
   left: 75%;
   transform: translate(-50%, -50%);
   text-align: center;
@@ -326,8 +326,8 @@ body {
 
 .btn-label {
   position: absolute;
-  top: 60%;         /* ajusta verticalmente */
-  left: 65%;        /* ajusta horizontalmente */
+  top: 62%;         /* ajusta verticalmente */
+  left: 60%;        /* ajusta horizontalmente */
   transform: translate(-50%, -50%);
   font-size: 1rem;
   font-weight: 500;
