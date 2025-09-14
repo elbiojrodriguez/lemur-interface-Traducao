@@ -6,6 +6,7 @@ html {
   text-align: center;
   transition: background-color 0.5s;
 }
+/* 🔹 BLOCO 1: Botão de gravação */
 .record-container {
   position: absolute;
   top: 49%;
@@ -31,6 +32,7 @@ html {
   transition: all 0.3s ease;
 }
 
+/* 🔹 BLOCO 2: Janela de gravação */
 .voice-popup {
   position: fixed;
   bottom: 20%;
@@ -45,6 +47,7 @@ html {
   display: none;
 }
 
+/* 🔹 BLOCO 3: Botão de idioma */
 .language-btn {
   background: none;
   border: none;
@@ -53,6 +56,7 @@ html {
   margin-bottom: 10px;
 }
 
+/* 🔹 BLOCO 4: Lista de idiomas */
 .language-list {
   display: none;
   flex-direction: column;
@@ -68,6 +72,7 @@ html {
   cursor: pointer;
 }
 
+/* 🔹 BLOCO 5: Visual de som */
 .wave-visual {
   width: 100%;
   height: 40px;
@@ -87,6 +92,7 @@ html {
   100% { background-position: 100px 0; }
 }
 
+/* 🔹 BLOCO 6: Botão de finalizar */
 .finish-btn {
   background: #4caf50;
   color: white;
