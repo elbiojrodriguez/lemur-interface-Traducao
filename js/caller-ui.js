@@ -11,7 +11,6 @@ window.onload = async () => {
   const rtcCore = new WebRTCCore();
   const myId = crypto.randomUUID().substr(0, 8);
   let localStream = null;
-  let targetId = null;
 
   document.getElementById('myId').textContent = myId;
 
@@ -26,17 +25,27 @@ window.onload = async () => {
       console.error("Erro ao acessar a câmera:", error);
     });
 
+  // ✅ Extrair dados do QR Code
   const urlParams = new URLSearchParams(window.location.search);
-  const targetIdFromUrl = urlParams.get('targetId');
+  const receiverId = urlParams.get('targetId') || '';
+  const receiverToken = urlParams.get('token') || '';
+  const receiverLang = urlParams.get('lang') || 'pt-BR';
 
-  if (targetIdFromUrl) {
-    targetId = targetIdFromUrl;
+  // ✅ Salvar para uso futuro (ex: Firebase)
+  window.receiverInfo = {
+    id: receiverId,
+    token: receiverToken,
+    lang: receiverLang
+  };
+
+  // ✅ Mostrar botão de chamada se tiver receiverId
+  if (receiverId) {
     document.getElementById('callActionBtn').style.display = 'block';
 
     document.getElementById('callActionBtn').onclick = () => {
       if (localStream) {
         const callerLang = navigator.language || 'pt-BR';
-        rtcCore.startCall(targetId, localStream, callerLang);
+        rtcCore.startCall(receiverId, localStream, callerLang);
       }
     };
   }
@@ -102,5 +111,26 @@ window.onload = async () => {
     }
   }
 
+  // ✅ Aplica bandeira do idioma do receiver
+  async function aplicarBandeiraRemota(langCode) {
+    try {
+      const response = await fetch('assets/bandeiras/language-flags.json');
+      const flags = await response.json();
+      const bandeira = flags[langCode] || flags[langCode.split('-')[0]] || '🔴';
+
+      const remoteLangElement = document.querySelector('.remoter-Lang');
+      if (remoteLangElement) {
+        remoteLangElement.textContent = bandeira;
+      }
+    } catch (error) {
+      console.error('Erro ao carregar bandeira remota:', error);
+      const remoteLangElement = document.querySelector('.remoter-Lang');
+      if (remoteLangElement) {
+        remoteLangElement.textContent = '🔴';
+      }
+    }
+  }
+
   aplicarBandeiraLocal(navegadorLang);
+  aplicarBandeiraRemota(receiverLang);
 };
