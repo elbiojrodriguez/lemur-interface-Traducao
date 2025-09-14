@@ -24,7 +24,7 @@ window.onload = async () => {
   const myId = fakeRandomUUID(fixedId).substr(0, 8);
 
   let localStream = null;
-  let callerLang = 'en'; // valor padrão
+  let callerLang = null;
 
   navigator.mediaDevices.getUserMedia({ video: true, audio: false })
     .then(stream => {
@@ -36,7 +36,7 @@ window.onload = async () => {
 
   const params = new URLSearchParams(window.location.search);
   const token = params.get('token') || '';
-  const lang = params.get('lang') || navigator.language || 'pt-BR'; // idioma do receiver
+  const lang = params.get('lang') || navigator.language || 'pt-BR';
 
   const callerUrl = `${window.location.origin}/caller.html?targetId=${myId}&token=${encodeURIComponent(token)}&lang=${encodeURIComponent(lang)}`;
   QRCodeGenerator.generate("qrcode", callerUrl);
@@ -52,7 +52,7 @@ window.onload = async () => {
       return;
     }
 
-    callerLang = receivedCallerLang || 'en';
+    callerLang = typeof receivedCallerLang === 'string' && receivedCallerLang.trim() !== '' ? receivedCallerLang : null;
 
     rtcCore.handleIncomingCall(offer, localStream, (remoteStream) => {
       remoteStream.getAudioTracks().forEach(track => track.enabled = false);
@@ -62,11 +62,12 @@ window.onload = async () => {
 
       localVideo.srcObject = remoteStream;
 
-      // ✅ Define idioma de destino para tradução
-      window.targetTranslationLang = callerLang;
-
-      // ✅ Aplica bandeira do caller
-      aplicarBandeiraRemota(callerLang);
+      if (callerLang) {
+        window.targetTranslationLang = callerLang;
+        aplicarBandeiraRemota(callerLang);
+      } else {
+        document.querySelector('.remoter-Lang').textContent = '🔴';
+      }
     });
   };
 
@@ -106,7 +107,6 @@ window.onload = async () => {
     }
   })();
 
-  // ✅ Aplica bandeira do receiver (local)
   async function aplicarBandeira(langCode) {
     try {
       const response = await fetch('assets/bandeiras/language-flags.json');
@@ -129,7 +129,6 @@ window.onload = async () => {
     }
   }
 
-  // ✅ Aplica bandeira do caller (remoto)
   async function aplicarBandeiraRemota(langCode) {
     try {
       const response = await fetch('assets/bandeiras/language-flags.json');
