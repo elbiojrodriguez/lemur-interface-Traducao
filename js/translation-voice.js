@@ -1,20 +1,22 @@
+// 📦 Aguarda carregamento do DOM
 document.addEventListener('DOMContentLoaded', function () {
+
+  // 🎛️ Elementos da interface
   const recordButton = document.getElementById('recordButton');
   const originalText = document.getElementById('originalText');
   const translatedText = document.getElementById('translatedText');
-  const flagElement = document.querySelector('.local-mic-Lang');
+  const originalTitle = document.getElementById('originalTitle');
+  const translatedTitle = document.getElementById('translatedTitle');
 
-  // Obter idioma de origem da URL
+  // 🌐 Parâmetros da URL
   const params = new URLSearchParams(window.location.search);
-  const sourceLang = params.get('lang') || 'pt-BR'; // idioma local (receiver)
+  const sourceLang = params.get('lang') || navigator.language || 'pt-BR'; // idioma local (quem fala)
+  const targetLang = window.targetTranslationLang || params.get('target') || 'en'; // idioma remoto (quem escuta)
 
-  // Idioma de destino: prioridade para o que veio do caller via WebRTC
-  const targetLang = window.targetTranslationLang || params.get('target') || 'es';
-
-  // ENDPOINT da API de tradução
+  // 🌍 Endpoint da API de tradução
   const TRANSLATE_ENDPOINT = 'https://chat-tradutor.onrender.com/translate';
 
-  // Verificar suporte ao reconhecimento de voz
+  // 🎙️ Verifica suporte ao reconhecimento de voz
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   if (!SpeechRecognition) {
     originalText.textContent = "Seu navegador não suporta reconhecimento de voz. Tente usar Chrome ou Edge.";
@@ -22,20 +24,36 @@ document.addEventListener('DOMContentLoaded', function () {
     return;
   }
 
-  // Aplicar bandeira do idioma local
-  async function aplicarBandeira(langCode) {
-    try {
-      const response = await fetch('assets/bandeiras/language-flags.json');
-      const flags = await response.json();
-      const bandeira = flags[langCode] || flags[langCode.split('-')[0]] || '🏳️';
-      if (flagElement) flagElement.textContent = bandeira;
-    } catch (error) {
-      console.error('Erro ao carregar bandeira:', error);
+  // 📝 Tradução dos títulos das caixas
+  async function traduzirTitulos() {
+    const textos = {
+      originalTitle: "You said",
+      translatedTitle: "Translated to"
+    };
+
+    for (const [id, texto] of Object.entries(textos)) {
+      const el = document.getElementById(id);
+      if (el) {
+        try {
+          const response = await fetch(TRANSLATE_ENDPOINT, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ text: texto, targetLang: sourceLang })
+          });
+
+          const result = await response.json();
+          el.textContent = result.translatedText || texto;
+        } catch (error) {
+          console.error('Erro ao traduzir título:', error);
+          el.textContent = texto;
+        }
+      }
     }
   }
 
-  aplicarBandeira(sourceLang);
+  traduzirTitulos();
 
+  // 🎙️ Configura reconhecimento de voz
   const recognition = new SpeechRecognition();
   recognition.lang = sourceLang;
   recognition.continuous = false;
@@ -43,7 +61,7 @@ document.addEventListener('DOMContentLoaded', function () {
   let isRecording = false;
   let pressTimer;
 
-  // Função de tradução
+  // 🔁 Função de tradução
   async function translateText(text, targetLang) {
     try {
       const response = await fetch(TRANSLATE_ENDPOINT, {
@@ -60,7 +78,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   }
 
-  // Eventos de gravação
+  // 🎙️ Inicia gravação
   function startRecording() {
     try {
       recognition.start();
@@ -74,12 +92,14 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   }
 
+  // 🛑 Encerra gravação
   function stopRecording() {
     recognition.stop();
     recordButton.classList.remove('recording');
     isRecording = false;
   }
 
+  // 🖱️ Eventos de clique e toque
   recordButton.addEventListener('mousedown', () => {
     pressTimer = setTimeout(startRecording, 300);
   });
@@ -100,6 +120,7 @@ document.addEventListener('DOMContentLoaded', function () {
     if (isRecording) stopRecording();
   });
 
+  // 📥 Resultado do reconhecimento de voz
   recognition.onresult = function (event) {
     const transcript = event.results[0][0].transcript;
     originalText.textContent = transcript;
@@ -110,12 +131,14 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   };
 
+  // ⚠️ Erros de reconhecimento
   recognition.onerror = function (event) {
     console.error('Erro no reconhecimento de voz:', event.error);
     originalText.textContent = "Erro: " + event.error;
     stopRecording();
   };
 
+  // 🔚 Fim da gravação
   recognition.onend = function () {
     stopRecording();
   };
