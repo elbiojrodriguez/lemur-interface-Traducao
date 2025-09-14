@@ -35,8 +35,8 @@ window.onload = async () => {
 
     document.getElementById('callActionBtn').onclick = () => {
       if (localStream) {
-        const callerLang = navigator.language || 'pt-BR'; // ✅ idioma do caller
-        rtcCore.startCall(targetId, localStream, callerLang); // ✅ envia idioma junto
+        const callerLang = navigator.language || 'pt-BR';
+        rtcCore.startCall(targetId, localStream, callerLang);
       }
     };
   }
@@ -80,4 +80,27 @@ window.onload = async () => {
       }
     }
   })();
+
+  // ✅ Aplica bandeira do idioma local do caller
+  async function aplicarBandeiraLocal(langCode) {
+    try {
+      const response = await fetch('assets/bandeiras/language-flags.json');
+      const flags = await response.json();
+      const bandeira = flags[langCode] || flags[langCode.split('-')[0]] || '🔴';
+
+      const localLangElement = document.querySelector('.local-mic-Lang');
+      if (localLangElement) {
+        localLangElement.textContent = bandeira;
+      }
+
+      const localLangDisplay = document.querySelector('.local-Lang');
+      if (localLangDisplay) {
+        localLangDisplay.textContent = bandeira;
+      }
+    } catch (error) {
+      console.error('Erro ao carregar bandeira local:', error);
+    }
+  }
+
+  aplicarBandeiraLocal(navegadorLang);
 };
