@@ -326,8 +326,8 @@ body {
 
 .btn-label {
   position: absolute;
-  top: 58%;         /* ajusta verticalmente */
-  left: 70%;        /* ajusta horizontalmente */
+  top: 60%;         /* ajusta verticalmente */
+  left: 65%;        /* ajusta horizontalmente */
   transform: translate(-50%, -50%);
   font-size: 1rem;
   font-weight: 500;
