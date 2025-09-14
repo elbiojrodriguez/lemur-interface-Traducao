@@ -88,7 +88,7 @@ body {
 /* ===== CIRCULO DA BANDEIRA ===== */
 .local-mic-Lang {
   position: absolute;
-  top: 69%;
+  top: 50%;
   left: 73%;
   width: 20%;
   aspect-ratio: 1 / 1;
@@ -111,7 +111,7 @@ body {
 /* microfone sobreposto */
 .local-mic {
   position: absolute;
-  top: 69%;
+  top: 50%;
   left: 73%;
   width: 20%;
   aspect-ratio: 1 / 1;
