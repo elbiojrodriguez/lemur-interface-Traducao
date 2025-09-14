@@ -182,7 +182,7 @@ body {
   width: 100%;
   z-index: 30;
   text-align: center;
-  background: transparent;
+  background-color: rgba(0, 0, 0, 0.05); /* preto com 5% de opacidade */
 }
 
 .qrcode-container {
