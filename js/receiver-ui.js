@@ -36,7 +36,7 @@ window.onload = async () => {
 
   const params = new URLSearchParams(window.location.search);
   const token = params.get('token') || '';
-  const lang = params.get('lang') || 'pt-BR'; // idioma do receiver
+  const lang = params.get('lang') || navigator.language || 'pt-BR'; // idioma do receiver
 
   const callerUrl = `${window.location.origin}/caller.html?targetId=${myId}&token=${encodeURIComponent(token)}&lang=${encodeURIComponent(lang)}`;
   QRCodeGenerator.generate("qrcode", callerUrl);
@@ -74,7 +74,7 @@ window.onload = async () => {
 
   async function translateText(text, targetLang) {
     try {
-      if (targetLang === lang) return text;
+      if (targetLang === 'en') return text;
 
       const response = await fetch(TRANSLATE_ENDPOINT, {
         method: 'POST',
@@ -144,6 +144,10 @@ window.onload = async () => {
 
     } catch (error) {
       console.error('Erro ao carregar bandeira remota:', error);
+      const remoteLangElement = document.querySelector('.remoter-Lang');
+      if (remoteLangElement) {
+        remoteLangElement.textContent = '🔴';
+      }
     }
   }
 
