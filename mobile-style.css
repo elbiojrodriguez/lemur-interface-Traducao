@@ -314,9 +314,9 @@ body {
   color: white;
   border: none;
   border-radius: 50%;
-  width: 80px;
-  height: 80px;
-  font-size: 3rem;
+  width: 60px;
+  height: 60px;
+  font-size: 2rem;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -326,8 +326,8 @@ body {
 
 .btn-label {
   position: absolute;
-  top: 56%;         /* ajusta verticalmente */
-  left: 72%;        /* ajusta horizontalmente */
+  top: 58%;         /* ajusta verticalmente */
+  left: 70%;        /* ajusta horizontalmente */
   transform: translate(-50%, -50%);
   font-size: 1rem;
   font-weight: 500;
