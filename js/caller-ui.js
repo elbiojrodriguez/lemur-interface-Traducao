@@ -46,4 +46,38 @@ window.onload = async () => {
     const remoteVideo = document.getElementById('remoteVideo');
     remoteVideo.srcObject = stream;
   });
+
+  // ✅ Tradução automática da frase com base no idioma do navegador
+  const TRANSLATE_ENDPOINT = 'https://chat-tradutor.onrender.com/translate';
+  const navegadorLang = navigator.language || 'pt-BR';
+
+  const frasesParaTraduzir = {
+    "translator-label": "Live translation. No filters. No platform."
+  };
+
+  async function translateText(text, targetLang) {
+    try {
+      const response = await fetch(TRANSLATE_ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text, targetLang })
+      });
+
+      const result = await response.json();
+      return result.translatedText || text;
+    } catch (error) {
+      console.error('Erro na tradução:', error);
+      return text;
+    }
+  }
+
+  (async () => {
+    for (const [id, texto] of Object.entries(frasesParaTraduzir)) {
+      const el = document.getElementById(id);
+      if (el) {
+        const traduzido = await translateText(texto, navegadorLang);
+        el.textContent = traduzido;
+      }
+    }
+  })();
 };
