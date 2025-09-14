@@ -300,6 +300,7 @@ body {
 }
 
 /* === 🎙️ Botão de gravação === */
+/* === 🎙️ Botão de gravação === */
 .record-btn {
   position: absolute;
   top: 48%;
@@ -316,25 +317,21 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
   box-shadow: 0 4px 10px rgba(255, 87, 34, 0.4);
   transition: all 0.3s ease;
 }
 
-.record-btn:hover {
-  transform: scale(1.05);
-  box-shadow: 0 6px 15px rgba(255, 87, 34, 0.5);
-}
-
-.record-btn.recording {
-  background: #f44336;
-  animation: pulse 1.5s infinite;
-}
-
-@keyframes pulse {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.1); }
-  100% { transform: scale(1); }
+/* === 🏷️ Frase abaixo do botão === */
+.btn-label {
+  position: absolute;
+  top: 58%;                   /* mais abaixo do botão */
+  left: 80%;                  /* alinhado com o botão */
+  transform: translate(-50%, -50%);
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: black;
+  white-space: nowrap;        /* impede quebra de linha */
+  z-index: 10;
 }
 
 /* === 🏷️ Rótulo do botão === */
