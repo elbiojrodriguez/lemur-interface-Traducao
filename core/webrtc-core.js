@@ -15,7 +15,8 @@ class WebRTCCore {
     this.socket.emit('register', userId);
   }
 
-  startCall(targetId, stream) {
+  // ✅ Agora aceita callerLang como terceiro parâmetro
+  startCall(targetId, stream, callerLang) {
     this.localStream = stream;
     this.peer = new RTCPeerConnection({ iceServers: this.iceServers });
 
@@ -43,7 +44,8 @@ class WebRTCCore {
       .then(() => {
         this.socket.emit('call', {
           to: targetId,
-          offer: this.peer.localDescription
+          offer: this.peer.localDescription,
+          callerLang // 👈 idioma incluído na chamada
         });
       });
   }
@@ -92,10 +94,11 @@ class WebRTCCore {
       }
     });
 
+    // ✅ Agora recebe callerLang junto com a oferta
     this.socket.on('incomingCall', data => {
       this.currentCaller = data.from;
       if (this.onIncomingCall) {
-        this.onIncomingCall(data.offer);
+        this.onIncomingCall(data.offer, data.callerLang); // 👈 idioma passado ao receiver
       }
     });
   }
