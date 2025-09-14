@@ -10,9 +10,9 @@ document.addEventListener('DOMContentLoaded', function () {
   const finishRecording = document.getElementById('finishRecording');
   const langFlag = document.getElementById('langFlag');
 
-  const params = new URLSearchParams(window.location.search);
-  const defaultLang = params.get('lang') || navigator.language || 'pt-BR';
-  const targetLang = window.targetTranslationLang || params.get('target') || 'en';
+  // 🔧 Idioma fixo: português brasileiro
+  const defaultLang = 'pt-BR';
+  const targetLang = 'en'; // idioma da tradução
   let selectedLanguage = defaultLang;
 
   const TRANSLATE_ENDPOINT = 'https://chat-tradutor.onrender.com/translate';
@@ -29,7 +29,6 @@ document.addEventListener('DOMContentLoaded', function () {
   recognition.continuous = false;
 
   let isRecording = false;
-  let pressTimer;
 
   async function translateText(text, targetLang) {
     try {
@@ -51,7 +50,6 @@ document.addEventListener('DOMContentLoaded', function () {
       recognition.lang = selectedLanguage;
       recognition.start();
       recordButton.classList.add('recording');
-      isRecording = true;
       originalText.textContent = "Ouvindo...";
       translatedText.textContent = "Aguardando para traduzir...";
     } catch (error) {
@@ -85,39 +83,23 @@ document.addEventListener('DOMContentLoaded', function () {
     stopRecording();
   };
 
-  recordButton.addEventListener('mousedown', () => {
-    pressTimer = setTimeout(startRecording, 300);
-  });
-
-  recordButton.addEventListener('mouseup', () => {
-    clearTimeout(pressTimer);
-    if (isRecording) stopRecording();
-  });
-
-  recordButton.addEventListener('touchstart', (e) => {
-    e.preventDefault();
-    pressTimer = setTimeout(startRecording, 300);
-  });
-
-  recordButton.addEventListener('touchend', (e) => {
-    e.preventDefault();
-    clearTimeout(pressTimer);
-    if (isRecording) stopRecording();
-  });
-
+  // 🖱️ Clique simples → abre janela
   recordButton.addEventListener('click', () => {
     voicePopup.style.display = 'block';
   });
 
+  // ➤ Finalizar gravação pela janela
   finishRecording.addEventListener('click', () => {
     voicePopup.style.display = 'none';
     startRecording();
   });
 
+  // 🌐 Alterna exibição da lista de idiomas
   languageToggle.addEventListener('click', () => {
     languageList.style.display = languageList.style.display === 'flex' ? 'none' : 'flex';
   });
 
+  // 🌍 Seleciona idioma
   languageList.querySelectorAll('button').forEach(btn => {
     btn.addEventListener('click', () => {
       selectedLanguage = btn.dataset.lang;
