@@ -316,7 +316,7 @@ body {
   border-radius: 50%;
   width: 50px;
   height: 50px;
-  font-size: 1rem;
+  font-size: 3rem;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -325,11 +325,16 @@ body {
 }
 
 .btn-label {
-  margin-top: 6px;
-  font-size: 1.2rem;
+  position: absolute;
+  top: 58%;         /* ajusta verticalmente */
+  left: 73%;        /* ajusta horizontalmente */
+  transform: translate(-50%, -50%);
+  font-size: 1rem;
   font-weight: 500;
   color: black;
   white-space: nowrap;
+  z-index: 10;
 }
+
 
 /* === 📱 Responsividade === */
