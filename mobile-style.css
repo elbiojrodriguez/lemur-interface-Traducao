@@ -302,10 +302,10 @@ body {
 /* === 🎙️ Botão de gravação === */
 .record-btn {
   position: absolute;
-  top: 45%;
-  left: 35%;
+  top: 50%;
+  left: 15%;
   transform: translate(-50%, -50%);
-  z-index: 1000;
+  z-index: 10;
   background: #ff5722;
   color: white;
   border: none;
