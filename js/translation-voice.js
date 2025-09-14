@@ -1,17 +1,22 @@
-// 📦 Aguarda carregamento do DOM
 document.addEventListener('DOMContentLoaded', function () {
-
   // 🎛️ Elementos da interface
   const recordButton = document.getElementById('recordButton');
   const originalText = document.getElementById('originalText');
   const translatedText = document.getElementById('translatedText');
   const originalTitle = document.getElementById('originalTitle');
   const translatedTitle = document.getElementById('translatedTitle');
+  const voicePopup = document.getElementById('voicePopup');
+  const languageToggle = document.getElementById('languageToggle');
+  const languageList = document.getElementById('languageList');
+  const finishRecording = document.getElementById('finishRecording');
+  const langFlag = document.getElementById('langFlag');
 
   // 🌐 Parâmetros da URL
   const params = new URLSearchParams(window.location.search);
-  const sourceLang = params.get('lang') || navigator.language || 'pt-BR'; // idioma local (quem fala)
-  const targetLang = window.targetTranslationLang || params.get('target') || 'en'; // idioma remoto (quem escuta)
+  const defaultLang = params.get('lang') || navigator.language || 'pt-BR';
+  const targetLang = window.targetTranslationLang || params.get('target') || 'en';
+
+  let selectedLanguage = defaultLang;
 
   // 🌍 Endpoint da API de tradução
   const TRANSLATE_ENDPOINT = 'https://chat-tradutor.onrender.com/translate';
@@ -38,7 +43,7 @@ document.addEventListener('DOMContentLoaded', function () {
           const response = await fetch(TRANSLATE_ENDPOINT, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ text: texto, targetLang: sourceLang })
+            body: JSON.stringify({ text: texto, targetLang: selectedLanguage })
           });
 
           const result = await response.json();
@@ -55,7 +60,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // 🎙️ Configura reconhecimento de voz
   const recognition = new SpeechRecognition();
-  recognition.lang = sourceLang;
+  recognition.lang = selectedLanguage;
   recognition.continuous = false;
 
   let isRecording = false;
@@ -81,6 +86,7 @@ document.addEventListener('DOMContentLoaded', function () {
   // 🎙️ Inicia gravação
   function startRecording() {
     try {
+      recognition.lang = selectedLanguage;
       recognition.start();
       recordButton.classList.add('recording');
       isRecording = true;
@@ -99,7 +105,28 @@ document.addEventListener('DOMContentLoaded', function () {
     isRecording = false;
   }
 
-  // 🖱️ Eventos de clique e toque
+  // 📥 Resultado do reconhecimento de voz
+  recognition.onresult = function (event) {
+    const transcript = event.results[0][0].transcript;
+    originalText.textContent = transcript;
+    translatedText.textContent = "Traduzindo...";
+
+    translateText(transcript, targetLang).then(translation => {
+      translatedText.textContent = translation;
+    });
+  };
+
+  recognition.onerror = function (event) {
+    console.error('Erro no reconhecimento de voz:', event.error);
+    originalText.textContent = "Erro: " + event.error;
+    stopRecording();
+  };
+
+  recognition.onend = function () {
+    stopRecording();
+  };
+
+  // 🖱️ Pressionar para gravar
   recordButton.addEventListener('mousedown', () => {
     pressTimer = setTimeout(startRecording, 300);
   });
@@ -120,26 +147,29 @@ document.addEventListener('DOMContentLoaded', function () {
     if (isRecording) stopRecording();
   });
 
-  // 📥 Resultado do reconhecimento de voz
-  recognition.onresult = function (event) {
-    const transcript = event.results[0][0].transcript;
-    originalText.textContent = transcript;
-    translatedText.textContent = "Traduzindo...";
+  // 🖱️ Clique simples → abre janela interativa
+  recordButton.addEventListener('click', () => {
+    voicePopup.style.display = 'block';
+  });
 
-    translateText(transcript, targetLang).then(translation => {
-      translatedText.textContent = translation;
+  // ➤ Finalizar gravação pela janela
+  finishRecording.addEventListener('click', () => {
+    voicePopup.style.display = 'none';
+    startRecording();
+  });
+
+  // 🌐 Alterna exibição da lista de idiomas
+  languageToggle.addEventListener('click', () => {
+    languageList.style.display = languageList.style.display === 'flex' ? 'none' : 'flex';
+  });
+
+  // 🌍 Seleciona idioma
+  languageList.querySelectorAll('button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      selectedLanguage = btn.dataset.lang;
+      recognition.lang = selectedLanguage;
+      langFlag.textContent = btn.textContent.split(' ')[0];
+      languageList.style.display = 'none';
     });
-  };
-
-  // ⚠️ Erros de reconhecimento
-  recognition.onerror = function (event) {
-    console.error('Erro no reconhecimento de voz:', event.error);
-    originalText.textContent = "Erro: " + event.error;
-    stopRecording();
-  };
-
-  // 🔚 Fim da gravação
-  recognition.onend = function () {
-    stopRecording();
-  };
+  });
 });
