@@ -8,38 +8,28 @@
 </head>
 <body>
 
-<div class="record-container" style="position: relative;">
-  <button class="record-btn" id="recordButton">🎤 <span id="langFlag">🇧🇷</span></button>
-  <button class="language-btn" id="languageToggle">🌐</button>
-  <div class="language-list" id="languageList">
-    <button data-lang="pt-BR">🇧🇷</button>
-    <button data-lang="en">🇺🇸</button>
-    <button data-lang="de">🇩🇪</button>
-    <button data-lang="es">🇪🇸</button>
-    <button data-lang="fr">🇫🇷</button>
-    <button data-lang="it">🇮🇹</button>
-    <button data-lang="ja">🇯🇵</button>
-  </div>
-</div>
-
-  <!-- 🔹 BLOCO 3: Janela flutuante que aparece durante a gravação -->
-  <div class="voice-popup" id="voicePopup">
-    <div class="wave-visual"></div>
-    <p class="recording-label">🎙️ Gravando...</p>
-    <button class="finish-btn" id="finishRecording">✅ Finalizar</button>
-  </div>
-
-  <!-- 🔹 BLOCO 4: Área de texto com o que foi falado e a tradução -->
-  <div class="translation-box">
-    <div class="text-display bloco-portugues">
-      <h3 id="originalTitle">Texto reconhecido</h3>
-      <div id="originalText" class="text-content">Aguardando entrada de voz...</div>
+<!-- ✅ SISTEMA DE TRADUÇÃO POR VOZ (ADICIONADO) -->
+        <div class="translation-section">
+            <h2>Tradução por Voz</h2>
+            
+            <div class="translation-box">
+                <div class="text-display">
+                    <h3>Texto em Português</h3>
+                    <div id="originalText" class="text-content">Aguardando entrada de voz...</div>
+                </div>
+                
+                <div class="text-display">
+                    <h3>Tradução em Inglês</h3>
+                    <div id="translatedText" class="text-content">A tradução aparecerá aqui</div>
+                </div>
+            </div>
+            
+            <div class="record-btn" id="recordButton">
+                🎤
+            </div>
+            <p class="btn-label">Pressione e segure para falar</p>
+        </div>
     </div>
-    <div class="text-display bloco-ingles">
-      <h3 id="translatedTitle">Tradução</h3>
-      <div id="translatedText" class="text-content">A tradução aparecerá aqui</div>
-    </div>
-  </div>
 
   <!-- 🔹 BLOCO 5: Elementos visuais do seu projeto Lemur -->
   <div class="box-principal">
