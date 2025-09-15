@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Lemur-EchoMeP2P-Caller</title>
   <link rel="stylesheet" href="mobile-style.css" />
+  <!-- Adicione este link para o CSS da tradução -->
+    <link rel="stylesheet" href="translation-style.css" />
 </head>
 <body>
 
@@ -46,25 +48,30 @@
       <button id="callActionBtn" style="display: none;">SEND 🚀</button>
     </div>
   </div>
-!-- ✅ SISTEMA DE TRADUÇÃO POR VOZ (ADICIONADO) -->
-<div class="translation-box">
-  <div class="text-display bloco-portugues">
-    <h3>Texto em Português</h3>
-    <div id="originalText" class="text-content">Aguardando entrada de voz...</div>
-  </div>
-
-  <div class="text-display bloco-ingles">
-    <h3>Tradução em Inglês</h3>
-    <div id="translatedText" class="text-content">A tradução aparecerá aqui</div>
-  </div>
-</div>
-
-<!-- 🎙️ Botão de gravação e rótulo agrupados -->
-<div class="record-container">
-  <div class="record-btn" id="recordButton">🎤</div>
-  <p class="btn-label">Hold to talk</p>
-</div>
-
+  
+<!-- ✅ SISTEMA DE TRADUÇÃO POR VOZ (ADICIONADO) -->
+        <div class="translation-section">
+            <h2>Tradução por Voz</h2>
+            
+            <div class="translation-box">
+                <div class="text-display">
+                    <h3>Texto em Português</h3>
+                    <div id="originalText" class="text-content">Aguardando entrada de voz...</div>
+                </div>
+                
+                <div class="text-display">
+                    <h3>Tradução em Inglês</h3>
+                    <div id="translatedText" class="text-content">A tradução aparecerá aqui</div>
+                </div>
+            </div>
+            
+            <div class="record-btn" id="recordButton">
+                🎤
+            </div>
+            <p class="btn-label">Pressione e segure para falar</p>
+        </div>
+    </div>
+  
   <!-- 🔹 BLOCO 6: Scripts do sistema -->
   <script src="https://lemur-signal.onrender.com/socket.io/socket.io.js"></script>
   <script type="module" src="js/caller-ui.js"></script>
