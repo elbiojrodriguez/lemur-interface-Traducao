@@ -143,13 +143,16 @@ body {
 /* ===== OVERLAY DE QR CODE ===== */
 .info-overlay {
   position: absolute;
-  top: 22%;
-  left: 10%; /* centraliza com 10% de margem dos lados */
-  width: 80%; /* reduz de 100% para 80% da largura da tela */
+  top: 10%;               /* distância do topo */
+  left: 50%;              /* posiciona no centro horizontal */
+  transform: translateX(-50%); /* centraliza horizontalmente */
+  width: 80%;             /* ocupa 80% da largura da tela */
+  background-color: white; /* fundo branco */
+  border-radius: 20px;    /* cantos arredondados */
+  padding: 2% 3%;         /* espaçamento interno */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* sombra suave */
   z-index: 30;
   text-align: center;
-  background-color: transparent; /* remove o cinza claro do fundo */
-  border-radius: 16px; /* cantos arredondados */
 }
 
 /* Mantém o container interno com fundo branco e sombra */
