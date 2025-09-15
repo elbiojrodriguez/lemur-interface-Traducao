@@ -103,26 +103,6 @@ body {
   z-index: 0; /* Fica atrás de tudo */
 }
 
-.bandeira-circulo img {
-  width: 100%;
-  height: auto;
-  object-fit: cover;
-}
-/* microfone sobreposto */
-.local-mic {
-  position: absolute;
-  top: 50%;
-  left: 73%;
-  width: 20%;
-  aspect-ratio: 1 / 1;
-  font-size: 14vw;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1;
-  pointer-events: none; /* evita que o microfone bloqueie cliques na bandeira */
-}
-
 .remoter-Lang {
   position: absolute;
   top: 31%;
@@ -132,11 +112,6 @@ body {
   z-index: 10;
 }
 
-.bandeira-circulo img {
-  width: 100%;
-  height: auto;
-  object-fit: cover;
-}
 .local-Lang {
   position: absolute;
   top: 31%;
@@ -144,12 +119,6 @@ body {
   font-size: 6vw;       /* controla o tamanho do emoji */
   line-height: 1;
   z-index: 10;
-}
-
-.bandeira-circulo img {
-  width: 100%;
-  height: auto;
-  object-fit: cover;
 }
 
 /* ===== CONTROLES ===== */
@@ -221,86 +190,4 @@ body {
 .info-overlay.hidden {
   opacity: 0;
   pointer-events: none;
-}
-
-/* === 🗣️ Bloco de texto em português === */
-.bloco-portugues {
-  position: absolute;
-  bottom: 5%;
-  left: 50%;                      /* centraliza horizontalmente */
-  transform: translateX(-50%);    /* ajusta para o centro real */
-  width: 80%;                     /* limite máximo de largura */
-  height: auto;                   /* altura automática conforme conteúdo */
-  padding: 10px;
-  background-color: white;
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-  border: 3px solid #2196f3;
-  z-index: 10;
-}
-
-
-/* === 🌍 Bloco de texto em inglês === */
-.bloco-ingles {
-  position: absolute;
-  bottom: 20%;
-  left: 50%;                      /* centraliza horizontalmente */
-  transform: translateX(-50%);    /* ajusta para o centro real */
-  width: 78%;                     /* limite máximo de largura */
-  height: auto;                   /* altura automática conforme conteúdo */
-  padding: 10px;
-  background-color: white;
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-  border: 3px solid #2196f3;
-  z-index: 10;
-}
-
-/* === 📝 Estilo interno dos blocos === */
-.text-display h3 {
-  color: #5c6bc0;
-  margin-bottom: 6px;
-  font-size: 0.9rem;
-}
-
-.text-content {
-  font-size: 0.95rem;
-  color: #333;
-  min-height: 20px;
-}
-
-/* === 🎙️ Botão de gravação === */
-.record-container {
-  position: absolute;
-  top: 49%;
-  left: 75%;
-  transform: translate(-50%, -50%);
-  text-align: center;
-  z-index: 10;
-}
-
-.record-btn {
-  background: #ff5722;
-  color: white;
-  border: none;
-  border-radius: 50%;
-  width: 60px;
-  height: 60px;
-  font-size: 2rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto; /* garante centralização */
-  box-shadow: 0 4px 10px rgba(255, 87, 34, 0.4);
-  transition: all 0.3s ease;
-}
-
-.btn-label {
-  margin-top: 8px;           /* espaço abaixo do botão */
-  font-size: 1rem;
-  font-weight: 500;
-  color: black;
-  white-space: nowrap;
 }
