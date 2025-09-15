@@ -88,7 +88,7 @@ body {
 /* ===== CIRCULO DA BANDEIRA ===== */
 .local-mic-Lang {
   position: absolute;
-  top: 69%;
+  top: 50%;
   left: 73%;
   width: 20%;
   aspect-ratio: 1 / 1;
@@ -111,7 +111,7 @@ body {
 /* microfone sobreposto */
 .local-mic {
   position: absolute;
-  top: 69%;
+  top: 50%;
   left: 73%;
   width: 20%;
   aspect-ratio: 1 / 1;
@@ -222,34 +222,6 @@ body {
   opacity: 0;
   pointer-events: none;
 }
-/* 🎯 Estilo para TEXTO TEMPORÁRIO (enquanto está falando) */
-.phrase-box.interim-box {
-    background-color: rgba(250, 250, 210, 0.9); /* Amarelo bem suave */
-    color: #666;
-    border-left: 3px solid #ffcc00;
-    animation: fadeIn 0.3s ease-out;
-}
-
-/* ✅ Estilo para TEXTO FINALIZADO */
-.phrase-box {
-    background-color: rgba(240, 240, 240, 0.9); /* Cinza bem suave */
-    padding: 10px 15px;
-    border-radius: 18px;
-    margin: 5px 0;
-    animation: fadeIn 0.3s ease-out;
-}
-
-/* 🔴 Feedback visual para microfone ativo */
-.lang-bubble.listening {
-    background-color: #ff4d4d;
-    animation: listeningPulse 1s infinite;
-}
-
-@keyframes listeningPulse {
-    0% { box-shadow: 0 0 0 0 rgba(255, 77, 77, 0.7); }
-    70% { box-shadow: 0 0 0 15px rgba(255, 77, 77, 0); }
-    100% { box-shadow: 0 0 0 0 rgba(255, 77, 77, 0); }
-}
 
 /* === 🗣️ Bloco de texto em português === */
 .bloco-portugues {
@@ -332,7 +304,3 @@ body {
   color: black;
   white-space: nowrap;
 }
-
-
-
-/* === 📱 Responsividade === */
