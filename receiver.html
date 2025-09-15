@@ -9,12 +9,12 @@
     <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
 </head>
 <body>
+    
     <div class="box-principal">
         <!-- círculo com a bandeira -->
         <!-- Local -->
          <div class="local-mic-Lang">🏳️</div>
-         <div class="local-mic">🎤</div>
-        
+                 
         <!-- Logo --> 
         <img src="assets/images/Lemur2P2.png" alt="Lemur Logo" class="logo">
         <img src="assets/images/Bridg.png" alt="ponte" class="ponte">
@@ -23,13 +23,9 @@
         <div class="translator-label" id="translator-label">
             Live translation. No filters. No platform.
         </div>
-            
-        <!-- círculo com a bandeira -->
-        <!-- Local -->
-       
-
-        <!-- Remoto & Local -->
-        <div class="remoter-Lang">🇺🇾</div>
+           
+       <!-- Remoto & Local -->
+        <div class="remoter-Lang">🏳️</div>
         <div class="local-Lang">🏳️</div>
 
         <!-- 🎥 Vídeo remoto -->
@@ -50,26 +46,7 @@
                 You can ask to scan, share or print on your business card.
             </p>
         </div>
-        
-          <!-- ✅ SISTEMA DE TRADUÇÃO POR VOZ (ADICIONADO) -->
-<div class="translation-box">
-  <div class="text-display bloco-portugues">
-    <h3>Texto em Português</h3>
-    <div id="originalText" class="text-content">Aguardando entrada de voz...</div>
-  </div>
-
-  <div class="text-display bloco-ingles">
-    <h3>Tradução em Inglês</h3>
-    <div id="translatedText" class="text-content">A tradução aparecerá aqui</div>
-  </div>
-</div>
-
-<!-- 🎙️ Botão de gravação e rótulo agrupados -->
-<div class="record-container">
-  <div class="record-btn" id="recordButton">🎤</div>
-  <p class="btn-label">Hold to talk</p>
-</div>
-      
+             
     <!-- 🔌 Scripts -->
     <script src="https://lemur-signal.onrender.com/socket.io/socket.io.js"></script>
     <script type="module" src="js/receiver-ui.js"></script>
