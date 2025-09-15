@@ -91,16 +91,13 @@ body {
   top: 50%;
   left: 73%;
   width: 20%;
-  aspect-ratio: 1 / 1;
-  border-radius: 50%;
-  background-color: white;
   font-size: 12vw;
   line-height: 1;
   text-align: center;
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 0; /* Fica atrás de tudo */
+  z-index: 10; /* Fica atrás de tudo */
 }
 
 .remoter-Lang {
