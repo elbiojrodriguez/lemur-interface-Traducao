@@ -143,7 +143,7 @@ body {
 /* ===== OVERLAY DE QR CODE ===== */
 .info-overlay {
   position: absolute;
-  top: 25%;               /* distância do topo */
+  top: 23%;               /* distância do topo */
   left: 50%;              /* posiciona no centro horizontal */
   transform: translateX(-50%); /* centraliza horizontalmente */
   width: 80%;             /* ocupa 80% da largura da tela */
