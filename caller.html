@@ -1,76 +1,81 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Lemur-EchoMeP2P-Caller</title>
-  <link rel="stylesheet" href="mobile-style.css" />
-  <link rel="stylesheet" href="translation-style.css" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lemur-EchoMeP2P-Receiver</title>
+    <link rel="stylesheet" href="mobile-style.css" />
+    <!-- Adicione este link para o CSS da tradução -->
+    <link rel="stylesheet" href="translation-style.css" />
+   
+    <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
 </head>
 <body>
-
-  <div class="box-principal">
-
-    <!-- círculo com a bandeira -->
-    <div class="local-mic-Lang">🏳️</div>
-    <div class="local-mic">🎤</div>
-
-    <!-- Logo -->
-    <img src="assets/images/Lemur2P2.png" alt="Lemur Logo" class="logo">
-    <img src="assets/images/Bridg.png" alt="ponte" class="ponte">
-
-    <!-- Sub Titulo -->
-    <div class="translator-label" id="translator-label">
-      Live translation. No filters. No platform.
-    </div>
-
-    <!-- Remoto & Local -->
-    <div class="remoter-Lang">🇺🇾</div>
-    <div class="local-Lang">🏳️</div>
-
-    <!-- 🎥 Vídeo remoto -->
-    <div class="video-wrapper">
-      <video id="remoteVideo" autoplay playsinline></video>
-    </div>
-
-    <!-- 🎥 Vídeo local (mutado) -->
-    <div class="video-wrapper">
-      <video id="localVideo" autoplay muted playsinline></video>
-    </div>
-
-    <div class="info-overlay" style="opacity: 0; position: absolute; pointer-events: none;">
-      <span id="myId"></span>
-    </div>
-
-    <div class="controls">
-      <button id="callActionBtn" style="display: none;">SEND 🚀</button>
-    </div>
-
-    <!-- ✅ SISTEMA DE TRADUÇÃO POR VOZ (ADICIONADO) -->
-    <div class="translation-section">
-      <h2>Tradução por Voz</h2>
-
-      <div class="translation-box">
-        <div class="text-display">
-          <h3>Texto em Português</h3>
-          <div id="originalText" class="text-content">Aguardando entrada de voz...</div>
+    <div class="box-principal">
+        <!-- círculo com a bandeira -->
+        <!-- Local -->
+        <div class="local-mic-Lang">🏳️</div>
+        <div class="local-mic">🎤</div>
+        
+        <!-- Logo --> 
+        <img src="assets/images/Lemur2P2.png" alt="Lemur Logo" class="logo">
+        <img src="assets/images/Bridg.png" alt="ponte" class="ponte">
+        
+        <!-- Sub Titulo --> 
+        <div class="translator-label" id="translator-label">
+            Live translation. No filters. No platform.
         </div>
 
-        <div class="text-display">
-          <h3>Tradução em Inglês</h3>
-          <div id="translatedText" class="text-content">A tradução aparecerá aqui</div>
+        <!-- Remoto & Local -->
+        <div class="remoter-Lang">🇺🇾</div>
+        <div class="local-Lang">🏳️</div>
+
+        <!-- 🎥 Vídeo remoto -->
+        <div class="video-wrapper">
+            <video id="remoteVideo" autoplay playsinline></video>
         </div>
-      </div>
 
-      <div class="record-btn" id="recordButton">🎤</div>
-      <p class="btn-label">Pressione e segure para falar</p>
+        <!-- 🎥 Vídeo local (mutado) -->
+        <div class="video-wrapper">
+            <video id="localVideo" autoplay muted playsinline></video>
+        </div>
+
+        <!-- 🧾 Overlay com QR Code -->
+        <div class="info-overlay"> 
+            <h2 id="qr-modal-title">This is your online key</h2>
+            <div id="qrcode" class="qrcode-container"></div>
+            <p class="qr-modal-description" id="qr-modal-description">
+                You can ask to scan, share or print on your business card.
+            </p>
+        </div>
+        
+        <!-- ✅ SISTEMA DE TRADUÇÃO POR VOZ (ADICIONADO) -->
+        <div class="translation-section">
+            <h2>Tradução por Voz</h2>
+            
+            <div class="translation-box">
+                <div class="text-display">
+                    <h3>Texto em Português</h3>
+                    <div id="originalText" class="text-content">Aguardando entrada de voz...</div>
+                </div>
+                
+                <div class="text-display">
+                    <h3>Tradução em Inglês</h3>
+                    <div id="translatedText" class="text-content">A tradução aparecerá aqui</div>
+                </div>
+            </div>
+            
+            <div class="record-btn" id="recordButton">
+                🎤
+            </div>
+            <p class="btn-label">Pressione e segure para falar</p>
+        </div>
     </div>
-
-  </div>
-
-  <!-- 🔹 BLOCO 6: Scripts do sistema -->
-  <script src="https://lemur-signal.onrender.com/socket.io/socket.io.js"></script>
-  <script type="module" src="js/caller-ui.js"></script>
-  <script src="js/translation-voice.js"></script>
+      
+    <!-- 🔌 Scripts -->
+    <script src="https://lemur-signal.onrender.com/socket.io/socket.io.js"></script>
+    <script type="module" src="js/receiver-ui.js"></script>
+    <!-- Script para a tradução por voz -->
+    <script src="js/translation-voice.js"></script>
 </body>
 </html>
