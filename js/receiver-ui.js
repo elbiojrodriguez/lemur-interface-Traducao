@@ -4,6 +4,9 @@ import { QRCodeGenerator } from './qr-code-utils.js';
 import { getMediaStream } from './media-manager.js';
 
 window.onload = async () => {
+ import { getMediaStream } from './media-manager.js';
+
+window.onload = async () => {
   try {
     const stream = await getMediaStream();
     document.getElementById("localVideo").srcObject = stream;
@@ -13,7 +16,6 @@ window.onload = async () => {
     console.error("Erro ao obter stream compartilhado:", error);
   }
 };
-
 
   const rtcCore = new WebRTCCore();
 
