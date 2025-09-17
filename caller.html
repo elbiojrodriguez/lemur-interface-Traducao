@@ -5,8 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Lemur-EchoMeP2P-Caller</title>
   <link rel="stylesheet" href="mobile-style.css" />
-  <!-- No seu HTML principal, adicione: -->
-<script src="translator.js"></script>
   
 </head>
 <body>
@@ -48,23 +46,6 @@
     <div class="controls">
       <button id="callActionBtn" style="display: none;">SEND 🚀</button>
     </div>
-
-    <!-- Sistema de Tradução -->
-<div class="translation-container">
-  <div class="translation-box">
-    <div id="translatedText" class="translation-text">🎤</div>
-    <div class="translation-controls">
-      <button class="translation-btn microphone-btn" id="recordButton" disabled>🎤</button>
-      <button class="translation-btn speaker-btn" id="speakerButton" disabled>🔊</button>
-    </div>
-  </div>
-  
-  <!-- Modal de gravação -->
-  <div class="recording-modal" id="recordingModal">
-    <div class="recording-dot"></div>
-    <div class="recording-timer" id="recordingTimer">0:00</div>
-  </div>
-</div>
          
   <!-- 🔌 Scripts -->
   <script src="https://lemur-signal.onrender.com/socket.io/socket.io.js"></script>
