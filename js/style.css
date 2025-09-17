@@ -1,0 +1,333 @@
+/* ===== ESTILOS GERAIS ===== */
+html {
+  height: 100%;
+  font-size: clamp(14px, 2.5vw, 18px);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  text-align: center;
+  transition: background-color 0.5s;
+}
+
+body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  font-size: 1em;
+}
+
+.box-principal {
+  width: 100%;
+  max-width: 600px;
+  height: 100%;
+  margin: 0 auto;
+  padding: 2vh 2vw;
+  position: relative;
+  overflow-y: auto;
+}
+
+/* ===== CAIXA DE TEXTO ===== */
+
+.text-display {
+  position: absolute; /* 👈 permite mover livremente */
+  top: 60vh;           /* 👈 distância do topo */
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 35%;
+  max-width: 400px;
+  height: auto;
+  width: 80%;
+  min-height: 15vh;
+  background: white;
+  border: 1px solid #8ecae6;
+  border-radius: 12px;
+  padding: 2vh 3vw;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  z-index: 10;
+}
+
+.text-title {
+  color: #126782;
+  font-size: 2rem;
+  margin-bottom: .2vh;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 600;
+}
+
+.text-content {
+  color: #333;
+  font-size: 2rem;
+  line-height: 1.6;
+  flex-grow: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 1vh 0;
+  min-height: 60px;
+}
+
+.speaker-btn {
+  background: none;
+  border: none;
+  font-size: 2rem;
+  cursor: pointer;
+  color: #126782;
+  padding: 0.5vh;
+  border-radius: 50%;
+  width: 2.5rem;
+  height: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.speaker-btn:hover {
+  background-color: rgba(18, 103, 130, 0.1);
+}
+
+/* ===== CAIXA DO MICROFONE ===== */
+
+.microphone-box {
+  position: absolute; /* 👈 permite mover livremente */
+  top: 35.5vh;          /* 👈 distância do topo */
+  left: 70vw;         /* 👈 distância da esquerda */
+  flex-direction: column;
+  align-items: center;
+  gap: 1vh;
+  z-index: 9;
+}
+
+.language-selector {
+  display: flex;
+  align-items: center;
+  gap: 1vw;
+  margin-bottom: 1vh;
+}
+
+.language-flag {
+  font-size: 2rem;
+}
+
+.world-btn {
+  position: relative;
+  background: none;
+  border: none;
+  font-size: 2rem;
+  cursor: pointer;
+  padding: 0.5vh;
+  border-radius: 50%;
+  width: 2.5rem;
+  height: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.world-btn:hover {
+  background-color: rgba(255, 255, 255, 0.3);
+}
+
+/* Dropdown de idiomas */
+
+.language-dropdown {
+  position: absolute; /* 👈 relativo ao ícone do mundinho */
+  bottom: 100%;        /* 👈 aparece acima do botão */
+  left: 50%;
+  transform: translateX(-50%);
+  background: white;
+  border-radius: 12px;
+  padding: 4px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  z-index: 9999;
+  display: none;
+  flex-direction: column; /* 👈 agora em coluna */
+  align-items: center;
+  gap: 2px;
+  width: auto;
+  min-width: 20px;
+}
+
+.language-dropdown.show {
+  display: flex;
+}
+
+.language-option {
+  font-size: 1.2rem;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+}
+
+
+.language-option:hover {
+  transform: scale(1.1);
+  background-color: #f0f8ff;
+}
+
+.record-btn {
+  width: 15vw;
+  height: 15vw;
+  max-width: 80px;
+  max-height: 80px;
+  border-radius: 50%;
+  background: #219ebc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  cursor: pointer;
+  border: none;
+  color: white;
+  transition: transform 0.2s, background-color 0.3s;
+}
+
+.record-btn:active {
+  transform: scale(0.95);
+}
+
+.record-btn.recording {
+  background: #ff6b6b;
+  animation: pulse 1.5s infinite;
+}
+
+/* Modal de gravação */
+.recording-modal {
+  position: fixed;
+  bottom: -100%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80%;
+  max-width: 320px;
+  background: rgba(0, 0, 0, 0.85);
+  border-radius: 20px;
+  padding: 3vh 4vw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: bottom 0.5s ease;
+  z-index: 1001;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+.recording-modal.visible {
+  bottom: 15vh;
+}
+
+.recording-indicator {
+  display: flex;
+  align-items: center;
+  margin-bottom: 2vh;
+  width: 100%;
+}
+
+.recording-dot {
+  width: 12px;
+  height: 12px;
+  background: #ff6b6b;
+  border-radius: 50%;
+  margin-right: 10px;
+  animation: blink 1s infinite;
+}
+
+.recording-text {
+  color: white;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.recording-timer {
+  color: white;
+  font-size: 0.9rem;
+  margin-left: auto;
+}
+
+.send-button {
+  width: 15vw;
+  height: 15vw;
+  max-width: 60px;
+  max-height: 60px;
+  border-radius: 50%;
+  background: #219ebc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 1.5rem;
+  cursor: pointer;
+  border: none;
+  transition: all 0.3s ease;
+}
+
+.send-button:active {
+  transform: scale(0.95);
+  background: #126782;
+}
+
+/* Animações */
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+@keyframes blink {
+  0% { opacity: 1; }
+  50% { opacity: 0.3; }
+  100% { opacity: 1; }
+}
+
+/* Ajustes para telas muito pequenas */
+@media (max-height: 600px) {
+  .box-principal {
+    padding: 1.5vh 3vw;
+    gap: 2vh;
+    justify-content: flex-start;
+    padding-top: 3vh;
+  }
+  
+  .text-display {
+    min-height: 25vh;
+    padding: 1.5vh 3vw;
+  }
+  
+  .language-flag {
+    font-size: 1.8rem;
+  }
+}
+
+/* Ajustes para orientação paisagem */
+@media (max-width: 600px) and (orientation: landscape) {
+  .box-principal {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    align-content: flex-start;
+    padding-top: 2vh;
+  }
+  
+  .text-box {
+    width: 70%;
+    min-height: 30vh;
+  }
+  
+  .microphone-box {
+    width: 25%;
+  }
+  
+  .record-btn {
+    width: 15vh;
+    height: 15vh;
+  }
+  
+  .language-dropdown {
+    top: 40%;
+  }
+}
