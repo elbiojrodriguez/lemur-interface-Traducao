@@ -1,12 +1,19 @@
 import WebRTCCore from '../core/webrtc-core.js';
 import { QRCodeGenerator } from './qr-code-utils.js';
 
+import { getMediaStream } from './media-manager.js';
+
 window.onload = async () => {
   try {
-    await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+    const stream = await getMediaStream();
+    document.getElementById("localVideo").srcObject = stream;
+
+    // Se quiser exibir o vídeo remoto ou enviar o stream para outro peer, continue aqui
   } catch (error) {
-    console.error("Erro ao solicitar acesso à câmera e microfone:", error);
+    console.error("Erro ao obter stream compartilhado:", error);
   }
+};
+
 
   const rtcCore = new WebRTCCore();
 
