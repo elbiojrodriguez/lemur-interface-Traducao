@@ -127,7 +127,7 @@ body {
   z-index: 20;
 }
 
-#callActionBtn {
+.callActionBtn {
   width: 60%;
   height: 6%;
   border-radius: 50px;
