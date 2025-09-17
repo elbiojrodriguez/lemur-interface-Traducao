@@ -1,47 +1,23 @@
 import WebRTCCore from '../core/webrtc-core.js';
 import { QRCodeGenerator } from './qr-code-utils.js';
-
 import { getMediaStream } from './media-manager.js';
 
 window.onload = async () => {
- import { getMediaStream } from './media-manager.js';
-
-window.onload = async () => {
-  try {
-    const stream = await getMediaStream();
-    document.getElementById("localVideo").srcObject = stream;
-
-    // Se quiser exibir o vídeo remoto ou enviar o stream para outro peer, continue aqui
-  } catch (error) {
-    console.error("Erro ao obter stream compartilhado:", error);
-  }
-};
-
   const rtcCore = new WebRTCCore();
 
   const url = window.location.href;
   const fixedId = url.split('?')[1] || crypto.randomUUID().substr(0, 8);
+  const myId = fixedId.substring(0, 8);
 
-  function fakeRandomUUID(fixedValue) {
-    return {
-      substr: function(start, length) {
-        return fixedValue.substr(start, length);
-      }
-    };
-  }
-
-  const myId = fakeRandomUUID(fixedId).substr(0, 8);
-
-  let localStream = null;
   let callerLang = null;
+  let localStream = null;
 
-  navigator.mediaDevices.getUserMedia({ video: true, audio: false })
-    .then(stream => {
-      localStream = stream;
-    })
-    .catch(error => {
-      console.error("Erro ao acessar a câmera:", error);
-    });
+  try {
+    localStream = await getMediaStream(); // ✅ usa o gerenciador
+    document.getElementById("localVideo").srcObject = localStream;
+  } catch (error) {
+    console.error("Erro ao obter stream compartilhado:", error);
+  }
 
   const params = new URLSearchParams(window.location.search);
   const token = params.get('token') || '';
@@ -106,15 +82,13 @@ window.onload = async () => {
     "qr-modal-description": "You can ask to scan, share or print on your business card."
   };
 
-  (async () => {
-    for (const [id, texto] of Object.entries(frasesParaTraduzir)) {
-      const el = document.getElementById(id);
-      if (el) {
-        const traduzido = await translateText(texto, lang);
-        el.textContent = traduzido;
-      }
+  for (const [id, texto] of Object.entries(frasesParaTraduzir)) {
+    const el = document.getElementById(id);
+    if (el) {
+      const traduzido = await translateText(texto, lang);
+      el.textContent = traduzido;
     }
-  })();
+  }
 
   async function aplicarBandeira(langCode) {
     try {
@@ -124,15 +98,10 @@ window.onload = async () => {
       const bandeira = flags[langCode] || flags[langCode.split('-')[0]] || '🔴';
 
       const localLangElement = document.querySelector('.local-mic-Lang');
-      if (localLangElement) {
-        localLangElement.textContent = bandeira;
-      }
+      if (localLangElement) localLangElement.textContent = bandeira;
 
       const localLangDisplay = document.querySelector('.local-Lang');
-      if (localLangDisplay) {
-        localLangDisplay.textContent = bandeira;
-      }
-
+      if (localLangDisplay) localLangDisplay.textContent = bandeira;
     } catch (error) {
       console.error('Erro ao carregar bandeira local:', error);
     }
@@ -146,16 +115,11 @@ window.onload = async () => {
       const bandeira = flags[langCode] || flags[langCode.split('-')[0]] || '🔴';
 
       const remoteLangElement = document.querySelector('.remoter-Lang');
-      if (remoteLangElement) {
-        remoteLangElement.textContent = bandeira;
-      }
-
+      if (remoteLangElement) remoteLangElement.textContent = bandeira;
     } catch (error) {
       console.error('Erro ao carregar bandeira remota:', error);
       const remoteLangElement = document.querySelector('.remoter-Lang');
-      if (remoteLangElement) {
-        remoteLangElement.textContent = '🔴';
-      }
+      if (remoteLangElement) remoteLangElement.textContent = '🔴';
     }
   }
 
