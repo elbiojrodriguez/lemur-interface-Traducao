@@ -4,11 +4,16 @@ import WebRTCCore from '../core/webrtc-core.js';
 window.onload = async () => {
 
   // 🎥 Solicita acesso à câmera e microfone
-  try {
-    await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-  } catch (error) {
-    console.error("Erro ao solicitar acesso à câmera e microfone:", error);
-  }
+import { getMediaStream } from './media-manager.js';
+
+try {
+  const stream = await getMediaStream();
+  document.getElementById("localVideo").srcObject = stream;
+
+  // Aqui você pode enviar o stream para o peer remoto, etc.
+} catch (error) {
+  console.error("Erro ao obter stream compartilhado:", error);
+}
 
   // 🧠 Inicializa variáveis principais
   const chatInputBox = document.querySelector('.chat-input-box');
