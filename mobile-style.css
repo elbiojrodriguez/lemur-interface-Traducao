@@ -106,13 +106,6 @@ body {
 }
 
 /* ===== CONTROLES ===== */
-.controls {
-  position: absolute;
-  bottom: 25%;
-  left: 10%;
-  display: flex;
-  z-index: 20;
-}
 
 .callActionBtn {
   position: absolute;
