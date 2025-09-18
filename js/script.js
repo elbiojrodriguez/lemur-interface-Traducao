@@ -1,41 +1,3 @@
-// NO INÍCIO do script.js - ADICIONE:
-let sharedSocket = null;
-
-// MODIFIQUE a função translateText:
-async function translateText(text) {
-    try {
-        // ⭐ USA MESMO ENDPOINT dos outros scripts
-        const response = await fetch('https://chat-tradutor.onrender.com/translate', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ 
-                text, 
-                targetLang: IDIOMA_DESTINO,
-                // ⭐ ADICIONE identificação para rastreamento
-                source: 'integrated-translator',
-                sessionId: window.myId || 'default-session'
-            })
-        });
-        
-        const result = await response.json();
-        if (speakerButton) speakerButton.disabled = false;
-        return result.translatedText || "❌";
-    } catch (error) {
-        console.error('Erro na tradução:', error);
-        return "❌";
-    }
-}
-
-// NO script.js - VERIFIQUE CONEXÃO COMPARTILHADA
-function checkSharedConnection() {
-    if (window.rtcCore && window.rtcCore.getSocket) {
-        sharedSocket = window.rtcCore.getSocket();
-        console.log("Usando socket compartilhado:", sharedSocket.connected);
-        return true;
-    }
-    return false;
-}
-
 function initializeTranslator() {
     // ===== CONFIGURAÇÃO =====
     // ✅ ATUALIZAÇÃO 1: Busca idiomas do navegador e parâmetros URL
@@ -211,6 +173,21 @@ function initializeTranslator() {
         }
     }
     
+    async function translateText(text) {
+        try {
+            const response = await fetch('https://chat-tradutor.onrender.com/translate', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ text, targetLang: IDIOMA_DESTINO })
+            });
+            const result = await response.json();
+            if (speakerButton) speakerButton.disabled = false;
+            return result.translatedText || "❌";
+        } catch (error) {
+            return "❌";
+        }
+    }
+    
     function speakText(text) {
         if (!SpeechSynthesis) return;
         window.speechSynthesis.cancel();
@@ -326,12 +303,6 @@ function initializeTranslator() {
     }
     
     // ===== INICIALIZAÇÃO =====
-    // ⭐ VERIFICA SE TEM CONEXÃO COMPARTILHADA
-    if (!checkSharedConnection()) {
-        console.log("Criando conexão própria para tradutor");
-        // Fallback para conexão própria se necessário
-    }
-    
     requestMicrophonePermission();
     
     console.log('Tradutor inicializado com sucesso!');
