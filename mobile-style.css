@@ -86,19 +86,6 @@ body {
 }
 
 /* ===== CIRCULO DA BANDEIRA ===== */
-.local-mic-Lang {
-  position: absolute;
-  top: 50%;
-  left: 73%;
-  width: 20%;
-  font-size: 6vw;
-  line-height: 1;
-  text-align: center;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 10; /* Fica atrás de tudo */
-}
 
 .remoter-Lang {
   position: absolute;
