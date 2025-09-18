@@ -128,6 +128,9 @@ body {
 }
 
 .callActionBtn {
+  position: absolute;
+  top: 70%;               /* distância do topo */
+  left: 50%;              /* posiciona no centro horizontal */
   width: 60%;
   height: 6%;
   border-radius: 50px;
