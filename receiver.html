@@ -1,96 +1,931 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Lemur-EchoMeP2P-Receiver + Tradutor</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lemur-EchoMeP2P - Receiver</title>
+    <style>
+        /* ===== ESTILOS GERAIS ===== */
+        html {
+            height: 100%;
+            font-size: clamp(14px, 2.5vw, 18px);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            text-align: center;
+            transition: background-color 0.5s;
+        }
 
-  <!-- Estilos -->
-  <link rel="stylesheet" href="mobile-style.css" />
-  <link rel="stylesheet" href="style.css" />
+        body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            font-size: 1em;
+            background: linear-gradient(135deg, #219ebc 0%, #126782 100%);
+            color: white;
+            overflow: hidden;
+        }
 
-  <!-- QR Code -->
-  <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
+        .box-principal {
+            width: 100%;
+            max-width: 600px;
+            height: 100%;
+            margin: 0 auto;
+            padding: 2vh 2vw;
+            box-sizing: border-box;
+            background-color: transparent;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ===== LOGO E CABEÇALHO ===== */
+        .logo {
+            width: 120px;
+            height: auto;
+            margin: 10px auto;
+            display: block;
+        }
+
+        .ponte {
+            width: 80px;
+            height: auto;
+            margin: 0 auto 10px;
+            display: block;
+        }
+
+        .translator-label {
+            font-size: 0.9rem;
+            margin-bottom: 2vh;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        /* ===== LAYOUT DE VÍDEO ===== */
+        .video-container {
+            display: flex;
+            flex-direction: column;
+            height: 40vh;
+            margin-bottom: 2vh;
+            position: relative;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .video-wrapper {
+            flex: 1;
+            position: relative;
+            background-color: #000;
+        }
+
+        #remoteVideo, #localVideo {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .lang-indicators {
+            display: flex;
+            justify-content: space-between;
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            right: 10px;
+            z-index: 5;
+        }
+
+        .remoter-Lang, .local-Lang {
+            font-size: 1.8rem;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* ===== CAIXA DE TEXTO ===== */
+        .text-display {
+            width: 90%;
+            margin: 0 auto;
+            min-height: 15vh;
+            background: white;
+            border: 1px solid #8ecae6;
+            border-radius: 12px;
+            padding: 2vh 3vw;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            z-index: 10;
+            margin-bottom: 2vh;
+        }
+
+        .text-title {
+            color: #126782;
+            font-size: 1.2rem;
+            margin-bottom: .2vh;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+        }
+
+        .text-content {
+            color: #333;
+            font-size: 1rem;
+            line-height: 1.6;
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 1vh 0;
+            min-height: 60px;
+        }
+
+        .speaker-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #126782;
+            padding: 0.5vh;
+            border-radius: 50%;
+            width: 2.5rem;
+            height: 2.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .speaker-btn:hover {
+            background-color: rgba(18, 103, 130, 0.1);
+        }
+
+        /* ===== CAIXA DO MICROFONE ===== */
+        .microphone-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1vh;
+            z-index: 9;
+            margin-top: auto;
+            padding-bottom: 2vh;
+        }
+
+        .language-selector {
+            display: flex;
+            align-items: center;
+            gap: 1vw;
+            margin-bottom: 1vh;
+        }
+
+        .language-flag {
+            font-size: 2rem;
+        }
+
+        .world-btn {
+            position: relative;
+            background: none;
+            border: none;
+            font-size: 2rem;
+            cursor: pointer;
+            padding: 0.5vh;
+            border-radius: 50%;
+            width: 2.5rem;
+            height: 2.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .world-btn:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Dropdown de idiomas */
+        .language-dropdown {
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            border-radius: 12px;
+            padding: 4px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            z-index: 9999;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            width: auto;
+            min-width: 20px;
+        }
+
+        .language-dropdown.show {
+            display: flex;
+        }
+
+        .language-option {
+            font-size: 1.2rem;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border-radius: 50%;
+            transition: all 0.2s ease;
+        }
+
+        .language-option:hover {
+            transform: scale(1.1);
+            background-color: #f0f8ff;
+        }
+
+        .record-btn {
+            width: 20vw;
+            height: 20vw;
+            max-width: 80px;
+            max-height: 80px;
+            border-radius: 50%;
+            background: #219ebc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            cursor: pointer;
+            border: none;
+            color: white;
+            transition: transform 0.2s, background-color 0.3s;
+        }
+
+        .record-btn:active {
+            transform: scale(0.95);
+        }
+
+        .record-btn.recording {
+            background: #ff6b6b;
+            animation: pulse 1.5s infinite;
+        }
+
+        /* Modal de QR Code */
+        .info-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.85);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 20;
+            padding: 20px;
+            transition: opacity 0.3s ease;
+        }
+
+        .info-overlay.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .info-overlay h2 {
+            color: white;
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+        }
+
+        .qrcode-container {
+            margin: 15px 0;
+            padding: 10px;
+            background: white;
+            border-radius: 8px;
+        }
+
+        .qr-modal-description {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
+            max-width: 80%;
+            margin-top: 15px;
+        }
+
+        /* Modal de gravação */
+        .recording-modal {
+            position: fixed;
+            bottom: -100%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80%;
+            max-width: 320px;
+            background: rgba(0, 0, 0, 0.85);
+            border-radius: 20px;
+            padding: 3vh 4vw;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: bottom 0.5s ease;
+            z-index: 1001;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .recording-modal.visible {
+            bottom: 15vh;
+        }
+
+        .recording-indicator {
+            display: flex;
+            align-items: center;
+            margin-bottom: 2vh;
+            width: 100%;
+        }
+
+        .recording-dot {
+            width: 12px;
+            height: 12px;
+            background: #ff6b6b;
+            border-radius: 50%;
+            margin-right: 10px;
+            animation: blink 1s infinite;
+        }
+
+        .recording-text {
+            color: white;
+            font-size: 1rem;
+            font-weight: 500;
+        }
+
+        .recording-timer {
+            color: white;
+            font-size: 0.9rem;
+            margin-left: auto;
+        }
+
+        .send-button {
+            width: 15vw;
+            height: 15vw;
+            max-width: 60px;
+            max-height: 60px;
+            border-radius: 50%;
+            background: #219ebc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s ease;
+        }
+
+        .send-button:active {
+            transform: scale(0.95);
+            background: #126782;
+        }
+
+        /* Animações */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes blink {
+            0% { opacity: 1; }
+            50% { opacity: 0.3; }
+            100% { opacity: 1; }
+        }
+
+        /* Ajustes para telas muito pequenas */
+        @media (max-height: 600px) {
+            .video-container {
+                height: 30vh;
+            }
+            
+            .text-display {
+                min-height: 20vh;
+            }
+        }
+
+        /* Ajustes para orientação paisagem */
+        @media (max-width: 600px) and (orientation: landscape) {
+            .box-principal {
+                flex-direction: row;
+                flex-wrap: wrap;
+                justify-content: space-around;
+                align-content: flex-start;
+                padding-top: 2vh;
+            }
+            
+            .video-container {
+                width: 60%;
+                height: 50vh;
+            }
+            
+            .text-display {
+                width: 35%;
+                min-height: 25vh;
+            }
+            
+            .microphone-box {
+                width: 100%;
+                flex-direction: row;
+                justify-content: center;
+            }
+            
+            .info-overlay {
+                flex-direction: row;
+                flex-wrap: wrap;
+            }
+        }
+    </style>
+    <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
 </head>
 <body>
-  <div class="box-principal">
-    
-    <!-- 🔷 Logo -->
-    <img src="assets/images/Lemur2P2.png" alt="Lemur Logo" class="logo">
-    <img src="assets/images/Bridg.png" alt="ponte" class="ponte">
-
-    <!-- 🔤 Subtítulo -->
-    <div class="translator-label" id="translator-label">
-      Live translation. No filters. No platform.
-    </div>
-
-    <!-- 🏳️ Idiomas -->
-    <div class="remoter-Lang">🏳️</div>
-    <div class="local-Lang">🏳️</div>
-
-    <!-- 🎥 Vídeos -->
-    <div class="video-wrapper">
-      <video id="remoteVideo" autoplay playsinline></video>
-    </div>
-    <div class="video-wrapper">
-      <video id="localVideo" autoplay muted playsinline></video>
-    </div>
-
-    <!-- 🧾 QR Code -->
-    <div class="info-overlay"> 
-      <h2 id="qr-modal-title">This is your online key</h2>
-      <div id="qrcode" class="qrcode-container"></div>
-      <p class="qr-modal-description" id="qr-modal-description">
-        You can ask to scan, share or print on your business card.
-      </p>
-    </div>
-
-    <!-- 🗣️ Tradutor por Voz -->
-    <div class="text-box">
-      <div class="text-display">
-        <div class="text-title">
-          🌐
-          <button class="speaker-btn" id="speakerButton" disabled>🔊</button>
+    <div class="box-principal">
+        <!-- Logo --> 
+        <img src="assets/images/Lemur2P2.png" alt="Lemur Logo" class="logo">
+        <img src="assets/images/Bridg.png" alt="ponte" class="ponte">
+        
+        <!-- Sub Titulo --> 
+        <div class="translator-label" id="translator-label">
+            Live translation. No filters. No platform.
         </div>
-        <div id="translatedText" class="text-content">🎤</div>
-      </div>
+        
+        <!-- Container de Vídeo -->
+        <div class="video-container">
+            <!-- Indicadores de Idioma -->
+            <div class="lang-indicators">
+                <div class="remoter-Lang">🏳️</div>
+                <div class="local-Lang">🏳️</div>
+            </div>
+            
+            <!-- 🎥 Vídeo remoto -->
+            <div class="video-wrapper">
+                <video id="remoteVideo" autoplay playsinline></video>
+            </div>
+
+            <!-- 🎥 Vídeo local (mutado) -->
+            <div class="video-wrapper">
+                <video id="localVideo" autoplay muted playsinline></video>
+            </div>
+        </div>
+
+        <!-- Caixa de Texto -->
+        <div class="text-display">
+            <div class="text-title">
+                🌐
+                <button class="speaker-btn" id="speakerButton" disabled>🔊</button>
+            </div>
+            <div id="translatedText" class="text-content">🎤</div>
+        </div>
+        
+        <!-- Caixa do Microfone -->
+        <div class="microphone-box">
+            <div class="language-selector">
+                <div class="language-flag" id="currentLanguageFlag">🇧🇷</div>
+                <button class="world-btn" id="worldButton">🌎</button>
+            </div>
+            
+            <div class="language-dropdown" id="languageDropdown">
+                <div class="language-option" data-lang="pt-BR">🇧🇷</div>
+                <div class="language-option" data-lang="en">🇺🇸</div>
+                <div class="language-option" data-lang="es">🇪🇸</div>
+                <div class="language-option" data-lang="fr">🇫🇷</div>
+                <div class="language-option" data-lang="de">🇩🇪</div>
+                <div class="language-option" data-lang="it">🇮🇹</div>
+                <div class="language-option" data-lang="ja">🇯🇵</div>
+            </div>
+            
+            <button class="record-btn" id="recordButton" disabled>🎤</button>
+        </div>
+        
+        <!-- 🧾 Overlay com QR Code -->
+        <div class="info-overlay"> 
+            <h2 id="qr-modal-title">This is your online key</h2>
+            <div id="qrcode" class="qrcode-container"></div>
+            <p class="qr-modal-description" id="qr-modal-description">
+                You can ask to scan, share or print on your business card.
+            </p>
+        </div>
     </div>
 
-    <!-- 🎙️ Microfone -->
-    <div class="microphone-box">
-      <div class="language-selector">
-        <div class="language-flag" id="currentLanguageFlag">🇧🇷</div>
-        <button class="world-btn" id="worldButton">🌎</button>
-      </div>
-
-      <div class="language-dropdown" id="languageDropdown">
-        <div class="language-option" data-lang="pt-BR">🇧🇷</div>
-        <div class="language-option" data-lang="en">🇺🇸</div>
-        <div class="language-option" data-lang="es">🇪🇸</div>
-        <div class="language-option" data-lang="fr">🇫🇷</div>
-        <div class="language-option" data-lang="de">🇩🇪</div>
-        <div class="language-option" data-lang="it">🇮🇹</div>
-        <div class="language-option" data-lang="ja">🇯🇵</div>
-      </div>
-
-      <button class="record-btn" id="recordButton" disabled>🎤</button>
+    <!-- Modal de gravação -->
+    <div class="recording-modal" id="recordingModal">
+        <div class="recording-indicator">
+            <div class="recording-dot"></div>
+            <div class="recording-text">●</div>
+            <div class="recording-timer" id="recordingTimer">0:00</div>
+        </div>
+        <button class="send-button" id="sendButton">▶</button>
     </div>
-  </div>
 
-  <!-- 🎬 Modal de gravação -->
-  <div class="recording-modal" id="recordingModal">
-    <div class="recording-indicator">
-      <div class="recording-dot"></div>
-      <div class="recording-text">●</div>
-      <div class="recording-timer" id="recordingTimer">0:00</div>
-    </div>
-    <button class="send-button" id="sendButton">▶</button>
-  </div>
+    <!-- Scripts -->
+    <script src="https://lemur-signal.onrender.com/socket.io/socket.io.js"></script>
+    <script type="module">
+        // 📦 Importa o núcleo WebRTC e utilitários QR Code
+        import WebRTCCore from '../core/webrtc-core.js';
+        import { QRCodeGenerator } from './qr-code-utils.js';
 
-  <!-- 🔌 Scripts -->
-  <script src="https://lemur-signal.onrender.com/socket.io/socket.io.js"></script>
-  <script type="module" src="js/receiver-ui.js"></script>
-  <script type="module" src="js/script.js"></script>
-<script type="module" src="js/translation-voice.js"></script>
+        // ===== CONFIGURAÇÃO DO TRADUTOR =====
+        let IDIOMA_ORIGEM = 'pt-BR';
+        const IDIOMA_DESTINO = 'en';
+        const IDIOMA_FALA = 'en-US';
+        
+        const BANDEIRAS_IDIOMAS = {
+            'pt-BR': '🇧🇷', 'en': '🇺🇸', 'es': '🇪🇸', 'fr': '🇫🇷', 
+            'de': '🇩🇪', 'it': '🇮🇹', 'ja': '🇯🇵'
+        };
+        
+        // ===== ELEMENTOS DOM =====
+        const recordButton = document.getElementById('recordButton');
+        const translatedText = document.getElementById('translatedText');
+        const recordingModal = document.getElementById('recordingModal');
+        const recordingTimer = document.getElementById('recordingTimer');
+        const sendButton = document.getElementById('sendButton');
+        const speakerButton = document.getElementById('speakerButton');
+        const currentLanguageFlag = document.getElementById('currentLanguageFlag');
+        const worldButton = document.getElementById('worldButton');
+        const languageDropdown = document.getElementById('languageDropdown');
+        const languageOptions = document.querySelectorAll('.language-option');
+        const infoOverlay = document.querySelector('.info-overlay');
+        
+        // ===== CONFIGURAÇÃO INICIAL =====
+        currentLanguageFlag.textContent = BANDEIRAS_IDIOMAS[IDIOMA_ORIGEM];
+        translatedText.textContent = "🎤";
+        
+        // ===== VERIFICAÇÃO DE SUPORTE =====
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        const SpeechSynthesis = window.speechSynthesis;
+        
+        if (!SpeechRecognition) {
+            translatedText.textContent = "❌ Navegador não suportado";
+            recordButton.style.display = 'none';
+        }
+        
+        if (!SpeechSynthesis) {
+            speakerButton.style.display = 'none';
+        }
+        
+        let recognition = new SpeechRecognition();
+        recognition.lang = IDIOMA_ORIGEM;
+        recognition.continuous = true;
+        recognition.interimResults = true;
+        
+        // ===== VARIÁVEIS DE ESTADO =====
+        let isRecording = false;
+        let recordingStartTime = 0;
+        let timerInterval = null;
+        let pressTimer;
+        let tapMode = false;
+        let isSpeechPlaying = false;
+        let microphonePermissionGranted = false;
+        
+        // ===== FUNÇÕES DE IDIOMA =====
+        worldButton.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            languageDropdown.classList.toggle('show');
+        });
+        
+        document.addEventListener('click', function(e) {
+            if (!languageDropdown.contains(e.target) && e.target !== worldButton) {
+                languageDropdown.classList.remove('show');
+            }
+        });
+        
+        languageOptions.forEach(option => {
+            option.addEventListener('click', function() {
+                const novoIdioma = this.getAttribute('data-lang');
+                IDIOMA_ORIGEM = novoIdioma;
+                currentLanguageFlag.textContent = BANDEIRAS_IDIOMAS[novoIdioma];
+                languageDropdown.classList.remove('show');
+                
+                if (isRecording) recognition.stop();
+                
+                recognition = new SpeechRecognition();
+                recognition.lang = novoIdioma;
+                recognition.continuous = true;
+                recognition.interimResults = true;
+                setupRecognitionEvents();
+                
+                translatedText.textContent = "✅";
+                setTimeout(() => translatedText.textContent = "🎤", 1000);
+            });
+        });
+        
+        // ===== FUNÇÕES PRINCIPAIS DO TRADUTOR =====
+        function setupRecognitionEvents() {
+            recognition.onresult = function(event) {
+                let finalTranscript = '';
+                for (let i = event.resultIndex; i < event.results.length; i++) {
+                    if (event.results[i].isFinal) {
+                        finalTranscript += event.results[i][0].transcript;
+                    }
+                }
+                
+                if (finalTranscript) {
+                    translatedText.textContent = "⏳ Traduzindo...";
+                    translateText(finalTranscript).then(translation => {
+                        translatedText.textContent = translation;
+                        if (SpeechSynthesis) {
+                            setTimeout(() => speakText(translation), 500);
+                        }
+                    });
+                }
+            };
+            
+            recognition.onerror = function(event) {
+                if (event.error !== 'no-speech') {
+                    translatedText.textContent = "❌ Erro de gravação";
+                }
+                stopRecording();
+            };
+            
+            recognition.onend = stopRecording;
+        }
+        
+        async function requestMicrophonePermission() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                stream.getTracks().forEach(track => track.stop());
+                microphonePermissionGranted = true;
+                recordButton.disabled = false;
+                translatedText.textContent = "🎤 Toque para falar";
+                setupRecognitionEvents();
+            } catch (error) {
+                translatedText.textContent = "🚫 Microfone não acessível";
+                recordButton.disabled = true;
+            }
+        }
+        
+        async function translateText(text) {
+            try {
+                const response = await fetch('https://chat-tradutor.onrender.com/translate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text, targetLang: IDIOMA_DESTINO })
+                });
+                const result = await response.json();
+                speakerButton.disabled = false;
+                return result.translatedText || "❌ Erro na tradução";
+            } catch (error) {
+                return "❌ Erro de conexão";
+            }
+        }
+        
+        function speakText(text) {
+            if (!SpeechSynthesis) return;
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = IDIOMA_FALA;
+            utterance.rate = 0.9;
+            utterance.onstart = function() {
+                isSpeechPlaying = true;
+                speakerButton.textContent = '⏹';
+            };
+            utterance.onend = function() {
+                isSpeechPlaying = false;
+                speakerButton.textContent = '🔊';
+            };
+            window.speechSynthesis.speak(utterance);
+        }
+        
+        function toggleSpeech() {
+            if (!SpeechSynthesis) return;
+            if (isSpeechPlaying) {
+                window.speechSynthesis.cancel();
+                isSpeechPlaying = false;
+                speakerButton.textContent = '🔊';
+            } else {
+                const textToSpeak = translatedText.textContent;
+                if (textToSpeak && textToSpeak !== "🎤" && textToSpeak !== "⏳" && !textToSpeak.includes("❌")) {
+                    speakText(textToSpeak);
+                }
+            }
+        }
+        
+        function startRecording() {
+            try {
+                recognition.start();
+                isRecording = true;
+                recordButton.classList.add('recording');
+                recordingStartTime = Date.now();
+                updateTimer();
+                timerInterval = setInterval(updateTimer, 1000);
+                translatedText.textContent = "🎙️ Gravando...";
+                speakerButton.disabled = true;
+                speakerButton.textContent = '🔇';
+            } catch (error) {
+                translatedText.textContent = "❌ Erro ao iniciar gravação";
+            }
+        }
+        
+        function stopRecording() {
+            if (!isRecording) return;
+            recognition.stop();
+            isRecording = false;
+            recordButton.classList.remove('recording');
+            clearInterval(timerInterval);
+            hideRecordingModal();
+            translatedText.textContent = "⏳ Processando...";
+        }
+        
+        function showRecordingModal() {
+            recordingModal.classList.add('visible');
+        }
+        
+        function hideRecordingModal() {
+            recordingModal.classList.remove('visible');
+        }
+        
+        function updateTimer() {
+            const elapsedSeconds = Math.floor((Date.now() - recordingStartTime) / 1000);
+            const minutes = Math.floor(elapsedSeconds / 60);
+            const seconds = elapsedSeconds % 60;
+            recordingTimer.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        }
+        
+        // ===== EVENTOS DO TRADUTOR =====
+        recordButton.addEventListener('touchstart', function(e) {
+            e.preventDefault();
+            if (recordButton.disabled || !microphonePermissionGranted) return;
+            if (!isRecording) {
+                pressTimer = setTimeout(() => {
+                    tapMode = false;
+                    startRecording();
+                    showRecordingModal();
+                }, 300);
+            }
+        });
+        
+        recordButton.addEventListener('touchend', function(e) {
+            e.preventDefault();
+            clearTimeout(pressTimer);
+            if (isRecording) {
+                stopRecording();
+            } else {
+                if (microphonePermissionGranted) {
+                    tapMode = true;
+                    startRecording();
+                    showRecordingModal();
+                }
+            }
+        });
+        
+        sendButton.addEventListener('click', stopRecording);
+        speakerButton.addEventListener('click', toggleSpeech);
+        
+        // ===== INICIALIZAÇÃO DO TRADUTOR =====
+        requestMicrophonePermission();
+
+        // ===== FUNCIONALIDADE RECEIVER =====
+        window.onload = async () => {
+            try {
+                await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+            } catch (error) {
+                console.error("Erro ao solicitar acesso à câmera e microfone:", error);
+            }
+
+            const rtcCore = new WebRTCCore();
+
+            const url = window.location.href;
+            const fixedId = url.split('?')[1] || crypto.randomUUID().substr(0, 8);
+
+            function fakeRandomUUID(fixedValue) {
+                return {
+                    substr: function(start, length) {
+                        return fixedValue.substr(start, length);
+                    }
+                };
+            }
+
+            const myId = fakeRandomUUID(fixedId).substr(0, 8);
+
+            let localStream = null;
+            let callerLang = null;
+
+            navigator.mediaDevices.getUserMedia({ video: true, audio: false })
+                .then(stream => {
+                    localStream = stream;
+                    const localVideo = document.getElementById('localVideo');
+                    localVideo.srcObject = stream;
+                })
+                .catch(error => {
+                    console.error("Erro ao acessar a câmera:", error);
+                });
+
+            const params = new URLSearchParams(window.location.search);
+            const token = params.get('token') || '';
+            const lang = params.get('lang') || navigator.language || 'pt-BR';
+
+            const callerUrl = `${window.location.origin}/caller.html?targetId=${myId}&token=${encodeURIComponent(token)}&lang=${encodeURIComponent(lang)}`;
+            QRCodeGenerator.generate("qrcode", callerUrl);
+
+            rtcCore.initialize(myId);
+            rtcCore.setupSocketHandlers();
+
+            rtcCore.onIncomingCall = (offer, receivedCallerLang) => {
+                if (!localStream) {
+                    console.warn("Stream local não disponível");
+                    return;
+                }
+
+                callerLang = typeof receivedCallerLang === 'string' && receivedCallerLang.trim() !== '' ? receivedCallerLang : null;
+
+                rtcCore.handleIncomingCall(offer, localStream, (remoteStream) => {
+                    remoteStream.getAudioTracks().forEach(track => track.enabled = false);
+
+                    if (infoOverlay) infoOverlay.classList.add('hidden');
+
+                    const remoteVideo = document.getElementById('remoteVideo');
+                    remoteVideo.srcObject = remoteStream;
+
+                    if (callerLang) {
+                        window.targetTranslationLang = callerLang;
+                        aplicarBandeiraRemota(callerLang);
+                    } else {
+                        document.querySelector('.remoter-Lang').textContent = '🔴';
+                    }
+                });
+            };
+
+            const TRANSLATE_ENDPOINT = 'https://chat-tradutor.onrender.com/translate';
+
+            async function translateText(text, targetLang) {
+                try {
+                    if (targetLang === 'en') return text;
+
+                    const response = await fetch(TRANSLATE_ENDPOINT, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ text, targetLang })
+                    });
+
+                    const result = await response.json();
+                    return result.translatedText || text;
+                } catch (error) {
+                    console.error('Erro na tradução:', error);
+                    return text;
+                }
+            }
+
+            const frasesParaTraduzir = {
+                "translator-label": "Live translation. No filters. No platform.",
+                "qr-modal-title": "This is your online key",
+                "qr-modal-description": "You can ask to scan, share or print on your business card."
+            };
+
+            (async () => {
+                for (const [id, texto] of Object.entries(frasesParaTraduzir)) {
+                    const el = document.getElementById(id);
+                    if (el) {
+                        const traduzido = await translateText(texto, lang);
+                        el.textContent = traduzido;
+                    }
+                }
+            })();
+
+            async function aplicarBandeira(langCode) {
+                try {
+                    const response = await fetch('assets/bandeiras/language-flags.json');
+                    const flags = await response.json();
+
+                    const bandeira = flags[langCode] || flags[langCode.split('-')[0]] || '🔴';
+
+                    const localLangDisplay = document.querySelector('.local-Lang');
+                    if (localLangDisplay) {
+                        localLangDisplay.textContent = bandeira;
+                    }
+
+                } catch (error) {
+                    console.error('Erro ao carregar bandeira local:', error);
+                }
+            }
+
+            async function aplicarBandeiraRemota(langCode) {
+                try {
+                    const response = await fetch('assets/bandeiras/language-flags.json');
+                    const flags = await response.json();
+
+                    const bandeira = flags[langCode] || flags[langCode.split('-')[0]] || '🔴';
+
+                    const remoteLangElement = document.querySelector('.remoter-Lang');
+                    if (remoteLangElement) {
+                        remoteLangElement.textContent = bandeira;
+                    }
+
+                } catch (error) {
+                    console.error('Erro ao carregar bandeira remota:', error);
+                    const remoteLangElement = document.querySelector('.remoter-Lang');
+                    if (remoteLangElement) {
+                        remoteLangElement.textContent = '🔴';
+                    }
+                }
+            }
+
+            aplicarBandeira(lang);
+        };
+    </script>
 </body>
 </html>
