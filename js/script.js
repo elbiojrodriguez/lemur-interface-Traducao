@@ -1,13 +1,48 @@
-document.addEventListener('DOMContentLoaded', function() {
+// NO INÍCIO do script.js - ADICIONE:
+let sharedSocket = null;
+
+// MODIFIQUE a função translateText:
+async function translateText(text) {
+    try {
+        // ⭐ USA MESMO ENDPOINT dos outros scripts
+        const response = await fetch('https://chat-tradutor.onrender.com/translate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                text, 
+                targetLang: IDIOMA_DESTINO,
+                // ⭐ ADICIONE identificação para rastreamento
+                source: 'integrated-translator',
+                sessionId: window.myId || 'default-session'
+            })
+        });
+        
+        const result = await response.json();
+        if (speakerButton) speakerButton.disabled = false;
+        return result.translatedText || "❌";
+    } catch (error) {
+        console.error('Erro na tradução:', error);
+        return "❌";
+    }
+}
+
+// NO script.js - VERIFIQUE CONEXÃO COMPARTILHADA
+function checkSharedConnection() {
+    if (window.rtcCore && window.rtcCore.getSocket) {
+        sharedSocket = window.rtcCore.getSocket();
+        console.log("Usando socket compartilhado:", sharedSocket.connected);
+        return true;
+    }
+    return false;
+}
+
+function initializeTranslator() {
     // ===== CONFIGURAÇÃO =====
-    let IDIOMA_ORIGEM = 'pt-BR';
-    const IDIOMA_DESTINO = 'en';
-    const IDIOMA_FALA = 'en-US';
-    
-    const BANDEIRAS_IDIOMAS = {
-        'pt-BR': '🇧🇷', 'en': '🇺🇸', 'es': '🇪🇸', 'fr': '🇫🇷', 
-        'de': '🇩🇪', 'it': '🇮🇹', 'ja': '🇯🇵'
-    };
+    // ✅ ATUALIZAÇÃO 1: Busca idiomas do navegador e parâmetros URL
+    let IDIOMA_ORIGEM = navigator.language || 'pt-BR';
+    const urlParams = new URLSearchParams(window.location.search);
+    const IDIOMA_DESTINO = urlParams.get('lang') || 'en';
+    const IDIOMA_FALA = urlParams.get('lang') || 'en-US';
     
     // ===== ELEMENTOS DOM =====
     const recordButton = document.getElementById('recordButton');
@@ -21,8 +56,17 @@ document.addEventListener('DOMContentLoaded', function() {
     const languageDropdown = document.getElementById('languageDropdown');
     const languageOptions = document.querySelectorAll('.language-option');
     
+    // ⭐ VERIFICA SE ELEMENTOS CRÍTICOS EXISTEM
+    if (!currentLanguageFlag || !recordButton || !translatedText || !languageDropdown) {
+        console.log('Aguardando elementos do DOM...');
+        setTimeout(initializeTranslator, 300);
+        return;
+    }
+    
     // ===== CONFIGURAÇÃO INICIAL =====
-    currentLanguageFlag.textContent = BANDEIRAS_IDIOMAS[IDIOMA_ORIGEM];
+    // ✅ ATUALIZAÇÃO 3: Usa bandeira já existente na página
+    const localLangElement = document.querySelector('.local-Lang');
+    currentLanguageFlag.textContent = localLangElement?.textContent || '🎌';
     translatedText.textContent = "🎤";
     
     // ===== VERIFICAÇÃO DE SUPORTE =====
@@ -31,11 +75,11 @@ document.addEventListener('DOMContentLoaded', function() {
     
     if (!SpeechRecognition) {
         translatedText.textContent = "❌";
-        recordButton.style.display = 'none';
+        if (recordButton) recordButton.style.display = 'none';
         return;
     }
     
-    if (!SpeechSynthesis) {
+    if (!SpeechSynthesis && speakerButton) {
         speakerButton.style.display = 'none';
     }
     
@@ -54,37 +98,55 @@ document.addEventListener('DOMContentLoaded', function() {
     let microphonePermissionGranted = false;
     
     // ===== FUNÇÕES DE IDIOMA =====
-    worldButton.addEventListener('click', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        languageDropdown.classList.toggle('show');
-    });
+    if (worldButton && languageDropdown) {
+        worldButton.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            languageDropdown.classList.toggle('show');
+        });
+    }
     
     document.addEventListener('click', function(e) {
-        if (!languageDropdown.contains(e.target) && e.target !== worldButton) {
+        if (languageDropdown && !languageDropdown.contains(e.target) && e.target !== worldButton) {
             languageDropdown.classList.remove('show');
         }
     });
     
-    languageOptions.forEach(option => {
-        option.addEventListener('click', function() {
-            const novoIdioma = this.getAttribute('data-lang');
-            IDIOMA_ORIGEM = novoIdioma;
-            currentLanguageFlag.textContent = BANDEIRAS_IDIOMAS[novoIdioma];
-            languageDropdown.classList.remove('show');
-            
-            if (isRecording) recognition.stop();
-            
-            recognition = new SpeechRecognition();
-            recognition.lang = novoIdioma;
-            recognition.continuous = true;
-            recognition.interimResults = true;
-            setupRecognitionEvents();
-            
-            translatedText.textContent = "✅";
-            setTimeout(() => translatedText.textContent = "🎤", 1000);
+    if (languageOptions && languageOptions.length > 0) {
+        languageOptions.forEach(option => {
+            option.addEventListener('click', function() {
+                const novoIdioma = this.getAttribute('data-lang');
+                IDIOMA_ORIGEM = novoIdioma;
+                
+                // ✅ ATUALIZAÇÃO 3: Busca bandeira do elemento existente
+                const bandeiraElement = document.querySelector('.local-Lang');
+                if (currentLanguageFlag) {
+                    currentLanguageFlag.textContent = bandeiraElement ? bandeiraElement.textContent : '🎌';
+                }
+                
+                if (languageDropdown) {
+                    languageDropdown.classList.remove('show');
+                }
+                
+                if (isRecording && recognition) {
+                    recognition.stop();
+                }
+                
+                recognition = new SpeechRecognition();
+                recognition.lang = novoIdioma;
+                recognition.continuous = true;
+                recognition.interimResults = true;
+                setupRecognitionEvents();
+                
+                if (translatedText) {
+                    translatedText.textContent = "✅";
+                    setTimeout(() => {
+                        if (translatedText) translatedText.textContent = "🎤";
+                    }, 1000);
+                }
+            });
         });
-    });
+    }
     
     // ===== FUNÇÕES PRINCIPAIS =====
     function setupRecognitionEvents() {
@@ -96,19 +158,21 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
             
-            if (finalTranscript) {
+            if (finalTranscript && translatedText) {
                 translatedText.textContent = "⏳";
                 translateText(finalTranscript).then(translation => {
-                    translatedText.textContent = translation;
-                    if (SpeechSynthesis) {
-                        setTimeout(() => speakText(translation), 500);
+                    if (translatedText) {
+                        translatedText.textContent = translation;
+                        if (SpeechSynthesis) {
+                            setTimeout(() => speakText(translation), 500);
+                        }
                     }
                 });
             }
         };
         
         recognition.onerror = function(event) {
-            if (event.error !== 'no-speech') {
+            if (event.error !== 'no-speech' && translatedText) {
                 translatedText.textContent = "❌";
             }
             stopRecording();
@@ -117,32 +181,33 @@ document.addEventListener('DOMContentLoaded', function() {
         recognition.onend = stopRecording;
     }
     
+    // ✅ ATUALIZAÇÃO 2: Compartilha permissão já concedida
     async function requestMicrophonePermission() {
+        // ⭐ PRIMEIRO: Tenta usar permissão já concedida pelos outros scripts
         try {
+            // Verifica se já temos permissão
             const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-            stream.getTracks().forEach(track => track.stop());
+            
+            // ⭐ IMPORTANTE: NÃO PARA O STREAM! Apenas verifica a permissão
             microphonePermissionGranted = true;
-            recordButton.disabled = false;
-            translatedText.textContent = "🎤";
+            if (recordButton) recordButton.disabled = false;
+            if (translatedText) translatedText.textContent = "🎤";
             setupRecognitionEvents();
+            return;
+            
         } catch (error) {
-            translatedText.textContent = "🚫";
-            recordButton.disabled = true;
-        }
-    }
-    
-    async function translateText(text) {
-        try {
-            const response = await fetch('https://chat-tradutor.onrender.com/translate', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ text, targetLang: IDIOMA_DESTINO })
-            });
-            const result = await response.json();
-            speakerButton.disabled = false;
-            return result.translatedText || "❌";
-        } catch (error) {
-            return "❌";
+            // ⭐ SEGUNDO: Se não tem permissão, pede só para áudio
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                stream.getTracks().forEach(track => track.stop());
+                microphonePermissionGranted = true;
+                if (recordButton) recordButton.disabled = false;
+                if (translatedText) translatedText.textContent = "🎤";
+                setupRecognitionEvents();
+            } catch (error) {
+                if (translatedText) translatedText.textContent = "🚫";
+                if (recordButton) recordButton.disabled = true;
+            }
         }
     }
     
@@ -154,11 +219,11 @@ document.addEventListener('DOMContentLoaded', function() {
         utterance.rate = 0.9;
         utterance.onstart = function() {
             isSpeechPlaying = true;
-            speakerButton.textContent = '⏹';
+            if (speakerButton) speakerButton.textContent = '⏹';
         };
         utterance.onend = function() {
             isSpeechPlaying = false;
-            speakerButton.textContent = '🔊';
+            if (speakerButton) speakerButton.textContent = '🔊';
         };
         window.speechSynthesis.speak(utterance);
     }
@@ -168,11 +233,13 @@ document.addEventListener('DOMContentLoaded', function() {
         if (isSpeechPlaying) {
             window.speechSynthesis.cancel();
             isSpeechPlaying = false;
-            speakerButton.textContent = '🔊';
+            if (speakerButton) speakerButton.textContent = '🔊';
         } else {
-            const textToSpeak = translatedText.textContent;
-            if (textToSpeak && textToSpeak !== "🎤" && textToSpeak !== "⏳" && textToSpeak !== "❌") {
-                speakText(textToSpeak);
+            if (translatedText) {
+                const textToSpeak = translatedText.textContent;
+                if (textToSpeak && textToSpeak !== "🎤" && textToSpeak !== "⏳" && textToSpeak !== "❌") {
+                    speakText(textToSpeak);
+                }
             }
         }
     }
@@ -181,15 +248,17 @@ document.addEventListener('DOMContentLoaded', function() {
         try {
             recognition.start();
             isRecording = true;
-            recordButton.classList.add('recording');
+            if (recordButton) recordButton.classList.add('recording');
             recordingStartTime = Date.now();
             updateTimer();
             timerInterval = setInterval(updateTimer, 1000);
-            translatedText.textContent = "🎙️";
-            speakerButton.disabled = true;
-            speakerButton.textContent = '🔇';
+            if (translatedText) translatedText.textContent = "🎙️";
+            if (speakerButton) {
+                speakerButton.disabled = true;
+                speakerButton.textContent = '🔇';
+            }
         } catch (error) {
-            translatedText.textContent = "❌";
+            if (translatedText) translatedText.textContent = "❌";
         }
     }
     
@@ -197,60 +266,84 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!isRecording) return;
         recognition.stop();
         isRecording = false;
-        recordButton.classList.remove('recording');
+        if (recordButton) recordButton.classList.remove('recording');
         clearInterval(timerInterval);
         hideRecordingModal();
-        translatedText.textContent = "⏳";
+        if (translatedText) translatedText.textContent = "⏳";
     }
     
     function showRecordingModal() {
-        recordingModal.classList.add('visible');
+        if (recordingModal) recordingModal.classList.add('visible');
     }
     
     function hideRecordingModal() {
-        recordingModal.classList.remove('visible');
+        if (recordingModal) recordingModal.classList.remove('visible');
     }
     
     function updateTimer() {
         const elapsedSeconds = Math.floor((Date.now() - recordingStartTime) / 1000);
         const minutes = Math.floor(elapsedSeconds / 60);
         const seconds = elapsedSeconds % 60;
-        recordingTimer.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        if (recordingTimer) {
+            recordingTimer.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        }
     }
     
     // ===== EVENTOS =====
-    recordButton.addEventListener('touchstart', function(e) {
-        e.preventDefault();
-        if (recordButton.disabled || !microphonePermissionGranted) return;
-        if (!isRecording) {
-            pressTimer = setTimeout(() => {
-                tapMode = false;
-                startRecording();
-            }, 300);
-        }
-    });
-    
-    recordButton.addEventListener('touchend', function(e) {
-        e.preventDefault();
-        clearTimeout(pressTimer);
-        if (isRecording) {
-            if (tapMode) {
+    if (recordButton) {
+        recordButton.addEventListener('touchstart', function(e) {
+            e.preventDefault();
+            if (recordButton.disabled || !microphonePermissionGranted) return;
+            if (!isRecording) {
+                pressTimer = setTimeout(() => {
+                    tapMode = false;
+                    startRecording();
+                }, 300);
+            }
+        });
+        
+        recordButton.addEventListener('touchend', function(e) {
+            e.preventDefault();
+            clearTimeout(pressTimer);
+            if (isRecording) {
                 stopRecording();
             } else {
-                stopRecording();
+                if (microphonePermissionGranted) {
+                    tapMode = true;
+                    startRecording();
+                    showRecordingModal();
+                }
             }
-        } else {
-            if (microphonePermissionGranted) {
-                tapMode = true;
-                startRecording();
-                showRecordingModal();
-            }
-        }
-    });
+        });
+    }
     
-    sendButton.addEventListener('click', stopRecording);
-    speakerButton.addEventListener('click', toggleSpeech);
+    if (sendButton) {
+        sendButton.addEventListener('click', stopRecording);
+    }
+    
+    if (speakerButton) {
+        speakerButton.addEventListener('click', toggleSpeech);
+    }
     
     // ===== INICIALIZAÇÃO =====
+    // ⭐ VERIFICA SE TEM CONEXÃO COMPARTILHADA
+    if (!checkSharedConnection()) {
+        console.log("Criando conexão própria para tradutor");
+        // Fallback para conexão própria se necessário
+    }
+    
     requestMicrophonePermission();
+    
+    console.log('Tradutor inicializado com sucesso!');
+    console.log('Configuração:', {
+        IDIOMA_ORIGEM,
+        IDIOMA_DESTINO,
+        IDIOMA_FALA
+    });
+}
+
+// Inicializa com delay para garantir que tudo esteja carregado
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM carregado, iniciando tradutor...');
+    setTimeout(initializeTranslator, 800);
 });
