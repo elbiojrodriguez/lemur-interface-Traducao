@@ -11,6 +11,16 @@ class WebRTCCore {
     this.iceServers = getIceServers();
   }
 
+  // ✅ MÉTODO PARA COMPARTILHAR O SOCKET
+  getSocket() {
+    return this.socket;
+  }
+
+  // ✅ MÉTODO PARA VERIFICAR CONEXÃO
+  isConnected() {
+    return this.socket && this.socket.connected;
+  }
+
   initialize(userId) {
     this.socket.emit('register', userId);
   }
