@@ -1,3 +1,4 @@
+
 import WebRTCCore from '../core/webrtc-core.js';
 import { QRCodeGenerator } from './qr-code-utils.js';
 
@@ -147,10 +148,6 @@ window.onload = async () => {
       if (remoteLangElement) {
         remoteLangElement.textContent = '🔴';
       }
-      // COMPARTILHA A CONEXÃO com o tradutor  
-window.rtcCore = rtcCore;
-window.myId = myId;
-console.log("Conexão WebRTC compartilhada com tradutor");
     }
   }
 
