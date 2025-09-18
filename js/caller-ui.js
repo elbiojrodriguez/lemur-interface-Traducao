@@ -1,7 +1,3 @@
-// COMPARTILHA A CONEXÃO com o tradutor
-window.rtcCore = rtcCore;
-window.myId = myId;
-console.log("Conexão WebRTC compartilhada com tradutor"); 
 
 // 📦 Importa o núcleo WebRTC
 import WebRTCCore from '../core/webrtc-core.js';
@@ -149,8 +145,3 @@ window.onload = async () => {
   aplicarBandeiraLocal(navegadorLang);
   aplicarBandeiraRemota(receiverLang);
 };
-
-// COMPARTILHA A CONEXÃO com o tradutor
-window.rtcCore = rtcCore;
-window.myId = myId;
-console.log("Conexão WebRTC compartilhada com tradutor");
