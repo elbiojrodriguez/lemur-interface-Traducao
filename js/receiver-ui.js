@@ -54,30 +54,24 @@ window.onload = async () => {
       return;
     }
 
-callerLang = typeof receivedCallerLang === 'string' && receivedCallerLang.trim() !== '' ? receivedCallerLang : null;
+    callerLang = typeof receivedCallerLang === 'string' && receivedCallerLang.trim() !== '' ? receivedCallerLang : null;
 
-if (callerLang) {
-    window.targetTranslationLang = lang; // Idioma LOCAL (do QR code)
-    window.callerLang = callerLang;      // Idioma REMOTO (recebido via WebRTC)
-    aplicarBandeiraRemota(callerLang);
-}
+    rtcCore.handleIncomingCall(offer, localStream, (remoteStream) => {
+      remoteStream.getAudioTracks().forEach(track => track.enabled = false);
 
-rtcCore.handleIncomingCall(offer, localStream, (remoteStream) => {
-    remoteStream.getAudioTracks().forEach(track => track.enabled = false);
+      const overlay = document.querySelector('.info-overlay');
+      if (overlay) overlay.classList.add('hidden');
 
-    const overlay = document.querySelector('.info-overlay');
-    if (overlay) overlay.classList.add('hidden');
+      localVideo.srcObject = remoteStream;
 
-    localVideo.srcObject = remoteStream;
-
-    // ⭐ REMOVER este bloco duplicado - já foi feito acima
-    // if (callerLang) {
-    //     window.targetTranslationLang = callerLang;
-    //     aplicarBandeiraRemota(callerLang);
-    // } else {
-    //     document.querySelector('.remoter-Lang').textContent = '🔴';
-    // }
-});
+      if (callerLang) {
+        window.targetTranslationLang = callerLang;
+        aplicarBandeiraRemota(callerLang);
+      } else {
+        document.querySelector('.remoter-Lang').textContent = '🔴';
+      }
+    });
+  };
 
   const TRANSLATE_ENDPOINT = 'https://chat-tradutor.onrender.com/translate';
 
