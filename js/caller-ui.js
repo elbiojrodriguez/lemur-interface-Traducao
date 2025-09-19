@@ -1,6 +1,38 @@
 // 📦 Importa o núcleo WebRTC
 import WebRTCCore from '../core/webrtc-core.js';
 
+// 🎯 FUNÇÃO PARA OBTER IDIOMA COMPLETO
+async function obterIdiomaCompleto(lang) {
+  if (!lang) return 'pt-BR';
+  if (lang.includes('-')) return lang; // Já está completo (ex: "pt-BR")
+  
+  try {
+    // 📦 CARREGA O JSON DE BANDEIRAS
+    const response = await fetch('assets/bandeiras/language-flags.json');
+    const flags = await response.json();
+    
+    // 🔍 PROCURA O CÓDIGO COMPLETO NO JSON
+    const codigoCompleto = Object.keys(flags).find(key => 
+      key.startsWith(lang + '-')
+    );
+    
+    // ✅ RETORNA O CÓDIGO COMPLETO ENCONTRADO
+    return codigoCompleto || `${lang}-${lang.toUpperCase()}`;
+    
+  } catch (error) {
+    console.error('Erro ao carregar JSON de bandeiras:', error);
+    
+    // 🆘 FALLBACK PARA CASOS DE ERRO
+    const fallback = {
+      'pt': 'pt-BR', 'es': 'es-ES', 'en': 'en-US',
+      'fr': 'fr-FR', 'de': 'de-DE', 'it': 'it-IT',
+      'ja': 'ja-JP', 'zh': 'zh-CN', 'ru': 'ru-RU'
+    };
+    
+    return fallback[lang] || 'en-US';
+  }
+}
+
 window.onload = async () => {
   // 🎥 Solicita acesso APENAS à câmera (SEM áudio)
   try {
@@ -48,10 +80,10 @@ window.onload = async () => {
   if (receiverId) {
     document.getElementById('callActionBtn').style.display = 'block';
 
-    document.getElementById('callActionBtn').onclick = () => {
+    document.getElementById('callActionBtn').onclick = async () => {
       if (localStream) {
-        const callerLang = navigator.language || 'pt-BR';
-        rtcCore.startCall(receiverId, localStream, callerLang); // ✅ envia idioma do caller
+        const callerLang = await obterIdiomaCompleto(navigator.language);
+        rtcCore.startCall(receiverId, localStream, callerLang);
       }
     };
   }
@@ -65,7 +97,7 @@ window.onload = async () => {
 
   // 🌐 Tradução automática da interface
   const TRANSLATE_ENDPOINT = 'https://chat-tradutor.onrender.com/translate';
-  const navegadorLang = navigator.language || 'pt-BR';
+  const navegadorLang = await obterIdiomaCompleto(navigator.language);
 
   const frasesParaTraduzir = {
     "translator-label": "Live translation. No filters. No platform."
