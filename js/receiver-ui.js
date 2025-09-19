@@ -67,6 +67,11 @@ window.onload = async () => {
       if (callerLang) {
         window.targetTranslationLang = callerLang;
         aplicarBandeiraRemota(callerLang);
+        
+        // ✅ INICIALIZA O TRADUTOR APÓS RECEBER A CHAMADA
+        setTimeout(() => {
+          initializeReceiverTranslator(callerLang);
+        }, 1000);
       } else {
         document.querySelector('.remoter-Lang').textContent = '🔴';
       }
@@ -153,4 +158,76 @@ window.onload = async () => {
   }
 
   aplicarBandeira(lang);
+
+  // ✅ NOVA FUNÇÃO: TRADUTOR PARA O RECEIVER (similar ao script.js)
+  function initializeReceiverTranslator(targetLang) {
+    console.log('Inicializando tradutor do receiver para:', targetLang);
+    
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      console.warn('Speech Recognition não suportado');
+      return;
+    }
+
+    let recognition = new SpeechRecognition();
+    recognition.lang = navigator.language || 'pt-BR';
+    recognition.continuous = true;
+    recognition.interimResults = true;
+
+    let isTranslating = false;
+    let lastTranslationTime = 0;
+
+    recognition.onresult = function(event) {
+      let finalTranscript = '';
+      
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        if (event.results[i].isFinal) {
+          finalTranscript += event.results[i][0].transcript;
+        }
+      }
+
+      if (finalTranscript && !isTranslating) {
+        const now = Date.now();
+        if (now - lastTranslationTime > 1000) {
+          lastTranslationTime = now;
+          isTranslating = true;
+
+          translateText(finalTranscript, targetLang)
+            .then(translatedText => {
+              console.log('Texto traduzido:', translatedText);
+              // Aqui você pode enviar o texto traduzido de volta para o caller
+              // ou exibir na interface do receiver
+              isTranslating = false;
+            })
+            .catch(error => {
+              console.error('Erro na tradução:', error);
+              isTranslating = false;
+            });
+        }
+      }
+    };
+
+    recognition.onerror = function(event) {
+      console.log('Erro no recognition:', event.error);
+    };
+
+    recognition.onend = function() {
+      // Reinicia o reconhecimento se parou inesperadamente
+      setTimeout(() => {
+        try {
+          recognition.start();
+        } catch (e) {
+          console.log('Não foi possível reiniciar o recognition:', e);
+        }
+      }, 500);
+    };
+
+    // Inicia o reconhecimento de voz
+    try {
+      recognition.start();
+      console.log('Reconhecimento de voz iniciado no receiver');
+    } catch (error) {
+      console.error('Erro ao iniciar recognition:', error);
+    }
+  }
 };
