@@ -1,12 +1,12 @@
-
 import WebRTCCore from '../core/webrtc-core.js';
 import { QRCodeGenerator } from './qr-code-utils.js';
 
 window.onload = async () => {
+  // 🎥 SOLICITA ACESSO APENAS À CÂMERA (SEM áudio)
   try {
-    await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+    await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
   } catch (error) {
-    console.error("Erro ao solicitar acesso à câmera e microfone:", error);
+    console.error("Erro ao solicitar acesso à câmera:", error);
   }
 
   const rtcCore = new WebRTCCore();
@@ -27,6 +27,7 @@ window.onload = async () => {
   let localStream = null;
   let callerLang = null;
 
+  // 🎥 CAPTURA VÍDEO LOCAL (SEM áudio)
   navigator.mediaDevices.getUserMedia({ video: true, audio: false })
     .then(stream => {
       localStream = stream;
