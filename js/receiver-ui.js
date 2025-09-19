@@ -40,6 +40,9 @@ window.onload = async () => {
   const token = params.get('token') || '';
   const lang = params.get('lang') || navigator.language || 'pt-BR';
 
+  // ✅ CORREÇÃO CRÍTICA: Define o idioma de destino IMEDIATAMENTE
+  window.targetTranslationLang = lang;
+
   const callerUrl = `${window.location.origin}/caller.html?targetId=${myId}&token=${encodeURIComponent(token)}&lang=${encodeURIComponent(lang)}`;
   QRCodeGenerator.generate("qrcode", callerUrl);
 
