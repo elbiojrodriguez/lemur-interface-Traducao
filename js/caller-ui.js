@@ -76,17 +76,23 @@ window.onload = async () => {
     lang: receiverLang
   };
 
-  // 📞 Botão de chamada — envia idioma do caller para o receiver
-  if (receiverId) {
-    document.getElementById('callActionBtn').style.display = 'block';
+// 📞 Botão de chamada — envia idioma do caller para o receiver
+if (receiverId) {
+  document.getElementById('callActionBtn').style.display = 'block';
 
-    document.getElementById('callActionBtn').onclick = async () => {
-      if (localStream) {
-        const callerLang = await obterIdiomaCompleto(navigator.language);
-        rtcCore.startCall(receiverId, localStream, callerLang);
-      }
-    };
-  }
+  document.getElementById('callActionBtn').onclick = async () => {
+    if (localStream) {
+      // ✅ NOME CORRIGIDO: "meuIdioma" em vez de "callerLang"
+      const meuIdioma = await obterIdiomaCompleto(navigator.language);
+      
+      // ✅ DEBUG PARA CONFIRMAR
+      console.log('🚀 Idioma do Caller sendo enviado:', meuIdioma);
+      alert(`📞 Enviando meu idioma: ${meuIdioma}`);
+      
+      rtcCore.startCall(receiverId, localStream, meuIdioma);
+    }
+  };
+}
 
   // 📺 Exibe vídeo remoto recebido
   rtcCore.setRemoteStreamCallback(stream => {
