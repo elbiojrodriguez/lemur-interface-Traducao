@@ -1,3 +1,21 @@
+// ✅ SOLICITA PERMISSÃO APENAS PARA ÁUDIO
+async function requestMicrophonePermission() {
+    try {
+        // ⭐ PEDE SOMENTE ÁUDIO (não interfere com WebRTC)
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        stream.getTracks().forEach(track => track.stop());
+        
+        microphonePermissionGranted = true;
+        recordButton.disabled = false;
+        translatedText.textContent = "🎤";
+        setupRecognitionEvents();
+        
+    } catch (error) {
+        translatedText.textContent = "🚫";
+        recordButton.disabled = true;
+    }
+} 
+
 function initializeTranslator() {
     // ===== CONFIGURAÇÃO =====
     let IDIOMA_ORIGEM = navigator.language || 'pt-BR';
