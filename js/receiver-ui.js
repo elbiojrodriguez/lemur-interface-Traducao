@@ -1,39 +1,5 @@
-```javascript
-// 📦 Importa o núcleo WebRTC
 import WebRTCCore from '../core/webrtc-core.js';
 import { QRCodeGenerator } from './qr-code-utils.js';
-
-// 🎯 FUNÇÃO PARA OBTER IDIOMA COMPLETO
-async function obterIdiomaCompleto(lang) {
-  if (!lang) return 'pt-BR';
-  if (lang.includes('-')) return lang; // Já está completo (ex: "pt-BR")
-  
-  try {
-    // 📦 CARREGA O JSON DE BANDEIRAS
-    const response = await fetch('assets/bandeiras/language-flags.json');
-    const flags = await response.json();
-    
-    // 🔍 PROCURA O CÓDIGO COMPLETO NO JSON
-    const codigoCompleto = Object.keys(flags).find(key => 
-      key.startsWith(lang + '-')
-    );
-    
-    // ✅ RETORNA O CÓDIGO COMPLETO ENCONTRADO
-    return codigoCompleto || `${lang}-${lang.toUpperCase()}`;
-    
-  } catch (error) {
-    console.error('Erro ao carregar JSON de bandeiras:', error);
-    
-    // 🆘 FALLBACK PARA CASOS DE ERRO
-    const fallback = {
-      'pt': 'pt-BR', 'es': 'es-ES', 'en': 'en-US',
-      'fr': 'fr-FR', 'de': 'de-DE', 'it': 'it-IT',
-      'ja': 'ja-JP', 'zh': 'zh-CN', 'ru': 'ru-RU'
-    };
-    
-    return fallback[lang] || 'en-US';
-  }
-}
 
 window.onload = async () => {
   // 🎥 SOLICITA ACESSO APENAS À CÂMERA (SEM áudio)
@@ -72,7 +38,7 @@ window.onload = async () => {
 
   const params = new URLSearchParams(window.location.search);
   const token = params.get('token') || '';
-  const lang = await obterIdiomaCompleto(params.get('lang') || navigator.language || 'pt-BR');
+  const lang = params.get('lang') || navigator.language || 'pt-BR';
 
   const callerUrl = `${window.location.origin}/caller.html?targetId=${myId}&token=${encodeURIComponent(token)}&lang=${encodeURIComponent(lang)}`;
   QRCodeGenerator.generate("qrcode", callerUrl);
@@ -82,15 +48,13 @@ window.onload = async () => {
 
   const localVideo = document.getElementById('localVideo');
 
-  rtcCore.onIncomingCall = async (offer, receivedCallerLang) => {
+  rtcCore.onIncomingCall = (offer, receivedCallerLang) => {
     if (!localStream) {
       console.warn("Stream local não disponível");
       return;
     }
 
-    callerLang = typeof receivedCallerLang === 'string' && receivedCallerLang.trim() !== '' 
-      ? await obterIdiomaCompleto(receivedCallerLang) 
-      : null;
+    callerLang = typeof receivedCallerLang === 'string' && receivedCallerLang.trim() !== '' ? receivedCallerLang : null;
 
     rtcCore.handleIncomingCall(offer, localStream, (remoteStream) => {
       remoteStream.getAudioTracks().forEach(track => track.enabled = false);
@@ -189,4 +153,3 @@ window.onload = async () => {
 
   aplicarBandeira(lang); // Aplica bandeira usando LANG do QR Code
 };
-```
