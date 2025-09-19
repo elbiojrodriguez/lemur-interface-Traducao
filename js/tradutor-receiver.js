@@ -1,5 +1,12 @@
 // ✅ SOLUÇÃO COMPLETA E CORRIGIDA
 function initializeTranslator() {
+    // ✅ ADICIONE ESTES CONSOLE.LOG AQUI:
+    console.log('=== 🔍 DEBUG TRADUTOR ===');
+    console.log('callerLang:', window.callerLang);
+    console.log('targetTranslationLang:', window.targetTranslationLang);
+    console.log('navigator.language:', navigator.language);
+    console.log('=========================');
+ 
  // ✅ CONFIGURAÇÃO CORRETA:
 let IDIOMA_ORIGEM = window.callerLang || navigator.language || 'pt-BR'; // Idioma de QUEM FALA
 const IDIOMA_DESTINO = window.targetTranslationLang || 'en'; // Idioma para TRADUZIR
