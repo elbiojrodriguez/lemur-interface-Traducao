@@ -2,7 +2,6 @@ import WebRTCCore from '../core/webrtc-core.js';
 import { QRCodeGenerator } from './qr-code-utils.js';
 
 window.onload = async () => {
-  // 🎥 SOLICITA ACESSO APENAS À CÂMERA (SEM áudio)
   try {
     await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
   } catch (error) {
@@ -27,7 +26,6 @@ window.onload = async () => {
   let localStream = null;
   let callerLang = null;
 
-  // 🎥 CAPTURA VÍDEO LOCAL (SEM áudio)
   navigator.mediaDevices.getUserMedia({ video: true, audio: false })
     .then(stream => {
       localStream = stream;
@@ -40,7 +38,6 @@ window.onload = async () => {
   const token = params.get('token') || '';
   const lang = params.get('lang') || navigator.language || 'pt-BR';
 
-  // ✅ CORREÇÃO CRÍTICA: Define o idioma de destino IMEDIATAMENTE
   window.targetTranslationLang = lang;
 
   const callerUrl = `${window.location.origin}/caller.html?targetId=${myId}&token=${encodeURIComponent(token)}&lang=${encodeURIComponent(lang)}`;
@@ -57,7 +54,9 @@ window.onload = async () => {
       return;
     }
 
-    callerLang = typeof receivedCallerLang === 'string' && receivedCallerLang.trim() !== '' ? receivedCallerLang : null;
+    // ✅ CORREÇÃO FINAL: Remove verificação complexa
+    callerLang = receivedCallerLang;
+    console.log('✅ Idioma recebido do caller:', callerLang);
 
     rtcCore.handleIncomingCall(offer, localStream, (remoteStream) => {
       remoteStream.getAudioTracks().forEach(track => track.enabled = false);
@@ -67,8 +66,11 @@ window.onload = async () => {
 
       localVideo.srcObject = remoteStream;
 
+      // ✅ CORREÇÃO FINAL: Sempre define, mesmo se null
+      window.targetTranslationLang = callerLang || lang;
+      console.log('✅ Idioma para tradução:', window.targetTranslationLang);
+
       if (callerLang) {
-        window.targetTranslationLang = callerLang;
         aplicarBandeiraRemota(callerLang);
       } else {
         document.querySelector('.remoter-Lang').textContent = '🔴';
@@ -94,7 +96,6 @@ window.onload = async () => {
     }
   }
 
-  // 🌐 TRADUÇÃO AUTOMÁTICA DA INTERFACE (usando idioma do QR Code)
   const frasesParaTraduzir = {
     "translator-label": "Live translation. No filters. No platform.",
     "qr-modal-title": "This is your online key",
@@ -105,7 +106,7 @@ window.onload = async () => {
     for (const [id, texto] of Object.entries(frasesParaTraduzir)) {
       const el = document.getElementById(id);
       if (el) {
-        const traduzido = await translateText(texto, lang); // Usa LANG do QR Code
+        const traduzido = await translateText(texto, lang);
         el.textContent = traduzido;
       }
     }
@@ -154,5 +155,5 @@ window.onload = async () => {
     }
   }
 
-  aplicarBandeira(lang); // Aplica bandeira usando LANG do QR Code
+  aplicarBandeira(lang);
 };
