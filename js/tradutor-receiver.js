@@ -1,7 +1,7 @@
 // ✅ SOLUÇÃO COMPLETA E CORRIGIDA
 function initializeTranslator() {
    // ===== CONFIGURAÇÃO =====
-   const lang = params.get('lang') || navigator.language || 'pt-BR';
+    let IDIOMA_ORIGEM = params.get('lang') || 'pt-BR';   
     const IDIOMA_DESTINO = callerLang ('lang') || 'en';
     const IDIOMA_FALA = callerLang ('lang') || 'en-US';
     
