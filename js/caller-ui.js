@@ -1,14 +1,12 @@
-
 // 📦 Importa o núcleo WebRTC
 import WebRTCCore from '../core/webrtc-core.js';
 
 window.onload = async () => {
-
-  // 🎥 Solicita acesso à câmera e microfone
+  // 🎥 Solicita acesso APENAS à câmera (SEM áudio)
   try {
-    await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+    await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
   } catch (error) {
-    console.error("Erro ao solicitar acesso à câmera e microfone:", error);
+    console.error("Erro ao solicitar acesso à câmera:", error);
   }
 
   // 🧠 Inicializa variáveis principais
@@ -24,7 +22,7 @@ window.onload = async () => {
   rtcCore.initialize(myId);
   rtcCore.setupSocketHandlers();
 
-  // 🎥 Captura vídeo local (sem áudio)
+  // 🎥 Captura vídeo local (SEM áudio)
   navigator.mediaDevices.getUserMedia({ video: true, audio: false })
     .then(stream => {
       localStream = stream;
