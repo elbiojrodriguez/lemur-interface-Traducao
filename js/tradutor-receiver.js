@@ -1,9 +1,9 @@
 // ✅ SOLUÇÃO COMPLETA E CORRIGIDA
 function initializeTranslator() {
    // ===== CONFIGURAÇÃO =====
-    let IDIOMA_ORIGEM = params.get('lang') || 'pt-BR';   
-    const IDIOMA_DESTINO = callerLang ('lang') || 'en';
-    const IDIOMA_FALA = callerLang ('lang') || 'en-US';
+    let IDIOMA_ORIGEM = window.targetTranslationLang || navigator.language || 'pt-BR';
+    const IDIOMA_DESTINO = window.callerLang || 'en';
+    const IDIOMA_FALA = window.callerLang || 'en-US';
     
     // ===== ELEMENTOS DOM =====
     const recordButton = document.getElementById('recordButton');
