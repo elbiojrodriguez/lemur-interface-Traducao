@@ -1,10 +1,9 @@
 // ✅ SOLUÇÃO COMPLETA E CORRIGIDA
 function initializeTranslator() {
    // ===== CONFIGURAÇÃO =====
-    let IDIOMA_ORIGEM = navigator.language || 'pt-BR';
-    const urlParams = new URLSearchParams(window.location.search);
-    const IDIOMA_DESTINO = urlParams.get('lang') || 'en';
-    const IDIOMA_FALA = urlParams.get('lang') || 'en-US';
+   const lang = params.get('lang') || navigator.language || 'pt-BR';
+    const IDIOMA_DESTINO = callerLang ('lang') || 'en';
+    const IDIOMA_FALA = callerLang ('lang') || 'en-US';
     
     // ===== ELEMENTOS DOM =====
     const recordButton = document.getElementById('recordButton');
