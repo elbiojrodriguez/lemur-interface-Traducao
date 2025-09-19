@@ -258,39 +258,6 @@ function initializeTranslator() {
         }
     }
     
-    async function translateText(text) {
-        try {
-            const trimmedText = text.trim().slice(0, 500);
-            if (!trimmedText) return "🎤";
-            
-            const response = await fetch('https://chat-tradutor.onrender.com/translate', {
-                method: 'POST',
-                headers: { 
-                    'Content-Type': 'application/json',
-                    'X-Request-Source': 'web-translator'
-                },
-                body: JSON.stringify({ 
-                    text: trimmedText, 
-                    targetLang: IDIOMA_DESTINO,
-                    source: 'integrated-translator',
-                    sessionId: window.myId || 'default-session'
-                })
-            });
-            
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            
-            const result = await response.json();
-            if (speakerButton) speakerButton.disabled = false;
-            return result.translatedText || "❌";
-            
-        } catch (error) {
-            console.error('Erro na tradução:', error);
-            return "❌";
-        }
-    }
-    
     function speakText(text) {
         if (!SpeechSynthesis || !text) return;
         
