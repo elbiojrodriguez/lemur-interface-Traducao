@@ -1,9 +1,9 @@
 // ✅ SOLUÇÃO COMPLETA E CORRIGIDA
 function initializeTranslator() {
-   // ===== CONFIGURAÇÃO =====
-    let IDIOMA_ORIGEM = window.targetTranslationLang || navigator.language || 'pt-BR';
-    const IDIOMA_DESTINO = window.callerLang || 'en';
-    const IDIOMA_FALA = window.callerLang || 'en-US';
+ // ✅ CONFIGURAÇÃO CORRETA:
+let IDIOMA_ORIGEM = window.callerLang || navigator.language || 'pt-BR'; // Idioma de QUEM FALA
+const IDIOMA_DESTINO = window.targetTranslationLang || 'en'; // Idioma para TRADUZIR
+const IDIOMA_FALA = window.targetTranslationLang || 'en-US'; // Idioma para FALAR
     
     // ===== ELEMENTOS DOM =====
     const recordButton = document.getElementById('recordButton');
