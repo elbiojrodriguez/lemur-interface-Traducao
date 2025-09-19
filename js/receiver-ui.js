@@ -48,37 +48,41 @@ window.onload = async () => {
 
   const localVideo = document.getElementById('localVideo');
 
- rtcCore.onIncomingCall = (offer, idiomaDoCaller) => {
-  if (!localStream) {
-    console.warn("Stream local não disponível");
-    return;
-  }
+  rtcCore.onIncomingCall = (offer, idiomaDoCaller) => {
+    if (!localStream) return;
 
-  // ✅ NOME CORRIGIDO: "idiomaDoCaller" em vez de "receivedCallerLang"
-  console.log('🎯 Idioma recebido de quem ligou:', idiomaDoCaller);
-  alert(`📞 Recebido idioma do caller: ${idiomaDoCaller || 'NÃO ENVIADO'}`);
+    console.log('🎯 Caller fala:', idiomaDoCaller);
+    console.log('🎯 Eu (receiver) entendo:', lang);
 
-  rtcCore.handleIncomingCall(offer, localStream, (remoteStream) => {
-    remoteStream.getAudioTracks().forEach(track => track.enabled = false);
+    // ✅ CORREÇÃO: NÃO usar idiomaDoCaller para tradução!
+    // Em vez disso: traduzir do idiomaDoCaller para MEU idioma (lang)
+    window.sourceTranslationLang = idiomaDoCaller; // Idioma de QUEM fala
+    window.targetTranslationLang = lang; // Idioma para QUEM ouve ← CORRETO!
 
-    const overlay = document.querySelector('.info-overlay');
-    if (overlay) overlay.classList.add('hidden');
+    console.log('🎯 Vou traduzir:', idiomaDoCaller, '→', lang);
 
-    localVideo.srcObject = remoteStream;
+    rtcCore.handleIncomingCall(offer, localStream, (remoteStream) => {
+      remoteStream.getAudioTracks().forEach(track => track.enabled = false);
 
-    // ✅ CORREÇÃO DEFINITIVA: Sempre define o idioma para tradução
-    window.targetTranslationLang = idiomaDoCaller || lang;
-    console.log('🎯 Idioma definido para tradução:', window.targetTranslationLang);
-    alert(`🌐 Vou traduzir para: ${window.targetTranslationLang}`);
+      const overlay = document.querySelector('.info-overlay');
+      if (overlay) overlay.classList.add('hidden');
 
-    // ✅ Aplica bandeira do idioma recebido
-    if (idiomaDoCaller) {
-      aplicarBandeiraRemota(idiomaDoCaller);
-    } else {
-      document.querySelector('.remoter-Lang').textContent = '🔴';
-    }
-  });
-};
+      localVideo.srcObject = remoteStream;
+
+      // ✅ CORREÇÃO DEFINITIVA: Sempre define o idioma para tradução
+      window.targetTranslationLang = idiomaDoCaller || lang;
+      console.log('🎯 Idioma definido para tradução:', window.targetTranslationLang);
+      alert(`🌐 Vou traduzir para: ${window.targetTranslationLang}`);
+
+      // ✅ Aplica bandeira do idioma recebido
+      if (idiomaDoCaller) {
+        aplicarBandeiraRemota(idiomaDoCaller);
+      } else {
+        document.querySelector('.remoter-Lang').textContent = '🔴';
+      }
+    });
+  };
+
   const TRANSLATE_ENDPOINT = 'https://chat-tradutor.onrender.com/translate';
 
   async function translateText(text, targetLang) {
