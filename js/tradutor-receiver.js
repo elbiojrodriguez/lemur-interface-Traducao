@@ -1,10 +1,36 @@
 // ✅ SOLUÇÃO COMPLETA E CORRIGIDA
 function initializeTranslator() {
     
- // ✅ CONFIGURAÇÃO CORRETA:
-let IDIOMA_ORIGEM = window.callerLang || navigator.language || 'pt-BR'; // Idioma de QUEM FALA
-const IDIOMA_DESTINO = window.targetTranslationLang || 'en'; // Idioma para TRADUZIR
-const IDIOMA_FALA = window.targetTranslationLang || 'en-US'; // Idioma para FALAR
+    // ✅ CONFIGURAÇÃO CORRIGIDA:
+    let IDIOMA_ORIGEM = window.callerLang || navigator.language || 'pt-BR';
+    
+    // ✅ NOVAS FUNÇÕES PARA OBTER IDIOMA CORRETO
+    function obterIdiomaDestino() {
+        // 1. Tenta pegar do caller (já deve estar definido)
+        // 2. Tenta pegar da URL (?lang=es-ES) 
+        // 3. Fallback inteligente
+        return window.targetTranslationLang || 
+               new URLSearchParams(window.location.search).get('lang') || 
+               'en';
+    }
+
+    function obterIdiomaFala() {
+        const lang = obterIdiomaDestino();
+        // Garante formato completo para síntese de voz
+        if (lang.includes('-')) return lang;
+        
+        // Fallback para formatos completos
+        const fallbackMap = {
+            'en': 'en-US', 'pt': 'pt-BR', 'es': 'es-ES', 
+            'fr': 'fr-FR', 'de': 'de-DE', 'it': 'it-IT'
+        };
+        
+        return fallbackMap[lang] || 'en-US';
+    }
+    
+    // ✅ AGORA USA AS FUNÇÕES CORRETAS
+    const IDIOMA_DESTINO = obterIdiomaDestino();
+    const IDIOMA_FALA = obterIdiomaFala();
     
     // ===== ELEMENTOS DOM =====
     const recordButton = document.getElementById('recordButton');
@@ -61,19 +87,19 @@ const IDIOMA_FALA = window.targetTranslationLang || 'en-US'; // Idioma para FALA
     
     let recognition = new SpeechRecognition();
     recognition.lang = IDIOMA_ORIGEM;
-    recognition.continuous = false; // ⭐ ALTERADO: continuous = false
+    recognition.continuous = false;
     recognition.interimResults = true;
     
     // ===== VARIÁVEIS DE ESTADO =====
     let isRecording = false;
-    let isTranslating = false; // ⭐ NOVO: controle de tradução
+    let isTranslating = false;
     let recordingStartTime = 0;
     let timerInterval = null;
     let pressTimer;
     let tapMode = false;
     let isSpeechPlaying = false;
     let microphonePermissionGranted = false;
-    let lastTranslationTime = 0; // ⭐ NOVO: debounce
+    let lastTranslationTime = 0;
     
     // ===== FUNÇÕES DE IDIOMA =====
     if (worldButton && languageDropdown) {
@@ -109,7 +135,7 @@ const IDIOMA_FALA = window.targetTranslationLang || 'en-US'; // Idioma para FALA
                 
                 recognition = new SpeechRecognition();
                 recognition.lang = novoIdioma;
-                recognition.continuous = false; // ⭐ continuous = false
+                recognition.continuous = false;
                 recognition.interimResults = true;
                 setupRecognitionEvents();
                 
@@ -137,17 +163,15 @@ const IDIOMA_FALA = window.targetTranslationLang || 'en-US'; // Idioma para FALA
                 }
             }
             
-            // ⭐ EXIBE TEXTO INTERIM (em tempo real)
             if (interimTranscript && !finalTranscript) {
                 if (translatedText) {
                     translatedText.textContent = interimTranscript;
                 }
             }
             
-            // ⭐ PROCESSA TEXTO FINAL COM DEBOUNCE
             if (finalTranscript && !isTranslating) {
                 const now = Date.now();
-                if (now - lastTranslationTime > 1000) { // ⭐ Debounce de 1s
+                if (now - lastTranslationTime > 1000) {
                     lastTranslationTime = now;
                     isTranslating = true;
                     
@@ -187,9 +211,7 @@ const IDIOMA_FALA = window.targetTranslationLang || 'en-US'; // Idioma para FALA
         };
     }
     
-    // ✅ SOLUÇÃO CORRIGIDA PARA PERMISSÃO
     async function requestMicrophonePermission() {
-        // ⭐ PRIMEIRO: Verifica se já temos permissão SEM pedir de novo
         try {
             const devices = await navigator.mediaDevices.enumerateDevices();
             const hasMicrophonePermission = devices.some(device => 
@@ -204,7 +226,6 @@ const IDIOMA_FALA = window.targetTranslationLang || 'en-US'; // Idioma para FALA
                 return;
             }
             
-            // ⭐ SEGUNDO: Se não tem permissão, pede UMA VEZ
             const stream = await navigator.mediaDevices.getUserMedia({ 
                 audio: {
                     echoCancellation: true,
@@ -213,7 +234,6 @@ const IDIOMA_FALA = window.targetTranslationLang || 'en-US'; // Idioma para FALA
                 }
             });
             
-            // ⭐ Para o stream após 1 segundo (apenas para verificação)
             setTimeout(() => {
                 stream.getTracks().forEach(track => track.stop());
             }, 1000);
@@ -232,7 +252,6 @@ const IDIOMA_FALA = window.targetTranslationLang || 'en-US'; // Idioma para FALA
     
     async function translateText(text) {
         try {
-            // ⭐ LIMITA TAMANHO DO TEXTO (evita sobrecarga)
             const trimmedText = text.trim().slice(0, 500);
             if (!trimmedText) return "🎤";
             
@@ -362,7 +381,6 @@ const IDIOMA_FALA = window.targetTranslationLang || 'en-US'; // Idioma para FALA
             recordingTimer.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
         }
         
-        // ⭐ PARA automaticamente após 30 segundos
         if (elapsedSeconds >= 30) {
             stopRecording();
         }
@@ -398,7 +416,6 @@ const IDIOMA_FALA = window.targetTranslationLang || 'en-US'; // Idioma para FALA
             }
         });
         
-        // ⭐ SUPORTE PARA CLIQUE (mouse)
         recordButton.addEventListener('click', function(e) {
             e.preventDefault();
             if (recordButton.disabled || !microphonePermissionGranted || isTranslating) return;
@@ -431,7 +448,6 @@ const IDIOMA_FALA = window.targetTranslationLang || 'en-US'; // Idioma para FALA
     });
 }
 
-// Inicializa com delay para garantir que tudo esteja carregado
 document.addEventListener('DOMContentLoaded', function() {
     console.log('DOM carregado, iniciando tradutor...');
     setTimeout(initializeTranslator, 800);
