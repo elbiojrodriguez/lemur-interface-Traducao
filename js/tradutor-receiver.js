@@ -1,3 +1,23 @@
+async function translateText(text) {
+  try {
+    // ✅ CORREÇÃO: Usar source e target CORRETOS
+    const response = await fetch('https://chat-tradutor.onrender.com/translate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ 
+        text: text,
+        sourceLang: window.sourceTranslationLang || 'auto', // Idioma de QUEM fala
+        targetLang: window.targetTranslationLang || 'en'    // Idioma para QUEM ouve
+      })
+    });
+
+    const result = await response.json();
+    return result.translatedText || text;
+  } catch (error) {
+    return text; // Retorna o texto original em caso de erro
+  }
+} 
+
 function initializeTranslator() {
     
     let IDIOMA_ORIGEM = window.callerLang || navigator.language || 'pt-BR';
