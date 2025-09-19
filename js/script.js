@@ -1,6 +1,5 @@
 function initializeTranslator() {
     // ===== CONFIGURAÇÃO =====
-    // ✅ ATUALIZAÇÃO 1: Busca idiomas do navegador e parâmetros URL
     let IDIOMA_ORIGEM = navigator.language || 'pt-BR';
     const urlParams = new URLSearchParams(window.location.search);
     const IDIOMA_DESTINO = urlParams.get('lang') || 'en';
@@ -25,10 +24,25 @@ function initializeTranslator() {
         return;
     }
     
+    // ===== FUNÇÃO PARA BUSCAR BANDEIRA DO JSON =====
+    async function getBandeiraDoJson(langCode) {
+        try {
+            const response = await fetch('assets/bandeiras/language-flags.json');
+            const flags = await response.json();
+            
+            // ⭐ TENTA: 1. Código completo → 2. Código base → 3. Fallback
+            return flags[langCode] || flags[langCode.split('-')[0]] || '🎌';
+        } catch (error) {
+            console.error('Erro ao carregar bandeiras:', error);
+            return '🎌';
+        }
+    }
+
     // ===== CONFIGURAÇÃO INICIAL =====
-    // ✅ ATUALIZAÇÃO 3: Usa bandeira já existente na página
-    const localLangElement = document.querySelector('.local-Lang');
-    currentLanguageFlag.textContent = localLangElement?.textContent || '🎌';
+    // ✅ USA BANDEIRA DO JSON (assíncrono)
+    getBandeiraDoJson(IDIOMA_ORIGEM).then(bandeira => {
+        currentLanguageFlag.textContent = bandeira;
+    });
     translatedText.textContent = "🎤";
     
     // ===== VERIFICAÇÃO DE SUPORTE =====
@@ -76,15 +90,13 @@ function initializeTranslator() {
     
     if (languageOptions && languageOptions.length > 0) {
         languageOptions.forEach(option => {
-            option.addEventListener('click', function() {
+            option.addEventListener('click', async function() {
                 const novoIdioma = this.getAttribute('data-lang');
                 IDIOMA_ORIGEM = novoIdioma;
                 
-                // ✅ ATUALIZAÇÃO 3: Busca bandeira do elemento existente
-                const bandeiraElement = document.querySelector('.local-Lang');
-                if (currentLanguageFlag) {
-                    currentLanguageFlag.textContent = bandeiraElement ? bandeiraElement.textContent : '🎌';
-                }
+                // ✅ BUSCA BANDEIRA NO JSON (assíncrono)
+                const bandeira = await getBandeiraDoJson(novoIdioma);
+                currentLanguageFlag.textContent = bandeira;
                 
                 if (languageDropdown) {
                     languageDropdown.classList.remove('show');
@@ -143,7 +155,7 @@ function initializeTranslator() {
         recognition.onend = stopRecording;
     }
     
-    // ✅ ATUALIZAÇÃO 2: Compartilha permissão já concedida
+    // ✅ COMPARTILHA PERMISSÃO JÁ CONCEDIDA
     async function requestMicrophonePermission() {
         // ⭐ PRIMEIRO: Tenta usar permissão já concedida pelos outros scripts
         try {
@@ -178,12 +190,19 @@ function initializeTranslator() {
             const response = await fetch('https://chat-tradutor.onrender.com/translate', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ text, targetLang: IDIOMA_DESTINO })
+                body: JSON.stringify({ 
+                    text, 
+                    targetLang: IDIOMA_DESTINO,
+                    source: 'integrated-translator',
+                    sessionId: window.myId || 'default-session'
+                })
             });
+            
             const result = await response.json();
             if (speakerButton) speakerButton.disabled = false;
             return result.translatedText || "❌";
         } catch (error) {
+            console.error('Erro na tradução:', error);
             return "❌";
         }
     }
