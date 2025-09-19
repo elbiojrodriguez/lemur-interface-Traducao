@@ -1,14 +1,9 @@
-// ✅ SOLUÇÃO COMPLETA E CORRIGIDA
 function initializeTranslator() {
     
-    // ✅ CONFIGURAÇÃO CORRIGIDA:
     let IDIOMA_ORIGEM = window.callerLang || navigator.language || 'pt-BR';
     
-    // ✅ NOVAS FUNÇÕES PARA OBTER IDIOMA CORRETO
+    // ✅ CORREÇÃO FINAL: Função melhorada
     function obterIdiomaDestino() {
-        // 1. Tenta pegar do caller (já deve estar definido)
-        // 2. Tenta pegar da URL (?lang=es-ES) 
-        // 3. Fallback inteligente
         return window.targetTranslationLang || 
                new URLSearchParams(window.location.search).get('lang') || 
                'en';
@@ -16,10 +11,8 @@ function initializeTranslator() {
 
     function obterIdiomaFala() {
         const lang = obterIdiomaDestino();
-        // Garante formato completo para síntese de voz
         if (lang.includes('-')) return lang;
         
-        // Fallback para formatos completos
         const fallbackMap = {
             'en': 'en-US', 'pt': 'pt-BR', 'es': 'es-ES', 
             'fr': 'fr-FR', 'de': 'de-DE', 'it': 'it-IT'
@@ -28,11 +21,15 @@ function initializeTranslator() {
         return fallbackMap[lang] || 'en-US';
     }
     
-    // ✅ AGORA USA AS FUNÇÕES CORRETAS
     const IDIOMA_DESTINO = obterIdiomaDestino();
     const IDIOMA_FALA = obterIdiomaFala();
     
-    // ===== ELEMENTOS DOM =====
+    console.log('🎯 Configuração de tradução:', {
+        origem: IDIOMA_ORIGEM,
+        destino: IDIOMA_DESTINO,
+        fala: IDIOMA_FALA
+    });
+
     const recordButton = document.getElementById('recordButton');
     const translatedText = document.getElementById('translatedText');
     const recordingModal = document.getElementById('recordingModal');
@@ -44,20 +41,16 @@ function initializeTranslator() {
     const languageDropdown = document.getElementById('languageDropdown');
     const languageOptions = document.querySelectorAll('.language-option');
     
-    // ⭐ VERIFICA SE ELEMENTOS CRÍTICOS EXISTEM
     if (!currentLanguageFlag || !recordButton || !translatedText || !languageDropdown) {
         console.log('Aguardando elementos do DOM...');
         setTimeout(initializeTranslator, 300);
         return;
     }
     
-    // ===== FUNÇÃO PARA BUSCAR BANDEIRA DO JSON =====
     async function getBandeiraDoJson(langCode) {
         try {
             const response = await fetch('assets/bandeiras/language-flags.json');
             const flags = await response.json();
-            
-            // ⭐ TENTA: 1. Código completo → 2. Código base → 3. Fallback
             return flags[langCode] || flags[langCode.split('-')[0]] || '🎌';
         } catch (error) {
             console.error('Erro ao carregar bandeiras:', error);
@@ -65,13 +58,11 @@ function initializeTranslator() {
         }
     }
 
-    // ===== CONFIGURAÇÃO INICIAL =====
     getBandeiraDoJson(IDIOMA_ORIGEM).then(bandeira => {
         currentLanguageFlag.textContent = bandeira;
     });
     translatedText.textContent = "🎤";
     
-    // ===== VERIFICAÇÃO DE SUPORTE =====
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     const SpeechSynthesis = window.speechSynthesis;
     
@@ -90,7 +81,6 @@ function initializeTranslator() {
     recognition.continuous = false;
     recognition.interimResults = true;
     
-    // ===== VARIÁVEIS DE ESTADO =====
     let isRecording = false;
     let isTranslating = false;
     let recordingStartTime = 0;
@@ -101,7 +91,6 @@ function initializeTranslator() {
     let microphonePermissionGranted = false;
     let lastTranslationTime = 0;
     
-    // ===== FUNÇÕES DE IDIOMA =====
     if (worldButton && languageDropdown) {
         worldButton.addEventListener('click', function(e) {
             e.preventDefault();
@@ -149,7 +138,6 @@ function initializeTranslator() {
         });
     }
     
-    // ===== FUNÇÕES PRINCIPAIS =====
     function setupRecognitionEvents() {
         recognition.onresult = function(event) {
             let finalTranscript = '';
@@ -386,7 +374,6 @@ function initializeTranslator() {
         }
     }
     
-    // ===== EVENTOS =====
     if (recordButton) {
         recordButton.addEventListener('touchstart', function(e) {
             e.preventDefault();
@@ -437,15 +424,9 @@ function initializeTranslator() {
         speakerButton.addEventListener('click', toggleSpeech);
     }
     
-    // ===== INICIALIZAÇÃO =====
     requestMicrophonePermission();
     
     console.log('Tradutor inicializado com sucesso!');
-    console.log('Configuração:', {
-        IDIOMA_ORIGEM,
-        IDIOMA_DESTINO,
-        IDIOMA_FALA
-    });
 }
 
 document.addEventListener('DOMContentLoaded', function() {
