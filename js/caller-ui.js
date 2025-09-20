@@ -4,25 +4,21 @@ import { WebRTCCore } from '../core/webrtc-core.js';
 // 🎯 FUNÇÃO PARA OBTER IDIOMA COMPLETO
 async function obterIdiomaCompleto(lang) {
   if (!lang) return 'pt-BR';
-  if (lang.includes('-')) return lang; // Já está completo (ex: "pt-BR")
+  if (lang.includes('-')) return lang;
   
   try {
-    // 📦 CARREGA O JSON DE BANDEIRAS
     const response = await fetch('assets/bandeiras/language-flags.json');
     const flags = await response.json();
     
-    // 🔍 PROCURA O CÓDIGO COMPLETO NO JSON
     const codigoCompleto = Object.keys(flags).find(key => 
       key.startsWith(lang + '-')
     );
     
-    // ✅ RETORNA O CÓDIGO COMPLETO ENCONTRADO
     return codigoCompleto || `${lang}-${lang.toUpperCase()}`;
     
   } catch (error) {
     console.error('Erro ao carregar JSON de bandeiras:', error);
     
-    // 🆘 FALLBACK PARA CASOS DE ERRO
     const fallback = {
       'pt': 'pt-BR', 'es': 'es-ES', 'en': 'en-US',
       'fr': 'fr-FR', 'de': 'de-DE', 'it': 'it-IT',
@@ -33,17 +29,36 @@ async function obterIdiomaCompleto(lang) {
   }
 }
 
+// ===== FUNÇÃO SIMPLES PARA ENVIAR TEXTO =====
+function enviarParaOutroCelular(texto) {
+    if (window.rtcDataChannel && window.rtcDataChannel.isOpen()) {
+        window.rtcDataChannel.send(texto);
+        console.log('✅ Texto enviado:', texto);
+    } else {
+        console.log('⏳ Canal não disponível ainda. Tentando novamente...');
+        setTimeout(() => enviarParaOutroCelular(texto), 1000);
+    }
+}
+
 window.onload = async () => {
-  // 🎥 Solicita acesso APENAS à câmera (SEM áudio) - PRIMEIRO!
   try {
+    // ✅ 1. PRIMEIRO: Solicita CÂMERA
     const stream = await navigator.mediaDevices.getUserMedia({ 
       video: true, 
       audio: false 
     });
     
-    // ✅ AGORA SIM: Inicializa WebRTC COM A STREAM
-    window.rtcCore = new WebRTCCore(); // 👈 Torna global
-    let localStream = stream; // 👈 Já temos a stream
+    let localStream = stream;
+
+    // ✅ 2. DEPOIS: Inicializa WebRTC GLOBAL
+    window.rtcCore = new WebRTCCore();
+    
+    // ✅ 3. CONFIGURA CALLBACK PARA RECEBER MENSAGENS
+    window.rtcCore.setDataChannelCallback((mensagem) => {
+      console.log('Mensagem recebida no caller:', mensagem);
+      const elemento = document.getElementById('texto-recebido');
+      if (elemento) elemento.textContent = mensagem;
+    });
 
     // 🆔 Exibe o ID do caller na interface
     const myId = crypto.randomUUID().substr(0, 8);
@@ -52,16 +67,6 @@ window.onload = async () => {
     // 🔌 Inicializa conexão WebRTC
     window.rtcCore.initialize(myId);
     window.rtcCore.setupSocketHandlers();
-
-    // ✅ Configura callback para receber mensagens
-    window.rtcCore.setDataChannelCallback((mensagem) => {
-      console.log('Mensagem recebida no caller:', mensagem);
-      // Exibir na UI do caller
-      const elemento = document.getElementById('texto-recebido');
-      if (elemento) {
-        elemento.textContent = mensagem;
-      }
-    });
 
     // 🔍 Extrai parâmetros do QR Code (receiver)
     const urlParams = new URLSearchParams(window.location.search);
@@ -116,6 +121,10 @@ window.onload = async () => {
         });
 
         const result = await response.json();
+        
+        // ✅ ENVIA PARA O OUTRO CELULAR
+        enviarParaOutroCelular(result.translatedText);
+        
         return result.translatedText || text;
       } catch (error) {
         console.error('Erro na tradução:', error);
@@ -182,6 +191,6 @@ window.onload = async () => {
   } catch (error) {
     console.error("Erro ao solicitar acesso à câmera:", error);
     alert("Erro ao acessar a câmera. Verifique as permissões.");
-    return; // ⛔ PARA TUDO se não tiver câmera
+    return;
   }
 };
