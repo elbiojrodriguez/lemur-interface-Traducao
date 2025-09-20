@@ -25,8 +25,8 @@ async function translateText(text) {
     const result = await response.json();
     const translatedText = result.translatedText || text;
     
-    // ✅ ENVIA PARA OUTRO CELULAR:
-    enviarParaOutroCelular(translatedText);
+    // ❌❌❌ REMOVA ESTA LINHA (está enviando para API, não para outro celular)
+    // enviarParaOutroCelular(translatedText);
     
     return translatedText;
     
@@ -34,7 +34,6 @@ async function translateText(text) {
     return text;
   }
 }
-
 function initializeTranslator() {
     
     let IDIOMA_ORIGEM = window.callerLang || navigator.language || 'pt-BR';
