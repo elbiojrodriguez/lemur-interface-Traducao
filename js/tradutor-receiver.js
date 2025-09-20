@@ -187,19 +187,25 @@ function initializeTranslator() {
                         translatedText.textContent = "⏳";
                     }
                     
-                    translateText(finalTranscript).then(translation => {
-                        if (translatedText) {
-                            translatedText.textContent = translation;
-                            if (SpeechSynthesis) {
-                                setTimeout(() => speakText(translation), 500);
-                            }
-                        }
-                        isTranslating = false;
-                    }).catch(error => {
-                        console.error('Erro na tradução:', error);
-                        if (translatedText) translatedText.textContent = "❌";
-                        isTranslating = false;
-                    });
+                 translateText(finalTranscript).then(translation => {
+    if (translatedText) {
+        translatedText.textContent = translation;
+        
+        // ✅ NOVO: ENVIA PARA O OUTRO CELULAR
+        if (window.centroTraducao && translation && translation !== "❌") {
+            window.centroTraducao.receberTextoTraduzido(translation);
+        }
+        
+        if (SpeechSynthesis) {
+            setTimeout(() => speakText(translation), 500);
+        }
+    }
+    isTranslating = false;
+}).catch(error => {
+    console.error('Erro na tradução:', error);
+    if (translatedText) translatedText.textContent = "❌";
+    isTranslating = false;
+});
                 }
             }
         };
