@@ -23,7 +23,7 @@ async function obterIdiomaCompleto(lang) {
 }
 
 window.onload = async () => {
-  // 🎥 Inicializa permissões de mídia com áudio e vídeo
+  // 🎥 Inicializa permissões de mídia (áudio + vídeo)
   try {
     await window.mediaPermissions.initialize();
   } catch (error) {
@@ -31,12 +31,16 @@ window.onload = async () => {
     return;
   }
 
+  // 🎥 Captura apenas o vídeo da câmera
+  const localStream = window.mediaPermissions.getVideoStream();
+  const localVideo = document.getElementById('localVideo');
+  if (localVideo) {
+    localVideo.srcObject = localStream;
+  }
+
   // 🧠 Inicializa variáveis principais
-  const chatInputBox = document.querySelector('.chat-input-box');
   const rtcCore = new WebRTCCore();
   const myId = crypto.randomUUID().substr(0, 8);
-  const localStream = window.mediaPermissions.getFullStream();
-
   document.getElementById('myId').textContent = myId;
 
   // 🔌 Inicializa conexão WebRTC
