@@ -33,6 +33,73 @@ async function obterIdiomaCompleto(lang) {
   }
 }
 
+// ➕ NOVO: Centro de Tradução integrado
+class CentroTraducao {
+    constructor() {
+        this.dataChannel = null;
+        this.callbackRecebimento = null;
+        this.translateEndpoint = 'https://chat-tradutor.onrender.com/translate';
+    }
+
+    configurarDataChannel(dataChannel) {
+        this.dataChannel = dataChannel;
+        
+        this.dataChannel.onmessage = (event) => {
+            try {
+                const dados = JSON.parse(event.data);
+                
+                if (dados.tipo === 'texto_traduzido' && this.callbackRecebimento) {
+                    this.callbackRecebimento(dados.texto);
+                }
+            } catch (error) {
+                console.error('Erro ao processar mensagem:', error);
+            }
+        };
+    }
+
+    definirCallbackRecebimento(callback) {
+        this.callbackRecebimento = callback;
+    }
+
+    async receberTextoTraduzido(texto) {
+        if (!this.dataChannel || this.dataChannel.readyState !== 'open') {
+            console.warn('DataChannel não está disponível para enviar texto traduzido');
+            return;
+        }
+
+        try {
+            const dados = {
+                tipo: 'texto_traduzido',
+                texto: texto,
+                timestamp: Date.now()
+            };
+            
+            this.dataChannel.send(JSON.stringify(dados));
+        } catch (error) {
+            console.error('Erro ao enviar texto traduzido:', error);
+        }
+    }
+
+    async traduzirTexto(texto, idiomaAlvo) {
+        try {
+            const response = await fetch(this.translateEndpoint, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ text: texto, targetLang: idiomaAlvo })
+            });
+
+            const result = await response.json();
+            return result.translatedText || texto;
+        } catch (error) {
+            console.error('Erro na tradução:', error);
+            return texto;
+        }
+    }
+}
+
+// ➕ NOVO: Instância global do centro de tradução
+window.centroTraducao = new CentroTraducao();
+
 window.onload = async () => {
   // 🎥 Solicita acesso APENAS à câmera (SEM áudio)
   try {
@@ -180,4 +247,20 @@ if (receiverId) {
   // 🚩 Aplica bandeiras iniciais
   aplicarBandeiraLocal(navegadorLang);
   aplicarBandeiraRemota(receiverLang);
+
+  // ➕ NOVO: Configuração do centro de tradução
+  // Aguarda o data channel estar disponível
+  const intervaloConfiguracao = setInterval(() => {
+    if (rtcCore.dataChannel && rtcCore.dataChannel.readyState === 'open') {
+      clearInterval(intervaloConfiguracao);
+      window.centroTraducao.configurarDataChannel(rtcCore.dataChannel);
+      
+      window.centroTraducao.definirCallbackRecebimento((textoRecebido) => {
+        const elementoTexto = document.getElementById('texto-recebido');
+        if (elementoTexto) {
+          elementoTexto.textContent = textoRecebido;
+        }
+      });
+    }
+  }, 500);
 };
