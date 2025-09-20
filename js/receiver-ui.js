@@ -9,8 +9,8 @@ window.onload = async () => {
       audio: false 
     });
     
-    // ✅ AGORA SIM: Inicializa WebRTC com a stream
-    const rtcCore = new WebRTCCore();
+    // ✅✅✅ CORREÇÃO: TORNA GLOBAL (window.rtcCore)
+    window.rtcCore = new WebRTCCore();
 
     const url = window.location.href;
     const fixedId = url.split('?')[1] || crypto.randomUUID().substr(0, 8);
@@ -39,12 +39,12 @@ window.onload = async () => {
     const callerUrl = `${window.location.origin}/caller.html?targetId=${myId}&token=${encodeURIComponent(token)}&lang=${encodeURIComponent(lang)}`;
     QRCodeGenerator.generate("qrcode", callerUrl);
 
-    rtcCore.initialize(myId);
-    rtcCore.setupSocketHandlers();
+    window.rtcCore.initialize(myId);
+    window.rtcCore.setupSocketHandlers();
 
     const localVideo = document.getElementById('localVideo');
 
-    rtcCore.onIncomingCall = (offer, idiomaDoCaller) => {
+    window.rtcCore.onIncomingCall = (offer, idiomaDoCaller) => {
       if (!localStream) return;
 
       console.log('🎯 Caller fala:', idiomaDoCaller);
@@ -57,7 +57,7 @@ window.onload = async () => {
 
       console.log('🎯 Vou traduzir:', idiomaDoCaller, '→', lang);
 
-      rtcCore.handleIncomingCall(offer, localStream, (remoteStream) => {
+      window.rtcCore.handleIncomingCall(offer, localStream, (remoteStream) => {
         remoteStream.getAudioTracks().forEach(track => track.enabled = false);
 
         const overlay = document.querySelector('.info-overlay');
@@ -158,6 +158,16 @@ window.onload = async () => {
 
     aplicarBandeira(lang);
 
+    // ✅✅✅ CONFIGURA CALLBACK PARA RECEBER MENSAGENS
+    window.rtcCore.setDataChannelCallback((mensagem) => {
+      console.log('Mensagem recebida no receiver:', mensagem);
+      // Exibir na UI
+      const elemento = document.getElementById('texto-recebido');
+      if (elemento) {
+        elemento.textContent = mensagem;
+      }
+    });
+
     // ✅ DEPOIS: Inicializar tradutor
     setTimeout(() => {
       if (typeof initializeTranslator === 'function') {
@@ -167,8 +177,7 @@ window.onload = async () => {
     
   } catch (error) {
     console.error("Erro ao solicitar acesso à câmera:", error);
-    // ⛔ MOSTRAR ERRO PARA O USUÁRIO
     alert("Erro ao acessar a câmera. Verifique as permissões.");
-    return; // ⛔ PARA TUDO se não tiver câmera
+    return;
   }
 };
