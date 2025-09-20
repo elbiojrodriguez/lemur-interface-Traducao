@@ -69,16 +69,12 @@ window.onload = async () => {
 
       localVideo.srcObject = remoteStream;
 
-      // ✅ MANTIDO: Configuração original do idioma
-      window.targetTranslationLang = idiomaDoCaller || lang;
       console.log('🎯 Idioma definido para tradução:', window.targetTranslationLang);
 
-      // ✅ Configura DataChannel para receber mensagens
       rtcCore.setDataChannelCallback((message) => {
         displayReceivedText(message);
       });
 
-      // ✅ Aplica bandeira do idioma recebido
       if (idiomaDoCaller) {
         aplicarBandeiraRemota(idiomaDoCaller);
       } else {
@@ -87,7 +83,6 @@ window.onload = async () => {
     });
   };
 
-  // ✅ FUNÇÃO PARA INICIAR RECONHECIMENTO DE FALA (MANUAL)
   function startSpeechRecognition() {
     if (!('webkitSpeechRecognition' in window)) {
       console.error('Reconhecimento de fala não suportado');
@@ -108,7 +103,6 @@ window.onload = async () => {
       }
 
       if (finalText && window.sourceTranslationLang) {
-        // ✅ CORRETO: Traduz do MEU idioma para o idioma do CALLER
         const translated = await translateText(finalText, window.sourceTranslationLang);
         if (rtcCore.dataChannel && rtcCore.dataChannel.readyState === 'open') {
           rtcCore.sendText(translated);
@@ -119,7 +113,6 @@ window.onload = async () => {
     recognition.start();
   }
 
-  // ✅ BOTÃO PARA ATIVAR MICROFONE MANUALMENTE
   document.getElementById('toggleMicBtn').onclick = () => {
     if (recognition && recognition.continuous) {
       recognition.stop();
