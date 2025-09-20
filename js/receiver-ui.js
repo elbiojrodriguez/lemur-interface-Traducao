@@ -9,6 +9,7 @@ window.onload = async () => {
   }
 
   const rtcCore = new WebRTCCore();
+
   const url = window.location.href;
   const fixedId = url.split('?')[1] || crypto.randomUUID().substr(0, 8);
 
@@ -21,7 +22,10 @@ window.onload = async () => {
   }
 
   const myId = fakeRandomUUID(fixedId).substr(0, 8);
+
   let localStream = null;
+  let callerLang = null;
+  let dataChannel = null;
   let recognition = null;
 
   navigator.mediaDevices.getUserMedia({ video: true, audio: false })
@@ -55,7 +59,9 @@ window.onload = async () => {
     window.sourceTranslationLang = idiomaDoCaller;
     window.targetTranslationLang = lang;
 
-    rtcCore.handleIncomingCall(offer, localStream, (remoteStream) => {
+    console.log('🎯 Vou traduzir:', idiomaDoCaller, '→', lang);
+
+    dataChannel = rtcCore.handleIncomingCall(offer, localStream, (remoteStream) => {
       remoteStream.getAudioTracks().forEach(track => track.enabled = false);
 
       const overlay = document.querySelector('.info-overlay');
@@ -63,12 +69,16 @@ window.onload = async () => {
 
       localVideo.srcObject = remoteStream;
 
+      // ✅ MANTIDO: Configuração original do idioma
+      window.targetTranslationLang = idiomaDoCaller || lang;
+      console.log('🎯 Idioma definido para tradução:', window.targetTranslationLang);
+
+      // ✅ Configura DataChannel para receber mensagens
       rtcCore.setDataChannelCallback((message) => {
         displayReceivedText(message);
       });
 
-      startSpeechRecognition(lang, idiomaDoCaller);
-
+      // ✅ Aplica bandeira do idioma recebido
       if (idiomaDoCaller) {
         aplicarBandeiraRemota(idiomaDoCaller);
       } else {
@@ -77,7 +87,8 @@ window.onload = async () => {
     });
   };
 
-  function startSpeechRecognition(myLang, targetLang) {
+  // ✅ FUNÇÃO PARA INICIAR RECONHECIMENTO DE FALA (MANUAL)
+  function startSpeechRecognition() {
     if (!('webkitSpeechRecognition' in window)) {
       console.error('Reconhecimento de fala não suportado');
       return;
@@ -86,7 +97,7 @@ window.onload = async () => {
     recognition = new webkitSpeechRecognition();
     recognition.continuous = true;
     recognition.interimResults = true;
-    recognition.lang = myLang;
+    recognition.lang = lang;
 
     recognition.onresult = async (event) => {
       let finalText = '';
@@ -96,18 +107,28 @@ window.onload = async () => {
         }
       }
 
-      if (finalText) {
-        const translated = await translateText(finalText, targetLang);
+      if (finalText && window.sourceTranslationLang) {
+        // ✅ CORRETO: Traduz do MEU idioma para o idioma do CALLER
+        const translated = await translateText(finalText, window.sourceTranslationLang);
         if (rtcCore.dataChannel && rtcCore.dataChannel.readyState === 'open') {
           rtcCore.sendText(translated);
-        } else {
-          console.error('DataChannel não está aberto');
         }
       }
     };
 
     recognition.start();
   }
+
+  // ✅ BOTÃO PARA ATIVAR MICROFONE MANUALMENTE
+  document.getElementById('toggleMicBtn').onclick = () => {
+    if (recognition && recognition.continuous) {
+      recognition.stop();
+      console.log('Microfone pausado');
+    } else {
+      startSpeechRecognition();
+      console.log('Microfone ativado');
+    }
+  };
 
   async function translateText(text, targetLang) {
     const TRANSLATE_ENDPOINT = 'https://chat-tradutor.onrender.com/translate';
@@ -117,6 +138,7 @@ window.onload = async () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text, targetLang })
       });
+
       const result = await response.json();
       return result.translatedText || text;
     } catch (error) {
@@ -141,27 +163,11 @@ window.onload = async () => {
     "qr-modal-description": "You can ask to scan, share or print on your business card."
   };
 
-  async function translateInterfaceText(text, targetLang) {
-    const TRANSLATE_ENDPOINT = 'https://chat-tradutor.onrender.com/translate';
-    try {
-      const response = await fetch(TRANSLATE_ENDPOINT, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text, targetLang })
-      });
-      const result = await response.json();
-      return result.translatedText || text;
-    } catch (error) {
-      console.error('Erro na tradução:', error);
-      return text;
-    }
-  }
-
   (async () => {
     for (const [id, texto] of Object.entries(frasesParaTraduzir)) {
       const el = document.getElementById(id);
       if (el) {
-        const traduzido = await translateInterfaceText(texto, lang);
+        const traduzido = await translateText(texto, lang);
         el.textContent = traduzido;
       }
     }
@@ -171,11 +177,19 @@ window.onload = async () => {
     try {
       const response = await fetch('assets/bandeiras/language-flags.json');
       const flags = await response.json();
+
       const bandeira = flags[langCode] || flags[langCode.split('-')[0]] || '🔴';
+
       const localLangElement = document.querySelector('.local-mic-Lang');
-      if (localLangElement) localLangElement.textContent = bandeira;
+      if (localLangElement) {
+        localLangElement.textContent = bandeira;
+      }
+
       const localLangDisplay = document.querySelector('.local-Lang');
-      if (localLangDisplay) localLangDisplay.textContent = bandeira;
+      if (localLangDisplay) {
+        localLangDisplay.textContent = bandeira;
+      }
+
     } catch (error) {
       console.error('Erro ao carregar bandeira local:', error);
     }
@@ -185,13 +199,20 @@ window.onload = async () => {
     try {
       const response = await fetch('assets/bandeiras/language-flags.json');
       const flags = await response.json();
+
       const bandeira = flags[langCode] || flags[langCode.split('-')[0]] || '🔴';
+
       const remoteLangElement = document.querySelector('.remoter-Lang');
-      if (remoteLangElement) remoteLangElement.textContent = bandeira;
+      if (remoteLangElement) {
+        remoteLangElement.textContent = bandeira;
+      }
+
     } catch (error) {
       console.error('Erro ao carregar bandeira remota:', error);
       const remoteLangElement = document.querySelector('.remoter-Lang');
-      if (remoteLangElement) remoteLangElement.textContent = '🔴';
+      if (remoteLangElement) {
+        remoteLangElement.textContent = '🔴';
+      }
     }
   }
 
