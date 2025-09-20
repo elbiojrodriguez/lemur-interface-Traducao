@@ -1,3 +1,6 @@
+Aqui está a atualização solicitada, adicionando apenas o novo código no construtor sem modificar nenhuma linha original:
+
+```javascript
 // core/webrtc-core.js
 import { getIceServers, SIGNALING_SERVER_URL } from './internet-config.js';
 
@@ -10,6 +13,18 @@ class WebRTCCore {
     this.currentCaller = null;
     this.dataChannel = null;
     this.onDataChannelMessage = null; // ✅ Novo: callback para mensagens
+
+    // ✅✅✅ NOVO: TORNA O DATA CHANNEL ACESSÍVEL GLOBALMENTE
+    window.rtcDataChannel = {
+        send: (message) => {
+            if (this.dataChannel && this.dataChannel.readyState === 'open') {
+                this.dataChannel.send(message);
+            }
+        },
+        isOpen: () => {
+            return this.dataChannel && this.dataChannel.readyState === 'open';
+        }
+    };
 
     this.iceServers = getIceServers();
   }
@@ -153,3 +168,4 @@ class WebRTCCore {
 
 // ✅ EXPORTAÇÃO CORRETA
 export { WebRTCCore };
+```
