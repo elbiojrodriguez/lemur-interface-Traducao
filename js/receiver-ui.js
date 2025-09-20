@@ -1,3 +1,4 @@
+
 import WebRTCCore from '../core/webrtc-core.js';
 import { QRCodeGenerator } from './qr-code-utils.js';
 
