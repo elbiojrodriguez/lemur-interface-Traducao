@@ -1,4 +1,3 @@
-
 import { getIceServers, SIGNALING_SERVER_URL } from './internet-config.js';
 
 class WebRTCCore {
@@ -8,6 +7,8 @@ class WebRTCCore {
     this.localStream = null;
     this.remoteStreamCallback = null;
     this.currentCaller = null;
+    this.dataChannel = null;
+    this.onDataChannelCallback = null;
 
     this.iceServers = getIceServers();
   }
@@ -16,7 +17,6 @@ class WebRTCCore {
     this.socket.emit('register', userId);
   }
 
-  // ✅ Agora aceita callerLang como terceiro parâmetro
   startCall(targetId, stream, callerLang) {
     this.localStream = stream;
     this.peer = new RTCPeerConnection({ iceServers: this.iceServers });
@@ -24,6 +24,9 @@ class WebRTCCore {
     stream.getTracks().forEach(track => {
       this.peer.addTrack(track, stream);
     });
+
+    this.dataChannel = this.peer.createDataChannel('chat');
+    this.setupDataChannelHandlers();
 
     this.peer.ontrack = event => {
       if (this.remoteStreamCallback) {
@@ -46,9 +49,11 @@ class WebRTCCore {
         this.socket.emit('call', {
           to: targetId,
           offer: this.peer.localDescription,
-          callerLang // 👈 idioma incluído na chamada
+          callerLang
         });
       });
+
+    return this.dataChannel;
   }
 
   handleIncomingCall(offer, localStream, callback) {
@@ -59,6 +64,11 @@ class WebRTCCore {
         this.peer.addTrack(track, localStream);
       });
     }
+
+    this.peer.ondatachannel = (event) => {
+      this.dataChannel = event.channel;
+      this.setupDataChannelHandlers();
+    };
 
     this.peer.ontrack = event => callback(event.streams[0]);
 
@@ -80,6 +90,20 @@ class WebRTCCore {
           answer: this.peer.localDescription
         });
       });
+
+    return this.dataChannel;
+  }
+
+  setupDataChannelHandlers() {
+    this.dataChannel.onopen = () => {
+      console.log('DataChannel conectado');
+    };
+
+    this.dataChannel.onmessage = (event) => {
+      if (this.onDataChannelCallback) {
+        this.onDataChannelCallback(event.data);
+      }
+    };
   }
 
   setupSocketHandlers() {
@@ -95,17 +119,26 @@ class WebRTCCore {
       }
     });
 
-    // ✅ Agora recebe callerLang junto com a oferta
     this.socket.on('incomingCall', data => {
       this.currentCaller = data.from;
       if (this.onIncomingCall) {
-        this.onIncomingCall(data.offer, data.callerLang); // 👈 idioma passado ao receiver
+        this.onIncomingCall(data.offer, data.callerLang);
       }
     });
   }
 
   setRemoteStreamCallback(callback) {
     this.remoteStreamCallback = callback;
+  }
+
+  setDataChannelCallback(callback) {
+    this.onDataChannelCallback = callback;
+  }
+
+  sendText(message) {
+    if (this.dataChannel && this.dataChannel.readyState === 'open') {
+      this.dataChannel.send(message);
+    }
   }
 }
 
