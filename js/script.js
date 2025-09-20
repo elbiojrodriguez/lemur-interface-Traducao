@@ -251,23 +251,18 @@ function initializeTranslator() {
             });
             
             if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
-}
-
-const result = await response.json();
-if (speakerButton) speakerButton.disabled = false;
-
-// ✅ NOVO: ENVIA PARA O OUTRO CELULAR
-if (window.centroTraducao && result.translatedText) {
-    window.centroTraducao.receberTextoTraduzido(result.translatedText);
-}
-
-return result.translatedText || "❌";
-
-} catch (error) {
-    console.error('Erro na tradução:', error);
-    return "❌";
-}
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            const result = await response.json();
+            if (speakerButton) speakerButton.disabled = false;
+            return result.translatedText || "❌";
+            
+        } catch (error) {
+            console.error('Erro na tradução:', error);
+            return "❌";
+        }
+    }
     
     function speakText(text) {
         if (!SpeechSynthesis || !text) return;
