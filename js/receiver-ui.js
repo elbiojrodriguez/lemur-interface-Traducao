@@ -22,7 +22,6 @@ window.onload = async () => {
 
   const myId = fakeRandomUUID(fixedId).substr(0, 8);
   let localStream = null;
-  let dataChannel = null;
   let recognition = null;
 
   navigator.mediaDevices.getUserMedia({ video: true, audio: false })
@@ -56,7 +55,7 @@ window.onload = async () => {
     window.sourceTranslationLang = idiomaDoCaller;
     window.targetTranslationLang = lang;
 
-    dataChannel = rtcCore.handleIncomingCall(offer, localStream, (remoteStream) => {
+    rtcCore.handleIncomingCall(offer, localStream, (remoteStream) => {
       remoteStream.getAudioTracks().forEach(track => track.enabled = false);
 
       const overlay = document.querySelector('.info-overlay');
@@ -64,7 +63,10 @@ window.onload = async () => {
 
       localVideo.srcObject = remoteStream;
 
-      setupDataChannelHandlers(dataChannel);
+      rtcCore.setDataChannelCallback((message) => {
+        displayReceivedText(message);
+      });
+
       startSpeechRecognition(lang, idiomaDoCaller);
 
       if (idiomaDoCaller) {
@@ -75,46 +77,37 @@ window.onload = async () => {
     });
   };
 
-  function setupDataChannelHandlers(channel) {
-    channel.onmessage = (event) => {
-      const translatedText = event.data;
-      displayReceivedText(translatedText);
+  function startSpeechRecognition(myLang, targetLang) {
+    if (!('webkitSpeechRecognition' in window)) {
+      console.error('Reconhecimento de fala não suportado');
+      return;
+    }
+
+    recognition = new webkitSpeechRecognition();
+    recognition.continuous = true;
+    recognition.interimResults = true;
+    recognition.lang = myLang;
+
+    recognition.onresult = async (event) => {
+      let finalText = '';
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        if (event.results[i].isFinal) {
+          finalText += event.results[i][0].transcript;
+        }
+      }
+
+      if (finalText) {
+        const translated = await translateText(finalText, targetLang);
+        if (rtcCore.dataChannel && rtcCore.dataChannel.readyState === 'open') {
+          rtcCore.sendText(translated);
+        } else {
+          console.error('DataChannel não está aberto');
+        }
+      }
     };
+
+    recognition.start();
   }
-
-// Substitua esta função:
-function startSpeechRecognition(myLang, targetLang) {
-  if (!('webkitSpeechRecognition' in window)) {
-    console.error('Reconhecimento de fala não suportado');
-    return;
-  }
-
-  recognition = new webkitSpeechRecognition();
-  recognition.continuous = true;
-  recognition.interimResults = true;
-  recognition.lang = myLang;
-
-  recognition.onresult = async (event) => {
-    let finalText = '';
-    for (let i = event.resultIndex; i < event.results.length; i++) {
-      if (event.results[i].isFinal) {
-        finalText += event.results[i][0].transcript;
-      }
-    }
-
-    if (finalText) {
-      const translated = await translateText(finalText, targetLang);
-      // ✅ ADICIONE AQUI:
-      if (dataChannel && dataChannel.readyState === 'open') {
-        dataChannel.send(translated);
-      } else {
-        console.error('DataChannel não está aberto');
-      }
-    }
-  };
-
-  recognition.start();
-}
 
   async function translateText(text, targetLang) {
     const TRANSLATE_ENDPOINT = 'https://chat-tradutor.onrender.com/translate';
@@ -142,19 +135,33 @@ function startSpeechRecognition(myLang, targetLang) {
     }
   }
 
-  const TRANSLATE_ENDPOINT = 'https://chat-tradutor.onrender.com/translate';
-
   const frasesParaTraduzir = {
     "translator-label": "Live translation. No filters. No platform.",
     "qr-modal-title": "This is your online key",
     "qr-modal-description": "You can ask to scan, share or print on your business card."
   };
 
+  async function translateInterfaceText(text, targetLang) {
+    const TRANSLATE_ENDPOINT = 'https://chat-tradutor.onrender.com/translate';
+    try {
+      const response = await fetch(TRANSLATE_ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text, targetLang })
+      });
+      const result = await response.json();
+      return result.translatedText || text;
+    } catch (error) {
+      console.error('Erro na tradução:', error);
+      return text;
+    }
+  }
+
   (async () => {
     for (const [id, texto] of Object.entries(frasesParaTraduzir)) {
       const el = document.getElementById(id);
       if (el) {
-        const traduzido = await translateText(texto, lang);
+        const traduzido = await translateInterfaceText(texto, lang);
         el.textContent = traduzido;
       }
     }
