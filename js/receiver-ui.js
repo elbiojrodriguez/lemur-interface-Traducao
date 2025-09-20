@@ -9,7 +9,6 @@ window.onload = async () => {
   }
 
   const rtcCore = new WebRTCCore();
-
   const url = window.location.href;
   const fixedId = url.split('?')[1] || crypto.randomUUID().substr(0, 8);
 
@@ -22,9 +21,9 @@ window.onload = async () => {
   }
 
   const myId = fakeRandomUUID(fixedId).substr(0, 8);
-
   let localStream = null;
-  let callerLang = null;
+  let dataChannel = null;
+  let recognition = null;
 
   navigator.mediaDevices.getUserMedia({ video: true, audio: false })
     .then(stream => {
@@ -54,14 +53,10 @@ window.onload = async () => {
     console.log('🎯 Caller fala:', idiomaDoCaller);
     console.log('🎯 Eu (receiver) entendo:', lang);
 
-    // ✅ CORREÇÃO: NÃO usar idiomaDoCaller para tradução!
-    // Em vez disso: traduzir do idiomaDoCaller para MEU idioma (lang)
-    window.sourceTranslationLang = idiomaDoCaller; // Idioma de QUEM fala
-    window.targetTranslationLang = lang; // Idioma para QUEM ouve ← CORRETO!
+    window.sourceTranslationLang = idiomaDoCaller;
+    window.targetTranslationLang = lang;
 
-    console.log('🎯 Vou traduzir:', idiomaDoCaller, '→', lang);
-
-    rtcCore.handleIncomingCall(offer, localStream, (remoteStream) => {
+    dataChannel = rtcCore.handleIncomingCall(offer, localStream, (remoteStream) => {
       remoteStream.getAudioTracks().forEach(track => track.enabled = false);
 
       const overlay = document.querySelector('.info-overlay');
@@ -69,12 +64,9 @@ window.onload = async () => {
 
       localVideo.srcObject = remoteStream;
 
-      // ✅ CORREÇÃO DEFINITIVA: Sempre define o idioma para tradução
-      window.targetTranslationLang = idiomaDoCaller || lang;
-      console.log('🎯 Idioma definido para tradução:', window.targetTranslationLang);
-      alert(`🌐 Vou traduzir para: ${window.targetTranslationLang}`);
+      setupDataChannelHandlers(dataChannel);
+      startSpeechRecognition(lang, idiomaDoCaller);
 
-      // ✅ Aplica bandeira do idioma recebido
       if (idiomaDoCaller) {
         aplicarBandeiraRemota(idiomaDoCaller);
       } else {
@@ -83,16 +75,51 @@ window.onload = async () => {
     });
   };
 
-  const TRANSLATE_ENDPOINT = 'https://chat-tradutor.onrender.com/translate';
+  function setupDataChannelHandlers(channel) {
+    channel.onmessage = (event) => {
+      const translatedText = event.data;
+      displayReceivedText(translatedText);
+    };
+  }
+
+  function startSpeechRecognition(myLang, targetLang) {
+    if (!('webkitSpeechRecognition' in window)) {
+      console.error('Reconhecimento de fala não suportado');
+      return;
+    }
+
+    recognition = new webkitSpeechRecognition();
+    recognition.continuous = true;
+    recognition.interimResults = true;
+    recognition.lang = myLang;
+
+    recognition.onresult = async (event) => {
+      let finalText = '';
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        if (event.results[i].isFinal) {
+          finalText += event.results[i][0].transcript;
+        }
+      }
+
+      if (finalText) {
+        const translated = await translateText(finalText, targetLang);
+        if (dataChannel && dataChannel.readyState === 'open') {
+          dataChannel.send(translated);
+        }
+      }
+    };
+
+    recognition.start();
+  }
 
   async function translateText(text, targetLang) {
+    const TRANSLATE_ENDPOINT = 'https://chat-tradutor.onrender.com/translate';
     try {
       const response = await fetch(TRANSLATE_ENDPOINT, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text, targetLang })
       });
-
       const result = await response.json();
       return result.translatedText || text;
     } catch (error) {
@@ -100,6 +127,18 @@ window.onload = async () => {
       return text;
     }
   }
+
+  function displayReceivedText(text) {
+    const chatDisplay = document.getElementById('chat-display');
+    if (chatDisplay) {
+      const messageElement = document.createElement('div');
+      messageElement.className = 'remote-message';
+      messageElement.textContent = text;
+      chatDisplay.appendChild(messageElement);
+    }
+  }
+
+  const TRANSLATE_ENDPOINT = 'https://chat-tradutor.onrender.com/translate';
 
   const frasesParaTraduzir = {
     "translator-label": "Live translation. No filters. No platform.",
@@ -121,19 +160,11 @@ window.onload = async () => {
     try {
       const response = await fetch('assets/bandeiras/language-flags.json');
       const flags = await response.json();
-
       const bandeira = flags[langCode] || flags[langCode.split('-')[0]] || '🔴';
-
       const localLangElement = document.querySelector('.local-mic-Lang');
-      if (localLangElement) {
-        localLangElement.textContent = bandeira;
-      }
-
+      if (localLangElement) localLangElement.textContent = bandeira;
       const localLangDisplay = document.querySelector('.local-Lang');
-      if (localLangDisplay) {
-        localLangDisplay.textContent = bandeira;
-      }
-
+      if (localLangDisplay) localLangDisplay.textContent = bandeira;
     } catch (error) {
       console.error('Erro ao carregar bandeira local:', error);
     }
@@ -143,20 +174,13 @@ window.onload = async () => {
     try {
       const response = await fetch('assets/bandeiras/language-flags.json');
       const flags = await response.json();
-
       const bandeira = flags[langCode] || flags[langCode.split('-')[0]] || '🔴';
-
       const remoteLangElement = document.querySelector('.remoter-Lang');
-      if (remoteLangElement) {
-        remoteLangElement.textContent = bandeira;
-      }
-
+      if (remoteLangElement) remoteLangElement.textContent = bandeira;
     } catch (error) {
       console.error('Erro ao carregar bandeira remota:', error);
       const remoteLangElement = document.querySelector('.remoter-Lang');
-      if (remoteLangElement) {
-        remoteLangElement.textContent = '🔴';
-      }
+      if (remoteLangElement) remoteLangElement.textContent = '🔴';
     }
   }
 
