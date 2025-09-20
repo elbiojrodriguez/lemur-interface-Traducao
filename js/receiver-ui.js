@@ -25,8 +25,6 @@ window.onload = async () => {
 
   let localStream = null;
   let callerLang = null;
-  let dataChannel = null;
-  let recognition = null;
 
   navigator.mediaDevices.getUserMedia({ video: true, audio: false })
     .then(stream => {
@@ -56,12 +54,14 @@ window.onload = async () => {
     console.log('🎯 Caller fala:', idiomaDoCaller);
     console.log('🎯 Eu (receiver) entendo:', lang);
 
-    window.sourceTranslationLang = idiomaDoCaller;
-    window.targetTranslationLang = lang;
+    // ✅ CORREÇÃO: NÃO usar idiomaDoCaller para tradução!
+    // Em vez disso: traduzir do idiomaDoCaller para MEU idioma (lang)
+    window.sourceTranslationLang = idiomaDoCaller; // Idioma de QUEM fala
+    window.targetTranslationLang = lang; // Idioma para QUEM ouve ← CORRETO!
 
     console.log('🎯 Vou traduzir:', idiomaDoCaller, '→', lang);
 
-    dataChannel = rtcCore.handleIncomingCall(offer, localStream, (remoteStream) => {
+    rtcCore.handleIncomingCall(offer, localStream, (remoteStream) => {
       remoteStream.getAudioTracks().forEach(track => track.enabled = false);
 
       const overlay = document.querySelector('.info-overlay');
@@ -69,12 +69,12 @@ window.onload = async () => {
 
       localVideo.srcObject = remoteStream;
 
+      // ✅ CORREÇÃO DEFINITIVA: Sempre define o idioma para tradução
+      window.targetTranslationLang = idiomaDoCaller || lang;
       console.log('🎯 Idioma definido para tradução:', window.targetTranslationLang);
+      alert(`🌐 Vou traduzir para: ${window.targetTranslationLang}`);
 
-      rtcCore.setDataChannelCallback((message) => {
-        displayReceivedText(message);
-      });
-
+      // ✅ Aplica bandeira do idioma recebido
       if (idiomaDoCaller) {
         aplicarBandeiraRemota(idiomaDoCaller);
       } else {
@@ -83,48 +83,9 @@ window.onload = async () => {
     });
   };
 
-  function startSpeechRecognition() {
-    if (!('webkitSpeechRecognition' in window)) {
-      console.error('Reconhecimento de fala não suportado');
-      return;
-    }
-
-    recognition = new webkitSpeechRecognition();
-    recognition.continuous = true;
-    recognition.interimResults = true;
-    recognition.lang = lang;
-
-    recognition.onresult = async (event) => {
-      let finalText = '';
-      for (let i = event.resultIndex; i < event.results.length; i++) {
-        if (event.results[i].isFinal) {
-          finalText += event.results[i][0].transcript;
-        }
-      }
-
-      if (finalText && window.sourceTranslationLang) {
-        const translated = await translateText(finalText, window.sourceTranslationLang);
-        if (rtcCore.dataChannel && rtcCore.dataChannel.readyState === 'open') {
-          rtcCore.sendText(translated);
-        }
-      }
-    };
-
-    recognition.start();
-  }
-
-  document.getElementById('toggleMicBtn').onclick = () => {
-    if (recognition && recognition.continuous) {
-      recognition.stop();
-      console.log('Microfone pausado');
-    } else {
-      startSpeechRecognition();
-      console.log('Microfone ativado');
-    }
-  };
+  const TRANSLATE_ENDPOINT = 'https://chat-tradutor.onrender.com/translate';
 
   async function translateText(text, targetLang) {
-    const TRANSLATE_ENDPOINT = 'https://chat-tradutor.onrender.com/translate';
     try {
       const response = await fetch(TRANSLATE_ENDPOINT, {
         method: 'POST',
@@ -137,16 +98,6 @@ window.onload = async () => {
     } catch (error) {
       console.error('Erro na tradução:', error);
       return text;
-    }
-  }
-
-  function displayReceivedText(text) {
-    const chatDisplay = document.getElementById('chat-display');
-    if (chatDisplay) {
-      const messageElement = document.createElement('div');
-      messageElement.className = 'remote-message';
-      messageElement.textContent = text;
-      chatDisplay.appendChild(messageElement);
     }
   }
 
