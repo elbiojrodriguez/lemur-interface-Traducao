@@ -29,7 +29,6 @@ window.onload = async () => {
     console.error("Erro ao solicitar acesso à câmera:", error);
   }
 
-  const chatInputBox = document.querySelector('.chat-input-box');
   const rtcCore = new WebRTCCore();
   const myId = crypto.randomUUID().substr(0, 8);
   let localStream = null;
@@ -70,53 +69,47 @@ window.onload = async () => {
         
         dataChannel = rtcCore.startCall(receiverId, localStream, meuIdioma);
         
-        setupDataChannelHandlers(dataChannel);
+        rtcCore.setDataChannelCallback((message) => {
+          displayReceivedText(message);
+        });
+
         startSpeechRecognition(meuIdioma, receiverLang);
       }
     };
   }
 
-  function setupDataChannelHandlers(channel) {
-    channel.onmessage = (event) => {
-      const translatedText = event.data;
-      displayReceivedText(translatedText);
+  function startSpeechRecognition(myLang, targetLang) {
+    if (!('webkitSpeechRecognition' in window)) {
+      console.error('Reconhecimento de fala não suportado');
+      return;
+    }
+
+    recognition = new webkitSpeechRecognition();
+    recognition.continuous = true;
+    recognition.interimResults = true;
+    recognition.lang = myLang;
+
+    recognition.onresult = async (event) => {
+      let finalText = '';
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        if (event.results[i].isFinal) {
+          finalText += event.results[i][0].transcript;
+        }
+      }
+
+      if (finalText) {
+        const translated = await translateText(finalText, targetLang);
+        if (rtcCore.dataChannel && rtcCore.dataChannel.readyState === 'open') {
+          rtcCore.sendText(translated);
+        } else {
+          console.error('DataChannel não está aberto');
+        }
+      }
     };
+
+    recognition.start();
   }
 
-  // Substitua esta função:
-function startSpeechRecognition(myLang, targetLang) {
-  if (!('webkitSpeechRecognition' in window)) {
-    console.error('Reconhecimento de fala não suportado');
-    return;
-  }
-
-  recognition = new webkitSpeechRecognition();
-  recognition.continuous = true;
-  recognition.interimResults = true;
-  recognition.lang = myLang;
-
-  recognition.onresult = async (event) => {
-    let finalText = '';
-    for (let i = event.resultIndex; i < event.results.length; i++) {
-      if (event.results[i].isFinal) {
-        finalText += event.results[i][0].transcript;
-      }
-    }
-
-    if (finalText) {
-      const translated = await translateText(finalText, targetLang);
-      // ✅ ADICIONE AQUI:
-      if (dataChannel && dataChannel.readyState === 'open') {
-        dataChannel.send(translated);
-      } else {
-        console.error('DataChannel não está aberto');
-      }
-    }
-  };
-
-  recognition.start();
-}
-  
   async function translateText(text, targetLang) {
     const TRANSLATE_ENDPOINT = 'https://chat-tradutor.onrender.com/translate';
     try {
@@ -149,14 +142,14 @@ function startSpeechRecognition(myLang, targetLang) {
     remoteVideo.srcObject = stream;
   });
 
-  const TRANSLATE_ENDPOINT = 'https://chat-tradutor.onrender.com/translate';
   const navegadorLang = await obterIdiomaCompleto(navigator.language);
 
   const frasesParaTraduzir = {
     "translator-label": "Live translation. No filters. No platform."
   };
 
-  async function translateText(text, targetLang) {
+  async function translateInterfaceText(text, targetLang) {
+    const TRANSLATE_ENDPOINT = 'https://chat-tradutor.onrender.com/translate';
     try {
       const response = await fetch(TRANSLATE_ENDPOINT, {
         method: 'POST',
@@ -175,7 +168,7 @@ function startSpeechRecognition(myLang, targetLang) {
     for (const [id, texto] of Object.entries(frasesParaTraduzir)) {
       const el = document.getElementById(id);
       if (el) {
-        const traduzido = await translateText(texto, navegadorLang);
+        const traduzido = await translateInterfaceText(texto, navegadorLang);
         el.textContent = traduzido;
       }
     }
