@@ -83,36 +83,40 @@ window.onload = async () => {
     };
   }
 
-  function startSpeechRecognition(myLang, targetLang) {
-    if (!('webkitSpeechRecognition' in window)) {
-      console.error('Reconhecimento de fala não suportado');
-      return;
-    }
-
-    recognition = new webkitSpeechRecognition();
-    recognition.continuous = true;
-    recognition.interimResults = true;
-    recognition.lang = myLang;
-
-    recognition.onresult = async (event) => {
-      let finalText = '';
-      for (let i = event.resultIndex; i < event.results.length; i++) {
-        if (event.results[i].isFinal) {
-          finalText += event.results[i][0].transcript;
-        }
-      }
-
-      if (finalText) {
-        const translated = await translateText(finalText, targetLang);
-        if (dataChannel && dataChannel.readyState === 'open') {
-          dataChannel.send(translated);
-        }
-      }
-    };
-
-    recognition.start();
+  // Substitua esta função:
+function startSpeechRecognition(myLang, targetLang) {
+  if (!('webkitSpeechRecognition' in window)) {
+    console.error('Reconhecimento de fala não suportado');
+    return;
   }
 
+  recognition = new webkitSpeechRecognition();
+  recognition.continuous = true;
+  recognition.interimResults = true;
+  recognition.lang = myLang;
+
+  recognition.onresult = async (event) => {
+    let finalText = '';
+    for (let i = event.resultIndex; i < event.results.length; i++) {
+      if (event.results[i].isFinal) {
+        finalText += event.results[i][0].transcript;
+      }
+    }
+
+    if (finalText) {
+      const translated = await translateText(finalText, targetLang);
+      // ✅ ADICIONE AQUI:
+      if (dataChannel && dataChannel.readyState === 'open') {
+        dataChannel.send(translated);
+      } else {
+        console.error('DataChannel não está aberto');
+      }
+    }
+  };
+
+  recognition.start();
+}
+  
   async function translateText(text, targetLang) {
     const TRANSLATE_ENDPOINT = 'https://chat-tradutor.onrender.com/translate';
     try {
