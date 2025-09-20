@@ -1,3 +1,5 @@
+```javascript
+// core/webrtc-core.js
 import { getIceServers, SIGNALING_SERVER_URL } from './internet-config.js';
 
 class WebRTCCore {
@@ -7,6 +9,8 @@ class WebRTCCore {
     this.localStream = null;
     this.remoteStreamCallback = null;
     this.currentCaller = null;
+    this.dataChannel = null; // Já deve existir
+    window.rtcDataChannel = () => this.dataChannel; // ✅ NOVO: Expoe o dataChannel
 
     this.iceServers = getIceServers();
   }
@@ -109,3 +113,4 @@ class WebRTCCore {
 }
 
 export default WebRTCCore;
+```
