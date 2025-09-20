@@ -157,32 +157,35 @@ function enviarParaOutroCelular(texto) {
             }
             
             // ⭐ PROCESSA TEXTO FINAL COM DEBOUNCE
-            if (finalTranscript && !isTranslating) {
-                const now = Date.now();
-                if (now - lastTranslationTime > 1000) { // ⭐ Debounce de 1s
-                    lastTranslationTime = now;
-                    isTranslating = true;
-                    
-                    if (translatedText) {
-                        translatedText.textContent = "⏳";
-                    }
-                    
-                    translateText(finalTranscript).then(translation => {
-                        if (translatedText) {
-                            translatedText.textContent = translation;
-                                                                                   
-                            if (SpeechSynthesis) {
-                                setTimeout(() => speakText(translation), 500);
-                            }
-                        }
-                        isTranslating = false;
-                    }).catch(error => {
-                        console.error('Erro na tradução:', error);
-                        if (translatedText) translatedText.textContent = "❌";
-                        isTranslating = false;
-                    });
+if (finalTranscript && !isTranslating) {
+    const now = Date.now();
+    if (now - lastTranslationTime > 1000) { // ⭐ Debounce de 1s
+        lastTranslationTime = now;
+        isTranslating = true;
+        
+        if (translatedText) {
+            translatedText.textContent = "⏳";
+        }
+        
+        translateText(finalTranscript).then(translation => {
+            if (translatedText) {
+                translatedText.textContent = translation;
+                
+                // ✅✅✅ ADICIONE ESTA LINHA (envia para outro celular):
+                enviarParaOutroCelular(translation);
+                
+                if (SpeechSynthesis) {
+                    setTimeout(() => speakText(translation), 500);
                 }
             }
+            isTranslating = false;
+        }).catch(error => {
+            console.error('Erro na tradução:', error);
+            if (translatedText) translatedText.textContent = "❌";
+            isTranslating = false;
+        });
+    }
+}
         };
         
         recognition.onerror = function(event) {
