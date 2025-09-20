@@ -24,7 +24,7 @@ async function translateText(text) {
     const result = await response.json();
     const translatedText = result.translatedText || text;
     
-    // ✅ ADICIONE ESTA LINHA (ENVIA PARA OUTRO CELULAR):
+    // ✅ ENVIA PARA OUTRO CELULAR:
     enviarParaOutroCelular(translatedText);
     
     return translatedText;
@@ -32,7 +32,7 @@ async function translateText(text) {
   } catch (error) {
     return text;
   }
-} 
+}
 
 function initializeTranslator() {
     
