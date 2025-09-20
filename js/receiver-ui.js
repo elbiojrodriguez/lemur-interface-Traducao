@@ -3,22 +3,40 @@ import { QRCodeGenerator } from './qr-code-utils.js';
 
 window.onload = async () => {
   try {
-    await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+    // ✅ PRIMEIRO: Solicita CÂMERA (WebRTC) - ESSENCIAL!
+    const stream = await navigator.mediaDevices.getUserMedia({ 
+      video: true, 
+      audio: false 
+    });
+    
+    // ✅ AGORA SIM: Inicializa WebRTC com a stream
+    const rtcCore = new WebRTCCore();
+
+    const url = window.location.href;
+    const fixedId = url.split('?')[1] || crypto.randomUUID().substr(0, 8);
+
+    function fakeRandomUUID(fixedValue) {
+      return {
+        substr: function(start, length) {
+          return fixedValue.substr(start, length);
+        }
+      };
+    }
+
+    const myId = fakeRandomUUID(fixedId).substr(0, 8);
+
+    // ✅ Já temos a stream da câmera
+    let localStream = stream;
+
+    // ... resto do seu código continua igual ...
+
   } catch (error) {
     console.error("Erro ao solicitar acesso à câmera:", error);
+    // ⛔ MOSTRAR ERRO PARA O USUÁRIO
+    alert("Erro ao acessar a câmera. Verifique as permissões.");
+    return; // ⛔ PARA TUDO se não tiver câmera
   }
-
-  const rtcCore = new WebRTCCore();
-
-  const url = window.location.href;
-  const fixedId = url.split('?')[1] || crypto.randomUUID().substr(0, 8);
-
-  function fakeRandomUUID(fixedValue) {
-    return {
-      substr: function(start, length) {
-        return fixedValue.substr(start, length);
-      }
-    };
+};
   }
 
   const myId = fakeRandomUUID(fixedId).substr(0, 8);
