@@ -1,4 +1,3 @@
-```javascript
 // 📦 Importa o núcleo WebRTC
 import { WebRTCCore } from '../core/webrtc-core.js';
 
@@ -186,4 +185,3 @@ window.onload = async () => {
     return; // ⛔ PARA TUDO se não tiver câmera
   }
 };
-```
