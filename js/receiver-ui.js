@@ -1,12 +1,11 @@
-
 import WebRTCCore from '../core/webrtc-core.js';
 import { QRCodeGenerator } from './qr-code-utils.js';
 
 window.onload = async () => {
   try {
-    await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+    await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
   } catch (error) {
-    console.error("Erro ao solicitar acesso à câmera e microfone:", error);
+    console.error("Erro ao solicitar acesso à câmera:", error);
   }
 
   const rtcCore = new WebRTCCore();
@@ -39,6 +38,8 @@ window.onload = async () => {
   const token = params.get('token') || '';
   const lang = params.get('lang') || navigator.language || 'pt-BR';
 
+  window.targetTranslationLang = lang;
+
   const callerUrl = `${window.location.origin}/caller.html?targetId=${myId}&token=${encodeURIComponent(token)}&lang=${encodeURIComponent(lang)}`;
   QRCodeGenerator.generate("qrcode", callerUrl);
 
@@ -47,13 +48,18 @@ window.onload = async () => {
 
   const localVideo = document.getElementById('localVideo');
 
-  rtcCore.onIncomingCall = (offer, receivedCallerLang) => {
-    if (!localStream) {
-      console.warn("Stream local não disponível");
-      return;
-    }
+  rtcCore.onIncomingCall = (offer, idiomaDoCaller) => {
+    if (!localStream) return;
 
-    callerLang = typeof receivedCallerLang === 'string' && receivedCallerLang.trim() !== '' ? receivedCallerLang : null;
+    console.log('🎯 Caller fala:', idiomaDoCaller);
+    console.log('🎯 Eu (receiver) entendo:', lang);
+
+    // ✅ CORREÇÃO: NÃO usar idiomaDoCaller para tradução!
+    // Em vez disso: traduzir do idiomaDoCaller para MEU idioma (lang)
+    window.sourceTranslationLang = idiomaDoCaller; // Idioma de QUEM fala
+    window.targetTranslationLang = lang; // Idioma para QUEM ouve ← CORRETO!
+
+    console.log('🎯 Vou traduzir:', idiomaDoCaller, '→', lang);
 
     rtcCore.handleIncomingCall(offer, localStream, (remoteStream) => {
       remoteStream.getAudioTracks().forEach(track => track.enabled = false);
@@ -63,9 +69,14 @@ window.onload = async () => {
 
       localVideo.srcObject = remoteStream;
 
-      if (callerLang) {
-        window.targetTranslationLang = callerLang;
-        aplicarBandeiraRemota(callerLang);
+      // ✅ CORREÇÃO DEFINITIVA: Sempre define o idioma para tradução
+      window.targetTranslationLang = idiomaDoCaller || lang;
+      console.log('🎯 Idioma definido para tradução:', window.targetTranslationLang);
+      alert(`🌐 Vou traduzir para: ${window.targetTranslationLang}`);
+
+      // ✅ Aplica bandeira do idioma recebido
+      if (idiomaDoCaller) {
+        aplicarBandeiraRemota(idiomaDoCaller);
       } else {
         document.querySelector('.remoter-Lang').textContent = '🔴';
       }
@@ -76,8 +87,6 @@ window.onload = async () => {
 
   async function translateText(text, targetLang) {
     try {
-      if (targetLang === 'en') return text;
-
       const response = await fetch(TRANSLATE_ENDPOINT, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
