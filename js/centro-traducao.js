@@ -2,16 +2,15 @@
 class CentroTraducao {
     constructor() {
         this.dataChannel = null;
-        this.onTextoRecebidoCallback = null;
+        this.callbackRecebimento = null;
     }
 
-    configurarDataChannel(canal) {
-        this.dataChannel = canal;
+    configurarDataChannel(dataChannel) {
+        this.dataChannel = dataChannel;
         
         this.dataChannel.onmessage = (event) => {
-            const textoRecebido = event.data;
-            if (this.onTextoRecebidoCallback && typeof textoRecebido === 'string') {
-                this.onTextoRecebidoCallback(textoRecebido);
+            if (this.callbackRecebimento && typeof event.data === 'string') {
+                this.callbackRecebimento(event.data);
             }
         };
 
@@ -24,26 +23,20 @@ class CentroTraducao {
         };
     }
 
-    receberTextoTraduzido(textoTraduzido) {
+    definirCallbackRecebimento(callback) {
+        if (typeof callback === 'function') {
+            this.callbackRecebimento = callback;
+        }
+    }
+
+    receberTextoTraduzido(texto) {
         if (this.dataChannel && this.dataChannel.readyState === 'open') {
-            try {
-                this.dataChannel.send(textoTraduzido);
-            } catch (error) {
-                console.error('Erro ao enviar texto traduzido:', error);
-            }
+            this.dataChannel.send(texto);
         } else {
             console.warn('Canal de dados não está disponível para envio');
         }
     }
-
-    definirCallbackRecebimento(callback) {
-        if (typeof callback === 'function') {
-            this.onTextoRecebidoCallback = callback;
-        } else {
-            console.error('Callback deve ser uma função');
-        }
-    }
 }
 
-// Exportar para uso nos outros módulos
-const centroTraducao = new CentroTraducao();
+// Exportar para uso global
+window.centroTraducao = new CentroTraducao();
