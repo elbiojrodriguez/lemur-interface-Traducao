@@ -244,41 +244,42 @@ function enviarParaOutroCelular(texto) {
     }
     
     async function translateText(text) {
-        try {
-            // ⭐ LIMITA TAMANHO DO TEXTO (evita sobrecarga)
-            const trimmedText = text.trim().slice(0, 500);
-            if (!trimmedText) return "🎤";
-            
-            const response = await fetch('https://chat-tradutor.onrender.com/translate', {
-                method: 'POST',
-                headers: { 
-                    'Content-Type': 'application/json',
-                    'X-Request-Source': 'web-translator'
-                },
-                body: JSON.stringify({ 
-                    text: trimmedText, 
-                    targetLang: IDIOMA_DESTINO,
-                    source: 'integrated-translator',
-                    sessionId: window.myId || 'default-session'
-                })
-            });
-            
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            
-            const result = await response.json();
-            if (speakerButton) speakerButton.disabled = false;
-            
-            // ✅ ADICIONE ESTA LINHA:
-            enviarParaOutroCelular(result.translatedText);
-            
-            return result.translatedText || "❌";
-            
-        } catch (error) {
-            console.error('Erro na tradução:', error);
-            return "❌";
+    try {
+        // ⭐ LIMITA TAMANHO DO TEXTO (evita sobrecarga)
+        const trimmedText = text.trim().slice(0, 500);
+        if (!trimmedText) return "🎤";
+        
+        const response = await fetch('https://chat-tradutor.onrender.com/translate', {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json',
+                'X-Request-Source': 'web-translator'
+            },
+            body: JSON.stringify({ 
+                text: trimmedText, 
+                targetLang: IDIOMA_DESTINO,
+                source: 'integrated-translator',
+                sessionId: window.myId || 'default-session'
+            })
+        });
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
         }
+        
+        const result = await response.json();
+        if (speakerButton) speakerButton.disabled = false;
+        
+        // ✅✅✅ REMOVA ESTA LINHA (estava enviando para API, não para outro celular)
+        // enviarParaOutroCelular(result.translatedText);
+        
+        return result.translatedText || "❌";
+        
+    } catch (error) {
+        console.error('Erro na tradução:', error);
+        return "❌";
+    }
+}
     }
     
     function speakText(text) {
