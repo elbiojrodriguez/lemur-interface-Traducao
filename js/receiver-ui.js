@@ -1,4 +1,3 @@
-// 📦 Importa o núcleo WebRTC
 import WebRTCCore from '../core/webrtc-core.js';
 import { QRCodeGenerator } from './qr-code-utils.js';
 
@@ -81,20 +80,6 @@ window.onload = async () => {
       } else {
         document.querySelector('.remoter-Lang').textContent = '🔴';
       }
-
-      // ➕ NOVO: Configurar centro de tradução após receber chamada
-      setTimeout(() => {
-        if (rtcCore.dataChannel) {
-          window.centroTraducao.configurarDataChannel(rtcCore.dataChannel);
-          
-          window.centroTraducao.definirCallbackRecebimento((textoRecebido) => {
-            const elementoTexto = document.getElementById('texto-recebido');
-            if (elementoTexto) {
-              elementoTexto.textContent = textoRecebido;
-            }
-          });
-        }
-      }, 2000);
     });
   };
 
