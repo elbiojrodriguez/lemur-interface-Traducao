@@ -1,4 +1,4 @@
-import WebRTCCore from '../core/webrtc-core.js';
+import { WebRTCCore } from '../core/webrtc-core.js';
 import { QRCodeGenerator } from './qr-code-utils.js';
 
 window.onload = async () => {
