@@ -1,20 +1,36 @@
+// ===== FUNÇÃO SIMPLES PARA ENVIAR TEXTO =====
+function enviarParaOutroCelular(texto) {
+    if (window.rtcCore && window.rtcCore.dataChannel && 
+        window.rtcCore.dataChannel.readyState === 'open') {
+        window.rtcCore.dataChannel.send(texto);
+        console.log('Texto enviado:', texto);
+    } else {
+        console.log('Canal não disponível para enviar:', texto);
+    }
+}
+
 async function translateText(text) {
   try {
-    // ✅ CORREÇÃO: Usar source e target CORRETOS
     const response = await fetch('https://chat-tradutor.onrender.com/translate', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ 
         text: text,
-        sourceLang: window.sourceTranslationLang || 'auto', // Idioma de QUEM fala
-        targetLang: window.targetTranslationLang || 'en'    // Idioma para QUEM ouve
+        sourceLang: window.sourceTranslationLang || 'auto',
+        targetLang: window.targetTranslationLang || 'en'
       })
     });
 
     const result = await response.json();
-    return result.translatedText || text;
+    const translatedText = result.translatedText || text;
+    
+    // ✅ ADICIONE ESTA LINHA (ENVIA PARA OUTRO CELULAR):
+    enviarParaOutroCelular(translatedText);
+    
+    return translatedText;
+    
   } catch (error) {
-    return text; // Retorna o texto original em caso de erro
+    return text;
   }
 } 
 
@@ -190,6 +206,10 @@ function initializeTranslator() {
                     translateText(finalTranscript).then(translation => {
                         if (translatedText) {
                             translatedText.textContent = translation;
+                            
+                            // ✅ ADICIONE ESTA LINHA:
+                            enviarParaOutroCelular(translation);
+                            
                             if (SpeechSynthesis) {
                                 setTimeout(() => speakText(translation), 500);
                             }
