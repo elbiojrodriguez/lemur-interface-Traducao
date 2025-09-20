@@ -1,6 +1,3 @@
-Aqui está a atualização solicitada, adicionando apenas o novo código no construtor sem modificar nenhuma linha original:
-
-```javascript
 // core/webrtc-core.js
 import { getIceServers, SIGNALING_SERVER_URL } from './internet-config.js';
 
@@ -12,9 +9,8 @@ class WebRTCCore {
     this.remoteStreamCallback = null;
     this.currentCaller = null;
     this.dataChannel = null;
-    this.onDataChannelMessage = null; // ✅ Novo: callback para mensagens
+    this.onDataChannelMessage = null;
 
-    // ✅✅✅ NOVO: TORNA O DATA CHANNEL ACESSÍVEL GLOBALMENTE
     window.rtcDataChannel = {
         send: (message) => {
             if (this.dataChannel && this.dataChannel.readyState === 'open') {
@@ -29,23 +25,22 @@ class WebRTCCore {
     this.iceServers = getIceServers();
   }
 
-  // ✅ FUNÇÃO PARA CONFIGURAR DATA CHANNEL
   setupDataChannelHandlers() {
     if (!this.dataChannel) return;
     
     this.dataChannel.onopen = () => {
-        console.log('DataChannel conectado');
+        console.log('DataChannel connected');
     };
 
     this.dataChannel.onmessage = (event) => {
-        console.log('Mensagem recebida:', event.data);
+        console.log('Message received:', event.data);
         if (this.onDataChannelMessage) {
             this.onDataChannelMessage(event.data);
         }
     };
 
     this.dataChannel.onerror = (error) => {
-        console.error('Erro no DataChannel:', error);
+        console.error('DataChannel error:', error);
     };
   }
 
@@ -57,7 +52,6 @@ class WebRTCCore {
     this.localStream = stream;
     this.peer = new RTCPeerConnection({ iceServers: this.iceServers });
 
-    // ✅ CRIA DATA CHANNEL
     this.dataChannel = this.peer.createDataChannel('chat');
     this.setupDataChannelHandlers();
 
@@ -100,7 +94,6 @@ class WebRTCCore {
         });
     }
 
-    // ✅ CONFIGURA DATA CHANNEL NO RECEIVER
     this.peer.ondatachannel = (event) => {
         this.dataChannel = event.channel;
         this.setupDataChannelHandlers();
@@ -153,12 +146,10 @@ class WebRTCCore {
     this.remoteStreamCallback = callback;
   }
 
-  // ✅ NOVO: Configurar callback para mensagens
   setDataChannelCallback(callback) {
     this.onDataChannelMessage = callback;
   }
 
-  // ✅ NOVO: Enviar mensagem
   sendMessage(message) {
     if (this.dataChannel && this.dataChannel.readyState === 'open') {
         this.dataChannel.send(message);
@@ -166,6 +157,4 @@ class WebRTCCore {
   }
 }
 
-// ✅ EXPORTAÇÃO CORRETA
 export { WebRTCCore };
-```
