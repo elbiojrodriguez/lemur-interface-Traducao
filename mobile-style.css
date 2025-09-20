@@ -26,6 +26,17 @@ body {
   overflow-y: auto;
 }
 
+.texto-traduzido {
+  font-size: 18px;
+  padding: 15px;
+  margin: 10px;
+  border: 2px solid #4CAF50;
+  border-radius: 10px;
+  background-color: #f8f9fa;
+  min-height: 50px;
+  text-align: center;
+}
+
 .logo {
   position: absolute;
   top: 7%;
