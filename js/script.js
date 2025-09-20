@@ -26,15 +26,16 @@ function initializeTranslator() {
     }
     
     // ===== FUNÇÃO SIMPLES PARA ENVIAR TEXTO =====
-    function enviarParaOutroCelular(texto) {
-        if (window.rtcCore && window.rtcCore.dataChannel && 
-            window.rtcCore.dataChannel.readyState === 'open') {
-            window.rtcCore.dataChannel.send(texto);
-            console.log('Texto enviado:', texto);
-        } else {
-            console.log('Canal não disponível para enviar:', texto);
-        }
+function enviarParaOutroCelular(texto) {
+    if (window.rtcDataChannel && window.rtcDataChannel.isOpen()) {
+        window.rtcDataChannel.send(texto);
+        console.log('✅ Texto enviado:', texto);
+    } else {
+        console.log('⏳ Canal não disponível ainda. Tentando novamente...');
+        // Tenta novamente após 1 segundo (recursão)
+        setTimeout(() => enviarParaOutroCelular(texto), 1000);
     }
+}
 
     // ===== FUNÇÃO PARA BUSCAR BANDEIRA DO JSON =====
     async function getBandeiraDoJson(langCode) {
