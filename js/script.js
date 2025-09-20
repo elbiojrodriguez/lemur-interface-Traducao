@@ -25,6 +25,17 @@ function initializeTranslator() {
         return;
     }
     
+    // ===== FUNÇÃO SIMPLES PARA ENVIAR TEXTO =====
+    function enviarParaOutroCelular(texto) {
+        if (window.rtcCore && window.rtcCore.dataChannel && 
+            window.rtcCore.dataChannel.readyState === 'open') {
+            window.rtcCore.dataChannel.send(texto);
+            console.log('Texto enviado:', texto);
+        } else {
+            console.log('Canal não disponível para enviar:', texto);
+        }
+    }
+
     // ===== FUNÇÃO PARA BUSCAR BANDEIRA DO JSON =====
     async function getBandeiraDoJson(langCode) {
         try {
@@ -158,6 +169,7 @@ function initializeTranslator() {
                     translateText(finalTranscript).then(translation => {
                         if (translatedText) {
                             translatedText.textContent = translation;
+                                                                                   
                             if (SpeechSynthesis) {
                                 setTimeout(() => speakText(translation), 500);
                             }
@@ -256,6 +268,10 @@ function initializeTranslator() {
             
             const result = await response.json();
             if (speakerButton) speakerButton.disabled = false;
+            
+            // ✅ ADICIONE ESTA LINHA:
+            enviarParaOutroCelular(result.translatedText);
+            
             return result.translatedText || "❌";
             
         } catch (error) {
