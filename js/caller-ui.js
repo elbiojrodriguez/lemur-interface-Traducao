@@ -1,14 +1,44 @@
-
 // 📦 Importa o núcleo WebRTC
 import WebRTCCore from '../core/webrtc-core.js';
 
-window.onload = async () => {
-
-  // 🎥 Solicita acesso à câmera e microfone
+// 🎯 FUNÇÃO PARA OBTER IDIOMA COMPLETO
+async function obterIdiomaCompleto(lang) {
+  if (!lang) return 'pt-BR';
+  if (lang.includes('-')) return lang; // Já está completo (ex: "pt-BR")
+  
   try {
-    await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+    // 📦 CARREGA O JSON DE BANDEIRAS
+    const response = await fetch('assets/bandeiras/language-flags.json');
+    const flags = await response.json();
+    
+    // 🔍 PROCURA O CÓDIGO COMPLETO NO JSON
+    const codigoCompleto = Object.keys(flags).find(key => 
+      key.startsWith(lang + '-')
+    );
+    
+    // ✅ RETORNA O CÓDIGO COMPLETO ENCONTRADO
+    return codigoCompleto || `${lang}-${lang.toUpperCase()}`;
+    
   } catch (error) {
-    console.error("Erro ao solicitar acesso à câmera e microfone:", error);
+    console.error('Erro ao carregar JSON de bandeiras:', error);
+    
+    // 🆘 FALLBACK PARA CASOS DE ERRO
+    const fallback = {
+      'pt': 'pt-BR', 'es': 'es-ES', 'en': 'en-US',
+      'fr': 'fr-FR', 'de': 'de-DE', 'it': 'it-IT',
+      'ja': 'ja-JP', 'zh': 'zh-CN', 'ru': 'ru-RU'
+    };
+    
+    return fallback[lang] || 'en-US';
+  }
+}
+
+window.onload = async () => {
+  // 🎥 Solicita acesso APENAS à câmera (SEM áudio)
+  try {
+    await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+  } catch (error) {
+    console.error("Erro ao solicitar acesso à câmera:", error);
   }
 
   // 🧠 Inicializa variáveis principais
@@ -24,7 +54,7 @@ window.onload = async () => {
   rtcCore.initialize(myId);
   rtcCore.setupSocketHandlers();
 
-  // 🎥 Captura vídeo local (sem áudio)
+  // 🎥 Captura vídeo local (SEM áudio)
   navigator.mediaDevices.getUserMedia({ video: true, audio: false })
     .then(stream => {
       localStream = stream;
@@ -46,17 +76,23 @@ window.onload = async () => {
     lang: receiverLang
   };
 
-  // 📞 Botão de chamada — envia idioma do caller para o receiver
-  if (receiverId) {
-    document.getElementById('callActionBtn').style.display = 'block';
+// 📞 Botão de chamada — envia idioma do caller para o receiver
+if (receiverId) {
+  document.getElementById('callActionBtn').style.display = 'block';
 
-    document.getElementById('callActionBtn').onclick = () => {
-      if (localStream) {
-        const callerLang = navigator.language || 'pt-BR';
-        rtcCore.startCall(receiverId, localStream, callerLang); // ✅ envia idioma do caller
-      }
-    };
-  }
+  document.getElementById('callActionBtn').onclick = async () => {
+    if (localStream) {
+      // ✅ NOME CORRIGIDO: "meuIdioma" em vez de "callerLang"
+      const meuIdioma = await obterIdiomaCompleto(navigator.language);
+      
+      // ✅ DEBUG PARA CONFIRMAR
+      console.log('🚀 Idioma do Caller sendo enviado:', meuIdioma);
+      alert(`📞 Enviando meu idioma: ${meuIdioma}`);
+      
+      rtcCore.startCall(receiverId, localStream, meuIdioma);
+    }
+  };
+}
 
   // 📺 Exibe vídeo remoto recebido
   rtcCore.setRemoteStreamCallback(stream => {
@@ -67,7 +103,7 @@ window.onload = async () => {
 
   // 🌐 Tradução automática da interface
   const TRANSLATE_ENDPOINT = 'https://chat-tradutor.onrender.com/translate';
-  const navegadorLang = navigator.language || 'pt-BR';
+  const navegadorLang = await obterIdiomaCompleto(navigator.language);
 
   const frasesParaTraduzir = {
     "translator-label": "Live translation. No filters. No platform."
