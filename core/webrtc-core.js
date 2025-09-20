@@ -1,3 +1,4 @@
+// core/webrtc-core.js
 import { getIceServers, SIGNALING_SERVER_URL } from './internet-config.js';
 
 class WebRTCCore {
@@ -97,11 +98,21 @@ class WebRTCCore {
   setupDataChannelHandlers() {
     this.dataChannel.onopen = () => {
       console.log('DataChannel conectado');
+      // ✅ NOVO: Configura automaticamente o centro de tradução
+      if (window.centroTraducao) {
+        window.centroTraducao.configurarDataChannel(this.dataChannel);
+        console.log('Centro de tradução configurado automaticamente');
+      }
     };
 
     this.dataChannel.onmessage = (event) => {
       if (this.onDataChannelCallback) {
         this.onDataChannelCallback(event.data);
+      }
+      
+      // ✅ NOVO: Também repassa para o centro de tradução se existir
+      if (window.centroTraducao && window.centroTraducao.callbackRecebimento) {
+        window.centroTraducao.callbackRecebimento(event.data);
       }
     };
   }
