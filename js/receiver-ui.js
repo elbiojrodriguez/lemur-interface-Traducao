@@ -3,7 +3,8 @@ import { QRCodeGenerator } from './qr-code-utils.js';
 
 window.onload = async () => {
   try {
-    await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+    // ÚNICA solicitação para a câmera
+    const localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
   } catch (error) {
     console.error("Erro ao solicitar acesso à câmera:", error);
   }
@@ -25,14 +26,6 @@ window.onload = async () => {
 
   let localStream = null;
   let callerLang = null;
-
-  navigator.mediaDevices.getUserMedia({ video: true, audio: false })
-    .then(stream => {
-      localStream = stream;
-    })
-    .catch(error => {
-      console.error("Erro ao acessar a câmera:", error);
-    });
 
   const params = new URLSearchParams(window.location.search);
   const token = params.get('token') || '';
