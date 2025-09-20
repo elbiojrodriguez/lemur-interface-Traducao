@@ -5,23 +5,23 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Lemur-EchoMeP2P-Caller</title>
   <link rel="stylesheet" href="mobile-style.css" />
-  <link rel="stylesheet" href="style.css">
+  
 </head>
 <body>
   <div class="box-principal">  
           
-    <!-- Logo -->     
+      <!-- Logo -->     
     <img src="assets/images/Lemur2P2.png" alt="Lemur Logo" class="logo">
-    <img src="assets/images/Bridg.png" alt="ponte" class="ponte">
+     <img src="assets/images/Bridg.png" alt="ponte" class="ponte">
  
-    <!-- Sub Titulo --> 
+ <!-- Sub Titulo --> 
     <div class="translator-label" id="translator-label">
       Live translation. No filters. No platform.
     </div>
 
-    <!-- Remoto & Local -->
-    <div class="remoter-Lang">🏳️</div>
-    <div class="local-Lang">🏳️</div>
+ <!-- Remoto & Local -->
+        <div class="remoter-Lang">🏳️</div>
+        <div class="local-Lang">🏳️</div>
     
     <!-- 🎥 Vídeo remoto -->
     <div class="video-wrapper">
@@ -38,60 +38,14 @@
       <span id="myId"></span>
     </div>
 
-   <!-- 🔘 Botão de chamada -->
-<button id="callActionBtn" style="display: none;">SEND 🚀</button>
-    
-    <!-- ===== TRADUTOR POR VOZ ===== -->
-    
-    <!-- Caixa de Texto -->
-    <div class="text-box">
-      <div class="text-display">
-        <div class="text-title">
-          🌐
-          <button class="speaker-btn" id="speakerButton" disabled>🔊</button>
-        </div>
-        <div id="translatedText" class="text-content">🎤</div>
-      </div>
-    </div>
-    
-    <!-- Caixa do Microfone -->
-    <div class="microphone-box">
-      <div class="language-selector">
-        <div class="language-flag" id="currentLanguageFlag">🇧🇷</div>
-        <button class="world-btn" id="worldButton">🌎</button>
-      </div>
-      
-      <div class="language-dropdown" id="languageDropdown">
-        <div class="language-option" data-lang="pt-BR">🇧🇷</div>
-        <div class="language-option" data-lang="en">🇺🇸</div>
-        <div class="language-option" data-lang="es">🇪🇸</div>
-        <div class="language-option" data-lang="fr">🇫🇷</div>
-        <div class="language-option" data-lang="de">🇩🇪</div>
-        <div class="language-option" data-lang="it">🇮🇹</div>
-        <div class="language-option" data-lang="ja">🇯🇵</div>
-      </div>
-      
-      <button class="record-btn" id="recordButton" disabled>🎤</button>
+    <!-- 🔘 Botão de chamada -->
+    <div class="controls">
+      <button id="callActionBtn" style="display: none;">SEND 🚀</button>
     </div>
          
-  </div>
-
-  <!-- Modal de gravação -->
-  <div class="recording-modal" id="recordingModal">
-    <div class="recording-indicator">
-      <div class="recording-dot"></div>
-      <div class="recording-text">●</div>
-      <div class="recording-timer" id="recordingTimer">0:00</div>
-    </div>
-    <button class="send-button" id="sendButton">▶</button>
-  </div>
-
   <!-- 🔌 Scripts -->
   <script src="https://lemur-signal.onrender.com/socket.io/socket.io.js"></script>
   <script type="module" src="js/caller-ui.js"></script>
-  <!-- Adicione este script para a tradução por voz -->
-  <script src="js/translation-voice.js"></script>
-  <!-- Depois carrega tradutor.js eu chamei de js/script.js -->
-  <script src="js/script.js"></script>
+  
 </body>
 </html>
