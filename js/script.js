@@ -1,10 +1,4 @@
-```javascript
-// ===== INICIALIZAÇÃO =====
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('DOM carregado, iniciando tradutor...');
-    setTimeout(initializeTranslator, 800);
-});
-
+// ✅ SOLUÇÃO COMPLETA E CORRIGIDA
 function initializeTranslator() {
     // ===== CONFIGURAÇÃO =====
     let IDIOMA_ORIGEM = navigator.language || 'pt-BR';
@@ -24,12 +18,32 @@ function initializeTranslator() {
     const languageDropdown = document.getElementById('languageDropdown');
     const languageOptions = document.querySelectorAll('.language-option');
     
-    // ===== VERIFICAÇÃO DE ELEMENTOS =====
+    // ⭐ VERIFICA SE ELEMENTOS CRÍTICOS EXISTEM
     if (!currentLanguageFlag || !recordButton || !translatedText || !languageDropdown) {
         console.log('Aguardando elementos do DOM...');
         setTimeout(initializeTranslator, 300);
         return;
     }
+    
+    // ===== FUNÇÃO PARA BUSCAR BANDEIRA DO JSON =====
+    async function getBandeiraDoJson(langCode) {
+        try {
+            const response = await fetch('assets/bandeiras/language-flags.json');
+            const flags = await response.json();
+            
+            // ⭐ TENTA: 1. Código completo → 2. Código base → 3. Fallback
+            return flags[langCode] || flags[langCode.split('-')[0]] || '🎌';
+        } catch (error) {
+            console.error('Erro ao carregar bandeiras:', error);
+            return '🎌';
+        }
+    }
+
+    // ===== CONFIGURAÇÃO INICIAL =====
+    getBandeiraDoJson(IDIOMA_ORIGEM).then(bandeira => {
+        currentLanguageFlag.textContent = bandeira;
+    });
+    translatedText.textContent = "🎤";
     
     // ===== VERIFICAÇÃO DE SUPORTE =====
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -45,27 +59,21 @@ function initializeTranslator() {
         speakerButton.style.display = 'none';
     }
     
-    // ===== CONFIGURAÇÃO INICIAL =====
-    getBandeiraDoJson(IDIOMA_ORIGEM).then(bandeira => {
-        currentLanguageFlag.textContent = bandeira;
-    });
-    translatedText.textContent = "🎤";
-    
-    // ===== VARIÁVEIS DE ESTADO =====
     let recognition = new SpeechRecognition();
     recognition.lang = IDIOMA_ORIGEM;
-    recognition.continuous = false;
+    recognition.continuous = false; // ⭐ ALTERADO: continuous = false
     recognition.interimResults = true;
     
+    // ===== VARIÁVEIS DE ESTADO =====
     let isRecording = false;
-    let isTranslating = false;
+    let isTranslating = false; // ⭐ NOVO: controle de tradução
     let recordingStartTime = 0;
     let timerInterval = null;
     let pressTimer;
     let tapMode = false;
     let isSpeechPlaying = false;
     let microphonePermissionGranted = false;
-    let lastTranslationTime = 0;
+    let lastTranslationTime = 0; // ⭐ NOVO: debounce
     
     // ===== FUNÇÕES DE IDIOMA =====
     if (worldButton && languageDropdown) {
@@ -101,7 +109,7 @@ function initializeTranslator() {
                 
                 recognition = new SpeechRecognition();
                 recognition.lang = novoIdioma;
-                recognition.continuous = false;
+                recognition.continuous = false; // ⭐ continuous = false
                 recognition.interimResults = true;
                 setupRecognitionEvents();
                 
@@ -115,7 +123,7 @@ function initializeTranslator() {
         });
     }
     
-    // ===== FUNÇÕES DE RECONHECIMENTO DE VOZ =====
+    // ===== FUNÇÕES PRINCIPAIS =====
     function setupRecognitionEvents() {
         recognition.onresult = function(event) {
             let finalTranscript = '';
@@ -129,15 +137,17 @@ function initializeTranslator() {
                 }
             }
             
+            // ⭐ EXIBE TEXTO INTERIM (em tempo real)
             if (interimTranscript && !finalTranscript) {
                 if (translatedText) {
                     translatedText.textContent = interimTranscript;
                 }
             }
             
+            // ⭐ PROCESSA TEXTO FINAL COM DEBOUNCE
             if (finalTranscript && !isTranslating) {
                 const now = Date.now();
-                if (now - lastTranslationTime > 1000) {
+                if (now - lastTranslationTime > 1000) { // ⭐ Debounce de 1s
                     lastTranslationTime = now;
                     isTranslating = true;
                     
@@ -148,8 +158,14 @@ function initializeTranslator() {
                     translateText(finalTranscript).then(translation => {
                         if (translatedText) {
                             translatedText.textContent = translation;
-                            enviarParaOutroCelular(translation);
+                            if (SpeechSynthesis) {
+                                setTimeout(() => speakText(translation), 500);
+                            }
                         }
+                        isTranslating = false;
+                    }).catch(error => {
+                        console.error('Erro na tradução:', error);
+                        if (translatedText) translatedText.textContent = "❌";
                         isTranslating = false;
                     });
                 }
@@ -171,9 +187,52 @@ function initializeTranslator() {
         };
     }
     
-    // ===== FUNÇÕES DE TRADUÇÃO =====
+    // ✅ SOLUÇÃO CORRIGIDA PARA PERMISSÃO
+    async function requestMicrophonePermission() {
+        // ⭐ PRIMEIRO: Verifica se já temos permissão SEM pedir de novo
+        try {
+            const devices = await navigator.mediaDevices.enumerateDevices();
+            const hasMicrophonePermission = devices.some(device => 
+                device.kind === 'audioinput' && device.deviceId !== ''
+            );
+            
+            if (hasMicrophonePermission) {
+                microphonePermissionGranted = true;
+                recordButton.disabled = false;
+                translatedText.textContent = "🎤";
+                setupRecognitionEvents();
+                return;
+            }
+            
+            // ⭐ SEGUNDO: Se não tem permissão, pede UMA VEZ
+            const stream = await navigator.mediaDevices.getUserMedia({ 
+                audio: {
+                    echoCancellation: true,
+                    noiseSuppression: true,
+                    sampleRate: 44100
+                }
+            });
+            
+            // ⭐ Para o stream após 1 segundo (apenas para verificação)
+            setTimeout(() => {
+                stream.getTracks().forEach(track => track.stop());
+            }, 1000);
+            
+            microphonePermissionGranted = true;
+            recordButton.disabled = false;
+            translatedText.textContent = "🎤";
+            setupRecognitionEvents();
+            
+        } catch (error) {
+            console.error('Erro permissão microfone:', error);
+            translatedText.textContent = "🚫";
+            recordButton.disabled = true;
+        }
+    }
+    
     async function translateText(text) {
         try {
+            // ⭐ LIMITA TAMANHO DO TEXTO (evita sobrecarga)
             const trimmedText = text.trim().slice(0, 500);
             if (!trimmedText) return "🎤";
             
@@ -197,7 +256,6 @@ function initializeTranslator() {
             
             const result = await response.json();
             if (speakerButton) speakerButton.disabled = false;
-            
             return result.translatedText || "❌";
             
         } catch (error) {
@@ -206,7 +264,6 @@ function initializeTranslator() {
         }
     }
     
-    // ===== FUNÇÕES DE ÁUDIO =====
     function speakText(text) {
         if (!SpeechSynthesis || !text) return;
         
@@ -251,7 +308,6 @@ function initializeTranslator() {
         }
     }
     
-    // ===== FUNÇÕES DE GRAVAÇÃO =====
     function startRecording() {
         if (isRecording || isTranslating) return;
         
@@ -290,7 +346,6 @@ function initializeTranslator() {
         }
     }
     
-    // ===== FUNÇÕES DE INTERFACE =====
     function showRecordingModal() {
         if (recordingModal) recordingModal.classList.add('visible');
     }
@@ -307,74 +362,13 @@ function initializeTranslator() {
             recordingTimer.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
         }
         
+        // ⭐ PARA automaticamente após 30 segundos
         if (elapsedSeconds >= 30) {
             stopRecording();
         }
     }
     
-    // ===== FUNÇÕES UTILITÁRIAS =====
-    function enviarParaOutroCelular(texto) {
-        if (window.rtcDataChannel && window.rtcDataChannel.isOpen()) {
-            window.rtcDataChannel.send(texto);
-            console.log('✅ Texto enviado:', texto);
-        } else {
-            console.log('⏳ Canal não disponível ainda. Tentando novamente...');
-            setTimeout(() => enviarParaOutroCelular(texto), 1000);
-        }
-    }
-
-    async function getBandeiraDoJson(langCode) {
-        try {
-            const response = await fetch('assets/bandeiras/language-flags.json');
-            const flags = await response.json();
-            
-            return flags[langCode] || flags[langCode.split('-')[0]] || '🎌';
-        } catch (error) {
-            console.error('Erro ao carregar bandeiras:', error);
-            return '🎌';
-        }
-    }
-    
-    async function requestMicrophonePermission() {
-        try {
-            const devices = await navigator.mediaDevices.enumerateDevices();
-            const hasMicrophonePermission = devices.some(device => 
-                device.kind === 'audioinput' && device.deviceId !== ''
-            );
-            
-            if (hasMicrophonePermission) {
-                microphonePermissionGranted = true;
-                recordButton.disabled = false;
-                translatedText.textContent = "🎤";
-                setupRecognitionEvents();
-                return;
-            }
-            
-            const stream = await navigator.mediaDevices.getUserMedia({ 
-                audio: {
-                    echoCancellation: true,
-                    noiseSuppression: true,
-                    sampleRate: 44100
-                }
-            });
-            
-            setTimeout(() => {
-                stream.getTracks().forEach(track => track.stop());
-            }, 1000);
-            
-            microphonePermissionGranted = true;
-            recordButton.disabled = false;
-            translatedText.textContent = "🎤";
-            setupRecognitionEvents();
-            
-        } catch (error) {
-            console.error('Erro permissão microfone:', error);
-            translatedText.textContent = "🚫";
-            recordButton.disabled = true;
-        }
-    }
-    
-    // ===== EVENT LISTENERS =====
+    // ===== EVENTOS =====
     if (recordButton) {
         recordButton.addEventListener('touchstart', function(e) {
             e.preventDefault();
@@ -404,6 +398,7 @@ function initializeTranslator() {
             }
         });
         
+        // ⭐ SUPORTE PARA CLIQUE (mouse)
         recordButton.addEventListener('click', function(e) {
             e.preventDefault();
             if (recordButton.disabled || !microphonePermissionGranted || isTranslating) return;
@@ -425,12 +420,19 @@ function initializeTranslator() {
         speakerButton.addEventListener('click', toggleSpeech);
     }
     
-    // ===== INICIALIZAÇÃO FINAL =====
+    // ===== INICIALIZAÇÃO =====
     requestMicrophonePermission();
+    
     console.log('Tradutor inicializado com sucesso!');
+    console.log('Configuração:', {
+        IDIOMA_ORIGEM,
+        IDIOMA_DESTINO,
+        IDIOMA_FALA
+    });
 }
-```
 
-
-
-
+// Inicializa com delay para garantir que tudo esteja carregado
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM carregado, iniciando tradutor...');
+    setTimeout(initializeTranslator, 800);
+});
