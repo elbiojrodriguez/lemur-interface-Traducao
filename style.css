@@ -153,6 +153,7 @@ body {
   cursor: pointer;
   border-radius: 50%;
   transition: all 0.2s ease;
+  z-index: 9999;
 }
 
 
