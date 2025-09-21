@@ -26,6 +26,55 @@ body {
   overflow-y: auto;
 }
 
+/* ESTILO PARA O ELEMENTO QUE EXIBE MENSAGENS RECEBIDAS */
+
+
+#texto-recebido {
+  position: absolute;
+  top: 70%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 1.2em;
+  padding: 2vh 2vw;
+  margin: 2vh 0;
+  border: 0.2vh solid #4CAF50;
+  border-radius: 1vh;
+  background-color: #f8f9fa;
+  width: 80%;         /* ✅ largura em porcentagem */
+  height: 25%;        /* ✅ altura em porcentagem */
+  max-width: 500px;
+  text-align: center;
+  color: #333;
+  font-weight: bold;
+  display: block;
+  opacity: 1;
+  visibility: visible;
+  box-sizing: border-box;
+}
+
+#logo-traduz {
+  position: absolute;
+  top: 5%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 25%;
+  max-width: 120px;
+  height: auto;
+}
+
+/* Para diferenciar caller vs receiver */
+
+caller.html #texto-recebido {
+  border-color: #2196F3; /* Azul para caller */
+  background-color: #e3f2fd;
+}
+
+receiver.html #texto-recebido {
+  border-color: #4CAF50; /* Verde para receiver */
+  background-color: #f1f8e9;
+}
+
+
 .logo {
   position: absolute;
   top: 7%;
