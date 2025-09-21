@@ -203,19 +203,22 @@ function initializeTranslator() {
                         translatedText.textContent = "⏳";
                     }
                     
-                    translateText(finalTranscript).then(translation => {
+ translateText(finalTranscript).then(translation => {
     if (translatedText) {
         translatedText.textContent = translation;
         
-        // ✅✅✅ ADICIONE ESTA LINHA (envia para outro celular):
+        // ✅✅✅ ENVIA para outro celular (MAS NÃO FALA LOCALMENTE)
         enviarParaOutroCelular(translation);
         
-        if (SpeechSynthesis) {
-            setTimeout(() => speakText(translation), 500);
-        }
+        // ❌❌❌ REMOVA ESTAS LINHAS (não fale localmente):
+        // if (SpeechSynthesis) {
+        //     setTimeout(() => speakText(translation), 500);
+        // }
     }
     isTranslating = false;
-}).catch(error => {
+});
+
+.catch(error => {
     console.error('Erro na tradução:', error);
     if (translatedText) translatedText.textContent = "❌";
     isTranslating = false;
