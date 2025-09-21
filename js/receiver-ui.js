@@ -1,15 +1,19 @@
 import { WebRTCCore } from '../core/webrtc-core.js';
 import { QRCodeGenerator } from './qr-code-utils.js';
 
+// Variável global para controle do idioma de tradução
+window.targetTranslationLang = null;
+window.sourceTranslationLang = null;
+
 window.onload = async () => {
   try {
-    // ✅ PRIMEIRO: Solicita CÂMERA (WebRTC) - ESSENCIAL!
+    // ✅ Solicita acesso à câmera
     const stream = await navigator.mediaDevices.getUserMedia({ 
       video: true, 
       audio: false 
     });
     
-    // ✅✅✅ CORREÇÃO: TORNA GLOBAL (window.rtcCore)
+    // ✅ Inicializa WebRTC
     window.rtcCore = new WebRTCCore();
 
     const url = window.location.href;
@@ -25,16 +29,20 @@ window.onload = async () => {
 
     const myId = fakeRandomUUID(fixedId).substr(0, 8);
 
-    // ✅ Já temos a stream da câmera
+    // ✅ Configura stream da câmera
     let localStream = stream;
-
-    let callerLang = null;
 
     const params = new URLSearchParams(window.location.search);
     const token = params.get('token') || '';
     const lang = params.get('lang') || navigator.language || 'pt-BR';
 
-    window.targetTranslationLang = lang;
+    // ✅ Define idioma padrão (apenas se não foi definido anteriormente)
+    if (!window.targetTranslationLang) {
+      window.targetTranslationLang = lang;
+    }
+    
+    // ✅ Mantém o idioma de origem como o do caller que será recebido
+    window.sourceTranslationLang = null;
 
     const callerUrl = `${window.location.origin}/caller.html?targetId=${myId}&token=${encodeURIComponent(token)}&lang=${encodeURIComponent(lang)}`;
     QRCodeGenerator.generate("qrcode", callerUrl);
@@ -48,14 +56,13 @@ window.onload = async () => {
       if (!localStream) return;
 
       console.log('🎯 Caller fala:', idiomaDoCaller);
-      console.log('🎯 Eu (receiver) entendo:', lang);
+      console.log('🎯 Eu (receiver) entendo:', window.targetTranslationLang);
 
-      // ✅ CORREÇÃO: NÃO usar idiomaDoCaller para tradução!
-      // Em vez disso: traduzir do idiomaDoCaller para MEU idioma (lang)
-      window.sourceTranslationLang = idiomaDoCaller; // Idioma de QUEM fala
-      window.targetTranslationLang = lang; // Idioma para QUEM ouve ← CORRETO!
+      // ✅ CORREÇÃO: Define o idioma de ORIGEM (caller) e mantém o de DESTINO (receiver)
+      window.sourceTranslationLang = idiomaDoCaller;
+      // NÃO altera window.targetTranslationLang para preservar a escolha do usuário
 
-      console.log('🎯 Vou traduzir:', idiomaDoCaller, '→', lang);
+      console.log('🎯 Vou traduzir:', idiomaDoCaller, '→', window.targetTranslationLang);
 
       window.rtcCore.handleIncomingCall(offer, localStream, (remoteStream) => {
         remoteStream.getAudioTracks().forEach(track => track.enabled = false);
@@ -65,12 +72,11 @@ window.onload = async () => {
 
         localVideo.srcObject = remoteStream;
 
-        // ✅ CORREÇÃO DEFINITIVA: Sempre define o idioma para tradução
-        window.targetTranslationLang = idiomaDoCaller || lang;
-        console.log('🎯 Idioma definido para tradução:', window.targetTranslationLang);
-        alert(`🌐 Vou traduzir para: ${window.targetTranslationLang}`);
-
-        // ✅ Aplica bandeira do idioma recebido
+        // ✅ Exibe informação clara sobre a tradução
+        console.log('🎯 Idioma de origem (caller):', window.sourceTranslationLang);
+        console.log('🎯 Idioma de destino (receiver):', window.targetTranslationLang);
+        
+        // ✅ Aplica bandeira do idioma recebido (caller)
         if (idiomaDoCaller) {
           aplicarBandeiraRemota(idiomaDoCaller);
         } else {
@@ -107,7 +113,7 @@ window.onload = async () => {
       for (const [id, texto] of Object.entries(frasesParaTraduzir)) {
         const el = document.getElementById(id);
         if (el) {
-          const traduzido = await translateText(texto, lang);
+          const traduzido = await translateText(texto, window.targetTranslationLang);
           el.textContent = traduzido;
         }
       }
@@ -158,16 +164,16 @@ window.onload = async () => {
 
     aplicarBandeira(lang);
 
-    // ✅✅✅ CONFIGURA CALLBACK PARA RECEBER MENSAGENS
+    // ✅ Configura callback para receber mensagens
     window.rtcCore.setDataChannelCallback((mensagem) => {
-  console.log('Mensagem recebida no receiver:', mensagem);
-  const elemento = document.getElementById('texto-recebido');
-  if (elemento) {
-    elemento.textContent = mensagem;
-  }
-});
+      console.log('Mensagem recebida no receiver:', mensagem);
+      const elemento = document.getElementById('texto-recebido');
+      if (elemento) {
+        elemento.textContent = mensagem;
+      }
+    });
 
-    // ✅ DEPOIS: Inicializar tradutor
+    // ✅ Inicializar tradutor
     setTimeout(() => {
       if (typeof initializeTranslator === 'function') {
         initializeTranslator();
@@ -179,4 +185,13 @@ window.onload = async () => {
     alert("Erro ao acessar a câmera. Verifique as permissões.");
     return;
   }
+};
+
+// ✅ Função para alterar o idioma de destino (a ser chamada pelo botão da UI)
+window.setTranslationLanguage = function(langCode) {
+  window.targetTranslationLang = langCode;
+  console.log('Idioma de tradução alterado para:', langCode);
+  
+  // Atualiza a bandeira local
+  aplicarBandeira(langCode);
 };
