@@ -26,41 +26,6 @@ body {
   overflow-y: auto;
 }
 
-/* ESTILO PARA O ELEMENTO QUE EXIBE MENSAGENS RECEBIDAS */
-
-/* ===== .text-display  #texto-recebido ===== */
-
-#texto-recebido   {
-  position: absolute;
-  top: 80%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 18px;
-  padding: 15px;
-  margin: 10px 0;
-  border: 2px solid #4CAF50;
-  border-radius: 10px;
-  background-color: #f8f9fa;
-  min-height: 50px;
-  text-align: center;
-  color: #333;
-  font-weight: bold;
-  display: block; /* ✅ IMPORTANTE: Garante que seja visível */
-  opacity: 1; /* ✅ IMPORTANTE: Garante que não esteja transparente */
-  visibility: visible; /* ✅ IMPORTANTE: Garante que não esteja escondido */
-}
-
-/* Para diferenciar caller vs receiver */
-caller.html #texto-recebido {
-  border-color: #2196F3; /* Azul para caller */
-  background-color: #e3f2fd;
-}
-
-receiver.html #texto-recebido {
-  border-color: #4CAF50; /* Verde para receiver */
-  background-color: #f1f8e9;
-}
-
 .logo {
   position: absolute;
   top: 7%;
