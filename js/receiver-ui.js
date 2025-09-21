@@ -160,13 +160,12 @@ window.onload = async () => {
 
     // ✅✅✅ CONFIGURA CALLBACK PARA RECEBER MENSAGENS
     window.rtcCore.setDataChannelCallback((mensagem) => {
-      console.log('Mensagem recebida no receiver:', mensagem);
-      // Exibir na UI
-      const elemento = document.getElementById('texto-recebido');
-      if (elemento) {
-        elemento.textContent = mensagem;
-      }
-    });
+  console.log('Mensagem recebida no receiver:', mensagem);
+  const elemento = document.getElementById('texto-recebido');
+  if (elemento) {
+    elemento.textContent = mensagem;
+  }
+});
 
     // ✅ DEPOIS: Inicializar tradutor
     setTimeout(() => {
