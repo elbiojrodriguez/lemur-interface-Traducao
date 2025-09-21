@@ -58,7 +58,7 @@ function initializeTranslator() {
         }
     }
 
-    // ✅✅✅ CORREÇÃO: MOVI ESTA CHAMADA PARA DEPOIS DE TODA CONFIGURAÇÃO
+    // ✅✅✅ CORREÇÃO: MOVI ESTA CHAMADA PARA DEPOIS DA VERIFICAÇÃO DO DOM
     getBandeiraDoJson(IDIOMA_ORIGEM).then(bandeira => {
         currentLanguageFlag.textContent = bandeira;
     });
@@ -68,7 +68,7 @@ function initializeTranslator() {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     const SpeechSynthesis = window.speechSynthesis;
     
-  if (!SpeechRecognition) {
+    if (!SpeechRecognition) {
         translatedText.textContent = "❌";
         if (recordButton) recordButton.style.display = 'none';
         return;
