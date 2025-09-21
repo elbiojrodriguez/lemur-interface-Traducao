@@ -204,22 +204,22 @@ function initializeTranslator() {
                     }
                     
                     translateText(finalTranscript).then(translation => {
-                        if (translatedText) {
-                            translatedText.textContent = translation;
-                            
-                            // ✅ ADICIONE ESTA LINHA:
-                            enviarParaOutroCelular(translation);
-                            
-                            if (SpeechSynthesis) {
-                                setTimeout(() => speakText(translation), 500);
-                            }
-                        }
-                        isTranslating = false;
-                    }).catch(error => {
-                        console.error('Erro na tradução:', error);
-                        if (translatedText) translatedText.textContent = "❌";
-                        isTranslating = false;
-                    });
+    if (translatedText) {
+        translatedText.textContent = translation;
+        
+        // ✅✅✅ ADICIONE ESTA LINHA (envia para outro celular):
+        enviarParaOutroCelular(translation);
+        
+        if (SpeechSynthesis) {
+            setTimeout(() => speakText(translation), 500);
+        }
+    }
+    isTranslating = false;
+}).catch(error => {
+    console.error('Erro na tradução:', error);
+    if (translatedText) translatedText.textContent = "❌";
+    isTranslating = false;
+});
                 }
             }
         };
