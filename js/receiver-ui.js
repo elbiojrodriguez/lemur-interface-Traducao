@@ -1,11 +1,13 @@
 import WebRTCCore from '../core/webrtc-core.js';
 import { QRCodeGenerator } from './qr-code-utils.js';
 
+// Substitua as duas chamadas por UMA só:
 window.onload = async () => {
   try {
-    await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+    localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+    // Restante do código...
   } catch (error) {
-    console.error("Erro ao solicitar acesso à câmera:", error);
+    console.error("Erro ao acessar a câmera:", error);
   }
 
   const rtcCore = new WebRTCCore();
