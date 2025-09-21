@@ -114,7 +114,7 @@ body {
 
 .language-flag {
   font-size: 2rem;
-   z-index: 0;
+  z-index:10;
 }
 
 .world-btn {
