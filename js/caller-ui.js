@@ -55,27 +55,25 @@ window.onload = async () => {
     
     // ✅ 3. CONFIGURA CALLBACK PARA RECEBER MENSAGENS
     window.rtcCore.setDataChannelCallback((mensagem) => {
-  console.log('Mensagem recebida:', mensagem);
-  const elemento = document.getElementById('texto-recebido');
-  if (elemento) {
-    elemento.textContent = mensagem;
-    
-    // ✅✅✅ FALA A MENSAGEM RECEBIDA AUTOMATICAMENTE
-    if (window.SpeechSynthesis) {
-      // Para qualquer fala anterior
-      window.speechSynthesis.cancel();
-      
-      // Cria nova fala
-      const utterance = new SpeechSynthesisUtterance(mensagem);
-      utterance.lang = IDIOMA_FALA; // Usa o idioma configurado
-      utterance.rate = 0.9;
-      utterance.volume = 0.8;
-      
-      // Fala a mensagem
-      window.speechSynthesis.speak(utterance);
-    }
-  }
-});
+        console.log('Mensagem recebida no caller:', mensagem);
+        const elemento = document.getElementById('texto-recebido');
+        if (elemento) {
+            elemento.textContent = mensagem;
+            
+            // ✅ FALA A MENSAGEM RECEBIDA AUTOMATICAMENTE
+            if (window.SpeechSynthesis) {
+                window.speechSynthesis.cancel();
+                
+                const utterance = new SpeechSynthesisUtterance(mensagem);
+                const idiomaFala = new URLSearchParams(window.location.search).get('lang') || 'en-US';
+                utterance.lang = idiomaFala;
+                utterance.rate = 0.9;
+                utterance.volume = 0.8;
+                
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+    });
 
     // 🆔 Exibe o ID do caller na interface
     const myId = crypto.randomUUID().substr(0, 8);
@@ -138,10 +136,6 @@ window.onload = async () => {
         });
 
         const result = await response.json();
-        
-        // ✅ ENVIA PARA O OUTRO CELULAR
-        enviarParaOutroCelular(result.translatedText);
-        
         return result.translatedText || text;
       } catch (error) {
         console.error('Erro na tradução:', error);
