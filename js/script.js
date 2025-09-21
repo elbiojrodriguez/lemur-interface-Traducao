@@ -148,15 +148,13 @@ function initializeTranslator() {
                     interimTranscript += event.results[i][0].transcript;
                 }
             }
-
-             // ⭐ EXIBE TEXTO INTERIM (em tempo real)
+            
             if (interimTranscript && !finalTranscript) {
                 if (translatedText) {
                     translatedText.textContent = interimTranscript;
                 }
             }
-
-            // ⭐ PROCESSA TEXTO FINAL COM DEBOUNCE
+            
             if (finalTranscript && !isTranslating) {
                 const now = Date.now();
                 if (now - lastTranslationTime > 1000) {
@@ -200,10 +198,8 @@ function initializeTranslator() {
             }
         };
     }
-
-     // ✅ SOLUÇÃO CORRIGIDA PARA PERMISSÃO
+    
     async function requestMicrophonePermission() {
-    // ⭐ PRIMEIRO: Verifica se já temos permissão SEM pedir de novo
         try {
             const devices = await navigator.mediaDevices.enumerateDevices();
             const hasMicrophonePermission = devices.some(device => 
@@ -217,8 +213,7 @@ function initializeTranslator() {
                 setupRecognitionEvents();
                 return;
             }
-
-             // ⭐ SEGUNDO: Se não tem permissão, pede UMA VEZ
+            
             const stream = await navigator.mediaDevices.getUserMedia({ 
                 audio: {
                     echoCancellation: true,
@@ -245,7 +240,6 @@ function initializeTranslator() {
     
     async function translateText(text) {
         try {
-         // ⭐ LIMITA TAMANHO DO TEXTO (evita sobrecarga)
             const trimmedText = text.trim().slice(0, 500);
             if (!trimmedText) return "🎤";
             
@@ -375,14 +369,12 @@ function initializeTranslator() {
         if (recordingTimer) {
             recordingTimer.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
         }
-
-         // ⭐ PARA automaticamente após 30 segundos
+        
         if (elapsedSeconds >= 30) {
             stopRecording();
         }
     }
-
-     // ===== EVENTOS =====
+    
     if (recordButton) {
         recordButton.addEventListener('touchstart', function(e) {
             e.preventDefault();
@@ -411,8 +403,7 @@ function initializeTranslator() {
                 }
             }
         });
-
-           // ⭐ SUPORTE PARA CLIQUE (mouse)
+        
         recordButton.addEventListener('click', function(e) {
             e.preventDefault();
             if (recordButton.disabled || !microphonePermissionGranted || isTranslating) return;
