@@ -33,7 +33,9 @@
         <!-- 🎥 Vídeo local (mutado) -->
         <div class="video-wrapper">
             <video id="localVideo" autoplay muted playsinline></video>
-        </div>
+        </div> 
+
+        <!-- ===== APENAS NO RECEIVER ===== -->
 
         <!-- 🧾 Overlay com QR Code -->
         <div class="info-overlay"> 
@@ -66,7 +68,7 @@
                 <button class="world-btn" id="worldButton">🌎</button>
             </div>
             
-            <div class="language-dropdown" id="languageDropdown">
+                <div class="language-dropdown" id="languageDropdown">
                 <div class="language-option" data-lang="pt-BR">🇧🇷</div>
                 <div class="language-option" data-lang="en">🇺🇸</div>
                 <div class="language-option" data-lang="es">🇪🇸</div>
@@ -82,6 +84,7 @@
     </div>
 
     <!-- Modal de gravação -->
+
     <div class="recording-modal" id="recordingModal">
         <div class="recording-indicator">
             <div class="recording-dot"></div>
@@ -92,11 +95,9 @@
     </div>
     
 <!-- 🔌 Scripts -->
-<script src="https://lemur-signal.onrender.com/socket.io/socket.io.js"></script>
-<!-- PRIMEIRO o módulo UI -->
-<script type="module" src="js/receiver-ui.js"></script>
-<!-- DEPOIS o tradutor -->
-<script src="js/tradutor-receiver.js"></script>
+  <script src="https://lemur-signal.onrender.com/socket.io/socket.io.js"></script>
+  <script type="module" src="js/receiver-ui.js"></script>
+  <script src="js/tradutor-receiver.js"></script>
   
 </body>
 </html>
