@@ -159,31 +159,14 @@ window.onload = async () => {
     aplicarBandeira(lang);
 
     // ✅✅✅ CONFIGURA CALLBACK PARA RECEBER MENSAGENS
-
     window.rtcCore.setDataChannelCallback((mensagem) => {
-  console.log('Mensagem recebida no receiver:', mensagem);
-  // Exibir na UI
-  const elemento = document.getElementById('texto-recebido');
-  if (elemento) {
-    elemento.textContent = mensagem;
-    
-    // ✅✅✅ FALA A MENSAGEM RECEBIDA AUTOMATICAMENTE
-
-    if (window.SpeechSynthesis) {
-      // Para qualquer fala anterior
-      window.speechSynthesis.cancel();
-      
-      // Cria nova fala
-      const utterance = new SpeechSynthesisUtterance(mensagem);
-      utterance.lang = window.targetTranslationLang || 'en-US'; // ✅ CORRETO
-      utterance.rate = 0.9;
-      utterance.volume = 0.8;
-      
-      // Fala a mensagem
-      window.speechSynthesis.speak(utterance);
-    }
-  }
-});
+      console.log('Mensagem recebida no receiver:', mensagem);
+      // Exibir na UI
+      const elemento = document.getElementById('texto-recebido');
+      if (elemento) {
+        elemento.textContent = mensagem;
+      }
+    });
 
     // ✅ DEPOIS: Inicializar tradutor
     setTimeout(() => {
