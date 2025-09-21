@@ -90,11 +90,13 @@
         </div>
         <button class="send-button" id="sendButton">▶</button>
     </div>
-
-    <!-- 🔌 Scripts -->
-    <script src="https://lemur-signal.onrender.com/socket.io/socket.io.js"></script>
-    <script type="module" src="js/receiver-ui.js"></script>
-    <!-- Depois carrega tradutor.js eu chamei de js/script.js --> 
-    <script src="js/tradutor-receiver.js"></script>
+    
+<!-- 🔌 Scripts -->
+<script src="https://lemur-signal.onrender.com/socket.io/socket.io.js"></script>
+<!-- PRIMEIRO carrega o tradutor -->
+<script src="js/tradutor-receiver.js"></script>
+<!-- DEPOIS carrega o UI que depende do tradutor -->
+<script type="module" src="js/receiver-ui.js"></script>
+  
 </body>
 </html>
