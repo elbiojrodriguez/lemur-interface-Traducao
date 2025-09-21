@@ -185,12 +185,18 @@ window.onload = async () => {
   }
 });
 
-    // ✅ DEPOIS: Inicializar tradutor
-    setTimeout(() => {
+       // ✅✅✅ CORREÇÃO: Espera o tradutor carregar (tenta múltiplas vezes)
+    function waitForTranslator() {
       if (typeof initializeTranslator === 'function') {
+        console.log('✅ Tradutor carregado, inicializando...');
         initializeTranslator();
+      } else {
+        console.log('⏳ Aguardando tradutor carregar...');
+        setTimeout(waitForTranslator, 300); // Tenta a cada 300ms
       }
-    }, 1000);
+    }
+    
+    waitForTranslator(); // Inicia a verificação
     
   } catch (error) {
     console.error("Erro ao solicitar acesso à câmera:", error);
