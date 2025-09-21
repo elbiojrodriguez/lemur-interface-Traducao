@@ -54,13 +54,28 @@ window.onload = async () => {
     window.rtcCore = new WebRTCCore();
     
     // ✅ 3. CONFIGURA CALLBACK PARA RECEBER MENSAGENS
-    window.rtcCore.setDataChannelCallback((mensagem) => {
-      console.log('Mensagem recebida no caller:', mensagem);
-      const elemento = document.getElementById('texto-recebido');
-      if (elemento) elemento.textContent = mensagem;
-    });
 
-    // 🆔 Exibe o ID do caller na interface
+ window.rtcCore.setDataChannelCallback((mensagem) => {
+  console.log('Mensagem recebida:', mensagem);
+  const elemento = document.getElementById('texto-recebido');
+  if (elemento) {
+    elemento.textContent = mensagem;
+    
+    if (window.SpeechSynthesis) {
+      window.speechSynthesis.cancel();
+      
+      const utterance = new SpeechSynthesisUtterance(mensagem);
+      utterance.lang = window.targetTranslationLang || 'pt-BR'; // ✅ CORRETO
+      utterance.rate = 0.9;
+      utterance.volume = 0.8;
+      
+      window.speechSynthesis.speak(utterance);
+    }
+  }
+})
+
+
+  // 🆔 Exibe o ID do caller na interface
     const myId = crypto.randomUUID().substr(0, 8);
     document.getElementById('myId').textContent = myId;
 
