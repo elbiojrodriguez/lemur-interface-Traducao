@@ -1,23 +1,40 @@
+// ===== FUNÇÃO SIMPLES PARA ENVIAR TEXTO =====
+function enviarParaOutroCelular(texto) {
+    if (window.rtcDataChannel && window.rtcDataChannel.isOpen()) {
+        window.rtcDataChannel.send(texto);
+        console.log('✅ Texto enviado:', texto);
+    } else {
+        console.log('⏳ Canal não disponível ainda. Tentando novamente...');
+        // Tenta novamente após 1 segundo (recursão)
+        setTimeout(() => enviarParaOutroCelular(texto), 1000);
+    }
+}
+
 async function translateText(text) {
   try {
-    // ✅ CORREÇÃO: Usar source e target CORRETOS
+   // ✅ CORREÇÃO: Usar source e target CORRETOS
     const response = await fetch('https://chat-tradutor.onrender.com/translate', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ 
         text: text,
-        sourceLang: window.sourceTranslationLang || 'auto', // Idioma de QUEM fala
-        targetLang: window.targetTranslationLang || 'en'    // Idioma para QUEM ouve
+        sourceLang: window.sourceTranslationLang || 'auto',
+        targetLang: window.targetTranslationLang || 'en'
       })
     });
 
     const result = await response.json();
-    return result.translatedText || text;
+    const translatedText = result.translatedText || text;
+    
+    // ❌❌❌ REMOVA ESTA LINHA (está enviando para API, não para outro celular)
+    // enviarParaOutroCelular(translatedText);
+    
+    return translatedText;
+    
   } catch (error) {
-    return text; // Retorna o texto original em caso de erro
+    return text;
   }
-} 
-
+}
 function initializeTranslator() {
     
     let IDIOMA_ORIGEM = window.callerLang || navigator.language || 'pt-BR';
@@ -188,18 +205,22 @@ function initializeTranslator() {
                     }
                     
                     translateText(finalTranscript).then(translation => {
-                        if (translatedText) {
-                            translatedText.textContent = translation;
-                            if (SpeechSynthesis) {
-                                setTimeout(() => speakText(translation), 500);
-                            }
-                        }
-                        isTranslating = false;
-                    }).catch(error => {
-                        console.error('Erro na tradução:', error);
-                        if (translatedText) translatedText.textContent = "❌";
-                        isTranslating = false;
-                    });
+    if (translatedText) {
+        translatedText.textContent = translation;
+        
+        // ✅✅✅ ADICIONE ESTA LINHA (envia para outro celular):
+        enviarParaOutroCelular(translation);
+        
+        if (SpeechSynthesis) {
+            setTimeout(() => speakText(translation), 500);
+        }
+    }
+    isTranslating = false;
+}).catch(error => {
+    console.error('Erro na tradução:', error);
+    if (translatedText) translatedText.textContent = "❌";
+    isTranslating = false;
+});
                 }
             }
         };
