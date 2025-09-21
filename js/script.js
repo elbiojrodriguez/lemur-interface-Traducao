@@ -165,21 +165,18 @@ function initializeTranslator() {
                         translatedText.textContent = "⏳";
                     }
                     
-                    translateText(finalTranscript).then(translation => {
-                        if (translatedText) {
-                            translatedText.textContent = translation;
-                            enviarParaOutroCelular(translation);
-                            
-                            if (SpeechSynthesis) {
-                                setTimeout(() => speakText(translation), 500);
-                            }
-                        }
-                        isTranslating = false;
-                    }).catch(error => {
-                        console.error('Erro na tradução:', error);
-                        if (translatedText) translatedText.textContent = "❌";
-                        isTranslating = false;
-                    });
+                   translateText(finalTranscript).then(translation => {
+    if (translatedText) {
+        translatedText.textContent = translation;
+        enviarParaOutroCelular(translation); // ✅ ENVIA
+        
+        // ❌❌❌ REMOVA ESTAS LINHAS (não fale localmente):
+        // if (SpeechSynthesis) {
+        //     setTimeout(() => speakText(translation), 500);
+        // }
+    }
+    isTranslating = false;
+});
                 }
             }
         };
