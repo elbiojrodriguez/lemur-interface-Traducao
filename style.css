@@ -130,7 +130,7 @@ body {
   border-radius: 12px;
   padding: 4px;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-  z-index: 9999;
+  z-index: 100;
   display: none;
   flex-direction: column; /* 👈 agora em coluna */
   align-items: center;
@@ -141,6 +141,7 @@ body {
 
 .language-dropdown.show {
   display: flex;
+  z-index: 1000;
 }
 
 .language-option {
