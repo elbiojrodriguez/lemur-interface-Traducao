@@ -15,6 +15,7 @@
         <!-- Logo --> 
         <img src="assets/images/Lemur2P2.png" alt="Lemur Logo" class="logo">
         <img src="assets/images/Bridg.png" alt="ponte" class="ponte">
+        <img id="logo-traduz" src="assets/images/TradGlobo.png" alt="logo-traduz">
         
         <!-- Sub Titulo --> 
         <div class="translator-label" id="translator-label">
@@ -56,6 +57,8 @@
                 <div id="translatedText" class="text-content">🎤</div>
             </div>
         </div>
+
+        <div id="texto-recebido"></div>
         
         <!-- Caixa do Microfone -->
         <div class="microphone-box">
@@ -92,8 +95,6 @@
     <!-- 🔌 Scripts -->
     <script src="https://lemur-signal.onrender.com/socket.io/socket.io.js"></script>
     <script type="module" src="js/receiver-ui.js"></script>
-    <!-- Script para a tradução por voz -->
-    <script src="js/translation-voice.js"></script>
     <!-- Depois carrega tradutor.js eu chamei de js/script.js --> 
     <script src="js/tradutor-receiver.js"></script>
 </body>
