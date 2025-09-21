@@ -12,7 +12,6 @@ function enviarParaOutroCelular(texto) {
 
 async function translateText(text) {
   try {
-   // ✅ CORREÇÃO: Usar source e target CORRETOS
     const response = await fetch('https://chat-tradutor.onrender.com/translate', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
