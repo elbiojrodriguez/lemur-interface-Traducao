@@ -1,3 +1,23 @@
+async function translateText(text) {
+  try {
+    // ✅ CORREÇÃO: Usar source e target CORRETOS
+    const response = await fetch('https://chat-tradutor.onrender.com/translate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ 
+        text: text,
+        sourceLang: window.sourceTranslationLang || 'auto', // Idioma de QUEM fala
+        targetLang: window.targetTranslationLang || 'en'    // Idioma para QUEM ouve
+      })
+    });
+
+    const result = await response.json();
+    return result.translatedText || text;
+  } catch (error) {
+    return text; // Retorna o texto original em caso de erro
+  }
+} 
+
 function initializeTranslator() {
     
     let IDIOMA_ORIGEM = window.callerLang || navigator.language || 'pt-BR';
@@ -58,11 +78,9 @@ function initializeTranslator() {
         }
     }
 
-    // ✅✅✅ CORREÇÃO: MOVI ESTA CHAMADA PARA DEPOIS DA VERIFICAÇÃO DO DOM
     getBandeiraDoJson(IDIOMA_ORIGEM).then(bandeira => {
         currentLanguageFlag.textContent = bandeira;
     });
-    
     translatedText.textContent = "🎤";
     
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -170,22 +188,18 @@ function initializeTranslator() {
                     }
                     
                     translateText(finalTranscript).then(translation => {
-    if (translatedText) {
-        translatedText.textContent = translation;
-        
-        // ✅✅✅ ADICIONE ESTA LINHA (envia para outro celular):
-        enviarParaOutroCelular(translation);
-        
-        if (SpeechSynthesis) {
-            setTimeout(() => speakText(translation), 500);
-        }
-    }
-    isTranslating = false;
-}).catch(error => {
-    console.error('Erro na tradução:', error);
-    if (translatedText) translatedText.textContent = "❌";
-    isTranslating = false;
-});
+                        if (translatedText) {
+                            translatedText.textContent = translation;
+                            if (SpeechSynthesis) {
+                                setTimeout(() => speakText(translation), 500);
+                            }
+                        }
+                        isTranslating = false;
+                    }).catch(error => {
+                        console.error('Erro na tradução:', error);
+                        if (translatedText) translatedText.textContent = "❌";
+                        isTranslating = false;
+                    });
                 }
             }
         };
