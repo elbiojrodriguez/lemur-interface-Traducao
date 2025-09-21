@@ -7,18 +7,22 @@ async function obterIdiomaCompleto(lang) {
   if (lang.includes('-')) return lang;
   
   try {
+    // 📦 CARREGA O JSON DE BANDEIRAS
     const response = await fetch('assets/bandeiras/language-flags.json');
     const flags = await response.json();
-    
+
+    // 🔍 PROCURA O CÓDIGO COMPLETO NO JSON
     const codigoCompleto = Object.keys(flags).find(key => 
       key.startsWith(lang + '-')
     );
-    
+
+    // ✅ RETORNA O CÓDIGO COMPLETO ENCONTRADO    
     return codigoCompleto || `${lang}-${lang.toUpperCase()}`;
     
   } catch (error) {
     console.error('Erro ao carregar JSON de bandeiras:', error);
     
+    // 🆘 FALLBACK PARA CASOS DE ERRO
     const fallback = {
       'pt': 'pt-BR', 'es': 'es-ES', 'en': 'en-US',
       'fr': 'fr-FR', 'de': 'de-DE', 'it': 'it-IT',
@@ -54,28 +58,28 @@ window.onload = async () => {
     window.rtcCore = new WebRTCCore();
     
     // ✅ 3. CONFIGURA CALLBACK PARA RECEBER MENSAGENS
-    window.rtcCore.setDataChannelCallback((mensagem) => {
-        console.log('Mensagem recebida no caller:', mensagem);
-        const elemento = document.getElementById('texto-recebido');
-        if (elemento) {
-            elemento.textContent = mensagem;
-            
-            // ✅ FALA A MENSAGEM RECEBIDA AUTOMATICAMENTE
-            if (window.SpeechSynthesis) {
-                window.speechSynthesis.cancel();
-                
-                const utterance = new SpeechSynthesisUtterance(mensagem);
-                const idiomaFala = new URLSearchParams(window.location.search).get('lang') || 'en-US';
-                utterance.lang = idiomaFala;
-                utterance.rate = 0.9;
-                utterance.volume = 0.8;
-                
-                window.speechSynthesis.speak(utterance);
-            }
-        }
-    });
 
-    // 🆔 Exibe o ID do caller na interface
+ window.rtcCore.setDataChannelCallback((mensagem) => {
+  console.log('Mensagem recebida:', mensagem);
+  const elemento = document.getElementById('texto-recebido');
+  if (elemento) {
+    elemento.textContent = mensagem;
+    
+    if (window.SpeechSynthesis) {
+      window.speechSynthesis.cancel();
+      
+      const utterance = new SpeechSynthesisUtterance(mensagem);
+      utterance.lang = window.targetTranslationLang || 'pt-BR'; // ✅ CORRETO
+      utterance.rate = 0.9;
+      utterance.volume = 0.8;
+      
+      window.speechSynthesis.speak(utterance);
+    }
+  }
+})
+
+
+  // 🆔 Exibe o ID do caller na interface
     const myId = crypto.randomUUID().substr(0, 8);
     document.getElementById('myId').textContent = myId;
 
@@ -136,6 +140,10 @@ window.onload = async () => {
         });
 
         const result = await response.json();
+        
+        // ✅ ENVIA PARA O OUTRO CELULAR
+        enviarParaOutroCelular(result.translatedText);
+        
         return result.translatedText || text;
       } catch (error) {
         console.error('Erro na tradução:', error);
