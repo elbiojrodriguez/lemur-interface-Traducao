@@ -168,20 +168,17 @@ function initializeTranslator() {
                     }
                     
                     translateText(finalTranscript).then(translation => {
-                        if (translatedText) {
-                            translatedText.textContent = translation;
-                            enviarParaOutroCelular(translation);
-                            
-                            if (SpeechSynthesis) {
-                                setTimeout(() => speakText(translation), 500);
-                            }
-                        }
-                        isTranslating = false;
-                    }).catch(error => {
-                        console.error('Erro na tradução:', error);
-                        if (translatedText) translatedText.textContent = "❌";
-                        isTranslating = false;
-                    });
+    if (translatedText) {
+        translatedText.textContent = translation;
+        enviarParaOutroCelular(translation);
+        // ✅ REMOVIDO: speakText (não falar localmente)
+    }
+    isTranslating = false;
+}).catch(error => {
+    console.error('Erro na tradução:', error);
+    if (translatedText) translatedText.textContent = "❌";
+    isTranslating = false;
+});
                 }
             }
         };
