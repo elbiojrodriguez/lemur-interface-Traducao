@@ -159,21 +159,44 @@ window.onload = async () => {
     aplicarBandeira(lang);
 
     // ✅✅✅ CONFIGURA CALLBACK PARA RECEBER MENSAGENS
-    window.rtcCore.setDataChannelCallback((mensagem) => {
-      console.log('Mensagem recebida no receiver:', mensagem);
-      // Exibir na UI
-      const elemento = document.getElementById('texto-recebido');
-      if (elemento) {
-        elemento.textContent = mensagem;
-      }
-    });
 
-    // ✅ DEPOIS: Inicializar tradutor
-    setTimeout(() => {
+    window.rtcCore.setDataChannelCallback((mensagem) => {
+  console.log('Mensagem recebida no receiver:', mensagem);
+  // Exibir na UI
+  const elemento = document.getElementById('texto-recebido');
+  if (elemento) {
+    elemento.textContent = mensagem;
+    
+    // ✅✅✅ FALA A MENSAGEM RECEBIDA AUTOMATICAMENTE
+
+    if (window.SpeechSynthesis) {
+      // Para qualquer fala anterior
+      window.speechSynthesis.cancel();
+      
+      // Cria nova fala
+      const utterance = new SpeechSynthesisUtterance(mensagem);
+      utterance.lang = window.targetTranslationLang || 'en-US'; // ✅ CORRETO
+      utterance.rate = 0.9;
+      utterance.volume = 0.8;
+      
+      // Fala a mensagem
+      window.speechSynthesis.speak(utterance);
+    }
+  }
+});
+
+       // ✅✅✅ CORREÇÃO: Espera o tradutor carregar (tenta múltiplas vezes)
+    function waitForTranslator() {
       if (typeof initializeTranslator === 'function') {
+        console.log('✅ Tradutor carregado, inicializando...');
         initializeTranslator();
+      } else {
+        console.log('⏳ Aguardando tradutor carregar...');
+        setTimeout(waitForTranslator, 300); // Tenta a cada 300ms
       }
-    }, 1000);
+    }
+    
+    waitForTranslator(); // Inicia a verificação
     
   } catch (error) {
     console.error("Erro ao solicitar acesso à câmera:", error);
