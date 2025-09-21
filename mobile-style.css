@@ -205,4 +205,25 @@ receiver.html #texto-recebido {
   opacity: 0;
   pointer-events: none;
 }
+/* ===== CORREÇÃO ESPECÍFICA PARA O RECEIVER ===== */
+/* Adicionar ao mobile-style.css */
 
+receiver.html .language-dropdown {
+    z-index: 1000 !important;
+}
+
+receiver.html .language-dropdown.show {
+    z-index: 1000 !important;
+    display: flex !important;
+}
+
+receiver.html .world-btn {
+    z-index: 1001 !important;
+    position: relative;
+}
+
+/* Garantir que o dropdown fique visível mesmo após o QR ser escondido */
+receiver.html .info-overlay.hidden ~ .microphone-box .language-dropdown.show {
+    z-index: 1000 !important;
+    display: flex !important;
+}
