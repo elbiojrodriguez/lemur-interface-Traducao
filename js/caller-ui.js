@@ -54,28 +54,13 @@ window.onload = async () => {
     window.rtcCore = new WebRTCCore();
     
     // ✅ 3. CONFIGURA CALLBACK PARA RECEBER MENSAGENS
+    window.rtcCore.setDataChannelCallback((mensagem) => {
+      console.log('Mensagem recebida no caller:', mensagem);
+      const elemento = document.getElementById('texto-recebido');
+      if (elemento) elemento.textContent = mensagem;
+    });
 
- window.rtcCore.setDataChannelCallback((mensagem) => {
-  console.log('Mensagem recebida:', mensagem);
-  const elemento = document.getElementById('texto-recebido');
-  if (elemento) {
-    elemento.textContent = mensagem;
-    
-    if (window.SpeechSynthesis) {
-      window.speechSynthesis.cancel();
-      
-      const utterance = new SpeechSynthesisUtterance(mensagem);
-      utterance.lang = window.targetTranslationLang || 'pt-BR'; // ✅ CORRETO
-      utterance.rate = 0.9;
-      utterance.volume = 0.8;
-      
-      window.speechSynthesis.speak(utterance);
-    }
-  }
-})
-
-
-  // 🆔 Exibe o ID do caller na interface
+    // 🆔 Exibe o ID do caller na interface
     const myId = crypto.randomUUID().substr(0, 8);
     document.getElementById('myId').textContent = myId;
 
@@ -127,27 +112,25 @@ window.onload = async () => {
       "translator-label": "Live translation. No filters. No platform."
     };
 
-    async function translateText(text, targetLang, shouldSend = true) {
-  try {
-    const response = await fetch(TRANSLATE_ENDPOINT, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ text, targetLang })
-    });
+    async function translateText(text, targetLang) {
+      try {
+        const response = await fetch(TRANSLATE_ENDPOINT, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text, targetLang })
+        });
 
-    const result = await response.json();
-    
-    // ✅ ENVIA PARA O OUTRO CELULAR (apenas se shouldSend for true)
-    if (shouldSend) {
-      enviarParaOutroCelular(result.translatedText);
+        const result = await response.json();
+        
+        // ✅ ENVIA PARA O OUTRO CELULAR
+        enviarParaOutroCelular(result.translatedText);
+        
+        return result.translatedText || text;
+      } catch (error) {
+        console.error('Erro na tradução:', error);
+        return text;
+      }
     }
-    
-    return result.translatedText || text;
-  } catch (error) {
-    console.error('Erro na tradução:', error);
-    return text;
-  }
-}
 
     // 📝 Aplica traduções na interface
     (async () => {
