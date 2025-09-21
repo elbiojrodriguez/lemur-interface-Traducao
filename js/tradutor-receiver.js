@@ -448,3 +448,18 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('DOM carregado, iniciando tradutor...');
     setTimeout(initializeTranslator, 800);
 });
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM carregado, iniciando tradutor...');
+    setTimeout(initializeTranslator, 800);
+}); // ← FECHA AQUI o DOMContentLoaded
+
+// ⚡ CÓDIGO DE EMERGÊNCIA - FORA do DOMContentLoaded ✅
+setTimeout(() => {
+    if (typeof initializeTranslator === 'function' && 
+        document.getElementById('worldButton') && 
+        !document.getElementById('worldButton').hasEventListener) {
+        
+        console.log('⚡ Inicialização de emergência do botão mundo');
+        initializeTranslator();
+    }
+}, 4000); // ↑ Aumentei para 4 segundos para dar mais tempo
