@@ -127,25 +127,27 @@ window.onload = async () => {
       "translator-label": "Live translation. No filters. No platform."
     };
 
-    async function translateText(text, targetLang) {
-      try {
-        const response = await fetch(TRANSLATE_ENDPOINT, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ text, targetLang })
-        });
+    async function translateText(text, targetLang, shouldSend = true) {
+  try {
+    const response = await fetch(TRANSLATE_ENDPOINT, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text, targetLang })
+    });
 
-        const result = await response.json();
-        
-        // ✅ ENVIA PARA O OUTRO CELULAR
-        enviarParaOutroCelular(result.translatedText);
-        
-        return result.translatedText || text;
-      } catch (error) {
-        console.error('Erro na tradução:', error);
-        return text;
-      }
+    const result = await response.json();
+    
+    // ✅ ENVIA PARA O OUTRO CELULAR (apenas se shouldSend for true)
+    if (shouldSend) {
+      enviarParaOutroCelular(result.translatedText);
     }
+    
+    return result.translatedText || text;
+  } catch (error) {
+    console.error('Erro na tradução:', error);
+    return text;
+  }
+}
 
     // 📝 Aplica traduções na interface
     (async () => {
