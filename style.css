@@ -29,9 +29,9 @@ body {
 
 
 /* ===== CAIXA DE TEXTO ===== */
+/* ===== .text-display  #texto-recebido ===== */
 
-
-.text-display {
+.texto-recebido {
   position: absolute; /* 👈 permite mover livremente */
   top: 60vh;           /* 👈 distância do topo */
   left: 50%;
