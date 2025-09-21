@@ -1,18 +1,8 @@
-// ===== FUNÇÃO SIMPLES PARA ENVIAR TEXTO =====
-function enviarParaOutroCelular(texto) {
-    if (window.rtcDataChannel && window.rtcDataChannel.isOpen()) {
-        window.rtcDataChannel.send(texto);
-        console.log('✅ Texto enviado:', texto);
-    } else {
-        console.log('⏳ Canal não disponível ainda. Tentando novamente...');
-        setTimeout(() => enviarParaOutroCelular(texto), 1000);
-    }
-}
-
 function initializeTranslator() {
     
     let IDIOMA_ORIGEM = window.callerLang || navigator.language || 'pt-BR';
     
+    // ✅ CORREÇÃO FINAL: Função melhorada
     function obterIdiomaDestino() {
         return window.targetTranslationLang || 
                new URLSearchParams(window.location.search).get('lang') || 
@@ -68,15 +58,17 @@ function initializeTranslator() {
         }
     }
 
+    // ✅✅✅ CORREÇÃO: MOVI ESTA CHAMADA PARA DEPOIS DE TODA CONFIGURAÇÃO
     getBandeiraDoJson(IDIOMA_ORIGEM).then(bandeira => {
         currentLanguageFlag.textContent = bandeira;
     });
+    
     translatedText.textContent = "🎤";
     
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     const SpeechSynthesis = window.speechSynthesis;
     
-    if (!SpeechRecognition) {
+  if (!SpeechRecognition) {
         translatedText.textContent = "❌";
         if (recordButton) recordButton.style.display = 'none';
         return;
@@ -101,7 +93,6 @@ function initializeTranslator() {
     let microphonePermissionGranted = false;
     let lastTranslationTime = 0;
     
-    // ===== CORREÇÃO DO MENU DE IDIOMAS =====
     if (worldButton && languageDropdown) {
         worldButton.addEventListener('click', function(e) {
             e.preventDefault();
@@ -111,9 +102,7 @@ function initializeTranslator() {
     }
     
     document.addEventListener('click', function(e) {
-        if (languageDropdown && worldButton && 
-            !languageDropdown.contains(e.target) && 
-            e.target !== worldButton) {
+        if (languageDropdown && !languageDropdown.contains(e.target) && e.target !== worldButton) {
             languageDropdown.classList.remove('show');
         }
     });
@@ -125,9 +114,7 @@ function initializeTranslator() {
                 IDIOMA_ORIGEM = novoIdioma;
                 
                 const bandeira = await getBandeiraDoJson(novoIdioma);
-                if (currentLanguageFlag) {
-                    currentLanguageFlag.textContent = bandeira;
-                }
+                currentLanguageFlag.textContent = bandeira;
                 
                 if (languageDropdown) {
                     languageDropdown.classList.remove('show');
@@ -151,41 +138,6 @@ function initializeTranslator() {
                 }
             });
         });
-    }
-    // ===== FIM DA CORREÇÃO =====
-    
-    async function translateText(text) {
-        try {
-            const trimmedText = text.trim().slice(0, 500);
-            if (!trimmedText) return "🎤";
-            
-            const response = await fetch('https://chat-tradutor.onrender.com/translate', {
-                method: 'POST',
-                headers: { 
-                    'Content-Type': 'application/json',
-                    'X-Request-Source': 'web-translator'
-                },
-                body: JSON.stringify({ 
-                    text: trimmedText, 
-                    targetLang: IDIOMA_DESTINO,
-                    source: 'integrated-translator',
-                    sessionId: window.myId || 'default-session'
-                })
-            });
-            
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            
-            const result = await response.json();
-            if (speakerButton) speakerButton.disabled = false;
-            
-            return result.translatedText || "❌";
-            
-        } catch (error) {
-            console.error('Erro na tradução:', error);
-            return "❌";
-        }
     }
     
     function setupRecognitionEvents() {
@@ -218,16 +170,22 @@ function initializeTranslator() {
                     }
                     
                     translateText(finalTranscript).then(translation => {
-                        if (translatedText) {
-                            translatedText.textContent = translation;
-                            enviarParaOutroCelular(translation);
-                        }
-                        isTranslating = false;
-                    }).catch(error => {
-                        console.error('Erro na tradução:', error);
-                        if (translatedText) translatedText.textContent = "❌";
-                        isTranslating = false;
-                    });
+    if (translatedText) {
+        translatedText.textContent = translation;
+        
+        // ✅✅✅ ADICIONE ESTA LINHA (envia para outro celular):
+        enviarParaOutroCelular(translation);
+        
+        if (SpeechSynthesis) {
+            setTimeout(() => speakText(translation), 500);
+        }
+    }
+    isTranslating = false;
+}).catch(error => {
+    console.error('Erro na tradução:', error);
+    if (translatedText) translatedText.textContent = "❌";
+    isTranslating = false;
+});
                 }
             }
         };
@@ -448,18 +406,3 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('DOM carregado, iniciando tradutor...');
     setTimeout(initializeTranslator, 800);
 });
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('DOM carregado, iniciando tradutor...');
-    setTimeout(initializeTranslator, 800);
-}); // ← FECHA AQUI o DOMContentLoaded
-
-// ⚡ CÓDIGO DE EMERGÊNCIA - FORA do DOMContentLoaded ✅
-setTimeout(() => {
-    if (typeof initializeTranslator === 'function' && 
-        document.getElementById('worldButton') && 
-        !document.getElementById('worldButton').hasEventListener) {
-        
-        console.log('⚡ Inicialização de emergência do botão mundo');
-        initializeTranslator();
-    }
-}, 4000); // ↑ Aumentei para 4 segundos para dar mais tempo
