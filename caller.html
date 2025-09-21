@@ -8,7 +8,6 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
   <div class="box-principal">  
           
     <!-- Logo -->     
@@ -34,8 +33,6 @@
       <video id="localVideo" autoplay muted playsinline></video>
     </div>
 
-   <!-- ===== APENAS NO CALLER ===== -->
-
     <!-- 🆔 ID do usuário -->
     <div class="info-overlay" style="opacity: 0; position: absolute; pointer-events: none;">
       <span id="myId"></span>
@@ -56,8 +53,6 @@
         <div id="translatedText" class="text-content">🎤</div>
       </div>
     </div>
-
-    <div id="texto-recebido"></div>
     
     <!-- Caixa do Microfone -->
     <div class="microphone-box">
@@ -66,7 +61,7 @@
         <button class="world-btn" id="worldButton">🌎</button>
       </div>
       
-        <div class="language-dropdown" id="languageDropdown">
+      <div class="language-dropdown" id="languageDropdown">
         <div class="language-option" data-lang="pt-BR">🇧🇷</div>
         <div class="language-option" data-lang="en">🇺🇸</div>
         <div class="language-option" data-lang="es">🇪🇸</div>
@@ -82,7 +77,6 @@
   </div>
 
   <!-- Modal de gravação -->
-
   <div class="recording-modal" id="recordingModal">
     <div class="recording-indicator">
       <div class="recording-dot"></div>
@@ -95,7 +89,9 @@
   <!-- 🔌 Scripts -->
   <script src="https://lemur-signal.onrender.com/socket.io/socket.io.js"></script>
   <script type="module" src="js/caller-ui.js"></script>
+  <!-- Adicione este script para a tradução por voz -->
+  <script src="js/translation-voice.js"></script>
+  <!-- Depois carrega tradutor.js eu chamei de js/script.js -->
   <script src="js/script.js"></script>
-
 </body>
 </html>
