@@ -1,4 +1,10 @@
-// ✅ SOLUÇÃO COMPLETA E CORRIGIDA
+```javascript
+// ===== INICIALIZAÇÃO =====
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM carregado, iniciando tradutor...');
+    setTimeout(initializeTranslator, 800);
+});
+
 function initializeTranslator() {
     // ===== CONFIGURAÇÃO =====
     let IDIOMA_ORIGEM = navigator.language || 'pt-BR';
@@ -18,44 +24,12 @@ function initializeTranslator() {
     const languageDropdown = document.getElementById('languageDropdown');
     const languageOptions = document.querySelectorAll('.language-option');
     
-    // ⭐ VERIFICA SE ELEMENTOS CRÍTICOS EXISTEM
+    // ===== VERIFICAÇÃO DE ELEMENTOS =====
     if (!currentLanguageFlag || !recordButton || !translatedText || !languageDropdown) {
         console.log('Aguardando elementos do DOM...');
         setTimeout(initializeTranslator, 300);
         return;
     }
-    
-    // ===== FUNÇÃO SIMPLES PARA ENVIAR TEXTO =====
-    function enviarParaOutroCelular(texto) {
-        if (window.rtcDataChannel && window.rtcDataChannel.isOpen()) {
-            window.rtcDataChannel.send(texto);
-            console.log('✅ Texto enviado:', texto);
-        } else {
-            console.log('⏳ Canal não disponível ainda. Tentando novamente...');
-            // Tenta novamente após 1 segundo (recursão)
-            setTimeout(() => enviarParaOutroCelular(texto), 1000);
-        }
-    }
-
-    // ===== FUNÇÃO PARA BUSCAR BANDEIRA DO JSON =====
-    async function getBandeiraDoJson(langCode) {
-        try {
-            const response = await fetch('assets/bandeiras/language-flags.json');
-            const flags = await response.json();
-            
-            // ⭐ TENTA: 1. Código completo → 2. Código base → 3. Fallback
-            return flags[langCode] || flags[langCode.split('-')[0]] || '🎌';
-        } catch (error) {
-            console.error('Erro ao carregar bandeiras:', error);
-            return '🎌';
-        }
-    }
-
-    // ===== CONFIGURAÇÃO INICIAL =====
-    getBandeiraDoJson(IDIOMA_ORIGEM).then(bandeira => {
-        currentLanguageFlag.textContent = bandeira;
-    });
-    translatedText.textContent = "🎤";
     
     // ===== VERIFICAÇÃO DE SUPORTE =====
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -71,12 +45,18 @@ function initializeTranslator() {
         speakerButton.style.display = 'none';
     }
     
+    // ===== CONFIGURAÇÃO INICIAL =====
+    getBandeiraDoJson(IDIOMA_ORIGEM).then(bandeira => {
+        currentLanguageFlag.textContent = bandeira;
+    });
+    translatedText.textContent = "🎤";
+    
+    // ===== VARIÁVEIS DE ESTADO =====
     let recognition = new SpeechRecognition();
     recognition.lang = IDIOMA_ORIGEM;
     recognition.continuous = false;
     recognition.interimResults = true;
     
-    // ===== VARIÁVEIS DE ESTADO =====
     let isRecording = false;
     let isTranslating = false;
     let recordingStartTime = 0;
@@ -135,7 +115,7 @@ function initializeTranslator() {
         });
     }
     
-    // ===== FUNÇÕES PRINCIPAIS =====
+    // ===== FUNÇÕES DE RECONHECIMENTO DE VOZ =====
     function setupRecognitionEvents() {
         recognition.onresult = function(event) {
             let finalTranscript = '';
@@ -165,18 +145,13 @@ function initializeTranslator() {
                         translatedText.textContent = "⏳";
                     }
                     
-                   translateText(finalTranscript).then(translation => {
-    if (translatedText) {
-        translatedText.textContent = translation;
-        enviarParaOutroCelular(translation); // ✅ ENVIA
-        
-        // ❌❌❌ REMOVA ESTAS LINHAS (não fale localmente):
-        // if (SpeechSynthesis) {
-        //     setTimeout(() => speakText(translation), 500);
-        // }
-    }
-    isTranslating = false;
-});
+                    translateText(finalTranscript).then(translation => {
+                        if (translatedText) {
+                            translatedText.textContent = translation;
+                            enviarParaOutroCelular(translation);
+                        }
+                        isTranslating = false;
+                    });
                 }
             }
         };
@@ -196,45 +171,7 @@ function initializeTranslator() {
         };
     }
     
-    async function requestMicrophonePermission() {
-        try {
-            const devices = await navigator.mediaDevices.enumerateDevices();
-            const hasMicrophonePermission = devices.some(device => 
-                device.kind === 'audioinput' && device.deviceId !== ''
-            );
-            
-            if (hasMicrophonePermission) {
-                microphonePermissionGranted = true;
-                recordButton.disabled = false;
-                translatedText.textContent = "🎤";
-                setupRecognitionEvents();
-                return;
-            }
-            
-            const stream = await navigator.mediaDevices.getUserMedia({ 
-                audio: {
-                    echoCancellation: true,
-                    noiseSuppression: true,
-                    sampleRate: 44100
-                }
-            });
-            
-            setTimeout(() => {
-                stream.getTracks().forEach(track => track.stop());
-            }, 1000);
-            
-            microphonePermissionGranted = true;
-            recordButton.disabled = false;
-            translatedText.textContent = "🎤";
-            setupRecognitionEvents();
-            
-        } catch (error) {
-            console.error('Erro permissão microfone:', error);
-            translatedText.textContent = "🚫";
-            recordButton.disabled = true;
-        }
-    }
-    
+    // ===== FUNÇÕES DE TRADUÇÃO =====
     async function translateText(text) {
         try {
             const trimmedText = text.trim().slice(0, 500);
@@ -269,6 +206,7 @@ function initializeTranslator() {
         }
     }
     
+    // ===== FUNÇÕES DE ÁUDIO =====
     function speakText(text) {
         if (!SpeechSynthesis || !text) return;
         
@@ -313,6 +251,7 @@ function initializeTranslator() {
         }
     }
     
+    // ===== FUNÇÕES DE GRAVAÇÃO =====
     function startRecording() {
         if (isRecording || isTranslating) return;
         
@@ -351,6 +290,7 @@ function initializeTranslator() {
         }
     }
     
+    // ===== FUNÇÕES DE INTERFACE =====
     function showRecordingModal() {
         if (recordingModal) recordingModal.classList.add('visible');
     }
@@ -372,6 +312,69 @@ function initializeTranslator() {
         }
     }
     
+    // ===== FUNÇÕES UTILITÁRIAS =====
+    function enviarParaOutroCelular(texto) {
+        if (window.rtcDataChannel && window.rtcDataChannel.isOpen()) {
+            window.rtcDataChannel.send(texto);
+            console.log('✅ Texto enviado:', texto);
+        } else {
+            console.log('⏳ Canal não disponível ainda. Tentando novamente...');
+            setTimeout(() => enviarParaOutroCelular(texto), 1000);
+        }
+    }
+
+    async function getBandeiraDoJson(langCode) {
+        try {
+            const response = await fetch('assets/bandeiras/language-flags.json');
+            const flags = await response.json();
+            
+            return flags[langCode] || flags[langCode.split('-')[0]] || '🎌';
+        } catch (error) {
+            console.error('Erro ao carregar bandeiras:', error);
+            return '🎌';
+        }
+    }
+    
+    async function requestMicrophonePermission() {
+        try {
+            const devices = await navigator.mediaDevices.enumerateDevices();
+            const hasMicrophonePermission = devices.some(device => 
+                device.kind === 'audioinput' && device.deviceId !== ''
+            );
+            
+            if (hasMicrophonePermission) {
+                microphonePermissionGranted = true;
+                recordButton.disabled = false;
+                translatedText.textContent = "🎤";
+                setupRecognitionEvents();
+                return;
+            }
+            
+            const stream = await navigator.mediaDevices.getUserMedia({ 
+                audio: {
+                    echoCancellation: true,
+                    noiseSuppression: true,
+                    sampleRate: 44100
+                }
+            });
+            
+            setTimeout(() => {
+                stream.getTracks().forEach(track => track.stop());
+            }, 1000);
+            
+            microphonePermissionGranted = true;
+            recordButton.disabled = false;
+            translatedText.textContent = "🎤";
+            setupRecognitionEvents();
+            
+        } catch (error) {
+            console.error('Erro permissão microfone:', error);
+            translatedText.textContent = "🚫";
+            recordButton.disabled = true;
+        }
+    }
+    
+    // ===== EVENT LISTENERS =====
     if (recordButton) {
         recordButton.addEventListener('touchstart', function(e) {
             e.preventDefault();
@@ -422,13 +425,12 @@ function initializeTranslator() {
         speakerButton.addEventListener('click', toggleSpeech);
     }
     
-    // ✅✅✅ CORREÇÃO: CHAMAR A FUNÇÃO DE PERmissÃO DO MICROFONE
+    // ===== INICIALIZAÇÃO FINAL =====
     requestMicrophonePermission();
-    
     console.log('Tradutor inicializado com sucesso!');
 }
+```
 
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('DOM carregado, iniciando tradutor...');
-    setTimeout(initializeTranslator, 800);
-});
+
+
+
