@@ -34,6 +34,7 @@ async function translateText(text) {
     return text;
   }
 }
+
 function initializeTranslator() {
     
     let IDIOMA_ORIGEM = window.callerLang || navigator.language || 'pt-BR';
@@ -203,26 +204,25 @@ function initializeTranslator() {
                         translatedText.textContent = "⏳";
                     }
                     
- translateText(finalTranscript).then(translation => {
-    if (translatedText) {
-        translatedText.textContent = translation;
-        
-        // ✅✅✅ ENVIA para outro celular (MAS NÃO FALA LOCALMENTE)
-        enviarParaOutroCelular(translation);
-        
-        // ❌❌❌ REMOVA ESTAS LINHAS (não fale localmente):
-        // if (SpeechSynthesis) {
-        //     setTimeout(() => speakText(translation), 500);
-        // }
-    }
-    isTranslating = false;
-});
-
-.catch(error => {
-    console.error('Erro na tradução:', error);
-    if (translatedText) translatedText.textContent = "❌";
-    isTranslating = false;
-});
+                    // CORREÇÃO DA SINTASE: Removido o ponto extra antes do .catch
+                    translateText(finalTranscript).then(translation => {
+                        if (translatedText) {
+                            translatedText.textContent = translation;
+                            
+                            // ✅✅✅ ENVIA para outro celular (MAS NÃO FALA LOCALMENTE)
+                            enviarParaOutroCelular(translation);
+                            
+                            // ❌❌❌ REMOVA ESTAS LINHAS (não fale localmente):
+                            // if (SpeechSynthesis) {
+                            //     setTimeout(() => speakText(translation), 500);
+                            // }
+                        }
+                        isTranslating = false;
+                    }).catch(error => {
+                        console.error('Erro na tradução:', error);
+                        if (translatedText) translatedText.textContent = "❌";
+                        isTranslating = false;
+                    });
                 }
             }
         };
