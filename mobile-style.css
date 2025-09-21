@@ -27,7 +27,8 @@ body {
 }
 
 /* ESTILO PARA O ELEMENTO QUE EXIBE MENSAGENS RECEBIDAS */
-.text-display  #texto-recebido
+
+/* ===== .text-display  #texto-recebido ===== */
 #text-display  {
   font-size: 18px;
   padding: 15px;
