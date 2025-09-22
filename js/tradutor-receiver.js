@@ -207,13 +207,8 @@ function initializeTranslator() {
                     translateText(finalTranscript).then(translation => {
     if (translatedText) {
         translatedText.textContent = translation;
-        
-        // ✅✅✅ ADICIONE ESTA LINHA (envia para outro celular):
-        enviarParaOutroCelular(translation);
-        
-        if (SpeechSynthesis) {
-            setTimeout(() => speakText(translation), 500);
-        }
+        enviarParaOutroCelular(translation); // ✅ Envia para outro celular
+        // ❌ REMOVER speakText (não falar localmente)
     }
     isTranslating = false;
 }).catch(error => {
