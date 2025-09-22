@@ -1,3 +1,7 @@
+// ===== VARIÁVEIS GLOBAIS DE CONTROLE =====
+window.isRecording = false;
+window.isSelectingLanguage = false;
+
 // ===== FUNÇÃO SIMPLES PARA ENVIAR TEXTO =====
 function enviarParaOutroCelular(texto) {
     if (window.rtcDataChannel && window.rtcDataChannel.isOpen()) {
@@ -129,13 +133,23 @@ function initializeTranslator() {
     let microphonePermissionGranted = false;
     let lastTranslationTime = 0;
     
-    // ✅ CORREÇÃO CONFIRMADA: Event listener do botão Mundo
+    // ✅✅✅ CORREÇÃO DEFINITIVA: Event listener do botão Mundo com proteção
     if (worldButton && languageDropdown) {
         worldButton.addEventListener('click', function(e) {
             console.log('✅ Botão Mundo clicado!');
             e.preventDefault();
             e.stopPropagation();
+            
+            // ✅ BLOQUEIA a fala automática enquanto seleciona idioma
+            window.isSelectingLanguage = true;
+            
             languageDropdown.classList.toggle('show');
+            
+            // ✅ Remove o bloqueio após 3 segundos
+            setTimeout(() => { 
+                window.isSelectingLanguage = false;
+                console.log('✅ Bloqueio de seleção de idioma removido');
+            }, 3000);
         });
     } else {
         console.error('❌ Elementos do seletor de idioma não encontrados');
@@ -329,6 +343,7 @@ function initializeTranslator() {
         try {
             recognition.start();
             isRecording = true;
+            window.isRecording = true; // ✅ Atualiza variável global
             
             if (recordButton) recordButton.classList.add('recording');
             recordingStartTime = Date.now();
@@ -352,6 +367,7 @@ function initializeTranslator() {
         if (!isRecording) return;
         
         isRecording = false;
+        window.isRecording = false; // ✅ Atualiza variável global
         if (recordButton) recordButton.classList.remove('recording');
         clearInterval(timerInterval);
         hideRecordingModal();
