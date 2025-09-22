@@ -199,6 +199,7 @@ document.addEventListener('DOMContentLoaded', async function() {
             };
         }
         
+        // ✅✅✅ FUNÇÃO CORRIGIDA PARA PERMISSÃO DO MICROFONE
         async function requestMicrophonePermission() {
             try {
                 const devices = await navigator.mediaDevices.enumerateDevices();
@@ -426,6 +427,7 @@ document.addEventListener('DOMContentLoaded', async function() {
             speakerButton.addEventListener('click', toggleSpeech);
         }
         
+        // ✅✅✅ CHAMADA CORRETA DA FUNÇÃO DE PERMISSÃO (ADICIONADA)
         requestMicrophonePermission();
         
         console.log('Tradutor inicializado com sucesso!');
