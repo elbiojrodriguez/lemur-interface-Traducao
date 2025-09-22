@@ -1,5 +1,3 @@
-Está sendo muito complicado para mim vamos vamos fazer mais simples pega esse arquivo que é o meu tradutor e que ele é manual e já troca ele pelo cabeçalho do receiver ficaria desse jeito: 
-
 document.addEventListener('DOMContentLoaded', function() {
     // ===== CONFIGURAÇÃO =====
    // ===== CABEÇALHO DE IDIOMAS PARA RECEIVER =====
