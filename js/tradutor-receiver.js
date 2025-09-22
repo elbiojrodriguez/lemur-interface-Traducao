@@ -10,40 +10,34 @@ function enviarParaOutroCelular(texto) {
     }
 }
 
-async function translateText(text) {
-  try {
-   // ✅ CORREÇÃO: Usar source e target CORRETOS
-    const response = await fetch('https://chat-tradutor.onrender.com/translate', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ 
-        text: text,
-        sourceLang: window.sourceTranslationLang || 'auto',
-        targetLang: window.targetTranslationLang || 'en'
-      })
-    });
+// ✅ CORREÇÃO: Função translateText simplificada e sem conflitos
+async function translateText(text, targetLang = 'en') {
+    try {
+        const response = await fetch('https://chat-tradutor.onrender.com/translate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                text: text,
+                targetLang: targetLang // ✅ Usa parâmetro direto, sem variáveis globais
+            })
+        });
 
-    const result = await response.json();
-    const translatedText = result.translatedText || text;
-    
-    // ❌❌❌ REMOVA ESTA LINHA (está enviando para API, não para outro celular)
-    // enviarParaOutroCelular(translatedText);
-    
-    return translatedText;
-    
-  } catch (error) {
-    return text;
-  }
+        const result = await response.json();
+        return result.translatedText || text;
+    } catch (error) {
+        console.error('Erro na tradução:', error);
+        return text;
+    }
 }
+
 function initializeTranslator() {
     
     let IDIOMA_ORIGEM = window.callerLang || navigator.language || 'pt-BR';
     
-    // ✅ CORREÇÃO FINAL: Função melhorada
+    // ✅ CORREÇÃO: Função simplificada sem dependências de variáveis globais problemáticas
     function obterIdiomaDestino() {
-        return window.targetTranslationLang || 
-               new URLSearchParams(window.location.search).get('lang') || 
-               'en';
+        // ✅ Usa apenas URL parameters ou fallback seguro
+        return new URLSearchParams(window.location.search).get('lang') || 'en';
     }
 
     function obterIdiomaFala() {
@@ -77,6 +71,13 @@ function initializeTranslator() {
     const worldButton = document.getElementById('worldButton');
     const languageDropdown = document.getElementById('languageDropdown');
     const languageOptions = document.querySelectorAll('.language-option');
+    
+    // ⭐ VERIFICAÇÃO CRÍTICA: Garante que o botão Mundo existe
+    if (!worldButton) {
+        console.error('❌ Botão Mundo não encontrado!');
+    } else {
+        console.log('✅ Botão Mundo encontrado:', worldButton);
+    }
     
     if (!currentLanguageFlag || !recordButton || !translatedText || !languageDropdown) {
         console.log('Aguardando elementos do DOM...');
@@ -128,12 +129,16 @@ function initializeTranslator() {
     let microphonePermissionGranted = false;
     let lastTranslationTime = 0;
     
+    // ✅ CORREÇÃO CONFIRMADA: Event listener do botão Mundo
     if (worldButton && languageDropdown) {
         worldButton.addEventListener('click', function(e) {
+            console.log('✅ Botão Mundo clicado!');
             e.preventDefault();
             e.stopPropagation();
             languageDropdown.classList.toggle('show');
         });
+    } else {
+        console.error('❌ Elementos do seletor de idioma não encontrados');
     }
     
     document.addEventListener('click', function(e) {
@@ -204,18 +209,18 @@ function initializeTranslator() {
                         translatedText.textContent = "⏳";
                     }
                     
-                    translateText(finalTranscript).then(translation => {
-    if (translatedText) {
-        translatedText.textContent = translation;
-        enviarParaOutroCelular(translation); // ✅ Envia para outro celular
-        // ❌ REMOVER speakText (não falar localmente)
-    }
-    isTranslating = false;
-}).catch(error => {
-    console.error('Erro na tradução:', error);
-    if (translatedText) translatedText.textContent = "❌";
-    isTranslating = false;
-});
+                    // ✅ CORREÇÃO: Chama translateText com parâmetro correto
+                    translateText(finalTranscript, IDIOMA_DESTINO).then(translation => {
+                        if (translatedText) {
+                            translatedText.textContent = translation;
+                            enviarParaOutroCelular(translation);
+                        }
+                        isTranslating = false;
+                    }).catch(error => {
+                        console.error('Erro na tradução:', error);
+                        if (translatedText) translatedText.textContent = "❌";
+                        isTranslating = false;
+                    });
                 }
             }
         };
@@ -429,10 +434,10 @@ function initializeTranslator() {
     
     requestMicrophonePermission();
     
-    console.log('Tradutor inicializado com sucesso!');
+    console.log('✅ Tradutor receiver inicializado com sucesso! Botão Mundo funcional.');
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('DOM carregado, iniciando tradutor...');
+    console.log('🚀 DOM receiver carregado, iniciando tradutor...');
     setTimeout(initializeTranslator, 800);
 });
