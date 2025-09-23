@@ -27,6 +27,8 @@ window.onload = async () => {
 
     // ✅ Já temos a stream da câmera
     let localStream = stream;
+    localVideo.srcObject = localStream;
+
 
     let callerLang = null;
 
