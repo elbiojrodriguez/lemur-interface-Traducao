@@ -81,7 +81,7 @@ body {
 
 .microphone-box {
   position: absolute; /* 👈 permite mover livremente */
-  top: 32vh;          /* 👈 distância do topo */
+  top: 40vh;          /* 👈 distância do topo */
   left: 72vw;         /* 👈 distância da esquerda */
   flex-direction: column;
   align-items: center;
