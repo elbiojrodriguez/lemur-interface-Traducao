@@ -1,18 +1,16 @@
- // ===== FUNÇÃO SIMPLES PARA ENVIAR TEXTO =====
+// ===== FUNÇÃO SIMPLES PARA ENVIAR TEXTO =====
 function enviarParaOutroCelular(texto) {
     if (window.rtcDataChannel && window.rtcDataChannel.isOpen()) {
         window.rtcDataChannel.send(texto);
         console.log('✅ Texto enviado:', texto);
     } else {
         console.log('⏳ Canal não disponível ainda. Tentando novamente...');
-        // Tenta novamente após 1 segundo (recursão)
         setTimeout(() => enviarParaOutroCelular(texto), 1000);
     }
 }
 
 async function translateText(text) {
   try {
-   // ✅ CORREÇÃO: Usar source e target CORRETOS
     const response = await fetch('https://chat-tradutor.onrender.com/translate', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -25,10 +23,6 @@ async function translateText(text) {
 
     const result = await response.json();
     const translatedText = result.translatedText || text;
-    
-    // ❌❌❌ REMOVA ESTA LINHA (está enviando para API, não para outro celular)
-    // enviarParaOutroCelular(translatedText);
-    
     return translatedText;
     
   } catch (error) {
@@ -36,11 +30,89 @@ async function translateText(text) {
   }
 }
 
-function initializeTranslator() {
+// ===== INICIALIZAÇÃO DO BOTÃO MUNDO (INDEPENDENTE) =====
+function initializeWorldButton() {
+    const currentLanguageFlag = document.getElementById('currentLanguageFlag');
+    const worldButton = document.getElementById('worldButton');
+    const languageDropdown = document.getElementById('languageDropdown');
+    const languageOptions = document.querySelectorAll('.language-option');
+    
+    if (!worldButton || !languageDropdown || !currentLanguageFlag) {
+        console.log('⏳ Aguardando elementos do botão mundo...');
+        setTimeout(initializeWorldButton, 300);
+        return;
+    }
+    
+    console.log('🎯 Inicializando botão mundo...');
     
     let IDIOMA_ORIGEM = window.callerLang || navigator.language || 'pt-BR';
     
-    // ✅ CORREÇÃO FINAL: Função melhorada
+    async function getBandeiraDoJson(langCode) {
+        try {
+            const response = await fetch('assets/bandeiras/language-flags.json');
+            const flags = await response.json();
+            return flags[langCode] || flags[langCode.split('-')[0]] || '🎌';
+        } catch (error) {
+            console.error('Erro ao carregar bandeiras:', error);
+            return '🎌';
+        }
+    }
+    
+    // Configurar bandeira inicial
+    getBandeiraDoJson(IDIOMA_ORIGEM).then(bandeira => {
+        currentLanguageFlag.textContent = bandeira;
+    });
+
+    // Evento do botão mundo
+    worldButton.addEventListener('click', function(e) {
+        console.log('🎯 Botão Mundo clicado!');
+        e.preventDefault();
+        e.stopPropagation();
+        languageDropdown.classList.toggle('show');
+    });
+
+    // Fechar dropdown ao clicar fora
+    document.addEventListener('click', function(e) {
+        if (!languageDropdown.contains(e.target) && e.target !== worldButton) {
+            languageDropdown.classList.remove('show');
+        }
+    });
+
+    // Eventos das opções de idioma
+    languageOptions.forEach(option => {
+        option.addEventListener('click', async function() {
+            const novoIdioma = this.getAttribute('data-lang');
+            IDIOMA_ORIGEM = novoIdioma;
+            
+            const bandeira = await getBandeiraDoJson(novoIdioma);
+            currentLanguageFlag.textContent = bandeira;
+            
+            languageDropdown.classList.remove('show');
+            
+            // Atualizar idioma no contexto global para o tradutor
+            window.currentSourceLang = novoIdioma;
+            
+            // Feedback visual
+            const translatedText = document.getElementById('translatedText');
+            if (translatedText) {
+                translatedText.textContent = "✅";
+                setTimeout(() => {
+                    if (translatedText) translatedText.textContent = "🎤";
+                }, 1000);
+            }
+            
+            console.log('🌎 Idioma alterado para:', novoIdioma);
+        });
+    });
+    
+    console.log('✅ Botão mundo inicializado com sucesso!');
+}
+
+// ===== INICIALIZAÇÃO DO TRADUTOR =====
+function initializeTranslator() {
+    
+    let IDIOMA_ORIGEM = window.currentSourceLang || window.callerLang || navigator.language || 'pt-BR';
+    
     function obterIdiomaDestino() {
         return window.targetTranslationLang || 
                new URLSearchParams(window.location.search).get('lang') || 
@@ -74,31 +146,13 @@ function initializeTranslator() {
     const recordingTimer = document.getElementById('recordingTimer');
     const sendButton = document.getElementById('sendButton');
     const speakerButton = document.getElementById('speakerButton');
-    const currentLanguageFlag = document.getElementById('currentLanguageFlag');
-    const worldButton = document.getElementById('worldButton');
-    const languageDropdown = document.getElementById('languageDropdown');
-    const languageOptions = document.querySelectorAll('.language-option');
     
-    if (!currentLanguageFlag || !recordButton || !translatedText || !languageDropdown) {
-        console.log('Aguardando elementos do DOM...');
+    if (!recordButton || !translatedText) {
+        console.log('⏳ Aguardando elementos do tradutor...');
         setTimeout(initializeTranslator, 300);
         return;
     }
     
-    async function getBandeiraDoJson(langCode) {
-        try {
-            const response = await fetch('assets/bandeiras/language-flags.json');
-            const flags = await response.json();
-            return flags[langCode] || flags[langCode.split('-')[0]] || '🎌';
-        } catch (error) {
-            console.error('Erro ao carregar bandeiras:', error);
-            return '🎌';
-        }
-    }
-
-    getBandeiraDoJson(IDIOMA_ORIGEM).then(bandeira => {
-        currentLanguageFlag.textContent = bandeira;
-    });
     translatedText.textContent = "🎤";
     
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -128,62 +182,6 @@ function initializeTranslator() {
     let isSpeechPlaying = false;
     let microphonePermissionGranted = false;
     let lastTranslationTime = 0;
-    
-    // ===== ✅ CORREÇÃO COMPLETA DO BOTÃO MUNDO =====
-    if (worldButton && languageDropdown) {
-        worldButton.addEventListener('click', function(e) {
-            console.log('🎯 Botão Mundo clicado!');
-            e.preventDefault();
-            e.stopPropagation();
-            languageDropdown.classList.toggle('show');
-        });
-    } else {
-        console.error('❌ Elementos do botão mundo não encontrados:', {
-            worldButton: !!worldButton,
-            languageDropdown: !!languageDropdown
-        });
-    }
-
-    document.addEventListener('click', function(e) {
-        if (languageDropdown && worldButton && 
-            !languageDropdown.contains(e.target) && 
-            e.target !== worldButton) {
-            languageDropdown.classList.remove('show');
-        }
-    });
-
-    if (languageOptions && languageOptions.length > 0) {
-        languageOptions.forEach(option => {
-            option.addEventListener('click', async function() {
-                const novoIdioma = this.getAttribute('data-lang');
-                IDIOMA_ORIGEM = novoIdioma;
-                
-                const bandeira = await getBandeiraDoJson(novoIdioma);
-                currentLanguageFlag.textContent = bandeira;
-                
-                if (languageDropdown) {
-                    languageDropdown.classList.remove('show');
-                }
-                
-                if (isRecording && recognition) {
-                    recognition.stop();
-                }
-                
-                recognition = new SpeechRecognition();
-                recognition.lang = novoIdioma;
-                recognition.continuous = false;
-                recognition.interimResults = true;
-                setupRecognitionEvents();
-                
-                if (translatedText) {
-                    translatedText.textContent = "✅";
-                    setTimeout(() => {
-                        if (translatedText) translatedText.textContent = "🎤";
-                    }, 1000);
-                }
-            });
-        });
-    }
     
     function setupRecognitionEvents() {
         recognition.onresult = function(event) {
@@ -215,17 +213,16 @@ function initializeTranslator() {
                     }
                     
                     translateText(finalTranscript).then(translation => {
-    if (translatedText) {
-        translatedText.textContent = translation;
-        enviarParaOutroCelular(translation); // ✅ Envia para outro celular
-        // ❌ REMOVER speakText (não falar localmente)
-    }
-    isTranslating = false;
-}).catch(error => {
-    console.error('Erro na tradução:', error);
-    if (translatedText) translatedText.textContent = "❌";
-    isTranslating = false;
-});
+                        if (translatedText) {
+                            translatedText.textContent = translation;
+                            enviarParaOutroCelular(translation);
+                        }
+                        isTranslating = false;
+                    }).catch(error => {
+                        console.error('Erro na tradução:', error);
+                        if (translatedText) translatedText.textContent = "❌";
+                        isTranslating = false;
+                    });
                 }
             }
         };
@@ -332,6 +329,10 @@ function initializeTranslator() {
         if (isRecording || isTranslating) return;
         
         try {
+            // Atualizar idioma dinamicamente
+            const currentLang = window.currentSourceLang || IDIOMA_ORIGEM;
+            recognition.lang = currentLang;
+            
             recognition.start();
             isRecording = true;
             
@@ -439,10 +440,12 @@ function initializeTranslator() {
     
     requestMicrophonePermission();
     
-    console.log('Tradutor inicializado com sucesso!');
+    console.log('✅ Tradutor inicializado com sucesso!');
 }
 
+// ===== INICIALIZAÇÃO GERAL =====
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('DOM carregado, iniciando tradutor...');
-    setTimeout(initializeTranslator, 800);
+    console.log('DOM carregado, iniciando aplicação...');
+    initializeWorldButton(); // Inicializa primeiro (independente)
+    setTimeout(initializeTranslator, 500); // Inicializa depois
 });
