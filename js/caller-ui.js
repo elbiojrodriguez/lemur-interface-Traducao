@@ -58,7 +58,9 @@ async function translateText(text, targetLang, enviar = false) {
 window.onload = async () => {
   try {
     const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
-    let localStream = stream;
+   let localStream = stream;
+   document.getElementById('localVideo').srcObject = localStream;
+
 
     window.rtcCore = new WebRTCCore();
 
