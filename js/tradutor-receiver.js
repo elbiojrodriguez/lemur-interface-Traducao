@@ -1,4 +1,4 @@
-// ===== FUNÇÃO SIMPLES PARA ENVIAR TEXTO =====
+ // ===== FUNÇÃO SIMPLES PARA ENVIAR TEXTO =====
 function enviarParaOutroCelular(texto) {
     if (window.rtcDataChannel && window.rtcDataChannel.isOpen()) {
         window.rtcDataChannel.send(texto);
@@ -35,6 +35,7 @@ async function translateText(text) {
     return text;
   }
 }
+
 function initializeTranslator() {
     
     let IDIOMA_ORIGEM = window.callerLang || navigator.language || 'pt-BR';
@@ -128,22 +129,29 @@ function initializeTranslator() {
     let microphonePermissionGranted = false;
     let lastTranslationTime = 0;
     
-    // ===== ✅ CORREÇÃO ESPECÍFICA DO BOTÃO MUNDO (VERSÃO SIMPLIFICADA DO ORIGINAL) =====
-    worldButton.addEventListener('click', function(e) {
-        console.log('🎯 Botão Mundo clicado!');
-        e.preventDefault();
-        e.stopPropagation();
-        languageDropdown.classList.toggle('show');
-    });
+    // ===== ✅ CORREÇÃO COMPLETA DO BOTÃO MUNDO =====
+    if (worldButton && languageDropdown) {
+        worldButton.addEventListener('click', function(e) {
+            console.log('🎯 Botão Mundo clicado!');
+            e.preventDefault();
+            e.stopPropagation();
+            languageDropdown.classList.toggle('show');
+        });
+    } else {
+        console.error('❌ Elementos do botão mundo não encontrados:', {
+            worldButton: !!worldButton,
+            languageDropdown: !!languageDropdown
+        });
+    }
 
-    // 3. MANTENHA o resto igual (document click e languageOptions)
     document.addEventListener('click', function(e) {
-        if (languageDropdown && !languageDropdown.contains(e.target) && e.target !== worldButton) {
+        if (languageDropdown && worldButton && 
+            !languageDropdown.contains(e.target) && 
+            e.target !== worldButton) {
             languageDropdown.classList.remove('show');
         }
     });
 
-    // 4. MANTENHA languageOptions IGUAL (com toda a lógica de idiomas)
     if (languageOptions && languageOptions.length > 0) {
         languageOptions.forEach(option => {
             option.addEventListener('click', async function() {
