@@ -262,25 +262,6 @@ body {
   background: #126782;
 }
 
-/* ===== CORREÇÕES ESPECÍFICAS BOTÃO MUNDO ===== */
-.language-dropdown {
-    z-index: 1000 !important; /* Força prioridade máxima */
-}
-
-.microphone-box {
-    z-index: 1; /* Garante que não sobreponha o dropdown */
-    pointer-events: none; /* Permite cliques passarem */
-}
-
-.world-btn, .language-dropdown, .language-option {
-    pointer-events: auto; /* Reativa cliques nos elementos importantes */
-}
-
-/* Garante que o dropdown fique acima de tudo */
-.language-dropdown.show {
-    z-index: 1000;
-    display: flex;
-}
 /* Animações */
 @keyframes pulse {
   0% { transform: scale(1); }
