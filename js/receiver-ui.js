@@ -3,13 +3,13 @@ import { QRCodeGenerator } from './qr-code-utils.js';
 
 window.onload = async () => {
   try {
-    // ✅ PRIMEIRO: Solicita CÂMERA (WebRTC) - ESSENCIAL!
+    // ✅ Solicita acesso à câmera (vídeo sem áudio)
     const stream = await navigator.mediaDevices.getUserMedia({ 
       video: true, 
       audio: false 
     });
-    
-    // ✅✅✅ CORREÇÃO: TORNA GLOBAL (window.rtcCore)
+
+    // ✅ Inicializa WebRTC
     window.rtcCore = new WebRTCCore();
 
     const url = window.location.href;
@@ -23,19 +23,20 @@ window.onload = async () => {
       };
     }
 
-   const myId = fakeRandomUUID(fixedId).substr(0, 8);
+    const myId = fakeRandomUUID(fixedId).substr(0, 8);
 
-// ✅ Já temos a stream da câmera
-const localVideo = document.getElementById('localVideo');
-let localStream = stream;
-localVideo.srcObject = localStream;
+    // ✅ Captura da câmera local
+    let localStream = stream;
 
-let callerLang = null;
+    // ✅ Mostra vídeo local no PiP azul
+    const localVideo = document.getElementById('localVideo');
+    localVideo.srcObject = localStream;
 
-const params = new URLSearchParams(window.location.search);
-const token = params.get('token') || '';
-const lang = params.get('lang') || navigator.language || 'pt-BR';
+    let callerLang = null;
 
+    const params = new URLSearchParams(window.location.search);
+    const token = params.get('token') || '';
+    const lang = params.get('lang') || navigator.language || 'pt-BR';
 
     window.targetTranslationLang = lang;
 
@@ -45,18 +46,14 @@ const lang = params.get('lang') || navigator.language || 'pt-BR';
     window.rtcCore.initialize(myId);
     window.rtcCore.setupSocketHandlers();
 
-    const localVideo = document.getElementById('localVideo');
-
     window.rtcCore.onIncomingCall = (offer, idiomaDoCaller) => {
       if (!localStream) return;
 
       console.log('🎯 Caller fala:', idiomaDoCaller);
       console.log('🎯 Eu (receiver) entendo:', lang);
 
-      // ✅ CORREÇÃO: NÃO usar idiomaDoCaller para tradução!
-      // Em vez disso: traduzir do idiomaDoCaller para MEU idioma (lang)
-      window.sourceTranslationLang = idiomaDoCaller; // Idioma de QUEM fala
-      window.targetTranslationLang = lang; // Idioma para QUEM ouve ← CORRETO!
+      window.sourceTranslationLang = idiomaDoCaller;
+      window.targetTranslationLang = lang;
 
       console.log('🎯 Vou traduzir:', idiomaDoCaller, '→', lang);
 
@@ -66,14 +63,13 @@ const lang = params.get('lang') || navigator.language || 'pt-BR';
         const overlay = document.querySelector('.info-overlay');
         if (overlay) overlay.classList.add('hidden');
 
-        localVideo.srcObject = remoteStream;
+        const remoteVideo = document.getElementById('remoteVideo');
+        remoteVideo.srcObject = remoteStream;
 
-        // ✅ CORREÇÃO DEFINITIVA: Sempre define o idioma para tradução
         window.targetTranslationLang = idiomaDoCaller || lang;
         console.log('🎯 Idioma definido para tradução:', window.targetTranslationLang);
         alert(`🌐 Vou traduzir para: ${window.targetTranslationLang}`);
 
-        // ✅ Aplica bandeira do idioma recebido
         if (idiomaDoCaller) {
           aplicarBandeiraRemota(idiomaDoCaller);
         } else {
@@ -124,14 +120,10 @@ const lang = params.get('lang') || navigator.language || 'pt-BR';
         const bandeira = flags[langCode] || flags[langCode.split('-')[0]] || '🔴';
 
         const localLangElement = document.querySelector('.local-mic-Lang');
-        if (localLangElement) {
-          localLangElement.textContent = bandeira;
-        }
+        if (localLangElement) localLangElement.textContent = bandeira;
 
         const localLangDisplay = document.querySelector('.local-Lang');
-        if (localLangDisplay) {
-          localLangDisplay.textContent = bandeira;
-        }
+        if (localLangDisplay) localLangDisplay.textContent = bandeira;
 
       } catch (error) {
         console.error('Erro ao carregar bandeira local:', error);
@@ -146,55 +138,40 @@ const lang = params.get('lang') || navigator.language || 'pt-BR';
         const bandeira = flags[langCode] || flags[langCode.split('-')[0]] || '🔴';
 
         const remoteLangElement = document.querySelector('.remoter-Lang');
-        if (remoteLangElement) {
-          remoteLangElement.textContent = bandeira;
-        }
+        if (remoteLangElement) remoteLangElement.textContent = bandeira;
 
       } catch (error) {
         console.error('Erro ao carregar bandeira remota:', error);
         const remoteLangElement = document.querySelector('.remoter-Lang');
-        if (remoteLangElement) {
-          remoteLangElement.textContent = '🔴';
-        }
+        if (remoteLangElement) remoteLangElement.textContent = '🔴';
       }
     }
 
     aplicarBandeira(lang);
 
-    // ✅✅✅ CONFIGURA CALLBACK PARA RECEBER MENSAGENS
-
     window.rtcCore.setDataChannelCallback((mensagem) => {
-  console.log('Mensagem recebida no receiver:', mensagem);
-  // Exibir na UI
-  const elemento = document.getElementById('texto-recebido');
-  if (elemento) {
-    elemento.textContent = mensagem;
-    
-    // ✅✅✅ FALA A MENSAGEM RECEBIDA AUTOMATICAMENTE
+      console.log('Mensagem recebida no receiver:', mensagem);
+      const elemento = document.getElementById('texto-recebido');
+      if (elemento) {
+        elemento.textContent = mensagem;
 
-    if (window.SpeechSynthesis) {
-      // Para qualquer fala anterior
-      window.speechSynthesis.cancel();
-      
-      // Cria nova fala
-      const utterance = new SpeechSynthesisUtterance(mensagem);
-      utterance.lang = window.targetTranslationLang || 'en-US'; // ✅ CORRETO
-      utterance.rate = 0.9;
-      utterance.volume = 0.8;
-      
-      // Fala a mensagem
-      window.speechSynthesis.speak(utterance);
-    }
-  }
-});
+        if (window.SpeechSynthesis) {
+          window.speechSynthesis.cancel();
+          const utterance = new SpeechSynthesisUtterance(mensagem);
+          utterance.lang = window.targetTranslationLang || 'en-US';
+          utterance.rate = 0.9;
+          utterance.volume = 0.8;
+          window.speechSynthesis.speak(utterance);
+        }
+      }
+    });
 
-    // ✅ DEPOIS: Inicializar tradutor
     setTimeout(() => {
       if (typeof initializeTranslator === 'function') {
         initializeTranslator();
       }
     }, 1000);
-    
+
   } catch (error) {
     console.error("Erro ao solicitar acesso à câmera:", error);
     alert("Erro ao acessar a câmera. Verifique as permissões.");
