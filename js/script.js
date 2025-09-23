@@ -167,10 +167,17 @@ function initializeTranslator() {
                         translatedText.textContent = "⏳";
                     }
                     
-                    translateText(finalTranscript).then(translation => {
+                    // ✅ VERSÃO CORRIGIDA - SUBSTITUA TODO ESTE BLOCO:
+translateText(finalTranscript).then(translation => {
     if (translatedText) {
         translatedText.textContent = translation;
-        enviarParaOutroCelular(translation);
+        
+        // ✅ CORREÇÃO CRÍTICA: Só envia se for texto de voz real
+        if (finalTranscript !== "Live translation. No filters. No platform." && 
+            finalTranscript !== "Tradução ao vivo. Sem filtros. Sem plataforma." &&
+            finalTranscript.length > 5) { // Só envia textos com mais de 5 caracteres
+            enviarParaOutroCelular(translation);
+        }
         // ✅ REMOVIDO: speakText (não falar localmente)
     }
     isTranslating = false;
