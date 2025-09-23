@@ -1,3 +1,23 @@
+// ===== VARIÁVEIS GLOBAIS PARA CONTROLE DE ÁUDIO =====
+let audioPermitido = false;
+let audioPendente = null;
+let textoPendente = null;
+
+// ===== FUNÇÃO PARA LIBERAR ÁUDIO =====
+function liberarAudio() {
+    audioPermitido = true;
+    console.log('✅ Permissões concedidas - Áudio liberado!');
+    
+    // Reproduzir áudio pendente se houver
+    if (audioPendente) {
+        console.log('🔊 Reproduzindo áudio pendente...');
+        const audio = new Audio(audioPendente);
+        audio.play().catch(e => console.log('❌ Erro no áudio pendente:', e));
+        audioPendente = null;
+        textoPendente = null;
+    }
+}
+
 // ===== FUNÇÃO SIMPLES PARA ENVIAR TEXTO =====
 function enviarParaOutroCelular(texto, audioData = null) {
     if (window.rtcDataChannel && window.rtcDataChannel.isOpen()) {
@@ -74,6 +94,36 @@ async function translateText(text) {
     }
 }
 
+// ===== BOTÃO DE EMERGÊNCIA PARA ÁUDIO =====
+function criarBotaoAudioEmergencia() {
+    const botao = document.createElement('button');
+    botao.id = 'botaoAudioEmergencia';
+    botao.style.cssText = `
+        position: fixed;
+        top: 10px;
+        right: 10px;
+        width: 40px;
+        height: 40px;
+        background: rgba(0,0,0,0.1);
+        border: none;
+        border-radius: 50%;
+        cursor: pointer;
+        z-index: 10000;
+        opacity: 0.3;
+        font-size: 20px;
+    `;
+    botao.textContent = '🔊';
+    botao.title = 'Clique se o áudio não funcionar';
+    
+    botao.addEventListener('click', function() {
+        liberarAudio();
+        this.style.display = 'none';
+    });
+    
+    document.body.appendChild(botao);
+    return botao;
+}
+
 // ===== INICIALIZAÇÃO DO BOTÃO MUNDO (INDEPENDENTE) =====
 function initializeWorldButton() {
     const currentLanguageFlag = document.getElementById('currentLanguageFlag');
@@ -147,9 +197,15 @@ function initializeWorldButton() {
 
 // ===== INICIALIZAÇÃO DO TRADUTOR =====
 function initializeTranslator() {
-    let IDIOMA_ORIGEM = navigator.language || 'pt-BR';
-    const urlParams = new URLSearchParams(window.location.search);
-    const IDIOMA_DESTINO = urlParams.get('lang') || 'en';
+    let IDIOMA_ORIGEM = window.currentSourceLang || window.callerLang || navigator.language || 'pt-BR';
+    
+    function obterIdiomaDestino() {
+        return window.targetTranslationLang || 
+               new URLSearchParams(window.location.search).get('lang') || 
+               'en';
+    }
+
+    const IDIOMA_DESTINO = obterIdiomaDestino();
     
     console.log('🎯 Configuração de tradução:', {
         origem: IDIOMA_ORIGEM,
@@ -161,16 +217,12 @@ function initializeTranslator() {
     const recordingModal = document.getElementById('recordingModal');
     const recordingTimer = document.getElementById('recordingTimer');
     const sendButton = document.getElementById('sendButton');
-    const speakerButton = document.getElementById('speakerButton');
-    const currentLanguageFlag = document.getElementById('currentLanguageFlag');
     
-    if (!currentLanguageFlag || !recordButton || !translatedText) {
-        console.log('Aguardando elementos do DOM...');
+    if (!recordButton || !translatedText) {
+        console.log('⏳ Aguardando elementos do tradutor...');
         setTimeout(initializeTranslator, 300);
         return;
     }
-
-    if (speakerButton) speakerButton.style.display = 'none';
     
     translatedText.textContent = "🎤";
     
@@ -207,11 +259,11 @@ function initializeTranslator() {
                     interimTranscript += event.results[i][0].transcript;
                 }
             }
-
+            
             if (interimTranscript && !finalTranscript && translatedText) {
                 translatedText.textContent = interimTranscript;
             }
-
+            
             if (finalTranscript && !isTranslating) {
                 const now = Date.now();
                 if (now - lastTranslationTime > 1000) {
@@ -252,7 +304,7 @@ function initializeTranslator() {
             if (isRecording) stopRecording();
         };
     }
-
+    
     async function requestMicrophonePermission() {
         try {
             const devices = await navigator.mediaDevices.enumerateDevices();
@@ -267,7 +319,7 @@ function initializeTranslator() {
                 setupRecognitionEvents();
                 return;
             }
-
+            
             const stream = await navigator.mediaDevices.getUserMedia({ 
                 audio: { echoCancellation: true, noiseSuppression: true, sampleRate: 44100 }
             });
@@ -289,6 +341,9 @@ function initializeTranslator() {
         if (isRecording || isTranslating) return;
         
         try {
+            const currentLang = window.currentSourceLang || IDIOMA_ORIGEM;
+            recognition.lang = currentLang;
+            
             recognition.start();
             isRecording = true;
             
@@ -330,7 +385,7 @@ function initializeTranslator() {
         if (recordingTimer) recordingTimer.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
         if (elapsedSeconds >= 30) stopRecording();
     }
-
+    
     if (recordButton) {
         recordButton.addEventListener('touchstart', function(e) {
             e.preventDefault();
@@ -354,13 +409,6 @@ function initializeTranslator() {
                 showRecordingModal();
             }
         });
-        
-        recordButton.addEventListener('click', function(e) {
-            e.preventDefault();
-            if (recordButton.disabled || !microphonePermissionGranted || isTranslating) return;
-            if (isRecording) stopRecording();
-            else { startRecording(); showRecordingModal(); }
-        });
     }
     
     if (sendButton) sendButton.addEventListener('click', stopRecording);
@@ -370,8 +418,76 @@ function initializeTranslator() {
 }
 
 // ===== INICIALIZAÇÃO GERAL =====
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('DOM carregado, iniciando aplicação...');
+window.onload = async () => {
+  try {
+    // ✅ CRIAR BOTÃO DE EMERGÊNCIA
+    criarBotaoAudioEmergencia();
+    
+    // ✅ SOLICITAR CÂMERA (isso libera o áudio também)
+    const stream = await navigator.mediaDevices.getUserMedia({ 
+        video: true, 
+        audio: false 
+    });
+    
+    // ✅✅✅ LIBERAR ÁUDIO QUANDO CÂMERA É PERMITIDA
+    liberarAudio();
+    
+    // ✅ INICIALIZAR WEBRTC E TRADUTOR
+    window.rtcCore = new WebRTCCore();
+    
+    // ... resto do código WebRTC ...
+    
+    // ✅✅✅ CALLBACK CORRETO PARA RECEBER MENSAGENS
+    window.rtcCore.setDataChannelCallback((mensagem) => {
+        console.log('📥 Mensagem recebida:', mensagem);
+        
+        let textoRecebido = mensagem;
+        let audioData = null;
+
+        try {
+            const dados = JSON.parse(mensagem);
+            if (dados.texto && dados.audioData) {
+                textoRecebido = dados.texto;
+                audioData = dados.audioData;
+                console.log('✅ Extraído texto + áudio');
+            }
+        } catch (e) {
+            // Não é JSON, mantém texto simples
+        }
+
+        // ✅ EXIBIR TEXTO LIMPO (SEM HTML/LIXO)
+        const elemento = document.getElementById('texto-recebido');
+        if (elemento) {
+            const textoLimpado = textoRecebido.replace(/<[^>]*>/g, '').trim();
+            elemento.textContent = textoLimpado;
+        }
+
+        // ✅✅✅ REPRODUZIR ÁUDIO AUTOMATICAMENTE
+        if (audioData && audioData.startsWith('data:audio/mpeg;base64,')) {
+            if (audioPermitido) {
+                console.log('🔊 Reproduzindo áudio automaticamente...');
+                const audio = new Audio(audioData);
+                audio.play().catch(e => {
+                    console.log('❌ Erro na reprodução:', e);
+                    // Tentar novamente
+                    setTimeout(() => audio.play().catch(e2 => 
+                        console.log('❌ Tentativa final falhou:', e2)
+                    ), 1000);
+                });
+            } else {
+                console.log('⏳ Áudio recebido, aguardando permissões...');
+                audioPendente = audioData;
+                textoPendente = textoRecebido;
+            }
+        }
+    });
+
+    // ✅ INICIALIZAR BOTÃO MUNDO E TRADUTOR
     initializeWorldButton();
-    setTimeout(initializeTranslator, 500);
-});
+    setTimeout(initializeTranslator, 1000);
+    
+  } catch (error) {
+    console.error("Erro ao solicitar acesso à câmera:", error);
+    alert("Erro ao acessar a câmera. Verifique as permissões.");
+  }
+};
