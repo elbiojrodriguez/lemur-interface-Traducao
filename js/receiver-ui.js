@@ -23,18 +23,19 @@ window.onload = async () => {
       };
     }
 
-    const myId = fakeRandomUUID(fixedId).substr(0, 8);
+   const myId = fakeRandomUUID(fixedId).substr(0, 8);
 
-    // ✅ Já temos a stream da câmera
-    let localStream = stream;
-    localVideo.srcObject = localStream;
+// ✅ Já temos a stream da câmera
+const localVideo = document.getElementById('localVideo');
+let localStream = stream;
+localVideo.srcObject = localStream;
 
+let callerLang = null;
 
-    let callerLang = null;
+const params = new URLSearchParams(window.location.search);
+const token = params.get('token') || '';
+const lang = params.get('lang') || navigator.language || 'pt-BR';
 
-    const params = new URLSearchParams(window.location.search);
-    const token = params.get('token') || '';
-    const lang = params.get('lang') || navigator.language || 'pt-BR';
 
     window.targetTranslationLang = lang;
 
