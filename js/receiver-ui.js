@@ -1,15 +1,15 @@
-// js/receiver-ui.js CORRIGIDO
 import { WebRTCCore } from '../core/webrtc-core.js';
 import { QRCodeGenerator } from './qr-code-utils.js';
 
 window.onload = async () => {
   try {
-    // ✅ PRIMEIRO: Solicita CÂMERA (WebRTC)
+    // ✅ PRIMEIRO: Solicita CÂMERA (WebRTC) - ESSENCIAL!
     const stream = await navigator.mediaDevices.getUserMedia({ 
       video: true, 
       audio: false 
     });
     
+    // ✅✅✅ CORREÇÃO: TORNA GLOBAL (window.rtcCore)
     window.rtcCore = new WebRTCCore();
 
     const url = window.location.href;
@@ -25,7 +25,10 @@ window.onload = async () => {
 
     const myId = fakeRandomUUID(fixedId).substr(0, 8);
 
+    // ✅ Já temos a stream da câmera
     let localStream = stream;
+
+    let callerLang = null;
 
     const params = new URLSearchParams(window.location.search);
     const token = params.get('token') || '';
@@ -47,8 +50,10 @@ window.onload = async () => {
       console.log('🎯 Caller fala:', idiomaDoCaller);
       console.log('🎯 Eu (receiver) entendo:', lang);
 
-      window.sourceTranslationLang = idiomaDoCaller;
-      window.targetTranslationLang = lang;
+      // ✅ CORREÇÃO: NÃO usar idiomaDoCaller para tradução!
+      // Em vez disso: traduzir do idiomaDoCaller para MEU idioma (lang)
+      window.sourceTranslationLang = idiomaDoCaller; // Idioma de QUEM fala
+      window.targetTranslationLang = lang; // Idioma para QUEM ouve ← CORRETO!
 
       console.log('🎯 Vou traduzir:', idiomaDoCaller, '→', lang);
 
@@ -60,9 +65,12 @@ window.onload = async () => {
 
         localVideo.srcObject = remoteStream;
 
+        // ✅ CORREÇÃO DEFINITIVA: Sempre define o idioma para tradução
         window.targetTranslationLang = idiomaDoCaller || lang;
         console.log('🎯 Idioma definido para tradução:', window.targetTranslationLang);
+        alert(`🌐 Vou traduzir para: ${window.targetTranslationLang}`);
 
+        // ✅ Aplica bandeira do idioma recebido
         if (idiomaDoCaller) {
           aplicarBandeiraRemota(idiomaDoCaller);
         } else {
@@ -112,6 +120,11 @@ window.onload = async () => {
 
         const bandeira = flags[langCode] || flags[langCode.split('-')[0]] || '🔴';
 
+        const localLangElement = document.querySelector('.local-mic-Lang');
+        if (localLangElement) {
+          localLangElement.textContent = bandeira;
+        }
+
         const localLangDisplay = document.querySelector('.local-Lang');
         if (localLangDisplay) {
           localLangDisplay.textContent = bandeira;
@@ -145,35 +158,36 @@ window.onload = async () => {
 
     aplicarBandeira(lang);
 
-    // ✅✅✅ CORREÇÃO CRÍTICA: Data channel callback NÃO-BLOQUEANTE
-    window.rtcCore.setDataChannelCallback((mensagem) => {
-      console.log('Mensagem recebida no receiver:', mensagem);
-      
-      const elemento = document.getElementById('texto-recebido');
-      if (elemento) {
-        elemento.textContent = mensagem;
-        
-        // ✅ CORREÇÃO: Fala apenas se NÃO estiver gravando/selecionando idioma
-        if (window.SpeechSynthesis && !window.isRecording && !window.isSelectingLanguage) {
-          setTimeout(() => {
-            window.speechSynthesis.cancel();
-            const utterance = new SpeechSynthesisUtterance(mensagem);
-            utterance.lang = window.targetTranslationLang || 'en-US';
-            utterance.rate = 0.9;
-            utterance.volume = 0.8;
-            window.speechSynthesis.speak(utterance);
-          }, 100);
-        }
-      }
-    });
+    // ✅✅✅ CONFIGURA CALLBACK PARA RECEBER MENSAGENS
 
-    // ✅ DEPOIS: Inicializar tradutor com prioridade
+    window.rtcCore.setDataChannelCallback((mensagem) => {
+  console.log('Mensagem recebida no receiver:', mensagem);
+  // Exibir na UI
+  const elemento = document.getElementById('texto-recebido');
+  if (elemento) {
+    elemento.textContent = mensagem;
+    
+    // ✅✅✅ FALA A MENSAGEM RECEBIDA AUTOMATICAMENTE
+
+    if (window.SpeechSynthesis) {
+      // Para qualquer fala anterior
+      window.speechSynthesis.cancel();
+      
+      // Cria nova fala
+      const utterance = new SpeechSynthesisUtterance(mensagem);
+      utterance.lang = window.targetTranslationLang || 'en-US'; // ✅ CORRETO
+      utterance.rate = 0.9;
+      utterance.volume = 0.8;
+      
+      // Fala a mensagem
+      window.speechSynthesis.speak(utterance);
+    }
+  }
+});
+
+    // ✅ DEPOIS: Inicializar tradutor
     setTimeout(() => {
       if (typeof initializeTranslator === 'function') {
-        // ✅ CORREÇÃO: Define variáveis globais para controle
-        window.isRecording = false;
-        window.isSelectingLanguage = false;
-        
         initializeTranslator();
       }
     }, 1000);
