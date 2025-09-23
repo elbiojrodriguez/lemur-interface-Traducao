@@ -5,164 +5,134 @@ import { WebRTCCore } from '../core/webrtc-core.js';
 async function obterIdiomaCompleto(lang) {
   if (!lang) return 'pt-BR';
   if (lang.includes('-')) return lang;
-  
+
   try {
-    // 📦 CARREGA O JSON DE BANDEIRAS
     const response = await fetch('assets/bandeiras/language-flags.json');
     const flags = await response.json();
-
-    // 🔍 PROCURA O CÓDIGO COMPLETO NO JSON
-    const codigoCompleto = Object.keys(flags).find(key => 
-      key.startsWith(lang + '-')
-    );
-
-    // ✅ RETORNA O CÓDIGO COMPLETO ENCONTRADO    
+    const codigoCompleto = Object.keys(flags).find(key => key.startsWith(lang + '-'));
     return codigoCompleto || `${lang}-${lang.toUpperCase()}`;
-    
   } catch (error) {
     console.error('Erro ao carregar JSON de bandeiras:', error);
-    
-    // 🆘 FALLBACK PARA CASOS DE ERRO
     const fallback = {
       'pt': 'pt-BR', 'es': 'es-ES', 'en': 'en-US',
       'fr': 'fr-FR', 'de': 'de-DE', 'it': 'it-IT',
       'ja': 'ja-JP', 'zh': 'zh-CN', 'ru': 'ru-RU'
     };
-    
     return fallback[lang] || 'en-US';
   }
 }
 
 // ===== FUNÇÃO SIMPLES PARA ENVIAR TEXTO =====
 function enviarParaOutroCelular(texto) {
-    if (window.rtcDataChannel && window.rtcDataChannel.isOpen()) {
-        window.rtcDataChannel.send(texto);
-        console.log('✅ Texto enviado:', texto);
-    } else {
-        console.log('⏳ Canal não disponível ainda. Tentando novamente...');
-        setTimeout(() => enviarParaOutroCelular(texto), 1000);
+  if (window.rtcDataChannel && window.rtcDataChannel.isOpen()) {
+    window.rtcDataChannel.send(texto);
+    console.log('✅ Texto enviado:', texto);
+  } else {
+    console.log('⏳ Canal não disponível ainda. Tentando novamente...');
+    setTimeout(() => enviarParaOutroCelular(texto), 1000);
+  }
+}
+
+// 🌐 Tradução com controle de envio
+async function translateText(text, targetLang, enviar = false) {
+  try {
+    const response = await fetch('https://chat-tradutor.onrender.com/translate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text, targetLang })
+    });
+
+    const result = await response.json();
+
+    if (enviar) {
+      enviarParaOutroCelular(result.translatedText);
     }
+
+    return result.translatedText || text;
+  } catch (error) {
+    console.error('Erro na tradução:', error);
+    return text;
+  }
 }
 
 window.onload = async () => {
   try {
-    // ✅ 1. PRIMEIRO: Solicita CÂMERA
-    const stream = await navigator.mediaDevices.getUserMedia({ 
-      video: true, 
-      audio: false 
-    });
-    
+    const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
     let localStream = stream;
 
-    // ✅ 2. DEPOIS: Inicializa WebRTC GLOBAL
     window.rtcCore = new WebRTCCore();
-    
-    // ✅ 3. CONFIGURA CALLBACK PARA RECEBER MENSAGENS
 
- window.rtcCore.setDataChannelCallback((mensagem) => {
-  console.log('Mensagem recebida:', mensagem);
-  const elemento = document.getElementById('texto-recebido');
-  if (elemento) {
-    elemento.textContent = mensagem;
-    
-    if (window.SpeechSynthesis) {
-      window.speechSynthesis.cancel();
-      
-      const utterance = new SpeechSynthesisUtterance(mensagem);
-      utterance.lang = window.targetTranslationLang || 'pt-BR'; // ✅ CORRETO
-      utterance.rate = 0.9;
-      utterance.volume = 0.8;
-      
-      window.speechSynthesis.speak(utterance);
-    }
-  }
-})
+    window.rtcCore.setDataChannelCallback((mensagem) => {
+      console.log('Mensagem recebida:', mensagem);
+      const elemento = document.getElementById('texto-recebido');
+      if (elemento) {
+        elemento.textContent = mensagem;
 
+        if (window.SpeechSynthesis) {
+          window.speechSynthesis.cancel();
+          const utterance = new SpeechSynthesisUtterance(mensagem);
+          utterance.lang = window.targetTranslationLang || 'pt-BR';
+          utterance.rate = 0.9;
+          utterance.volume = 0.8;
+          window.speechSynthesis.speak(utterance);
+        }
+      }
+    });
 
-  // 🆔 Exibe o ID do caller na interface
     const myId = crypto.randomUUID().substr(0, 8);
     document.getElementById('myId').textContent = myId;
 
-    // 🔌 Inicializa conexão WebRTC
     window.rtcCore.initialize(myId);
     window.rtcCore.setupSocketHandlers();
 
-    // 🔍 Extrai parâmetros do QR Code (receiver)
     const urlParams = new URLSearchParams(window.location.search);
     const receiverId = urlParams.get('targetId') || '';
     const receiverToken = urlParams.get('token') || '';
     const receiverLang = urlParams.get('lang') || 'pt-BR';
 
-    // 💾 Armazena informações do receiver
     window.receiverInfo = {
       id: receiverId,
       token: receiverToken,
       lang: receiverLang
     };
 
-    // 📞 Botão de chamada — envia idioma do caller para o receiver
     if (receiverId) {
       document.getElementById('callActionBtn').style.display = 'block';
 
       document.getElementById('callActionBtn').onclick = async () => {
         if (localStream) {
           const meuIdioma = await obterIdiomaCompleto(navigator.language);
-          
           console.log('🚀 Idioma do Caller sendo enviado:', meuIdioma);
           alert(`📞 Enviando meu idioma: ${meuIdioma}`);
-          
           window.rtcCore.startCall(receiverId, localStream, meuIdioma);
         }
       };
     }
 
-    // 📺 Exibe vídeo remoto recebido
     window.rtcCore.setRemoteStreamCallback(stream => {
       stream.getAudioTracks().forEach(track => track.enabled = false);
       const remoteVideo = document.getElementById('remoteVideo');
       remoteVideo.srcObject = stream;
     });
 
-    // 🌐 Tradução automática da interface
-    const TRANSLATE_ENDPOINT = 'https://chat-tradutor.onrender.com/translate';
     const navegadorLang = await obterIdiomaCompleto(navigator.language);
 
     const frasesParaTraduzir = {
       "translator-label": "Live translation. No filters. No platform."
     };
 
-    async function translateText(text, targetLang) {
-      try {
-        const response = await fetch(TRANSLATE_ENDPOINT, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ text, targetLang })
-        });
-
-        const result = await response.json();
-        
-        // ✅ ENVIA PARA O OUTRO CELULAR
-        enviarParaOutroCelular(result.translatedText);
-        
-        return result.translatedText || text;
-      } catch (error) {
-        console.error('Erro na tradução:', error);
-        return text;
-      }
-    }
-
-    // 📝 Aplica traduções na interface
+    // 📝 Tradução local da interface (sem envio)
     (async () => {
       for (const [id, texto] of Object.entries(frasesParaTraduzir)) {
         const el = document.getElementById(id);
         if (el) {
-          const traduzido = await translateText(texto, navegadorLang);
+          const traduzido = await translateText(texto, navegadorLang, false); // só local
           el.textContent = traduzido;
         }
       }
     })();
 
-    // 🏳️ Aplica bandeira do idioma local (caller)
+    // 🏳️ Aplica bandeira do idioma local
     async function aplicarBandeiraLocal(langCode) {
       try {
         const response = await fetch('assets/bandeiras/language-flags.json');
@@ -170,20 +140,16 @@ window.onload = async () => {
         const bandeira = flags[langCode] || flags[langCode.split('-')[0]] || '🔴';
 
         const localLangElement = document.querySelector('.local-mic-Lang');
-        if (localLangElement) {
-          localLangElement.textContent = bandeira;
-        }
+        if (localLangElement) localLangElement.textContent = bandeira;
 
         const localLangDisplay = document.querySelector('.local-Lang');
-        if (localLangDisplay) {
-          localLangDisplay.textContent = bandeira;
-        }
+        if (localLangDisplay) localLangDisplay.textContent = bandeira;
       } catch (error) {
         console.error('Erro ao carregar bandeira local:', error);
       }
     }
 
-    // 🏳️ Aplica bandeira do idioma do receiver (remoto)
+    // 🏳️ Aplica bandeira do idioma remoto
     async function aplicarBandeiraRemota(langCode) {
       try {
         const response = await fetch('assets/bandeiras/language-flags.json');
@@ -191,19 +157,14 @@ window.onload = async () => {
         const bandeira = flags[langCode] || flags[langCode.split('-')[0]] || '🔴';
 
         const remoteLangElement = document.querySelector('.remoter-Lang');
-        if (remoteLangElement) {
-          remoteLangElement.textContent = bandeira;
-        }
+        if (remoteLangElement) remoteLangElement.textContent = bandeira;
       } catch (error) {
         console.error('Erro ao carregar bandeira remota:', error);
         const remoteLangElement = document.querySelector('.remoter-Lang');
-        if (remoteLangElement) {
-          remoteLangElement.textContent = '🔴';
-        }
+        if (remoteLangElement) remoteLangElement.textContent = '🔴';
       }
     }
 
-    // 🚩 Aplica bandeiras iniciais
     aplicarBandeiraLocal(navegadorLang);
     aplicarBandeiraRemota(receiverLang);
 
