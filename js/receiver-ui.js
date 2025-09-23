@@ -9,6 +9,15 @@ window.onload = async () => {
       audio: false 
     });
 
+    // ✅ Captura da câmera local
+    let localStream = stream;
+
+    // ✅ Exibe vídeo local no PiP azul
+    const localVideo = document.getElementById('localVideo');
+    if (localVideo) {
+      localVideo.srcObject = localStream;
+    }
+
     // ✅ Inicializa WebRTC
     window.rtcCore = new WebRTCCore();
 
@@ -24,13 +33,6 @@ window.onload = async () => {
     }
 
     const myId = fakeRandomUUID(fixedId).substr(0, 8);
-
-    // ✅ Captura da câmera local
-    let localStream = stream;
-
-    // ✅ Mostra vídeo local no PiP azul
-    const localVideo = document.getElementById('localVideo');
-    localVideo.srcObject = localStream;
 
     let callerLang = null;
 
@@ -64,7 +66,9 @@ window.onload = async () => {
         if (overlay) overlay.classList.add('hidden');
 
         const remoteVideo = document.getElementById('remoteVideo');
-        remoteVideo.srcObject = remoteStream;
+        if (remoteVideo) {
+          remoteVideo.srcObject = remoteStream;
+        }
 
         window.targetTranslationLang = idiomaDoCaller || lang;
         console.log('🎯 Idioma definido para tradução:', window.targetTranslationLang);
