@@ -1,4 +1,4 @@
-// ✅ SOLUÇÃO COMPLETA E CORRIGIDA
+// ✅ SOLUÇÃO COM GOOGLE TTS SERVER
 function initializeTranslator() {
     // ===== CONFIGURAÇÃO =====
     let IDIOMA_ORIGEM = navigator.language || 'pt-BR';
@@ -26,14 +26,36 @@ function initializeTranslator() {
     }
     
     // ===== FUNÇÃO SIMPLES PARA ENVIAR TEXTO =====
-    function enviarParaOutroCelular(texto) {
+    function enviarParaOutroCelular(texto, audioUrl = null) {
         if (window.rtcDataChannel && window.rtcDataChannel.isOpen()) {
-            window.rtcDataChannel.send(texto);
+            const mensagem = audioUrl 
+                ? JSON.stringify({ texto, audioUrl }) 
+                : texto;
+            window.rtcDataChannel.send(mensagem);
             console.log('✅ Texto enviado:', texto);
         } else {
-            console.log('⏳ Canal não disponível ainda. Tentando novamente...');
-            // Tenta novamente após 1 segundo (recursão)
-            setTimeout(() => enviarParaOutroCelular(texto), 1000);
+            console.log('⏳ Canal não disponível...');
+            setTimeout(() => enviarParaOutroCelular(texto, audioUrl), 1000);
+        }
+    }
+
+    // ===== NOVA FUNÇÃO: GERAR ÁUDIO NO SERVIDOR =====
+    async function generateServerAudio(text, languageCode) {
+        try {
+            const response = await fetch('https://chat-tradutor.onrender.com/speak', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ text, languageCode })
+            });
+            
+            if (!response.ok) throw new Error('Erro no servidor TTS');
+            
+            const audioBlob = await response.blob();
+            const audioUrl = URL.createObjectURL(audioBlob);
+            return audioUrl;
+        } catch (error) {
+            console.error('Erro ao gerar áudio:', error);
+            return null;
         }
     }
 
@@ -42,8 +64,6 @@ function initializeTranslator() {
         try {
             const response = await fetch('assets/bandeiras/language-flags.json');
             const flags = await response.json();
-            
-            // ⭐ TENTA: 1. Código completo → 2. Código base → 3. Fallback
             return flags[langCode] || flags[langCode.split('-')[0]] || '🎌';
         } catch (error) {
             console.error('Erro ao carregar bandeiras:', error);
@@ -67,9 +87,8 @@ function initializeTranslator() {
         return;
     }
     
-    if (!SpeechSynthesis && speakerButton) {
-        speakerButton.style.display = 'none';
-    }
+    // ⭐ REMOVIDO: Não precisa mais do TTS do navegador
+    if (speakerButton) speakerButton.style.display = 'none';
     
     let recognition = new SpeechRecognition();
     recognition.lang = IDIOMA_ORIGEM;
@@ -83,7 +102,6 @@ function initializeTranslator() {
     let timerInterval = null;
     let pressTimer;
     let tapMode = false;
-    let isSpeechPlaying = false;
     let microphonePermissionGranted = false;
     let lastTranslationTime = 0;
     
@@ -111,13 +129,8 @@ function initializeTranslator() {
                 const bandeira = await getBandeiraDoJson(novoIdioma);
                 currentLanguageFlag.textContent = bandeira;
                 
-                if (languageDropdown) {
-                    languageDropdown.classList.remove('show');
-                }
-                
-                if (isRecording && recognition) {
-                    recognition.stop();
-                }
+                if (languageDropdown) languageDropdown.classList.remove('show');
+                if (isRecording && recognition) recognition.stop();
                 
                 recognition = new SpeechRecognition();
                 recognition.lang = novoIdioma;
@@ -127,9 +140,7 @@ function initializeTranslator() {
                 
                 if (translatedText) {
                     translatedText.textContent = "✅";
-                    setTimeout(() => {
-                        if (translatedText) translatedText.textContent = "🎤";
-                    }, 1000);
+                    setTimeout(() => translatedText.textContent = "🎤", 1000);
                 }
             });
         });
@@ -149,43 +160,35 @@ function initializeTranslator() {
                 }
             }
 
-             // ⭐ EXIBE TEXTO INTERIM (em tempo real)
-            if (interimTranscript && !finalTranscript) {
-                if (translatedText) {
-                    translatedText.textContent = interimTranscript;
-                }
+            if (interimTranscript && !finalTranscript && translatedText) {
+                translatedText.textContent = interimTranscript;
             }
 
-            // ⭐ PROCESSA TEXTO FINAL COM DEBOUNCE
             if (finalTranscript && !isTranslating) {
                 const now = Date.now();
                 if (now - lastTranslationTime > 1000) {
                     lastTranslationTime = now;
                     isTranslating = true;
                     
-                    if (translatedText) {
-                        translatedText.textContent = "⏳";
-                    }
+                    if (translatedText) translatedText.textContent = "⏳";
                     
-                    // ✅ VERSÃO CORRIGIDA - SUBSTITUA TODO ESTE BLOCO:
-translateText(finalTranscript).then(translation => {
-    if (translatedText) {
-        translatedText.textContent = translation;
-        
-        // ✅ CORREÇÃO CRÍTICA: Só envia se for texto de voz real
-        if (finalTranscript !== "Live translation. No filters. No platform." && 
-            finalTranscript !== "Tradução ao vivo. Sem filtros. Sem plataforma." &&
-            finalTranscript.length > 5) { // Só envia textos com mais de 5 caracteres
-            enviarParaOutroCelular(translation);
-        }
-        // ✅ REMOVIDO: speakText (não falar localmente)
-    }
-    isTranslating = false;
-}).catch(error => {
-    console.error('Erro na tradução:', error);
-    if (translatedText) translatedText.textContent = "❌";
-    isTranslating = false;
-});
+                    // ⭐ NOVO FLUXO: Traduz → Gera áudio → Envia ambos
+                    translateText(finalTranscript).then(async translation => {
+                        if (translatedText) {
+                            translatedText.textContent = translation;
+                            
+                            if (finalTranscript.length > 5) {
+                                // ⭐ GERA ÁUDIO NO SERVIDOR E ENVIA
+                                const audioUrl = await generateServerAudio(translation, IDIOMA_DESTINO);
+                                enviarParaOutroCelular(translation, audioUrl);
+                            }
+                        }
+                        isTranslating = false;
+                    }).catch(error => {
+                        console.error('Erro na tradução:', error);
+                        if (translatedText) translatedText.textContent = "❌";
+                        isTranslating = false;
+                    });
                 }
             }
         };
@@ -199,15 +202,11 @@ translateText(finalTranscript).then(translation => {
         };
         
         recognition.onend = function() {
-            if (isRecording) {
-                stopRecording();
-            }
+            if (isRecording) stopRecording();
         };
     }
 
-     // ✅ SOLUÇÃO CORRIGIDA PARA PERMISSÃO
     async function requestMicrophonePermission() {
-    // ⭐ PRIMEIRO: Verifica se já temos permissão SEM pedir de novo
         try {
             const devices = await navigator.mediaDevices.enumerateDevices();
             const hasMicrophonePermission = devices.some(device => 
@@ -222,19 +221,11 @@ translateText(finalTranscript).then(translation => {
                 return;
             }
 
-             // ⭐ SEGUNDO: Se não tem permissão, pede UMA VEZ
             const stream = await navigator.mediaDevices.getUserMedia({ 
-                audio: {
-                    echoCancellation: true,
-                    noiseSuppression: true,
-                    sampleRate: 44100
-                }
+                audio: { echoCancellation: true, noiseSuppression: true, sampleRate: 44100 }
             });
             
-            setTimeout(() => {
-                stream.getTracks().forEach(track => track.stop());
-            }, 1000);
-            
+            setTimeout(() => stream.getTracks().forEach(track => track.stop()), 1000);
             microphonePermissionGranted = true;
             recordButton.disabled = false;
             translatedText.textContent = "🎤";
@@ -249,7 +240,6 @@ translateText(finalTranscript).then(translation => {
     
     async function translateText(text) {
         try {
-         // ⭐ LIMITA TAMANHO DO TEXTO (evita sobrecarga)
             const trimmedText = text.trim().slice(0, 500);
             if (!trimmedText) return "🎤";
             
@@ -267,62 +257,13 @@ translateText(finalTranscript).then(translation => {
                 })
             });
             
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
             const result = await response.json();
-            if (speakerButton) speakerButton.disabled = false;
-            
             return result.translatedText || "❌";
             
         } catch (error) {
             console.error('Erro na tradução:', error);
             return "❌";
-        }
-    }
-    
-    function speakText(text) {
-        if (!SpeechSynthesis || !text) return;
-        
-        window.speechSynthesis.cancel();
-        const utterance = new SpeechSynthesisUtterance(text);
-        utterance.lang = IDIOMA_FALA;
-        utterance.rate = 0.9;
-        utterance.volume = 0.8;
-        
-        utterance.onstart = function() {
-            isSpeechPlaying = true;
-            if (speakerButton) speakerButton.textContent = '⏹';
-        };
-        
-        utterance.onend = function() {
-            isSpeechPlaying = false;
-            if (speakerButton) speakerButton.textContent = '🔊';
-        };
-        
-        utterance.onerror = function() {
-            isSpeechPlaying = false;
-            if (speakerButton) speakerButton.textContent = '🔊';
-        };
-        
-        window.speechSynthesis.speak(utterance);
-    }
-    
-    function toggleSpeech() {
-        if (!SpeechSynthesis) return;
-        
-        if (isSpeechPlaying) {
-            window.speechSynthesis.cancel();
-            isSpeechPlaying = false;
-            if (speakerButton) speakerButton.textContent = '🔊';
-        } else {
-            if (translatedText) {
-                const textToSpeak = translatedText.textContent;
-                if (textToSpeak && textToSpeak !== "🎤" && textToSpeak !== "⏳" && textToSpeak !== "❌") {
-                    speakText(textToSpeak);
-                }
-            }
         }
     }
     
@@ -339,10 +280,6 @@ translateText(finalTranscript).then(translation => {
             timerInterval = setInterval(updateTimer, 1000);
             
             if (translatedText) translatedText.textContent = "🎙️";
-            if (speakerButton) {
-                speakerButton.disabled = true;
-                speakerButton.textContent = '🔇';
-            }
             
         } catch (error) {
             console.error('Erro ao iniciar gravação:', error);
@@ -353,15 +290,11 @@ translateText(finalTranscript).then(translation => {
     
     function stopRecording() {
         if (!isRecording) return;
-        
         isRecording = false;
         if (recordButton) recordButton.classList.remove('recording');
         clearInterval(timerInterval);
         hideRecordingModal();
-        
-        if (translatedText && !isTranslating) {
-            translatedText.textContent = "⏳";
-        }
+        if (translatedText && !isTranslating) translatedText.textContent = "⏳";
     }
     
     function showRecordingModal() {
@@ -376,22 +309,15 @@ translateText(finalTranscript).then(translation => {
         const elapsedSeconds = Math.floor((Date.now() - recordingStartTime) / 1000);
         const minutes = Math.floor(elapsedSeconds / 60);
         const seconds = elapsedSeconds % 60;
-        if (recordingTimer) {
-            recordingTimer.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
-        }
-
-         // ⭐ PARA automaticamente após 30 segundos
-        if (elapsedSeconds >= 30) {
-            stopRecording();
-        }
+        if (recordingTimer) recordingTimer.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        if (elapsedSeconds >= 30) stopRecording();
     }
 
-     // ===== EVENTOS =====
+    // ===== EVENTOS =====
     if (recordButton) {
         recordButton.addEventListener('touchstart', function(e) {
             e.preventDefault();
             if (recordButton.disabled || !microphonePermissionGranted || isTranslating) return;
-            
             if (!isRecording) {
                 pressTimer = setTimeout(() => {
                     tapMode = false;
@@ -404,47 +330,28 @@ translateText(finalTranscript).then(translation => {
         recordButton.addEventListener('touchend', function(e) {
             e.preventDefault();
             clearTimeout(pressTimer);
-            
-            if (isRecording) {
-                stopRecording();
-            } else {
-                if (microphonePermissionGranted && !isTranslating) {
-                    tapMode = true;
-                    startRecording();
-                    showRecordingModal();
-                }
-            }
-        });
-
-           // ⭐ SUPORTE PARA CLIQUE (mouse)
-        recordButton.addEventListener('click', function(e) {
-            e.preventDefault();
-            if (recordButton.disabled || !microphonePermissionGranted || isTranslating) return;
-            
-            if (isRecording) {
-                stopRecording();
-            } else {
+            if (isRecording) stopRecording();
+            else if (microphonePermissionGranted && !isTranslating) {
+                tapMode = true;
                 startRecording();
                 showRecordingModal();
             }
         });
+        
+        recordButton.addEventListener('click', function(e) {
+            e.preventDefault();
+            if (recordButton.disabled || !microphonePermissionGranted || isTranslating) return;
+            if (isRecording) stopRecording();
+            else { startRecording(); showRecordingModal(); }
+        });
     }
     
-    if (sendButton) {
-        sendButton.addEventListener('click', stopRecording);
-    }
+    if (sendButton) sendButton.addEventListener('click', stopRecording);
     
-    if (speakerButton) {
-        speakerButton.addEventListener('click', toggleSpeech);
-    }
-    
-    // ✅✅✅ CORREÇÃO: CHAMAR A FUNÇÃO DE PERmissÃO DO MICROFONE
     requestMicrophonePermission();
-    
-    console.log('Tradutor inicializado com sucesso!');
+    console.log('Tradutor com Google TTS inicializado!');
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('DOM carregado, iniciando tradutor...');
     setTimeout(initializeTranslator, 800);
 });
