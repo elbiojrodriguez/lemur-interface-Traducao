@@ -128,20 +128,22 @@ function initializeTranslator() {
     let microphonePermissionGranted = false;
     let lastTranslationTime = 0;
     
-    if (worldButton && languageDropdown) {
-        worldButton.addEventListener('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            languageDropdown.classList.toggle('show');
-        });
-    }
-    
+    // ===== ✅ CORREÇÃO ESPECÍFICA DO BOTÃO MUNDO (VERSÃO SIMPLIFICADA DO ORIGINAL) =====
+    worldButton.addEventListener('click', function(e) {
+        console.log('🎯 Botão Mundo clicado!');
+        e.preventDefault();
+        e.stopPropagation();
+        languageDropdown.classList.toggle('show');
+    });
+
+    // 3. MANTENHA o resto igual (document click e languageOptions)
     document.addEventListener('click', function(e) {
         if (languageDropdown && !languageDropdown.contains(e.target) && e.target !== worldButton) {
             languageDropdown.classList.remove('show');
         }
     });
-    
+
+    // 4. MANTENHA languageOptions IGUAL (com toda a lógica de idiomas)
     if (languageOptions && languageOptions.length > 0) {
         languageOptions.forEach(option => {
             option.addEventListener('click', async function() {
