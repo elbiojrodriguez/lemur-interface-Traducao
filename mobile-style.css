@@ -138,7 +138,7 @@ body {
   border-radius: 20px;    /* cantos arredondados */
   padding: 2% 3%;         /* espaçamento interno */
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* sombra suave */
-  z-index: 30;
+  z-index: 9999;
   text-align: center;
 }
 
