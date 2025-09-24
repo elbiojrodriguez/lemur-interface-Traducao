@@ -3,22 +3,18 @@ import { QRCodeGenerator } from './qr-code-utils.js';
 
 window.onload = async () => {
   try {
-    // ✅ Solicita acesso à câmera (vídeo sem áudio)
     const stream = await navigator.mediaDevices.getUserMedia({ 
       video: true, 
       audio: false 
     });
 
-    // ✅ Captura da câmera local
     let localStream = stream;
 
-    // ✅ Exibe vídeo local no PiP azul
     const localVideo = document.getElementById('localVideo');
     if (localVideo) {
       localVideo.srcObject = localStream;
     }
 
-    // ✅ Inicializa WebRTC
     window.rtcCore = new WebRTCCore();
 
     const url = window.location.href;
@@ -34,13 +30,9 @@ window.onload = async () => {
 
     const myId = fakeRandomUUID(fixedId).substr(0, 8);
 
-    let callerLang = null;
-
     const params = new URLSearchParams(window.location.search);
     const token = params.get('token') || '';
     const lang = params.get('lang') || navigator.language || 'pt-BR';
-
-    window.targetTranslationLang = lang;
 
     const callerUrl = `${window.location.origin}/caller.html?targetId=${myId}&token=${encodeURIComponent(token)}&lang=${encodeURIComponent(lang)}`;
     QRCodeGenerator.generate("qrcode", callerUrl);
@@ -50,14 +42,6 @@ window.onload = async () => {
 
     window.rtcCore.onIncomingCall = (offer, idiomaDoCaller) => {
       if (!localStream) return;
-
-      console.log('🎯 Caller fala:', idiomaDoCaller);
-      console.log('🎯 Eu (receiver) entendo:', lang);
-
-      window.sourceTranslationLang = idiomaDoCaller;
-      window.targetTranslationLang = lang;
-
-      console.log('🎯 Vou traduzir:', idiomaDoCaller, '→', lang);
 
       window.rtcCore.handleIncomingCall(offer, localStream, (remoteStream) => {
         remoteStream.getAudioTracks().forEach(track => track.enabled = false);
@@ -69,10 +53,6 @@ window.onload = async () => {
         if (remoteVideo) {
           remoteVideo.srcObject = remoteStream;
         }
-
-        window.targetTranslationLang = idiomaDoCaller || lang;
-        console.log('🎯 Idioma definido para tradução:', window.targetTranslationLang);
-        alert(`🌐 Vou traduzir para: ${window.targetTranslationLang}`);
 
         if (idiomaDoCaller) {
           aplicarBandeiraRemota(idiomaDoCaller);
@@ -158,23 +138,8 @@ window.onload = async () => {
       const elemento = document.getElementById('texto-recebido');
       if (elemento) {
         elemento.textContent = mensagem;
-
-        if (window.SpeechSynthesis) {
-          window.speechSynthesis.cancel();
-          const utterance = new SpeechSynthesisUtterance(mensagem);
-          utterance.lang = window.targetTranslationLang || 'en-US';
-          utterance.rate = 0.9;
-          utterance.volume = 0.8;
-          window.speechSynthesis.speak(utterance);
-        }
       }
     });
-
-    setTimeout(() => {
-      if (typeof initializeTranslator === 'function') {
-        initializeTranslator();
-      }
-    }, 1000);
 
   } catch (error) {
     console.error("Erro ao solicitar acesso à câmera:", error);
