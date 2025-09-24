@@ -26,71 +26,19 @@ body {
   overflow-y: auto;
 }
 
-
-
-/* ===== CAIXA DE TEXTO ===== */
-
-
-.text-display {
-  display: none !important;
-}
-
-.text-title {
-  color: #126782;
-  font-size: 2rem;
-  margin-bottom: .2vh;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-weight: 600;
-}
-
-.text-content {
-  color: #333;
-  font-size: 1rem;
-  line-height: 1.6;
-  flex-grow: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  padding: 1vh 0;
-  min-height: 60px;
-}
-
-.speaker-btn {
-  background: none;
-  border: none;
-  font-size: 2rem;
-  cursor: pointer;
-  color: #126782;
-  padding: 0.5vh;
-  border-radius: 50%;
-  width: 2.5rem;
-  height: 2.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.speaker-btn:hover {
-  background-color: rgba(18, 103, 130, 0.1);
-}
-<!-- 🌍 Mundinho + Bandeira + Dropdown -->
-
 /* 🌍 Mundinho */
 .world-btn {
   position: absolute;
-  top: 10vh;
-  left: 150vw;
+  top: 10%;
+  left: 10%;
   background: none;
   border: none;
   font-size: 2rem;
   cursor: pointer;
-  padding: 0.5vh;
+  padding: 2%;
   border-radius: 50%;
-  width: 2.5rem;
-  height: 2.5rem;
+  width: 10%;
+  height: 10%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -104,8 +52,8 @@ body {
 /* 🏳️ Bandeira */
 .language-flag {
   position: absolute;
-  top: 10vh;
-  left: 150vw;
+  top: 10%;
+  left: 25%;
   font-size: 2rem;
   z-index: 30;
 }
@@ -113,12 +61,10 @@ body {
 /* 🎤 Microfone */
 .record-btn {
   position: absolute;
-  top: 60vh;
-  left: 150vw;
-  width: 20vw;
-  height: 20vw;
-  max-width: 80px;
-  max-height: 80px;
+  top: 60%;
+  left: 10%;
+  width: 20%;
+  height: 20%;
   border-radius: 50%;
   background: #219ebc;
   display: flex;
@@ -141,37 +87,27 @@ body {
   animation: pulse 1.5s infinite;
 }
 
-/* Animações */
-@keyframes pulse {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.05); }
-  100% { transform: scale(1); }
-}
-
-
 /* Dropdown de idiomas */
-
 .language-dropdown {
-  position: absolute; /* 👈 relativo ao ícone do mundinho */
-  bottom: 100%;        /* 👈 aparece acima do botão */
+  position: absolute;
+  bottom: 100%;
   left: 50%;
   transform: translateX(-50%);
   background: white;
   border-radius: 12px;
-  padding: 4px;
+  padding: 2%;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
   z-index: 40;
   display: none;
-  flex-direction: column; /* 👈 agora em coluna */
+  flex-direction: column;
   align-items: center;
-  gap: 2px;
+  gap: 2%;
   width: auto;
   min-width: 20px;
 }
 
 .language-dropdown.show {
   display: flex;
-  z-index: 40
 }
 
 .language-option {
@@ -191,17 +127,7 @@ body {
   background-color: #f0f8ff;
 }
 
-.record-btn:active {
-  transform: scale(0.95);
-}
-
-.record-btn.recording {
-  background: #ff6b6b;
-  animation: pulse 1.5s infinite;
-}
-
 /* Modal de gravação */
-
 .recording-modal {
   position: fixed;
   bottom: -100%;
@@ -211,7 +137,7 @@ body {
   max-width: 320px;
   background: rgba(0, 0, 0, 0.85);
   border-radius: 20px;
-  padding: 3vh 4vw;
+  padding: 6% 8%;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -221,13 +147,13 @@ body {
 }
 
 .recording-modal.visible {
-  bottom: 15vh;
+  bottom: 15%;
 }
 
 .recording-indicator {
   display: flex;
   align-items: center;
-  margin-bottom: 2vh;
+  margin-bottom: 4%;
   width: 100%;
 }
 
@@ -253,8 +179,8 @@ body {
 }
 
 .send-button {
-  width: 15vw;
-  height: 15vw;
+  width: 15%;
+  height: 15%;
   max-width: 60px;
   max-height: 60px;
   border-radius: 50%;
@@ -285,52 +211,4 @@ body {
   0% { opacity: 1; }
   50% { opacity: 0.3; }
   100% { opacity: 1; }
-}
-
-/* Ajustes para telas muito pequenas */
-@media (max-height: 600px) {
-  .box-principal {
-    padding: 1.5vh 3vw;
-    gap: 2vh;
-    justify-content: flex-start;
-    padding-top: 3vh;
-  }
-  
-  .text-display {
-    min-height: 25vh;
-    padding: 1.5vh 3vw;
-  }
-  
-  .language-flag {
-    font-size: 1.8rem;
-  }
-}
-
-/* Ajustes para orientação paisagem */
-@media (max-width: 600px) and (orientation: landscape) {
-  .box-principal {
-    flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: space-around;
-    align-content: flex-start;
-    padding-top: 2vh;
-  }
-  
-  .text-box {
-    width: 70%;
-    min-height: 30vh;
-  }
-  
-  .microphone-box {
-    width: 25%;
-  }
-  
-  .record-btn {
-    width: 15vh;
-    height: 15vh;
-  }
-  
-  .language-dropdown {
-    top: 40%;
-  }
 }
