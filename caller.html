@@ -48,5 +48,132 @@
   <script type="module" src="js/caller-ui.js"></script>
   <!-- Adicione este script para a tradução por voz -->
   <script src="js/translation-voice.js"></script>
+
+<!-- === CHAT TRADUTOR - ADICIONAR ANTES DO </body> === -->
+
+<div class="chat-overlay">
+    <div class="language-selector">
+        <select id="myLanguage">
+            <option value="portugues">Português</option>
+            <option value="ingles">Inglês</option>
+            <option value="espanhol">Espanhol</option>
+            <option value="alemao">Alemão</option>
+        </select>
+        
+        <select id="targetLanguage">
+            <option value="ingles">Inglês</option>
+            <option value="portugues">Português</option>
+            <option value="espanhol">Espanhol</option>
+            <option value="alemao">Alemão</option>
+        </select>
+    </div>
+    
+    <div class="chat-messages" id="chatMessages"></div>
+    
+    <button class="mic-button" id="micButton">🎤</button>
+</div>
+
+<script>
+// === CHAT TRADUTOR - ADICIONAR NO FINAL ===
+const micButton = document.getElementById('micButton');
+const chatMessages = document.getElementById('chatMessages');
+const myLanguageSelect = document.getElementById('myLanguage');
+const targetLanguageSelect = document.getElementById('targetLanguage');
+
+let recognition;
+let isRecording = false;
+let socket;
+
+// Conecta ao SEU SERVER.JS EXISTENTE do chat-tradutor
+socket = io('https://chat-tradutor.onrender.com');
+
+// Registra como caller
+socket.emit('register-user', {
+    language: myLanguageSelect.value,
+    targetLanguage: targetLanguageSelect.value,
+    userType: 'caller'
+});
+
+// Configura reconhecimento de voz
+function setupSpeechRecognition() {
+    recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognition.lang = getLanguageCode(myLanguageSelect.value);
+
+    recognition.onresult = function(event) {
+        const transcript = event.results[0][0].transcript;
+        addMessage(transcript, 'own');
+        socket.emit('voice-message', { text: transcript });
+    };
+
+    recognition.onend = function() {
+        isRecording = false;
+        micButton.classList.remove('recording');
+    };
+}
+
+// Controle do microfone
+micButton.addEventListener('click', function() {
+    if (!isRecording) {
+        if (!recognition) setupSpeechRecognition();
+        recognition.start();
+        isRecording = true;
+        micButton.classList.add('recording');
+    } else {
+        recognition.stop();
+    }
+});
+
+// Recebe mensagens traduzidas do SEU SERVER
+socket.on('translated-message', function(data) {
+    playAudio(data.audio);
+    setTimeout(() => {
+        addMessage(data.text, 'received');
+    }, 500);
+});
+
+// Funções auxiliares
+function playAudio(audioBase64) {
+    const audio = new Audio('data:audio/mp3;base64,' + audioBase64);
+    audio.play().catch(e => console.log('Audio error:', e));
+}
+
+function addMessage(text, type) {
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `message ${type}`;
+    messageDiv.textContent = text;
+    chatMessages.appendChild(messageDiv);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+function getLanguageCode(lang) {
+    const codes = {
+        'portugues': 'pt-BR',
+        'ingles': 'en-US',
+        'espanhol': 'es-ES',
+        'alemao': 'de-DE'
+    };
+    return codes[lang] || 'en-US';
+}
+
+// Atualiza idiomas
+myLanguageSelect.addEventListener('change', updateLanguages);
+targetLanguageSelect.addEventListener('change', updateLanguages);
+
+function updateLanguages() {
+    socket.emit('register-user', {
+        language: myLanguageSelect.value,
+        targetLanguage: targetLanguageSelect.value,
+        userType: 'caller'
+    });
+}
+
+// Solicita permissões
+navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+    .then(() => console.log('Permissões concedidas!'))
+    .catch(console.error);
+</script>
+
 </body>
 </html>
