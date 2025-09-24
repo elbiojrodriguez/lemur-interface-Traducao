@@ -30,7 +30,7 @@ body {
 .world-btn {
   position: absolute;
   top: 10%;
-  left: 10%;
+  left: 50%;
   background: none;
   border: none;
   font-size: 2rem;
@@ -53,7 +53,7 @@ body {
 .language-flag {
   position: absolute;
   top: 10%;
-  left: 25%;
+  left: 50%;
   font-size: 2rem;
   z-index: 30;
 }
@@ -62,7 +62,7 @@ body {
 .record-btn {
   position: absolute;
   top: 60%;
-  left: 10%;
+  left: 50%;
   width: 20%;
   height: 20%;
   border-radius: 50%;
