@@ -1,1 +1,0 @@
-# lemur-interface-Traducao
