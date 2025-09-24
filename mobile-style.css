@@ -180,7 +180,7 @@ body {
 
 .chat-overlay {
     position: fixed;
-    top: 100px;
+    top: 10px;
     right: 10px;
     width: 280px;
     background: rgba(0,0,0,0.85);
