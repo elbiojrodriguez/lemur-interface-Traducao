@@ -82,7 +82,7 @@ body {
 .world-btn {
   position: absolute;
   top: 10vh;
-  left: 10vw;
+  left: 50vw;
   background: none;
   border: none;
   font-size: 2rem;
@@ -94,7 +94,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 20;
+  z-index: 30;
 }
 
 .world-btn:hover {
@@ -105,7 +105,7 @@ body {
 .language-flag {
   position: absolute;
   top: 10vh;
-  left: 15vw;
+  left: 50vw;
   font-size: 2rem;
   z-index: 30;
 }
@@ -114,7 +114,7 @@ body {
 .record-btn {
   position: absolute;
   top: 60vh;
-  left: 10vw;
+  left: 50vw;
   width: 20vw;
   height: 20vw;
   max-width: 80px;
@@ -129,7 +129,7 @@ body {
   border: none;
   color: white;
   transition: transform 0.2s, background-color 0.3s;
-  z-index: 20;
+  z-index: 30;
 }
 
 .record-btn:active {
