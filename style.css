@@ -26,11 +26,7 @@ body {
   overflow-y: auto;
 }
 
-
-
 /* ===== CAIXA DE TEXTO ===== */
-
-
 .text-display {
   display: none !important;
 }
@@ -77,12 +73,12 @@ body {
   background-color: rgba(18, 103, 130, 0.1);
 }
 
-/* ===== CAIXA DO MICROFONE ===== */
-
-.microphone-box {
-  position: absolute; /* 👈 permite mover livremente */
-  top: 40vh;          /* 👈 distância do topo */
-  left: 72vw;         /* 👈 distância da esquerda */
+/* ===== 🌍 Mundinho + Bandeira agrupados ===== */
+.language-box {
+  position: absolute;
+  top: 40vh;
+  left: 72vw;
+  display: flex;
   flex-direction: column;
   align-items: center;
   gap: 1vh;
@@ -98,11 +94,10 @@ body {
 
 .language-flag {
   font-size: 2rem;
-  z-index:30;
+  z-index: 30;
 }
 
 .world-btn {
-  position: relative;
   background: none;
   border: none;
   font-size: 2rem;
@@ -114,6 +109,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
+  z-index: 20;
 }
 
 .world-btn:hover {
@@ -121,10 +117,9 @@ body {
 }
 
 /* Dropdown de idiomas */
-
 .language-dropdown {
-  position: absolute; /* 👈 relativo ao ícone do mundinho */
-  bottom: 100%;        /* 👈 aparece acima do botão */
+  position: absolute;
+  bottom: 100%;
   left: 50%;
   transform: translateX(-50%);
   background: white;
@@ -133,7 +128,7 @@ body {
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
   z-index: 40;
   display: none;
-  flex-direction: column; /* 👈 agora em coluna */
+  flex-direction: column;
   align-items: center;
   gap: 2px;
   width: auto;
@@ -142,7 +137,6 @@ body {
 
 .language-dropdown.show {
   display: flex;
-  z-index: 40
 }
 
 .language-option {
@@ -157,13 +151,16 @@ body {
   transition: all 0.2s ease;
 }
 
-
 .language-option:hover {
   transform: scale(1.1);
   background-color: #f0f8ff;
 }
 
+/* 🎤 Botão do Microfone separado */
 .record-btn {
+  position: absolute;
+  top: 60vh;
+  left: 10vw;
   width: 20vw;
   height: 20vw;
   max-width: 80px;
@@ -178,6 +175,7 @@ body {
   border: none;
   color: white;
   transition: transform 0.2s, background-color 0.3s;
+  z-index: 20;
 }
 
 .record-btn:active {
@@ -283,12 +281,12 @@ body {
     justify-content: flex-start;
     padding-top: 3vh;
   }
-  
+
   .text-display {
     min-height: 25vh;
     padding: 1.5vh 3vw;
   }
-  
+
   .language-flag {
     font-size: 1.8rem;
   }
@@ -303,21 +301,17 @@ body {
     align-content: flex-start;
     padding-top: 2vh;
   }
-  
+
   .text-box {
     width: 70%;
     min-height: 30vh;
   }
-  
-  .microphone-box {
-    width: 25%;
-  }
-  
+
   .record-btn {
     width: 15vh;
     height: 15vh;
   }
-  
+
   .language-dropdown {
     top: 40%;
   }
