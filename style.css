@@ -26,7 +26,11 @@ body {
   overflow-y: auto;
 }
 
+
+
 /* ===== CAIXA DE TEXTO ===== */
+
+
 .text-display {
   display: none !important;
 }
@@ -72,32 +76,13 @@ body {
 .speaker-btn:hover {
   background-color: rgba(18, 103, 130, 0.1);
 }
+<!-- 🌍 Mundinho + Bandeira + Dropdown -->
 
-/* ===== 🌍 Mundinho + Bandeira agrupados ===== */
-.language-box {
-  position: absolute;
-  top: 40vh;
-  left: 72vw;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1vh;
-  z-index: 10;
-}
-
-.language-selector {
-  display: flex;
-  align-items: center;
-  gap: 1vw;
-  margin-bottom: 1vh;
-}
-
-.language-flag {
-  font-size: 2rem;
-  z-index: 30;
-}
-
+/* 🌍 Mundinho */
 .world-btn {
+  position: absolute;
+  top: 10vh;
+  left: 10vw;
   background: none;
   border: none;
   font-size: 2rem;
@@ -116,47 +101,16 @@ body {
   background-color: rgba(255, 255, 255, 0.3);
 }
 
-/* Dropdown de idiomas */
-.language-dropdown {
+/* 🏳️ Bandeira */
+.language-flag {
   position: absolute;
-  bottom: 100%;
-  left: 50%;
-  transform: translateX(-50%);
-  background: white;
-  border-radius: 12px;
-  padding: 4px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-  z-index: 40;
-  display: none;
-  flex-direction: column;
-  align-items: center;
-  gap: 2px;
-  width: auto;
-  min-width: 20px;
+  top: 10vh;
+  left: 15vw;
+  font-size: 2rem;
+  z-index: 30;
 }
 
-.language-dropdown.show {
-  display: flex;
-}
-
-.language-option {
-  font-size: 1.2rem;
-  width: 30px;
-  height: 30px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  border-radius: 50%;
-  transition: all 0.2s ease;
-}
-
-.language-option:hover {
-  transform: scale(1.1);
-  background-color: #f0f8ff;
-}
-
-/* 🎤 Botão do Microfone separado */
+/* 🎤 Microfone */
 .record-btn {
   position: absolute;
   top: 60vh;
@@ -187,7 +141,67 @@ body {
   animation: pulse 1.5s infinite;
 }
 
+/* Animações */
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+
+/* Dropdown de idiomas */
+
+.language-dropdown {
+  position: absolute; /* 👈 relativo ao ícone do mundinho */
+  bottom: 100%;        /* 👈 aparece acima do botão */
+  left: 50%;
+  transform: translateX(-50%);
+  background: white;
+  border-radius: 12px;
+  padding: 4px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  z-index: 40;
+  display: none;
+  flex-direction: column; /* 👈 agora em coluna */
+  align-items: center;
+  gap: 2px;
+  width: auto;
+  min-width: 20px;
+}
+
+.language-dropdown.show {
+  display: flex;
+  z-index: 40
+}
+
+.language-option {
+  font-size: 1.2rem;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+}
+
+.language-option:hover {
+  transform: scale(1.1);
+  background-color: #f0f8ff;
+}
+
+.record-btn:active {
+  transform: scale(0.95);
+}
+
+.record-btn.recording {
+  background: #ff6b6b;
+  animation: pulse 1.5s infinite;
+}
+
 /* Modal de gravação */
+
 .recording-modal {
   position: fixed;
   bottom: -100%;
@@ -281,12 +295,12 @@ body {
     justify-content: flex-start;
     padding-top: 3vh;
   }
-
+  
   .text-display {
     min-height: 25vh;
     padding: 1.5vh 3vw;
   }
-
+  
   .language-flag {
     font-size: 1.8rem;
   }
@@ -301,17 +315,21 @@ body {
     align-content: flex-start;
     padding-top: 2vh;
   }
-
+  
   .text-box {
     width: 70%;
     min-height: 30vh;
   }
-
+  
+  .microphone-box {
+    width: 25%;
+  }
+  
   .record-btn {
     width: 15vh;
     height: 15vh;
   }
-
+  
   .language-dropdown {
     top: 40%;
   }
