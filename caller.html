@@ -42,27 +42,19 @@
    <!-- 🔘 Botão de chamada -->
 <button id="callActionBtn" style="display: none;">SEND 🚀</button>
     
-    <!-- ===== TRADUTOR POR VOZ ===== -->
-    
-    <!-- Caixa de Texto -->
-    <div class="text-box">
-      <div class="text-display">
-        <div class="text-title">
-          🌐
-          <button class="speaker-btn" id="speakerButton" disabled>🔊</button>
-        </div>
-        <div id="translatedText" class="text-content">🎤</div>
-      </div>
-    </div>
+    <!-- 🏳️ Bandeira +  Microfone-->
+        
+       <!-- 🏳️ Bandeira -->
+<div class="language-flag" id="currentLanguageFlag">🇧🇷</div>
 
-    <div id="texto-recebido"></div>
-    
-   <!-- 🌍 Mundinho + Bandeira -->
-<div class="language-box">
-  <div class="language-selector">
-    <div class="language-flag" id="currentLanguageFlag">🇧🇷</div>
-    <button class="world-btn" id="worldButton">🌎</button>
-  </div>
+<!-- 🎤 Microfone -->
+<button class="record-btn" id="recordButton" disabled>🎤</button>
+
+
+<!-- 🌍 Mundinho + Dropdown juntos -->
+
+<div class="world-wrapper" style="position: absolute; top: 10%; left: 10%;">
+  <button class="world-btn" id="worldButton">🌎</button>
 
   <div class="language-dropdown" id="languageDropdown">
     <div class="language-option" data-lang="pt-BR">🇧🇷</div>
@@ -75,12 +67,8 @@
   </div>
 </div>
 
-<!-- 🎤 Botão do Microfone separado -->
-<button class="record-btn" id="recordButton" disabled>🎤</button>
-
-         
-  </div>
-
+             
+    </div>
   <!-- Modal de gravação -->
   <div class="recording-modal" id="recordingModal">
     <div class="recording-indicator">
