@@ -49,30 +49,34 @@ class TradutorBidirecional {
         }
     }
 
-    exibirMinhaMensagem(original, traduzido) {
-        // Exibe na caixa de texto existente
-        const textElement = document.getElementById('translatedText');
-        if (textElement) {
-            textElement.innerHTML = `
-                <div style="color: blue;">🇧🇷 ${original}</div>
-                <div style="color: green;">🌍 ${traduzido}</div>
-            `;
-        }
+   exibirMinhaMensagem(original, traduzido) {
+    // Exibe na caixa de texto existente - CORRIGIDO
+    const textElement = document.getElementById('translatedText');
+    if (textElement) {
+        textElement.innerHTML = `
+            <div style="color: blue;">🇧🇷 Você: ${original}</div>
+            <div style="color: green;">🌍 Traduzido: ${traduzido}</div>
+        `;
+    } else {
+        console.error('Elemento translatedText não encontrado!');
     }
+}
 
-    exibirMensagemRecebida(data) {
-        // Exibe mensagem do parceiro
-        const textElement = document.getElementById('translatedText');
-        if (textElement) {
-            textElement.innerHTML = `
-                <div style="color: red;">🇺🇸 ${data.textoOriginal}</div>
-                <div style="color: purple;">🌍 ${data.textoTraduzido}</div>
-            `;
-        }
-        
-        // Toca áudio da mensagem recebida
-        this.tocarAudio(data.audioData);
+exibirMensagemRecebida(data) {
+    // Exibe mensagem do parceiro - CORRIGIDO
+    const textElement = document.getElementById('translatedText');
+    if (textElement) {
+        textElement.innerHTML = `
+            <div style="color: red;">🇺🇸 Parceiro: ${data.textoOriginal}</div>
+            <div style="color: purple;">🌍 Traduzido: ${data.textoTraduzido}</div>
+        `;
+    } else {
+        console.error('Elemento translatedText não encontrado!');
     }
+    
+    // Toca áudio da mensagem recebida
+    this.tocarAudio(data.audioData);
+}
 
     tocarAudio(audioData) {
         const audio = new Audio(audioData);
