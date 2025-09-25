@@ -99,49 +99,48 @@ window.onload = async () => {
     }
   })();
 
-  // 🏳️ Aplica bandeira do idioma local (caller)
-  async function aplicarBandeiraLocal(langCode) {
+// 🏳️ Aplica bandeira do idioma local (caller)
+async function aplicarBandeiraLocal(langCode) {
     try {
-      const response = await fetch('assets/bandeiras/language-flags.json');
-      const flags = await response.json();
-      const bandeira = flags[langCode] || flags[langCode.split('-')[0]] || '🔴';
+        const response = await fetch('assets/bandeiras/language-flags.json');
+        const flags = await response.json();
+        const bandeira = flags[langCode] || flags[langCode.split('-')[0]] || '🔴';
 
-      const localLangElement = document.querySelector('.local-mic-Lang');
-      if (localLangElement) {
-        localLangElement.textContent = bandeira;
-      }
+        const localLangElement = document.querySelector('.local-mic-Lang');
+        if (localLangElement) {
+            localLangElement.textContent = bandeira;
+        }
 
-      const localLangDisplay = document.querySelector('.local-Lang');
-      if (localLangDisplay) {
-        localLangDisplay.textContent = bandeira;
-         remoteLangElement.setAttribute('data-lang', langCode); // ✅ ADICIONE ESTA LINHA
-      }
+        const localLangDisplay = document.querySelector('.local-Lang');
+        if (localLangDisplay) {
+            localLangDisplay.textContent = bandeira;
+            localLangDisplay.setAttribute('data-lang', langCode); // ✅ CORRIGIDO: era 'remoteLangElement'
+        }
     } catch (error) {
-      console.error('Erro ao carregar bandeira local:', error);
+        console.error('Erro ao carregar bandeira local:', error);
     }
-  }
+}
 
-  // 🏳️ Aplica bandeira do idioma do receiver (remoto)
-  async function aplicarBandeiraRemota(langCode) {
+// 🏳️ Aplica bandeira do idioma do receiver (remoto)
+async function aplicarBandeiraRemota(langCode) {
     try {
-      const response = await fetch('assets/bandeiras/language-flags.json');
-      const flags = await response.json();
-      const bandeira = flags[langCode] || flags[langCode.split('-')[0]] || '🔴';
+        const response = await fetch('assets/bandeiras/language-flags.json');
+        const flags = await response.json();
+        const bandeira = flags[langCode] || flags[langCode.split('-')[0]] || '🔴';
 
-      const remoteLangElement = document.querySelector('.remoter-Lang');
-      if (remoteLangElement) {
-        remoteLangElement.textContent = bandeira;
-         remoteLangElement.setAttribute('data-lang', langCode); // ✅ ADICIONE ESTA LINHA
-      }
+        const remoteLangElement = document.querySelector('.remoter-Lang');
+        if (remoteLangElement) {
+            remoteLangElement.textContent = bandeira;
+            remoteLangElement.setAttribute('data-lang', langCode); // ✅ ESTÁ CORRETO
+        }
     } catch (error) {
-      console.error('Erro ao carregar bandeira remota:', error);
-      const remoteLangElement = document.querySelector('.remoter-Lang');
-      if (remoteLangElement) {
-        remoteLangElement.textContent = '🔴';
-      }
+        console.error('Erro ao carregar bandeira remota:', error);
+        const remoteLangElement = document.querySelector('.remoter-Lang');
+        if (remoteLangElement) {
+            remoteLangElement.textContent = '🔴';
+        }
     }
-  }
-
+}
   // 🚩 Aplica bandeiras iniciais
   aplicarBandeiraLocal(navegadorLang);
   aplicarBandeiraRemota(receiverLang);
