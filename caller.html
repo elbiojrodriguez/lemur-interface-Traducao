@@ -5,32 +5,64 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Lemur-EchoMeP2P-Caller</title>
   <link rel="stylesheet" href="mobile-style.css" />
+  <style>
+      .auth-overlay {
+          position: fixed; top: 0; left: 0; 
+          width: 100%; height: 100%;
+          background: #000;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          z-index: 10000;
+      }
+      .auth-content { text-align: center; color: white; }
+      .permissions-icons { font-size: 50px; margin: 20px; }
+      .auth-btn { 
+          font-size: 30px; 
+          padding: 15px 30px; 
+          border: none; 
+          background: #007bff; 
+          color: white; 
+          border-radius: 10px; 
+          cursor: pointer;
+      }
+      .hidden { display: none; }
+  </style>
 </head>
 <body>
-  <div class="box-principal">  
+  <!-- TELA DE AUTORIZAÇÃO SIMPLES -->
+  <div id="authOverlay" class="auth-overlay">
+      <div class="auth-content">
+          <div class="permissions-icons">🎥 🎤 🔊</div>
+          <button id="authButton" class="auth-btn">👉 🔓 👈</button>
+      </div>
+  </div>
+
+  <!-- CONTEÚDO PRINCIPAL (ESCONDIDO) -->
+  <div class="box-principal hidden">
           
-     <!-- Logo -->     
+    <!-- Logo -->     
     <img src="assets/images/Lemur2P2.png" alt="Lemur Logo" class="logo">
     <img src="assets/images/Bridg.png" alt="ponte" class="ponte">
      <img id="logo-traduz" src="assets/images/TradGlobo.png" alt="logo-traduz">
-  
- <!-- Sub Titulo --> 
+ 
+    <!-- Sub Titulo --> 
     <div class="translator-label" id="translator-label">
       Live translation. No filters. No platform.
     </div>
 
- <!-- Remoto & Local -->
-        <div class="remoter-Lang">🏳️</div>
-        <div class="local-Lang">🏳️</div>
+    <!-- Remoto & Local -->
+    <div class="remoter-Lang">🏳️</div>
+    <div class="local-Lang">🏳️</div>
     
-    <!-- 🎥 Vídeo remoto -->
+    <!-- 🎥 Vídeo remoto (já existente) -->
     <div class="video-wrapper">
       <video id="remoteVideo" autoplay playsinline></video>
-    </div>
 
-    <!-- 🎥 Vídeo local (mutado) -->
-    <div class="video-wrapper">
-      <video id="localVideo" autoplay muted playsinline></video>
+      <!-- 🎥 Vídeo local em PiP -->
+      <div class="pip-local-wrapper">
+        <video id="localVideo" autoplay muted playsinline></video>
+      </div>
     </div>
 
     <!-- 🆔 ID do usuário -->
@@ -38,30 +70,88 @@
       <span id="myId"></span>
     </div>
 
-    <!-- 🔘 Botão de chamada -->
-    <div class="controls">
-      <button id="callActionBtn" style="display: none;">SEND 🚀</button>
+   <!-- 🔘 Botão de chamada -->
+    <button id="callActionBtn" style="display: none;">SEND 🚀</button>
+    
+    <!-- ===== ELEMENTOS PARA NOVO TRADUTOR ===== -->
+    <div class="text-box">
+        <div class="text-display">
+            <div class="text-title">
+                🌐
+                <button class="speaker-btn" id="speakerButton" disabled>🔊</button>
+            </div>
+            <div id="translatedText" class="text-content">🎤</div>
+        </div>
     </div>
 
- <!-- Caixa de Texto -->
-        <div class="text-box">
-            <div class="text-display">
-                <div class="text-title">
-                    🌐
-                    <button class="speaker-btn" id="speakerButton" disabled>🔊</button>
-                </div>
-                <div id="translatedText" class="text-content">🎤</div>
-            </div>
-        </div>
+    <div id="texto-recebido"></div>
 
-        <div id="texto-recebido"></div>
-         
+    <!-- 🏳️ Bandeira + Microfone -->
+    <div class="language-flag" id="currentLanguageFlag">🇧🇷</div>
+    <button class="record-btn" id="recordButton" disabled>🎤</button>
+
+    <!-- 🌍 Mundinho + Dropdown -->
+    <div class="world-wrapper" style="position: absolute; top: 10%; left: 10%;">
+      <button class="world-btn" id="worldButton">🌎</button>
+      <div class="language-dropdown" id="languageDropdown">
+        <div class="language-option" data-lang="pt-BR">🇧🇷</div>
+        <div class="language-option" data-lang="en">🇺🇸</div>
+        <div class="language-option" data-lang="es">🇪🇸</div>
+        <div class="language-option" data-lang="fr">🇫🇷</div>
+        <div class="language-option" data-lang="de">🇩🇪</div>
+        <div class="language-option" data-lang="it">🇮🇹</div>
+        <div class="language-option" data-lang="ja">🇯🇵</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Modal de gravação -->
+  <div class="recording-modal" id="recordingModal">
+    <div class="recording-indicator">
+      <div class="recording-dot"></div>
+      <div class="recording-text">●</div>
+      <div class="recording-timer" id="recordingTimer">0:00</div>
+    </div>
+    <button class="send-button" id="sendButton">▶</button>
+  </div>
+
   <!-- 🔌 Scripts -->
   <script src="https://lemur-signal.onrender.com/socket.io/socket.io.js"></script>
   <script type="module" src="js/caller-ui.js"></script>
-  
-  <!-- 🔥 SCRIPTS DO TRADUTOR (ADICIONADOS AQUI) -->
-  <script src="js/tradutor.js"></script>
-  <script src="js/translation-voice.js"></script>
+    
+  <script>
+  document.getElementById('authButton').onclick = async function() {
+      // 1️⃣ ÁUDIO FANTASMA (para desbloquear autoplay)
+      const audioContext = new AudioContext();
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+      
+      gainNode.gain.value = 0.0001; // Quase zero
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+      oscillator.start();
+      await new Promise(resolve => setTimeout(resolve, 500));
+      oscillator.stop();
+
+      // 2️⃣ PERMISSÕES CÂMERA + MICROFONE
+      await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+
+      // 3️⃣ ATIVA MP3 DO NAVEGADOR (para TTS funcionar)
+      // 🔥 ISSO QUE EU ESQUECI!
+      const audio = new Audio();
+      audio.src = "data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hREAxOnuDyu2McBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hREAxOnuDyu2Mc";
+      await audio.play().catch(e => console.log('Áudio ativado!'));
+
+      // MOSTRA APP
+      document.getElementById('authOverlay').classList.add('hidden');
+      document.querySelector('.box-principal').classList.remove('hidden');
+
+  // ✅ AGORA SIM CARREGA O TRADUTOR
+        const script = document.createElement('script');
+        script.src = 'js/tradutor-simples.js';
+        document.body.appendChild(script);
+  };
+  </script>
 </body>
 </html>
