@@ -1,5 +1,5 @@
-import WebRTCCore from '../core/webrtc-core.js';        // ✅ SEM colchetes  
-import { QRCodeGenerator } from './qr-code-utils.js';   // ✅ COM colchetes (APENAS UMA VEZ!)
+import { WebRTCCore } from '../core/webrtc-core.js';
+import { QRCodeGenerator } from './qr-code-utils.js';
 
 window.onload = async () => {
   try {
@@ -117,45 +117,40 @@ window.onload = async () => {
     })();
 
     async function aplicarBandeira(langCode) {
-    try {
+      try {
         const response = await fetch('assets/bandeiras/language-flags.json');
         const flags = await response.json();
+
         const bandeira = flags[langCode] || flags[langCode.split('-')[0]] || '🔴';
 
         const localLangElement = document.querySelector('.local-mic-Lang');
-        if (localLangElement) {
-            localLangElement.textContent = bandeira;
-        }
+        if (localLangElement) localLangElement.textContent = bandeira;
 
         const localLangDisplay = document.querySelector('.local-Lang');
-        if (localLangDisplay) {
-            localLangDisplay.textContent = bandeira;
-            localLangDisplay.setAttribute('data-lang', langCode); // ✅ CORRIGIDO: era 'elemento'
-        }
-    } catch (error) {
-        console.error('Erro ao carregar bandeira local:', error);
-    }
-}
+        if (localLangDisplay) localLangDisplay.textContent = bandeira;
 
-async function aplicarBandeiraRemota(langCode) {
-    try {
+      } catch (error) {
+        console.error('Erro ao carregar bandeira local:', error);
+      }
+    }
+
+    async function aplicarBandeiraRemota(langCode) {
+      try {
         const response = await fetch('assets/bandeiras/language-flags.json');
         const flags = await response.json();
+
         const bandeira = flags[langCode] || flags[langCode.split('-')[0]] || '🔴';
 
         const remoteLangElement = document.querySelector('.remoter-Lang');
-        if (remoteLangElement) {
-            remoteLangElement.textContent = bandeira;
-            remoteLangElement.setAttribute('data-lang', langCode); // ✅ CORRIGIDO: era 'elemento'
-        }
-    } catch (error) {
+        if (remoteLangElement) remoteLangElement.textContent = bandeira;
+
+      } catch (error) {
         console.error('Erro ao carregar bandeira remota:', error);
         const remoteLangElement = document.querySelector('.remoter-Lang');
-        if (remoteLangElement) {
-            remoteLangElement.textContent = '🔴';
-        }
+        if (remoteLangElement) remoteLangElement.textContent = '🔴';
+      }
     }
-}
+
     aplicarBandeira(lang);
 
     window.rtcCore.setDataChannelCallback((mensagem) => {
