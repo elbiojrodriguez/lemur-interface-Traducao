@@ -117,11 +117,12 @@ window.onload = async () => {
       const localLangElement = document.querySelector('.local-mic-Lang');
       if (localLangElement) {
         localLangElement.textContent = bandeira;
-      }
+         }
 
       const localLangDisplay = document.querySelector('.local-Lang');
       if (localLangDisplay) {
         localLangDisplay.textContent = bandeira;
+         elemento.setAttribute('data-lang', langCode); // ✅ ADICIONE ESTA LINHA
       }
 
     } catch (error) {
@@ -139,6 +140,7 @@ window.onload = async () => {
       const remoteLangElement = document.querySelector('.remoter-Lang');
       if (remoteLangElement) {
         remoteLangElement.textContent = bandeira;
+         elemento.setAttribute('data-lang', langCode); // ✅ ADICIONE ESTA LINHA
       }
 
     } catch (error) {
