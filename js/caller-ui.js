@@ -1,6 +1,4 @@
-// receiver-ui.js e caller-ui.js:
 import WebRTCCore from '../core/webrtc-core.js';        // ✅ SEM colchetes
-import { QRCodeGenerator } from './qr-code-utils.js';   // ✅ COM colchetes
 
 // 🎯 FUNÇÃO PARA OBTER IDIOMA COMPLETO
 async function obterIdiomaCompleto(lang) {
