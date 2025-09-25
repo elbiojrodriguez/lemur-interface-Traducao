@@ -1,113 +1,122 @@
-import WebRTCCore from '../core/webrtc-core.js';
+import { WebRTCCore } from '../core/webrtc-core.js';
 import { QRCodeGenerator } from './qr-code-utils.js';
 
 window.onload = async () => {
   try {
-    await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-  } catch (error) {
-    console.error("Erro ao solicitar acesso à câmera e microfone:", error);
-  }
-
-  const rtcCore = new WebRTCCore();
-
-  const url = window.location.href;
-  const fixedId = url.split('?')[1] || crypto.randomUUID().substr(0, 8);
-
-  function fakeRandomUUID(fixedValue) {
-    return {
-      substr: function(start, length) {
-        return fixedValue.substr(start, length);
-      }
-    };
-  }
-
-  const myId = fakeRandomUUID(fixedId).substr(0, 8);
-
-  let localStream = null;
-  let callerLang = null;
-
-  navigator.mediaDevices.getUserMedia({ video: true, audio: false })
-    .then(stream => {
-      localStream = stream;
-    })
-    .catch(error => {
-      console.error("Erro ao acessar a câmera:", error);
+    // ✅ Solicita acesso à câmera (vídeo sem áudio)
+    const stream = await navigator.mediaDevices.getUserMedia({ 
+      video: true, 
+      audio: false 
     });
 
-  const params = new URLSearchParams(window.location.search);
-  const token = params.get('token') || '';
-  const lang = params.get('lang') || navigator.language || 'pt-BR';
+    // ✅ Captura da câmera local
+    let localStream = stream;
 
-  const callerUrl = `${window.location.origin}/caller.html?targetId=${myId}&token=${encodeURIComponent(token)}&lang=${encodeURIComponent(lang)}`;
-  QRCodeGenerator.generate("qrcode", callerUrl);
-
-  rtcCore.initialize(myId);
-  rtcCore.setupSocketHandlers();
-
-  const localVideo = document.getElementById('localVideo');
-
-  rtcCore.onIncomingCall = (offer, receivedCallerLang) => {
-    if (!localStream) {
-      console.warn("Stream local não disponível");
-      return;
+    // ✅ Exibe vídeo local no PiP azul
+    const localVideo = document.getElementById('localVideo');
+    if (localVideo) {
+      localVideo.srcObject = localStream;
     }
 
-    callerLang = typeof receivedCallerLang === 'string' && receivedCallerLang.trim() !== '' ? receivedCallerLang : null;
+    // ✅ Inicializa WebRTC
+    window.rtcCore = new WebRTCCore();
 
-    rtcCore.handleIncomingCall(offer, localStream, (remoteStream) => {
-      remoteStream.getAudioTracks().forEach(track => track.enabled = false);
+    const url = window.location.href;
+    const fixedId = url.split('?')[1] || crypto.randomUUID().substr(0, 8);
 
-      const overlay = document.querySelector('.info-overlay');
-      if (overlay) overlay.classList.add('hidden');
+    function fakeRandomUUID(fixedValue) {
+      return {
+        substr: function(start, length) {
+          return fixedValue.substr(start, length);
+        }
+      };
+    }
 
-      localVideo.srcObject = remoteStream;
+    const myId = fakeRandomUUID(fixedId).substr(0, 8);
 
-      if (callerLang) {
-        window.targetTranslationLang = callerLang;
-        aplicarBandeiraRemota(callerLang);
-      } else {
-        document.querySelector('.remoter-Lang').textContent = '🔴';
-      }
-    });
-  };
+    let callerLang = null;
 
-  const TRANSLATE_ENDPOINT = 'https://chat-tradutor.onrender.com/translate';
+    const params = new URLSearchParams(window.location.search);
+    const token = params.get('token') || '';
+    const lang = params.get('lang') || navigator.language || 'pt-BR';
 
-  async function translateText(text, targetLang) {
-    try {
-      if (targetLang === 'en') return text;
+    window.targetTranslationLang = lang;
 
-      const response = await fetch(TRANSLATE_ENDPOINT, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text, targetLang })
+    const callerUrl = `${window.location.origin}/caller.html?targetId=${myId}&token=${encodeURIComponent(token)}&lang=${encodeURIComponent(lang)}`;
+    QRCodeGenerator.generate("qrcode", callerUrl);
+
+    window.rtcCore.initialize(myId);
+    window.rtcCore.setupSocketHandlers();
+
+    window.rtcCore.onIncomingCall = (offer, idiomaDoCaller) => {
+      if (!localStream) return;
+
+      console.log('🎯 Caller fala:', idiomaDoCaller);
+      console.log('🎯 Eu (receiver) entendo:', lang);
+
+      window.sourceTranslationLang = idiomaDoCaller;
+      window.targetTranslationLang = lang;
+
+      console.log('🎯 Vou traduzir:', idiomaDoCaller, '→', lang);
+
+      window.rtcCore.handleIncomingCall(offer, localStream, (remoteStream) => {
+        remoteStream.getAudioTracks().forEach(track => track.enabled = false);
+
+        const overlay = document.querySelector('.info-overlay');
+        if (overlay) overlay.classList.add('hidden');
+
+        const remoteVideo = document.getElementById('remoteVideo');
+        if (remoteVideo) {
+          remoteVideo.srcObject = remoteStream;
+        }
+
+        window.targetTranslationLang = idiomaDoCaller || lang;
+        console.log('🎯 Idioma definido para tradução:', window.targetTranslationLang);
+        alert(`🌐 Vou traduzir para: ${window.targetTranslationLang}`);
+
+        if (idiomaDoCaller) {
+          aplicarBandeiraRemota(idiomaDoCaller);
+        } else {
+          document.querySelector('.remoter-Lang').textContent = '🔴';
+        }
       });
+    };
 
-      const result = await response.json();
-      return result.translatedText || text;
-    } catch (error) {
-      console.error('Erro na tradução:', error);
-      return text;
-    }
-  }
+    const TRANSLATE_ENDPOINT = 'https://chat-tradutor.onrender.com/translate';
 
-  const frasesParaTraduzir = {
-    "translator-label": "Live translation. No filters. No platform.",
-    "qr-modal-title": "This is your online key",
-    "qr-modal-description": "You can ask to scan, share or print on your business card."
-  };
+    async function translateText(text, targetLang) {
+      try {
+        const response = await fetch(TRANSLATE_ENDPOINT, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text, targetLang })
+        });
 
-  (async () => {
-    for (const [id, texto] of Object.entries(frasesParaTraduzir)) {
-      const el = document.getElementById(id);
-      if (el) {
-        const traduzido = await translateText(texto, lang);
-        el.textContent = traduzido;
+        const result = await response.json();
+        return result.translatedText || text;
+      } catch (error) {
+        console.error('Erro na tradução:', error);
+        return text;
       }
     }
-  })();
 
- async function aplicarBandeira(langCode) {
+    const frasesParaTraduzir = {
+      "translator-label": "Live translation. No filters. No platform.",
+      "qr-modal-title": "This is your online key",
+      "qr-modal-description": "You can ask to scan, share or print on your business card."
+    };
+
+    (async () => {
+      for (const [id, texto] of Object.entries(frasesParaTraduzir)) {
+        const el = document.getElementById(id);
+        if (el) {
+          const traduzido = await translateText(texto, lang);
+          el.textContent = traduzido;
+        }
+      }
+    })();
+
+    async function aplicarBandeira(langCode) {
     try {
         const response = await fetch('assets/bandeiras/language-flags.json');
         const flags = await response.json();
@@ -147,5 +156,34 @@ async function aplicarBandeiraRemota(langCode) {
         }
     }
 }
-  aplicarBandeira(lang);
+    aplicarBandeira(lang);
+
+    window.rtcCore.setDataChannelCallback((mensagem) => {
+      console.log('Mensagem recebida no receiver:', mensagem);
+      const elemento = document.getElementById('texto-recebido');
+      if (elemento) {
+        elemento.textContent = mensagem;
+
+        if (window.SpeechSynthesis) {
+          window.speechSynthesis.cancel();
+          const utterance = new SpeechSynthesisUtterance(mensagem);
+          utterance.lang = window.targetTranslationLang || 'en-US';
+          utterance.rate = 0.9;
+          utterance.volume = 0.8;
+          window.speechSynthesis.speak(utterance);
+        }
+      }
+    });
+
+    setTimeout(() => {
+      if (typeof initializeTranslator === 'function') {
+        initializeTranslator();
+      }
+    }, 1000);
+
+  } catch (error) {
+    console.error("Erro ao solicitar acesso à câmera:", error);
+    alert("Erro ao acessar a câmera. Verifique as permissões.");
+    return;
+  }
 };
