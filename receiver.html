@@ -6,41 +6,10 @@
     <title>Lemur-EchoMeP2P-Receiver</title>
     <link rel="stylesheet" href="mobile-style.css" />
     <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
-    <style>
-        .auth-overlay {
-            position: fixed; top: 0; left: 0; 
-            width: 100%; height: 100%;
-            background: #000;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 10000;
-        }
-        .auth-content { text-align: center; color: white; }
-        .permissions-icons { font-size: 50px; margin: 20px; }
-        .auth-btn { 
-            font-size: 30px; 
-            padding: 15px 30px; 
-            border: none; 
-            background: #007bff; 
-            color: white; 
-            border-radius: 10px; 
-            cursor: pointer;
-        }
-        .hidden { display: none; }
-    </style>
 </head>
 <body>
-    <!-- TELA DE AUTORIZAÇÃO SIMPLES -->
-    <div id="authOverlay" class="auth-overlay">
-        <div class="auth-content">
-            <div class="permissions-icons">🎥 🎤 🔊</div>
-            <button id="authButton" class="auth-btn">👉 🔓 👈</button>
-        </div>
-    </div>
-
-    <!-- CONTEÚDO PRINCIPAL (ESCONDIDO) -->
-    <div class="box-principal hidden">
+    
+    <div class="box-principal">
                       
         <!-- Logo --> 
         <img src="assets/images/Lemur2P2.png" alt="Lemur Logo" class="logo">
@@ -128,41 +97,9 @@
         <button class="send-button" id="sendButton">▶</button>
     </div>
 
-       <!-- 🔌 Scripts -->
+    <!-- 🔌 Scripts -->
     <script src="https://lemur-signal.onrender.com/socket.io/socket.io.js"></script>
     <script type="module" src="js/receiver-ui.js"></script>
-    
-    <script>
-    document.getElementById('authButton').onclick = async function() {
-        // 1️⃣ ÁUDIO FANTASMA
-        const audioContext = new AudioContext();
-        const oscillator = audioContext.createOscillator();
-        const gainNode = audioContext.createGain();
-        
-        gainNode.gain.value = 0.0001;
-        oscillator.connect(gainNode);
-        gainNode.connect(audioContext.destination);
-        oscillator.start();
-        await new Promise(resolve => setTimeout(resolve, 500));
-        oscillator.stop();
-
-        // 2️⃣ PERMISSÕES
-        await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-
-        // 3️⃣ ATIVA MP3
-        const audio = new Audio();
-        audio.src = "data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hREAxOnuDyu2McBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hREAxOnuDyu2Mc";
-        await audio.play().catch(e => console.log('Áudio ativado!'));
-
-        // 4️⃣ MOSTRA APP E SÓ DEPOIS CARREGA TRADUTOR
-        document.getElementById('authOverlay').classList.add('hidden');
-        document.querySelector('.box-principal').classList.remove('hidden');
-        
-        // ✅ AGORA SIM CARREGA O TRADUTOR
-        const script = document.createElement('script');
-        script.src = 'js/tradutor-simples.js';
-        document.body.appendChild(script);
-    };
-    </script>
+     
 </body>
 </html>
