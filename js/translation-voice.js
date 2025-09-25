@@ -1,4 +1,4 @@
-// translation-voice.js - Adiciona controle de voz aos HTMLs existentes
+// translation-voice.js - Conecta microfone com o tradutor existente
 
 // Aguarda a página carregar
 document.addEventListener('DOMContentLoaded', function() {
@@ -34,7 +34,7 @@ document.addEventListener('DOMContentLoaded', function() {
         `;
         
         micButton.onclick = function() {
-            window.tradutor.iniciarReconhecimentoVoz();
+            iniciarReconhecimentoVoz();
             micButton.style.background = '#dc3545';
             setTimeout(() => micButton.style.background = '#007bff', 2000);
         };
@@ -43,12 +43,45 @@ document.addEventListener('DOMContentLoaded', function() {
         textBox.appendChild(micButton);
     }
 
+    // FUNÇÃO DE RECONHECIMENTO DE VOZ CORRIGIDA
+    function iniciarReconhecimentoVoz() {
+        if (!('webkitSpeechRecognition' in window)) {
+            alert('Reconhecimento de voz não suportado neste navegador');
+            return;
+        }
+        
+        const recognition = new webkitSpeechRecognition();
+        recognition.continuous = false; // Para após falar
+        recognition.interimResults = false; // Só resultado final
+        recognition.lang = config.meuIdioma === 'portugues' ? 'pt-BR' : 'en-US';
+
+        recognition.onresult = function(event) {
+            const textoFalado = event.results[0][0].transcript;
+            console.log('Texto falado:', textoFalado);
+            
+            // 1. Coloca o texto na caixa de entrada
+            const inputText = document.getElementById('inputText');
+            if (inputText) {
+                inputText.value = textoFalado;
+            }
+            
+            // 2. Envia para tradução automaticamente
+            if (window.tradutor && window.tradutor.enviarMensagem) {
+                window.tradutor.enviarMensagem(textoFalado);
+            }
+        };
+
+        recognition.onerror = function(event) {
+            console.error('Erro no reconhecimento:', event.error);
+        };
+
+        recognition.start();
+    }
+
     // Inicia reconhecimento automaticamente após permissões
     navigator.mediaDevices.getUserMedia({ audio: true })
         .then(() => {
             console.log('Microfone permitido - tradutor pronto');
-            // Opcional: iniciar automaticamente
-            // window.tradutor.iniciarReconhecimentoVoz();
         })
         .catch(err => {
             console.log('Microfone não permitido para tradutor');
