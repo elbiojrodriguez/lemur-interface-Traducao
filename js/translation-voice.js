@@ -59,13 +59,13 @@ document.addEventListener('DOMContentLoaded', function() {
             const textoFalado = event.results[0][0].transcript;
             console.log('Texto falado:', textoFalado);
             
-            // 1. Coloca o texto na caixa de entrada
-            const inputText = document.getElementById('inputText');
-            if (inputText) {
-                inputText.value = textoFalado;
+            // MOSTRAR O TEXTO FALADO NA TELA ANTES DE TRADUZIR
+            const translatedTextElement = document.getElementById('translatedText');
+            if (translatedTextElement) {
+                translatedTextElement.innerHTML = `<div style="color: blue;">🎤 Falado: ${textoFalado}</div>`;
             }
             
-            // 2. Envia para tradução automaticamente
+            // Envia para tradução automaticamente
             if (window.tradutor && window.tradutor.enviarMensagem) {
                 window.tradutor.enviarMensagem(textoFalado);
             }
@@ -73,9 +73,25 @@ document.addEventListener('DOMContentLoaded', function() {
 
         recognition.onerror = function(event) {
             console.error('Erro no reconhecimento:', event.error);
+            
+            // Mostrar erro na tela
+            const translatedTextElement = document.getElementById('translatedText');
+            if (translatedTextElement) {
+                translatedTextElement.innerHTML = `<div style="color: red;">❌ Erro: ${event.error}</div>`;
+            }
+        };
+
+        recognition.onend = function() {
+            console.log('Reconhecimento de voz terminado');
         };
 
         recognition.start();
+        
+        // Mostrar status na tela
+        const translatedTextElement = document.getElementById('translatedText');
+        if (translatedTextElement) {
+            translatedTextElement.innerHTML = '<div style="color: orange;">🎤 Ouvindo... Fale agora</div>';
+        }
     }
 
     // Inicia reconhecimento automaticamente após permissões
