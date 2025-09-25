@@ -114,6 +114,7 @@ window.onload = async () => {
       const localLangDisplay = document.querySelector('.local-Lang');
       if (localLangDisplay) {
         localLangDisplay.textContent = bandeira;
+         remoteLangElement.setAttribute('data-lang', langCode); // ✅ ADICIONE ESTA LINHA
       }
     } catch (error) {
       console.error('Erro ao carregar bandeira local:', error);
@@ -130,6 +131,7 @@ window.onload = async () => {
       const remoteLangElement = document.querySelector('.remoter-Lang');
       if (remoteLangElement) {
         remoteLangElement.textContent = bandeira;
+         remoteLangElement.setAttribute('data-lang', langCode); // ✅ ADICIONE ESTA LINHA
       }
     } catch (error) {
       console.error('Erro ao carregar bandeira remota:', error);
