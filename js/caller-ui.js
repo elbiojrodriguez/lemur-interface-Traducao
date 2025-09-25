@@ -22,19 +22,8 @@ async function obterIdiomaCompleto(lang) {
   }
 }
 
-// ===== FUNÇÃO SIMPLES PARA ENVIAR TEXTO =====
-function enviarParaOutroCelular(texto) {
-  if (window.rtcDataChannel && window.rtcDataChannel.isOpen()) {
-    window.rtcDataChannel.send(texto);
-    console.log('✅ Texto enviado:', texto);
-  } else {
-    console.log('⏳ Canal não disponível ainda. Tentando novamente...');
-    setTimeout(() => enviarParaOutroCelular(texto), 1000);
-  }
-}
-
-// 🌐 Tradução com controle de envio
-async function translateText(text, targetLang, enviar = false) {
+// ✅ FUNÇÃO SIMPLES PARA TRADUÇÃO LOCAL (APENAS INTERFACE)
+async function translateText(text, targetLang) {
   try {
     const response = await fetch('https://chat-tradutor.onrender.com/translate', {
       method: 'POST',
@@ -43,14 +32,9 @@ async function translateText(text, targetLang, enviar = false) {
     });
 
     const result = await response.json();
-
-    if (enviar) {
-      enviarParaOutroCelular(result.translatedText);
-    }
-
-    return result.translatedText || text;
+    return result.translatedText || text; // ✅ APENAS RETORNA, NÃO ENVIA
   } catch (error) {
-    console.error('Erro na tradução:', error);
+    console.error('Erro na tradução local:', error);
     return text;
   }
 }
@@ -58,28 +42,10 @@ async function translateText(text, targetLang, enviar = false) {
 window.onload = async () => {
   try {
     const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
-   let localStream = stream;
-   document.getElementById('localVideo').srcObject = localStream;
-
+    let localStream = stream;
+    document.getElementById('localVideo').srcObject = localStream;
 
     window.rtcCore = new WebRTCCore();
-
-    window.rtcCore.setDataChannelCallback((mensagem) => {
-      console.log('Mensagem recebida:', mensagem);
-      const elemento = document.getElementById('texto-recebido');
-      if (elemento) {
-        elemento.textContent = mensagem;
-
-        if (window.SpeechSynthesis) {
-          window.speechSynthesis.cancel();
-          const utterance = new SpeechSynthesisUtterance(mensagem);
-          utterance.lang = window.targetTranslationLang || 'pt-BR';
-          utterance.rate = 0.9;
-          utterance.volume = 0.8;
-          window.speechSynthesis.speak(utterance);
-        }
-      }
-    });
 
     const myId = crypto.randomUUID().substr(0, 8);
     document.getElementById('myId').textContent = myId;
@@ -119,22 +85,22 @@ window.onload = async () => {
 
     const navegadorLang = await obterIdiomaCompleto(navigator.language);
 
+    // ✅ TRADUÇÃO LOCAL DA INTERFACE (MANTIDA)
     const frasesParaTraduzir = {
       "translator-label": "Live translation. No filters. No platform."
     };
 
-    // 📝 Tradução local da interface (sem envio)
     (async () => {
       for (const [id, texto] of Object.entries(frasesParaTraduzir)) {
         const el = document.getElementById(id);
         if (el) {
-          const traduzido = await translateText(texto, navegadorLang, false); // só local
+          const traduzido = await translateText(texto, navegadorLang);
           el.textContent = traduzido;
         }
       }
     })();
 
-    // 🏳️ Aplica bandeira do idioma local
+    // ✅ BANDEIRAS COM DATA-LANG (MANTIDAS)
     async function aplicarBandeiraLocal(langCode) {
       try {
         const response = await fetch('assets/bandeiras/language-flags.json');
@@ -142,16 +108,20 @@ window.onload = async () => {
         const bandeira = flags[langCode] || flags[langCode.split('-')[0]] || '🔴';
 
         const localLangElement = document.querySelector('.local-mic-Lang');
-        if (localLangElement) localLangElement.textContent = bandeira;
+        if (localLangElement) {
+          localLangElement.textContent = bandeira;
+        }
 
         const localLangDisplay = document.querySelector('.local-Lang');
-        if (localLangDisplay) localLangDisplay.textContent = bandeira;
+        if (localLangDisplay) {
+          localLangDisplay.textContent = bandeira;
+          localLangDisplay.setAttribute('data-lang', langCode);
+        }
       } catch (error) {
         console.error('Erro ao carregar bandeira local:', error);
       }
     }
 
-    // 🏳️ Aplica bandeira do idioma remoto
     async function aplicarBandeiraRemota(langCode) {
       try {
         const response = await fetch('assets/bandeiras/language-flags.json');
@@ -159,11 +129,16 @@ window.onload = async () => {
         const bandeira = flags[langCode] || flags[langCode.split('-')[0]] || '🔴';
 
         const remoteLangElement = document.querySelector('.remoter-Lang');
-        if (remoteLangElement) remoteLangElement.textContent = bandeira;
+        if (remoteLangElement) {
+          remoteLangElement.textContent = bandeira;
+          remoteLangElement.setAttribute('data-lang', langCode);
+        }
       } catch (error) {
         console.error('Erro ao carregar bandeira remota:', error);
         const remoteLangElement = document.querySelector('.remoter-Lang');
-        if (remoteLangElement) remoteLangElement.textContent = '🔴';
+        if (remoteLangElement) {
+          remoteLangElement.textContent = '🔴';
+        }
       }
     }
 
