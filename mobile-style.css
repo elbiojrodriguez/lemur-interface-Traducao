@@ -26,6 +26,39 @@ body {
   overflow-y: auto;
 }
 
+#texto-recebido {
+  position: absolute;
+  top: 70%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 1.2em;
+  padding: 2vh 2vw;
+  margin: 2vh 0;
+  border: 0.2vh solid #4CAF50;
+  border-radius: 1vh;
+  background-color: #f8f9fa;
+  width: 80%;         /* ✅ largura em porcentagem */
+  height: 25%;        /* ✅ altura em porcentagem */
+  max-width: 500px;
+  text-align: center;
+  color: #333;
+  font-weight: bold;
+  display: block;
+  opacity: 1;
+  visibility: visible;
+  box-sizing: border-box;
+}
+
+#logo-traduz {
+  position: absolute;
+  top: 5%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 25%;
+  max-width: 120px;
+  height: auto;
+}
+
 .logo {
   position: absolute;
   top: 7%;
@@ -138,7 +171,7 @@ body {
   border-radius: 20px;    /* cantos arredondados */
   padding: 2% 3%;         /* espaçamento interno */
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* sombra suave */
-  z-index: 9999;
+  z-index: 30;
   text-align: center;
 }
 
@@ -175,87 +208,6 @@ body {
 .info-overlay {
   transition: opacity 0.5s ease;
   opacity: 1;
-}
-/* ===== CHAT TRADUTOR - ADICIONAR AO EXISTENTE ===== */
-
-.chat-overlay {
-    position: fixed;
-    top: 10px;
-    right: 10px;
-    width: 280px;
-    background: rgba(0,0,0,0.85);
-    border: 2px solid #00ff88;
-    border-radius: 15px;
-    z-index: 10000;
-    padding: 10px;
-    backdrop-filter: blur(10px);
-}
-
-.chat-messages {
-    height: 50px;
-    overflow-y: auto;
-    margin-bottom: 10px;
-    padding: 5px;
-    background: rgba(255,255,255,0.1);
-    border-radius: 8px;
-}
-
-.message {
-    margin: 5px 0;
-    padding: 8px;
-    border-radius: 10px;
-    font-size: 12px;
-    line-height: 1.3;
-}
-
-.message.own {
-    background: linear-gradient(135deg, #0066cc, #0099ff);
-    margin-left: 20px;
-    text-align: right;
-}
-
-.message.received {
-    background: linear-gradient(135deg, #333, #555);
-    margin-right: 20px;
-}
-
-.mic-button {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    background: #ff4444;
-    border: none;
-    cursor: pointer;
-    margin: 0 auto;
-    display: block;
-    font-size: 20px;
-}
-
-.mic-button.recording {
-    background: #00ff44;
-    animation: pulse 0.8s infinite;
-}
-
-.language-selector {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 5px;
-    margin-bottom: 10px;
-}
-
-.language-selector select {
-    padding: 6px;
-    border-radius: 8px;
-    background: #333;
-    color: white;
-    border: 1px solid #00ff88;
-    font-size: 11px;
-}
-
-@keyframes pulse {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.1); }
-    100% { transform: scale(1); }
 }
 
 .info-overlay.hidden {
