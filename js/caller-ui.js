@@ -58,20 +58,16 @@ window.onload = async () => {
 
     window.rtcCore = new WebRTCCore();
 
-    // ✅ CORRETO: Box SEMPRE visível, apenas o texto muda com efeito suave
+    // ✅ CORRETO: Box SEMPRE visível e fixo, frase só aparece com a voz
     window.rtcCore.setDataChannelCallback((mensagem) => {
       console.log('📩 Mensagem recebida:', mensagem);
 
       const elemento = document.getElementById('texto-recebido');
       if (elemento) {
-        // Efeito de pulsação enquanto aguarda a voz
-        elemento.style.animation = 'pulsar 1s infinite';
-        
-        // Atualiza o texto IMEDIATAMENTE (box continua visível)
-        elemento.textContent = mensagem;
-        
-        // Remove qualquer transição de opacity anterior
-        elemento.style.opacity = '1';
+        // Box SEMPRE visível, mas texto vazio inicialmente
+        elemento.textContent = ""; // ← TEXTO FICA VAZIO NO INÍCIO
+        elemento.style.opacity = '1'; // ← BOX SEMPRE VISÍVEL
+        elemento.style.transition = 'opacity 0.5s ease'; // ← Transição suave
       }
 
       if (window.SpeechSynthesis) {
@@ -83,19 +79,8 @@ window.onload = async () => {
 
         utterance.onstart = () => {
           if (elemento) {
-            // Para a pulsação quando a voz começa
-            elemento.style.animation = 'none';
-          }
-        };
-
-        utterance.onend = () => {
-          if (elemento) {
-            // Efeito final suave quando a voz termina
-            elemento.style.transition = 'all 0.5s ease';
-            elemento.style.transform = 'scale(1.05)';
-            setTimeout(() => {
-              elemento.style.transform = 'scale(1)';
-            }, 500);
+            // SÓ MOSTRA O TEXTO QUANDO A VOZ COMEÇA
+            elemento.textContent = mensagem;
           }
         };
 
