@@ -161,8 +161,9 @@ window.onload = async () => {
 
                 const elemento = document.getElementById("texto-recebido");
                 if (elemento) {
-                    elemento.textContent = ""; // Limpa o texto
-                    elemento.classList.remove("visible"); // Esconde a frase
+                    elemento.textContent = ""; // Oculta o texto inicialmente
+                    elemento.style.opacity = 0; // Garante que esteja invisível
+                    elemento.style.transition = "opacity 1s ease-in-out"; // Suavidade na aparição
                 }
 
                 const utterance = new SpeechSynthesisUtterance(mensagem);
@@ -172,8 +173,10 @@ window.onload = async () => {
 
                 utterance.onstart = () => {
                     if (elemento) {
-                        elemento.textContent = mensagem; // Coloca o texto
-                        elemento.classList.add("visible"); // ✅ Apenas a frase aparece
+                        elemento.textContent = mensagem; // ✅ MOSTRA APENAS O QUE RECEBE
+                        setTimeout(() => {
+                            elemento.style.opacity = 1; // Faz o texto aparecer suavemente
+                        }, 100);
                     }
                 };
 
