@@ -33,8 +33,8 @@ function enviarParaOutroCelular(texto) {
   }
 }
 
-// 🌐 Tradução com controle de envio
-async function translateText(text, targetLang, enviar = false) {
+// 🌐 Tradução apenas para texto
+async function translateText(text, targetLang) {
   try {
     const response = await fetch('https://chat-tradutor.onrender.com/translate', {
       method: 'POST',
@@ -43,11 +43,6 @@ async function translateText(text, targetLang, enviar = false) {
     });
 
     const result = await response.json();
-
-    if (enviar) {
-      enviarParaOutroCelular(result.translatedText);
-    }
-
     return result.translatedText || text;
   } catch (error) {
     console.error('Erro na tradução:', error);
@@ -63,6 +58,7 @@ window.onload = async () => {
 
     window.rtcCore = new WebRTCCore();
 
+    // ✅ CORRETO: Mostra APENAS o que recebe do outro celular
     window.rtcCore.setDataChannelCallback((mensagem) => {
       console.log('📩 Mensagem recebida:', mensagem);
 
@@ -82,7 +78,7 @@ window.onload = async () => {
 
         utterance.onstart = () => {
           if (elemento) {
-            elemento.textContent = mensagem;
+            elemento.textContent = mensagem; // ✅ MOSTRA APENAS O QUE RECEBE
             setTimeout(() => {
               elemento.style.opacity = 1;
             }, 100);
@@ -131,16 +127,16 @@ window.onload = async () => {
 
     const navegadorLang = await obterIdiomaCompleto(navigator.language);
 
+    // ✅ MANTIDO: Tradução dos títulos da interface
     const frasesParaTraduzir = {
       "translator-label": "Live translation. No filters. No platform."
     };
 
-    // 📝 Tradução local da interface (sem envio)
     (async () => {
       for (const [id, texto] of Object.entries(frasesParaTraduzir)) {
         const el = document.getElementById(id);
         if (el) {
-          const traduzido = await translateText(texto, navegadorLang, false); // só local
+          const traduzido = await translateText(texto, navegadorLang);
           el.textContent = traduzido;
         }
       }
