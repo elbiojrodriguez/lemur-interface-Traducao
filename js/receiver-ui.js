@@ -98,7 +98,7 @@ window.onload = async () => {
             }
         }
 
-        // ✅ MANTIDO: Tradução das frases da interface (agora sem afetar o estilo)
+        // ✅ MANTIDO: Tradução dos títulos da interface (inglês → idioma local)
         const frasesParaTraduzir = {
             "translator-label": "Live translation. No filters. No platform.",
             "qr-modal-title": "This is your online key",
@@ -111,8 +111,6 @@ window.onload = async () => {
                 if (el) {
                     const traduzido = await translateText(texto, lang);
                     el.textContent = traduzido;
-                    // ✅ AGORA: Mantém as classes CSS originais para não perder o estilo
-                    el.classList.add('translated-text'); // Adiciona uma classe específica se necessário
                 }
             }
         })();
@@ -154,6 +152,7 @@ window.onload = async () => {
 
         aplicarBandeira(lang);
 
+        // ✅ CORRETO: Mostra APENAS o que recebe do outro celular
         window.rtcCore.setDataChannelCallback((mensagem) => {
             console.log('Mensagem recebida no receiver:', mensagem);
             
@@ -174,10 +173,10 @@ window.onload = async () => {
 
                 utterance.onstart = () => {
                     if (elemento) {
-                        elemento.textContent = mensagem;
+                        elemento.textContent = mensagem; // ✅ MOSTRA APENAS O QUE RECEBE
                         setTimeout(() => {
                             elemento.style.opacity = 1; // Faz o texto aparecer suavemente
-                        }, 100); // Pequeno delay para ativar a transição
+                        }, 100);
                     }
                 };
 
