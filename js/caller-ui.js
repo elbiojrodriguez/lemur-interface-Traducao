@@ -58,15 +58,20 @@ window.onload = async () => {
 
     window.rtcCore = new WebRTCCore();
 
-    // ✅ CORRETO: Mostra APENAS o que recebe do outro celular
+    // ✅ CORRETO: Box SEMPRE visível, apenas o texto muda com efeito suave
     window.rtcCore.setDataChannelCallback((mensagem) => {
       console.log('📩 Mensagem recebida:', mensagem);
 
       const elemento = document.getElementById('texto-recebido');
       if (elemento) {
-        elemento.textContent = "";
-        elemento.style.opacity = 0;
-        elemento.style.transition = "opacity 1s ease-in-out";
+        // Efeito de pulsação enquanto aguarda a voz
+        elemento.style.animation = 'pulsar 1s infinite';
+        
+        // Atualiza o texto IMEDIATAMENTE (box continua visível)
+        elemento.textContent = mensagem;
+        
+        // Remove qualquer transição de opacity anterior
+        elemento.style.opacity = '1';
       }
 
       if (window.SpeechSynthesis) {
@@ -78,10 +83,19 @@ window.onload = async () => {
 
         utterance.onstart = () => {
           if (elemento) {
-            elemento.textContent = mensagem; // ✅ MOSTRA APENAS O QUE RECEBE
+            // Para a pulsação quando a voz começa
+            elemento.style.animation = 'none';
+          }
+        };
+
+        utterance.onend = () => {
+          if (elemento) {
+            // Efeito final suave quando a voz termina
+            elemento.style.transition = 'all 0.5s ease';
+            elemento.style.transform = 'scale(1.05)';
             setTimeout(() => {
-              elemento.style.opacity = 1;
-            }, 100);
+              elemento.style.transform = 'scale(1)';
+            }, 500);
           }
         };
 
