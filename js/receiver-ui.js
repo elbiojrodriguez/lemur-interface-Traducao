@@ -115,7 +115,7 @@ window.onload = async () => {
 
         // ✅ MANTIDO: Tradução dos títulos da interface (inglês → idioma local)
         const frasesParaTraduzir = {
-            "translator-label": "Real-Time Translation",
+            "translator-label": "Real-time Translation.",
             "qr-modal-title": "This is your online key",
             "qr-modal-description": "You can ask to scan, share or print on your business card."
         };
