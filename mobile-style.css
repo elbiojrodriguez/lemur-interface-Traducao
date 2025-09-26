@@ -27,6 +27,7 @@ body {
 }
 
 /* ESTILO PARA O ELEMENTO QUE EXIBE MENSAGENS RECEBIDAS */
+
 #texto-recebido {
   position: absolute;
   top:65%;
@@ -63,10 +64,11 @@ body {
 }
 
 /* ===== ESTILOS CORRIGIDOS PARA O BOTÃO DO GLOBO ===== */
+
 .world-wrapper {
   position: absolute;
-  top: 43%;
-  left: 83%;
+  top: 40%;
+  left: 71%;
   z-index: 30;
 }
 
@@ -98,18 +100,18 @@ body {
 /* 🏳️ Bandeira */
 .language-flag {
   position: absolute;
-  top: 40%;
-  left: 65%;
+  top: 51%;
+  left: 83.6%;
   font-size: 2rem;
-  z-index: 30;
+  z-index: 40;
 }
 
 .record-btn {
   position: absolute;
   top: 46.5%;
-  left: 82%;
-  width: 60px;
-  height: 60px;
+  left: 81%;
+  width: 65px;
+  height: 65px;
   border-radius: 50%;
   background: #219ebc;
   display: flex;
@@ -128,6 +130,7 @@ body {
 }
 
 /* Para diferenciar caller vs receiver */
+
 caller.html #texto-recebido {
   border-color: #2196F3; /* Azul para caller */
   background-color: #e3f2fd;
@@ -176,6 +179,7 @@ receiver.html #texto-recebido {
 }
 
 /* ===== VÍDEO REMOTO ===== */
+
 .video-wrapper {
   position: absolute;
   bottom: 45%;               /* 20% da altura da box */
@@ -197,6 +201,7 @@ receiver.html #texto-recebido {
 }
 
 /* ===== PiP LOCAL ===== */
+
 .pip-local-wrapper {
   position: absolute;
   bottom: 5%;
@@ -217,6 +222,7 @@ receiver.html #texto-recebido {
 }
 
 /* ===== CIRCULO DA BANDEIRA ===== */
+
 .remoter-Lang {
   position: absolute;
   top: 31%;
@@ -236,6 +242,7 @@ receiver.html #texto-recebido {
 }
 
 /* ===== CONTROLES ===== */
+
 .callActionBtn {
   position: absolute;
   top: 70%;               /* distância do topo */
@@ -254,6 +261,7 @@ receiver.html #texto-recebido {
 }
 
 /* ===== OVERLAY DE QR CODE ===== */
+
 .info-overlay {
   position: absolute;
   top: 23%;               /* distância do topo */
@@ -354,6 +362,7 @@ receiver.html #texto-recebido {
 }
 
 /* Modal de gravação */
+
 .recording-modal {
   position: fixed;
   bottom: -100%;
