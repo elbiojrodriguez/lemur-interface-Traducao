@@ -448,17 +448,8 @@ receiver.html #texto-recebido {
   100% { opacity: 1; }
 }
 
-@keyframes pulsar-suave {
-  0% { 
-    box-shadow: 0 0 5px rgba(76, 175, 80, 0.5);
-    background-color: rgba(76, 175, 80, 0.1);
-  }
-  50% { 
-    box-shadow: 0 0 20px rgba(76, 175, 80, 0.8);
-    background-color: rgba(76, 175, 80, 0.2);
-  }
-  100% { 
-    box-shadow: 0 0 5px rgba(76, 175, 80, 0.5);
-    background-color: rgba(76, 175, 80, 0.1);
-  }
+@keyframes pulsar {
+  0% { transform: scale(1); opacity: 0.8; }
+  50% { transform: scale(1.02); opacity: 1; }
+  100% { transform: scale(1); opacity: 0.8; }
 }
