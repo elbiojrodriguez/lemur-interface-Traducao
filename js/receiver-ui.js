@@ -2,7 +2,7 @@ import { WebRTCCore } from '../core/webrtc-core.js';
 import { QRCodeGenerator } from './qr-code-utils.js';
 
 window.onload = async () => {
-    // ✅ Mostra loading imediatamente
+    // ✅ Loading aparece automaticamente pelo CSS
     const loadingOverlay = document.getElementById('loadingOverlay');
     
     try {
@@ -178,7 +178,7 @@ window.onload = async () => {
             }
         });
 
-        // ✅ FINALMENTE: Esconde o loading - SEM DELAY
+        // ✅ FINALMENTE: Esconde o loading - SIMPLES E DIRETO
         if (loadingOverlay) {
             loadingOverlay.classList.add('hidden');
         }
