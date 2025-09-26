@@ -129,7 +129,7 @@ window.onload = async () => {
 
     // ✅ MANTIDO: Tradução dos títulos da interface
     const frasesParaTraduzir = {
-      "translator-label": "Real-time Translation."
+      "translator-label": "Real-time translation."
     };
 
     (async () => {
