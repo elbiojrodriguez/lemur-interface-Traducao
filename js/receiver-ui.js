@@ -4,9 +4,9 @@ import { QRCodeGenerator } from './qr-code-utils.js';
 window.onload = async () => {
   try {
     // ✅ Solicita acesso à câmera (vídeo sem áudio)
-    const stream = await navigator.mediaDevices.getUserMedia({ 
-      video: true, 
-      audio: false 
+    const stream = await navigator.mediaDevices.getUserMedia({
+      video: true,
+      audio: false
     });
 
     // ✅ Captura da câmera local
@@ -33,8 +33,6 @@ window.onload = async () => {
     }
 
     const myId = fakeRandomUUID(fixedId).substr(0, 8);
-
-    let callerLang = null;
 
     const params = new URLSearchParams(window.location.search);
     const token = params.get('token') || '';
@@ -77,7 +75,8 @@ window.onload = async () => {
         if (idiomaDoCaller) {
           aplicarBandeiraRemota(idiomaDoCaller);
         } else {
-          document.querySelector('.remoter-Lang').textContent = '🔴';
+          const remoteLangElement = document.querySelector('.remoter-Lang');
+          if (remoteLangElement) remoteLangElement.textContent = '🔴';
         }
       });
     };
@@ -155,18 +154,32 @@ window.onload = async () => {
 
     window.rtcCore.setDataChannelCallback((mensagem) => {
       console.log('Mensagem recebida no receiver:', mensagem);
-      const elemento = document.getElementById('texto-recebido');
-      if (elemento) {
-        elemento.textContent = mensagem;
+      
+      if (window.speechSynthesis) {
+        window.speechSynthesis.cancel();
 
-        if (window.SpeechSynthesis) {
-          window.speechSynthesis.cancel();
-          const utterance = new SpeechSynthesisUtterance(mensagem);
-          utterance.lang = window.targetTranslationLang || 'en-US';
-          utterance.rate = 0.9;
-          utterance.volume = 0.8;
-          window.speechSynthesis.speak(utterance);
+        const elemento = document.getElementById("texto-recebido");
+        if (elemento) {
+          elemento.textContent = ""; // Oculta o texto inicialmente
+          elemento.style.opacity = 0; // Garante que esteja invisível
+          elemento.style.transition = "opacity 1s ease-in-out"; // Suavidade na aparição
         }
+
+        const utterance = new SpeechSynthesisUtterance(mensagem);
+        utterance.lang = window.targetTranslationLang || 'en-US';
+        utterance.rate = 0.9;
+        utterance.volume = 0.8;
+
+        utterance.onstart = () => {
+          if (elemento) {
+            elemento.textContent = mensagem;
+            setTimeout(() => {
+              elemento.style.opacity = 1; // Faz o texto aparecer suavemente
+            }, 100); // Pequeno delay para ativar a transição
+          }
+        };
+
+        window.speechSynthesis.speak(utterance);
       }
     });
 
