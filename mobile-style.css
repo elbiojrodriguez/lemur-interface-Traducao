@@ -68,7 +68,7 @@ body {
 .world-wrapper {
   position: absolute;
   top: 40%;
-  left: 70%;
+  left: 69%;
   z-index: 30;
 }
 
@@ -109,7 +109,7 @@ body {
 .record-btn {
   position: absolute;
   top: 46%;
-  left: 80%;
+  left: 78%;
   width: 65px;
   height: 65px;
   border-radius: 50%;
