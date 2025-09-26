@@ -1,3 +1,14 @@
+// ✅ Função para enviar e preparar leitura remota com suavidade
+function enviarParaOutroCelular(texto) {
+  if (window.rtcDataChannel && window.rtcDataChannel.isOpen()) {
+    window.rtcDataChannel.send(texto);
+    console.log('✅ Texto enviado:', texto);
+  } else {
+    console.log('⏳ Canal não disponível ainda. Tentando novamente...');
+    setTimeout(() => enviarParaOutroCelular(texto), 1000);
+  }
+}
+
 // 📦 Importa o núcleo WebRTC
 import { WebRTCCore } from '../core/webrtc-core.js';
 
@@ -61,23 +72,35 @@ window.onload = async () => {
    let localStream = stream;
    document.getElementById('localVideo').srcObject = localStream;
 
-
     window.rtcCore = new WebRTCCore();
 
     window.rtcCore.setDataChannelCallback((mensagem) => {
-      console.log('Mensagem recebida:', mensagem);
+      console.log('📩 Mensagem recebida:', mensagem);
+
       const elemento = document.getElementById('texto-recebido');
       if (elemento) {
-        elemento.textContent = mensagem;
+        elemento.textContent = "";
+        elemento.style.opacity = 0;
+        elemento.style.transition = "opacity 1s ease-in-out";
+      }
 
-        if (window.SpeechSynthesis) {
-          window.speechSynthesis.cancel();
-          const utterance = new SpeechSynthesisUtterance(mensagem);
-          utterance.lang = window.targetTranslationLang || 'pt-BR';
-          utterance.rate = 0.9;
-          utterance.volume = 0.8;
-          window.speechSynthesis.speak(utterance);
-        }
+      if (window.SpeechSynthesis) {
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(mensagem);
+        utterance.lang = window.targetTranslationLang || 'pt-BR';
+        utterance.rate = 0.9;
+        utterance.volume = 0.8;
+
+        utterance.onstart = () => {
+          if (elemento) {
+            elemento.textContent = mensagem;
+            setTimeout(() => {
+              elemento.style.opacity = 1;
+            }, 100);
+          }
+        };
+
+        window.speechSynthesis.speak(utterance);
       }
     });
 
