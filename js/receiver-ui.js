@@ -80,6 +80,43 @@ window.onload = async () => {
             });
         };
 
+        const TRANSLATE_ENDPOINT = 'https://chat-tradutor.onrender.com/translate';
+
+        async function translateText(text, targetLang) {
+            try {
+                const response = await fetch(TRANSLATE_ENDPOINT, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text, targetLang })
+                });
+
+                const result = await response.json();
+                return result.translatedText || text;
+            } catch (error) {
+                console.error('Erro na tradução:', error);
+                return text;
+            }
+        }
+
+        // ✅ MANTIDO: Tradução das frases da interface (agora sem afetar o estilo)
+        const frasesParaTraduzir = {
+            "translator-label": "Live translation. No filters. No platform.",
+            "qr-modal-title": "This is your online key",
+            "qr-modal-description": "You can ask to scan, share or print on your business card."
+        };
+
+        (async () => {
+            for (const [id, texto] of Object.entries(frasesParaTraduzir)) {
+                const el = document.getElementById(id);
+                if (el) {
+                    const traduzido = await translateText(texto, lang);
+                    el.textContent = traduzido;
+                    // ✅ AGORA: Mantém as classes CSS originais para não perder o estilo
+                    el.classList.add('translated-text'); // Adiciona uma classe específica se necessário
+                }
+            }
+        })();
+
         async function aplicarBandeira(langCode) {
             try {
                 const response = await fetch('assets/bandeiras/language-flags.json');
