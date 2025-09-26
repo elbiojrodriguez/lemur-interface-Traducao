@@ -10,24 +10,24 @@ function enviarParaOutroCelular(texto) {
 }
 
 async function translateText(text) {
-  try {
-    const response = await fetch('https://chat-tradutor.onrender.com/translate', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ 
-        text: text,
-        sourceLang: window.sourceTranslationLang || 'auto',
-        targetLang: window.targetTranslationLang || 'en'
-      })
-    });
+    try {
+        const response = await fetch('https://chat-tradutor.onrender.com/translate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                text: text,
+                sourceLang: window.sourceTranslationLang || 'auto',
+                targetLang: window.targetTranslationLang || 'en'
+            })
+        });
 
-    const result = await response.json();
-    const translatedText = result.translatedText || text;
-    return translatedText;
-    
-  } catch (error) {
-    return text;
-  }
+        const result = await response.json();
+        const translatedText = result.translatedText || text;
+        return translatedText;
+        
+    } catch (error) {
+        return text;
+    }
 }
 
 // ===== INICIALIZAÇÃO DO BOTÃO MUNDO (INDEPENDENTE) =====
@@ -196,31 +196,33 @@ function initializeTranslator() {
                 }
             }
             
-            if (interimTranscript && !finalTranscript) {
-                if (translatedText) {
-                    translatedText.textContent = interimTranscript;
-                }
+            // ✅ CORREÇÃO: NUNCA mostra o que estou falando, apenas o ícone
+            if (translatedText) {
+                translatedText.textContent = "🎤"; // Mantém apenas o ícone
             }
             
+            // ✅ CORREÇÃO: Processo totalmente silencioso
             if (finalTranscript && !isTranslating) {
                 const now = Date.now();
                 if (now - lastTranslationTime > 1000) {
                     lastTranslationTime = now;
                     isTranslating = true;
                     
-                    if (translatedText) {
-                        translatedText.textContent = "⏳";
-                    }
-                    
+                    // ✅ Traduz e envia SEM MOSTRAR o processo
                     translateText(finalTranscript).then(translation => {
+                        enviarParaOutroCelular(translation); // Envia silenciosamente
+                        
+                        // ✅ Apenas confirmação visual breve
                         if (translatedText) {
-                            translatedText.textContent = translation;
-                            enviarParaOutroCelular(translation);
+                            translatedText.textContent = "✅";
+                            setTimeout(() => {
+                                if (translatedText) translatedText.textContent = "🎤";
+                            }, 500);
                         }
                         isTranslating = false;
                     }).catch(error => {
                         console.error('Erro na tradução:', error);
-                        if (translatedText) translatedText.textContent = "❌";
+                        if (translatedText) translatedText.textContent = "🎤";
                         isTranslating = false;
                     });
                 }
@@ -316,9 +318,11 @@ function initializeTranslator() {
             isSpeechPlaying = false;
             if (speakerButton) speakerButton.textContent = '🔊';
         } else {
-            if (translatedText) {
-                const textToSpeak = translatedText.textContent;
-                if (textToSpeak && textToSpeak !== "🎤" && textToSpeak !== "⏳" && textToSpeak !== "❌") {
+            // ✅ CORREÇÃO: Lê apenas o texto recebido (não o que eu falo)
+            const textoRecebido = document.getElementById("texto-recebido");
+            if (textoRecebido && textoRecebido.textContent) {
+                const textToSpeak = textoRecebido.textContent;
+                if (textToSpeak && textToSpeak.trim() !== "") {
                     speakText(textToSpeak);
                 }
             }
@@ -363,7 +367,7 @@ function initializeTranslator() {
         hideRecordingModal();
         
         if (translatedText && !isTranslating) {
-            translatedText.textContent = "⏳";
+            translatedText.textContent = "🎤";
         }
     }
     
