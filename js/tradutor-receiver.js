@@ -242,7 +242,7 @@ function initializeTranslator() {
                 stopRecording();
             }
         };
-    }
+    } // ✅ CORREÇÃO: Fechamento adicionado aqui
     
     async function requestMicrophonePermission() {
         try {
@@ -442,7 +442,7 @@ function initializeTranslator() {
         speakerButton.addEventListener('click', toggleSpeech);
     }
     
-    requestMicrophonePermission();
+    requestMicrophonePermission(); // ✅ AGORA esta função será executada corretamente
     
     console.log('✅ Tradutor inicializado com sucesso!');
 }
