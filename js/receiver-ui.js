@@ -2,7 +2,18 @@ import { WebRTCCore } from '../core/webrtc-core.js';
 import { QRCodeGenerator } from './qr-code-utils.js';
 
 window.onload = async () => {
+    // ✅ Mostra loading imediatamente
+    const loadingOverlay = document.getElementById('loadingOverlay');
+    const loadingText = document.getElementById('loadingText');
+    const boxPrincipal = document.querySelector('.box-principal');
+    
+    // Esconde conteúdo principal
+    if (boxPrincipal) boxPrincipal.style.opacity = '0';
+    
     try {
+        // Atualiza texto do loading
+        if (loadingText) loadingText.textContent = 'Solicitando permissões...';
+        
         // ✅ Solicita acesso à câmera (vídeo sem áudio)
         const stream = await navigator.mediaDevices.getUserMedia({
             video: true,
@@ -20,6 +31,8 @@ window.onload = async () => {
 
         // ✅ Inicializa WebRTC
         window.rtcCore = new WebRTCCore();
+
+        if (loadingText) loadingText.textContent = 'Conectando servidor...';
 
         const url = window.location.href;
         const fixedId = url.split('?')[1] || crypto.randomUUID().substr(0, 8);
@@ -45,6 +58,8 @@ window.onload = async () => {
 
         window.rtcCore.initialize(myId);
         window.rtcCore.setupSocketHandlers();
+
+        if (loadingText) loadingText.textContent = 'Configurando tradução...';
 
         window.rtcCore.onIncomingCall = (offer, idiomaDoCaller) => {
             if (!localStream) return;
@@ -100,7 +115,7 @@ window.onload = async () => {
 
         // ✅ MANTIDO: Tradução dos títulos da interface (inglês → idioma local)
         const frasesParaTraduzir = {
-            "translator-label": "Real-time Translation",
+            "translator-label": "Real-Time Translation",
             "qr-modal-title": "This is your online key",
             "qr-modal-description": "You can ask to scan, share or print on your business card."
         };
@@ -190,9 +205,32 @@ window.onload = async () => {
             }
         }, 1000);
 
+        // ✅ QUANDO TUDO ESTIVER PRONTO, ESCONDE LOADING
+        setTimeout(() => {
+            if (loadingOverlay) {
+                loadingOverlay.classList.add('hidden');
+            }
+            if (boxPrincipal) {
+                boxPrincipal.classList.add('loaded');
+            }
+            
+            console.log('✅ Sistema totalmente carregado e pronto!');
+        }, 1000); // Pequeno delay para garantir que tudo carregou
+
     } catch (error) {
         console.error("Erro ao solicitar acesso à câmera:", error);
-        alert("Erro ao acessar a câmera. Verifique as permissões.");
+        
+        // Mostra erro no loading
+        if (loadingText) {
+            loadingText.textContent = 'Erro ao carregar. Verifique as permissões.';
+            loadingText.style.color = '#ff6b6b';
+        }
+        
+        setTimeout(() => {
+            if (loadingOverlay) loadingOverlay.classList.add('hidden');
+            alert("Erro ao acessar a câmera. Verifique as permissões.");
+        }, 3000);
+        
         return;
     }
 };
