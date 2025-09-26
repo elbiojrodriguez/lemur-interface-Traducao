@@ -4,16 +4,8 @@ import { QRCodeGenerator } from './qr-code-utils.js';
 window.onload = async () => {
     // ✅ Mostra loading imediatamente
     const loadingOverlay = document.getElementById('loadingOverlay');
-    const loadingText = document.getElementById('loadingText');
-    const boxPrincipal = document.querySelector('.box-principal');
-    
-    // Esconde conteúdo principal
-    if (boxPrincipal) boxPrincipal.style.opacity = '0';
     
     try {
-        // Atualiza texto do loading
-        if (loadingText) loadingText.textContent = 'Solicitando permissões...';
-        
         // ✅ Solicita acesso à câmera (vídeo sem áudio)
         const stream = await navigator.mediaDevices.getUserMedia({
             video: true,
@@ -23,7 +15,7 @@ window.onload = async () => {
         // ✅ Captura da câmera local
         let localStream = stream;
 
-        // ✅ Exibe vídeo local no PiP azul
+        // ✅ Exibe vídeo local
         const localVideo = document.getElementById('localVideo');
         if (localVideo) {
             localVideo.srcObject = localStream;
@@ -31,8 +23,6 @@ window.onload = async () => {
 
         // ✅ Inicializa WebRTC
         window.rtcCore = new WebRTCCore();
-
-        if (loadingText) loadingText.textContent = 'Conectando servidor...';
 
         const url = window.location.href;
         const fixedId = url.split('?')[1] || crypto.randomUUID().substr(0, 8);
@@ -58,8 +48,6 @@ window.onload = async () => {
 
         window.rtcCore.initialize(myId);
         window.rtcCore.setupSocketHandlers();
-
-        if (loadingText) loadingText.textContent = 'Configurando tradução...';
 
         window.rtcCore.onIncomingCall = (offer, idiomaDoCaller) => {
             if (!localStream) return;
@@ -113,7 +101,7 @@ window.onload = async () => {
             }
         }
 
-        // ✅ MANTIDO: Tradução dos títulos da interface (inglês → idioma local)
+        // ✅ Tradução dos títulos
         const frasesParaTraduzir = {
             "translator-label": "Real-time Translation.",
             "qr-modal-title": "This is your online key",
@@ -134,15 +122,10 @@ window.onload = async () => {
             try {
                 const response = await fetch('assets/bandeiras/language-flags.json');
                 const flags = await response.json();
-
                 const bandeira = flags[langCode] || flags[langCode.split('-')[0]] || '🔴';
-
-                const localLangElement = document.querySelector('.local-mic-Lang');
-                if (localLangElement) localLangElement.textContent = bandeira;
 
                 const localLangDisplay = document.querySelector('.local-Lang');
                 if (localLangDisplay) localLangDisplay.textContent = bandeira;
-
             } catch (error) {
                 console.error('Erro ao carregar bandeira local:', error);
             }
@@ -152,22 +135,18 @@ window.onload = async () => {
             try {
                 const response = await fetch('assets/bandeiras/language-flags.json');
                 const flags = await response.json();
-
                 const bandeira = flags[langCode] || flags[langCode.split('-')[0]] || '🔴';
 
                 const remoteLangElement = document.querySelector('.remoter-Lang');
                 if (remoteLangElement) remoteLangElement.textContent = bandeira;
-
             } catch (error) {
                 console.error('Erro ao carregar bandeira remota:', error);
-                const remoteLangElement = document.querySelector('.remoter-Lang');
-                if (remoteLangElement) remoteLangElement.textContent = '🔴';
             }
         }
 
         aplicarBandeira(lang);
 
-        // ✅ CORRETO: Mostra APENAS o que recebe do outro celular
+        // ✅ Data channel callback
         window.rtcCore.setDataChannelCallback((mensagem) => {
             console.log('Mensagem recebida no receiver:', mensagem);
             
@@ -176,9 +155,9 @@ window.onload = async () => {
 
                 const elemento = document.getElementById("texto-recebido");
                 if (elemento) {
-                    elemento.textContent = ""; // Oculta o texto inicialmente
-                    elemento.style.opacity = 0; // Garante que esteja invisível
-                    elemento.style.transition = "opacity 1s ease-in-out"; // Suavidade na aparição
+                    elemento.textContent = "";
+                    elemento.style.opacity = 0;
+                    elemento.style.transition = "opacity 1s ease-in-out";
                 }
 
                 const utterance = new SpeechSynthesisUtterance(mensagem);
@@ -188,9 +167,9 @@ window.onload = async () => {
 
                 utterance.onstart = () => {
                     if (elemento) {
-                        elemento.textContent = mensagem; // ✅ MOSTRA APENAS O QUE RECEBE
+                        elemento.textContent = mensagem;
                         setTimeout(() => {
-                            elemento.style.opacity = 1; // Faz o texto aparecer suavemente
+                            elemento.style.opacity = 1;
                         }, 100);
                     }
                 };
@@ -199,38 +178,20 @@ window.onload = async () => {
             }
         });
 
-        setTimeout(() => {
-            if (typeof initializeTranslator === 'function') {
-                initializeTranslator();
-            }
-        }, 1000);
-
-        // ✅ QUANDO TUDO ESTIVER PRONTO, ESCONDE LOADING
-        setTimeout(() => {
-            if (loadingOverlay) {
-                loadingOverlay.classList.add('hidden');
-            }
-            if (boxPrincipal) {
-                boxPrincipal.classList.add('loaded');
-            }
-            
-            console.log('✅ Sistema totalmente carregado e pronto!');
-        }, 1000); // Pequeno delay para garantir que tudo carregou
-
-    } catch (error) {
-        console.error("Erro ao solicitar acesso à câmera:", error);
-        
-        // Mostra erro no loading
-        if (loadingText) {
-            loadingText.textContent = 'Erro ao carregar. Verifique as permissões.';
-            loadingText.style.color = '#ff6b6b';
+        // ✅ FINALMENTE: Esconde o loading - SEM DELAY
+        if (loadingOverlay) {
+            loadingOverlay.classList.add('hidden');
         }
         
-        setTimeout(() => {
-            if (loadingOverlay) loadingOverlay.classList.add('hidden');
-            alert("Erro ao acessar a câmera. Verifique as permissões.");
-        }, 3000);
+        console.log('✅ Sistema carregado! QR Code gerado!');
+
+    } catch (error) {
+        console.error("Erro:", error);
         
-        return;
+        // Em caso de erro, também esconde o loading
+        if (loadingOverlay) {
+            loadingOverlay.classList.add('hidden');
+        }
+        alert("Erro ao carregar. Verifique as permissões.");
     }
 };
