@@ -59,35 +59,42 @@ window.onload = async () => {
     window.rtcCore = new WebRTCCore();
 
     // ✅ CORRETO: Box SEMPRE visível e fixo, frase só aparece com a voz
-    window.rtcCore.setDataChannelCallback((mensagem) => {
-      console.log('📩 Mensagem recebida:', mensagem);
+window.rtcCore.setDataChannelCallback((mensagem) => {
+  console.log('📩 Mensagem recebida:', mensagem);
 
-      const elemento = document.getElementById('texto-recebido');
+  const elemento = document.getElementById('texto-recebido');
+  if (elemento) {
+    // Box SEMPRE visível, mas texto vazio inicialmente
+    elemento.textContent = ""; // ← TEXTO FICA VAZIO NO INÍCIO
+    elemento.style.opacity = '1'; // ← BOX SEMPRE VISÍVEL
+    elemento.style.transition = 'opacity 0.5s ease'; // ← Transição suave
+    
+    // ✅ ADICIONE AQUI A PULSAÇÃO:
+    elemento.style.animation = 'pulsar-suave 1.5s infinite';
+    elemento.style.backgroundColor = 'rgba(76, 175, 80, 0.2)'; // Verde bem fraquinho
+  }
+
+  if (window.SpeechSynthesis) {
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(mensagem);
+    utterance.lang = window.targetTranslationLang || 'pt-BR';
+    utterance.rate = 0.9;
+    utterance.volume = 0.8;
+
+    utterance.onstart = () => {
       if (elemento) {
-        // Box SEMPRE visível, mas texto vazio inicialmente
-        elemento.textContent = ""; // ← TEXTO FICA VAZIO NO INÍCIO
-        elemento.style.opacity = '1'; // ← BOX SEMPRE VISÍVEL
-        elemento.style.transition = 'opacity 0.5s ease'; // ← Transição suave
+        // ✅ ADICIONE AQUI PARA PARAR A PULSAÇÃO:
+        elemento.style.animation = 'none';
+        elemento.style.backgroundColor = 'white'; // Volta ao branco original
+        
+        // SÓ MOSTRA O TEXTO QUANDO A VOZ COMEÇA
+        elemento.textContent = mensagem;
       }
+    };
 
-      if (window.SpeechSynthesis) {
-        window.speechSynthesis.cancel();
-        const utterance = new SpeechSynthesisUtterance(mensagem);
-        utterance.lang = window.targetTranslationLang || 'pt-BR';
-        utterance.rate = 0.9;
-        utterance.volume = 0.8;
-
-        utterance.onstart = () => {
-          if (elemento) {
-            // SÓ MOSTRA O TEXTO QUANDO A VOZ COMEÇA
-            elemento.textContent = mensagem;
-          }
-        };
-
-        window.speechSynthesis.speak(utterance);
-      }
-    });
-
+    window.speechSynthesis.speak(utterance);
+  }
+});
     const myId = crypto.randomUUID().substr(0, 8);
     document.getElementById('myId').textContent = myId;
 
