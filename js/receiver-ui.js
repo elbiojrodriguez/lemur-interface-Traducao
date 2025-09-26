@@ -152,7 +152,7 @@ window.onload = async () => {
 
         aplicarBandeira(lang);
 
-        // ✅ CORRIGIDO: Mostra APENAS o que recebe do outro celular
+        // ✅ CORRETO: Mostra APENAS o que recebe do outro celular
         window.rtcCore.setDataChannelCallback((mensagem) => {
             console.log('Mensagem recebida no receiver:', mensagem);
             
@@ -161,9 +161,9 @@ window.onload = async () => {
 
                 const elemento = document.getElementById("texto-recebido");
                 if (elemento) {
-                    elemento.textContent = "";
-                    elemento.style.opacity = 0;
-                    elemento.style.transition = "opacity 1s ease-in-out";
+                    elemento.textContent = ""; // Oculta o texto inicialmente
+                    elemento.style.opacity = 0; // Garante que esteja invisível
+                    elemento.style.transition = "opacity 1s ease-in-out"; // Suavidade na aparição
                 }
 
                 const utterance = new SpeechSynthesisUtterance(mensagem);
@@ -173,9 +173,9 @@ window.onload = async () => {
 
                 utterance.onstart = () => {
                     if (elemento) {
-                        elemento.textContent = mensagem;
+                        elemento.textContent = mensagem; // ✅ MOSTRA APENAS O QUE RECEBE
                         setTimeout(() => {
-                            elemento.style.opacity = 1;
+                            elemento.style.opacity = 1; // Faz o texto aparecer suavemente
                         }, 100);
                     }
                 };
