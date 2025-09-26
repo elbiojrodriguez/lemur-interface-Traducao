@@ -152,7 +152,7 @@ window.onload = async () => {
 
         aplicarBandeira(lang);
 
-        // ✅ CORRETO: Mostra APENAS o que recebe do outro celular
+        // ✅ CORRIGIDO: Mostra APENAS o que recebe do outro celular
         window.rtcCore.setDataChannelCallback((mensagem) => {
             console.log('Mensagem recebida no receiver:', mensagem);
             
@@ -160,28 +160,27 @@ window.onload = async () => {
                 window.speechSynthesis.cancel();
 
                 const elemento = document.getElementById("texto-recebido");
-if (elemento) {
-  elemento.textContent = "";
-  elemento.style.opacity = 0;
-  elemento.style.transition = "opacity 1s ease-in-out";
-}
+                if (elemento) {
+                    elemento.textContent = "";
+                    elemento.style.opacity = 0;
+                    elemento.style.transition = "opacity 1s ease-in-out";
+                }
 
-const utterance = new SpeechSynthesisUtterance(mensagem);
-utterance.lang = window.targetTranslationLang || 'en-US';
-utterance.rate = 0.9;
-utterance.volume = 0.8;
+                const utterance = new SpeechSynthesisUtterance(mensagem);
+                utterance.lang = window.targetTranslationLang || 'en-US';
+                utterance.rate = 0.9;
+                utterance.volume = 0.8;
 
-utterance.onstart = () => {
-  if (elemento) {
-    elemento.textContent = mensagem;
-    setTimeout(() => {
-      elemento.style.opacity = 1;
-    }, 100);
-  }
-};
+                utterance.onstart = () => {
+                    if (elemento) {
+                        elemento.textContent = mensagem;
+                        setTimeout(() => {
+                            elemento.style.opacity = 1;
+                        }, 100);
+                    }
+                };
 
-window.speechSynthesis.speak(utterance);
-
+                window.speechSynthesis.speak(utterance);
             }
         });
 
