@@ -99,10 +99,9 @@ body {
 .record-btn {
   position: absolute;
   top: 46.5%;
-  left: 82%; 
-  aspect-ratio: 1 / 1;
-  width: 10%;
-  height: 10%;
+  left: 82%;
+  width: 60px;
+  height: 60px;
   border-radius: 50%;
   background: #219ebc;
   display: flex;
