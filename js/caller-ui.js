@@ -106,17 +106,16 @@ window.onload = async () => {
       lang: receiverLang
     };
 
+    // ✅ AUTOMATIZADO - inicia chamada automaticamente quando tem receiverId
     if (receiverId) {
-      document.getElementById('callActionBtn').style.display = 'block';
-
-      document.getElementById('callActionBtn').onclick = async () => {
-        if (localStream) {
-          const meuIdioma = await obterIdiomaCompleto(navigator.language);
-          console.log('🚀 Idioma do Caller sendo enviado:', meuIdioma);
-          alert(`📞 Enviando meu idioma: ${meuIdioma}`);
-          window.rtcCore.startCall(receiverId, localStream, meuIdioma);
-        }
-      };
+      document.getElementById('callActionBtn').style.display = 'none'; // Esconde o botão
+      
+      // Inicia chamada automaticamente
+      if (localStream) {
+        const meuIdioma = await obterIdiomaCompleto(navigator.language);
+        console.log('🚀 Chamada automática iniciada. Idioma:', meuIdioma);
+        window.rtcCore.startCall(receiverId, localStream, meuIdioma);
+      }
     }
 
     window.rtcCore.setRemoteStreamCallback(stream => {
