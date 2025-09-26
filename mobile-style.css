@@ -50,6 +50,7 @@ body {
   opacity: 1;
   visibility: visible;
   box-sizing: border-box;
+  z-index: 30;
 }
 
 #logo-traduz {
@@ -60,7 +61,7 @@ body {
   width: 15%;
   max-width: 120px;
   height: auto;
-  z-index: 50;
+  z-index: 40;
 }
 
 /* 🌍 Mundinho */
@@ -79,7 +80,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 50;
+  z-index: 30;
 }
 
 .world-btn:hover {
@@ -95,11 +96,11 @@ body {
   z-index: 30;
 }
 
-/* 🎤 Microfone */
 .record-btn {
   position: absolute;
   top: 46.5%;
-  left: 82%;
+  left: 82%; 
+  aspect-ratio: 1 / 1;
   width: 10%;
   height: 10%;
   border-radius: 50%;
@@ -247,7 +248,7 @@ receiver.html #texto-recebido {
   cursor: pointer;
   backdrop-filter: blur(6px);
   background: #4CAF50;
-  z-index: 9999
+  z-index: 1000
 }
 
 /* ===== OVERLAY DE QR CODE ===== */
@@ -261,7 +262,7 @@ receiver.html #texto-recebido {
   border-radius: 20px;    /* cantos arredondados */
   padding: 2% 3%;         /* espaçamento interno */
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* sombra suave */
-  z-index: 30;
+  z-index: 50;
   text-align: center;
 }
 
