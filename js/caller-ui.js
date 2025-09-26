@@ -1,14 +1,3 @@
-// ✅ Função para enviar e preparar leitura remota com suavidade
-function enviarParaOutroCelular(texto) {
-  if (window.rtcDataChannel && window.rtcDataChannel.isOpen()) {
-    window.rtcDataChannel.send(texto);
-    console.log('✅ Texto enviado:', texto);
-  } else {
-    console.log('⏳ Canal não disponível ainda. Tentando novamente...');
-    setTimeout(() => enviarParaOutroCelular(texto), 1000);
-  }
-}
-
 // 📦 Importa o núcleo WebRTC
 import { WebRTCCore } from '../core/webrtc-core.js';
 
