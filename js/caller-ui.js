@@ -58,7 +58,7 @@ window.onload = async () => {
 
     window.rtcCore = new WebRTCCore();
 
-    // ✅ CORRETO: Box pulsando enquanto aguarda, frase só aparece com a voz
+    // ✅ CORRETO: Box SEMPRE visível e fixo, frase só aparece com a voz
     window.rtcCore.setDataChannelCallback((mensagem) => {
       console.log('📩 Mensagem recebida:', mensagem);
 
@@ -67,10 +67,7 @@ window.onload = async () => {
         // Box SEMPRE visível, mas texto vazio inicialmente
         elemento.textContent = ""; // ← TEXTO FICA VAZIO NO INÍCIO
         elemento.style.opacity = '1'; // ← BOX SEMPRE VISÍVEL
-        
-        // EFEITO DE PULSAÇÃO NO BOX (sem mexer na posição)
-        elemento.style.animation = 'pulsar-suave 1.5s infinite';
-        elemento.style.border = '2px solid #4CAF50'; // ← Destaque visual
+        elemento.style.transition = 'opacity 0.5s ease'; // ← Transição suave
       }
 
       if (window.SpeechSynthesis) {
@@ -82,11 +79,6 @@ window.onload = async () => {
 
         utterance.onstart = () => {
           if (elemento) {
-            // PARA A PULSAÇÃO quando a voz começa
-            elemento.style.animation = 'none';
-            elemento.style.border = 'none'; // ← Remove o destaque
-            elemento.style.transform = 'scale(1)';
-            
             // SÓ MOSTRA O TEXTO QUANDO A VOZ COMEÇA
             elemento.textContent = mensagem;
           }
