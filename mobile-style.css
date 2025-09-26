@@ -54,7 +54,7 @@ body {
 
 #logo-traduz {
   position: absolute;
-  top: 35%;
+  top: 53%;
   left: 50%;
   transform: translate(-50%, -50%);
   width: 15%;
@@ -100,7 +100,7 @@ body {
 /* 🏳️ Bandeira */
 .language-flag {
   position: absolute;
-  top: 51%;
+  top: 53%;
   left: 83.6%;
   font-size: 2rem;
   z-index: 40;
