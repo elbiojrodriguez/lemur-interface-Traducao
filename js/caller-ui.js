@@ -65,7 +65,8 @@ window.onload = async () => {
       const elemento = document.getElementById('texto-recebido');
       if (elemento) {
         elemento.textContent = "";
-        elemento.classList.remove("visible");
+        elemento.style.opacity = 0;
+        elemento.style.transition = "opacity 1s ease-in-out";
       }
 
       if (window.SpeechSynthesis) {
@@ -78,7 +79,9 @@ window.onload = async () => {
         utterance.onstart = () => {
           if (elemento) {
             elemento.textContent = mensagem; // ✅ MOSTRA APENAS O QUE RECEBE
-            elemento.classList.add("visible");
+            setTimeout(() => {
+              elemento.style.opacity = 1;
+            }, 100);
           }
         };
 
