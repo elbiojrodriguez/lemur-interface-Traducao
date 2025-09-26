@@ -160,27 +160,28 @@ window.onload = async () => {
                 window.speechSynthesis.cancel();
 
                 const elemento = document.getElementById("texto-recebido");
-                if (elemento) {
-                    elemento.textContent = ""; // Oculta o texto inicialmente
-                    elemento.style.opacity = 0; // Garante que esteja invisível
-                    elemento.style.transition = "opacity 1s ease-in-out"; // Suavidade na aparição
-                }
+if (elemento) {
+  elemento.textContent = "";
+  elemento.style.opacity = 0;
+  elemento.style.transition = "opacity 1s ease-in-out";
+}
 
-                const utterance = new SpeechSynthesisUtterance(mensagem);
-                utterance.lang = window.targetTranslationLang || 'en-US';
-                utterance.rate = 0.9;
-                utterance.volume = 0.8;
+const utterance = new SpeechSynthesisUtterance(mensagem);
+utterance.lang = window.targetTranslationLang || 'en-US';
+utterance.rate = 0.9;
+utterance.volume = 0.8;
 
-                utterance.onstart = () => {
-                    if (elemento) {
-                        elemento.textContent = mensagem; // ✅ MOSTRA APENAS O QUE RECEBE
-                        setTimeout(() => {
-                            elemento.style.opacity = 1; // Faz o texto aparecer suavemente
-                        }, 100);
-                    }
-                };
+utterance.onstart = () => {
+  if (elemento) {
+    elemento.textContent = mensagem;
+    setTimeout(() => {
+      elemento.style.opacity = 1;
+    }, 100);
+  }
+};
 
-                window.speechSynthesis.speak(utterance);
+window.speechSynthesis.speak(utterance);
+
             }
         });
 
