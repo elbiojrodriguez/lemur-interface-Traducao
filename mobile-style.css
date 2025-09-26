@@ -426,6 +426,7 @@ receiver.html #texto-recebido {
   background: #126782;
 }
 /* ===== LOADING ANIMADO ===== */
+/* ===== LOADING SIMPLES E EFICAZ ===== */
 .loading-overlay {
     position: fixed;
     top: 0;
@@ -434,56 +435,26 @@ receiver.html #texto-recebido {
     height: 100%;
     background: #aee2ff;
     display: flex;
-    flex-direction: column;
     align-items: center;
     justify-content: center;
     z-index: 9999;
-    transition: opacity 0.5s ease, visibility 0.5s ease;
 }
 
 .loading-overlay.hidden {
-    opacity: 0;
-    visibility: hidden;
+    display: none;
 }
 
 .loading-heart {
-    width: 80px;
-    height: 80px;
-    animation: heartbeat 1.5s ease-in-out infinite both;
-}
-
-.loading-text {
-    color: #219ebc;
-    font-size: 1.2rem;
-    margin-top: 20px;
-    font-weight: bold;
-    text-align: center;
+    width: 150px;
+    height: 150px;
+    animation: heartbeat 1.5s infinite;
 }
 
 @keyframes heartbeat {
-    from {
-        transform: scale(1);
-        transform-origin: center center;
-        animation-timing-function: ease-out;
-    }
-    10% {
-        transform: scale(0.91);
-        animation-timing-function: ease-in;
-    }
-    17% {
-        transform: scale(0.98);
-        animation-timing-function: ease-out;
-    }
-    33% {
-        transform: scale(0.87);
-        animation-timing-function: ease-in;
-    }
-    45% {
-        transform: scale(1);
-        animation-timing-function: ease-out;
-    }
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
 }
-
 /* Esconde o conteúdo principal inicialmente */
 .box-principal {
     opacity: 0;
