@@ -1,6 +1,44 @@
 import { WebRTCCore } from '../core/webrtc-core.js';
 import { QRCodeGenerator } from './qr-code-utils.js';
 
+// 🎯 FUNÇÃO PARA OBTER IDIOMA COMPLETO (igual ao caller)
+async function obterIdiomaCompleto(lang) {
+  if (!lang) return 'pt-BR';
+  if (lang.includes('-')) return lang;
+
+  try {
+    const response = await fetch('assets/bandeiras/language-flags.json');
+    const flags = await response.json();
+    const codigoCompleto = Object.keys(flags).find(key => key.startsWith(lang + '-'));
+    return codigoCompleto || `${lang}-${lang.toUpperCase()}`;
+  } catch (error) {
+    console.error('Erro ao carregar JSON de bandeiras:', error);
+    const fallback = {
+      'pt': 'pt-BR', 'es': 'es-ES', 'en': 'en-US',
+      'fr': 'fr-FR', 'de': 'de-DE', 'it': 'it-IT',
+      'ja': 'ja-JP', 'zh': 'zh-CN', 'ru': 'ru-RU'
+    };
+    return fallback[lang] || 'en-US';
+  }
+}
+
+// 🌐 Tradução apenas para texto (igual ao caller)
+async function translateText(text, targetLang) {
+  try {
+    const response = await fetch('https://chat-tradutor.onrender.com/translate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text, targetLang })
+    });
+
+    const result = await response.json();
+    return result.translatedText || text;
+  } catch (error) {
+    console.error('Erro na tradução:', error);
+    return text;
+  }
+}
+
 window.onload = async () => {
     try {
         // ✅ Solicita acesso à câmera (vídeo sem áudio)
@@ -46,6 +84,45 @@ window.onload = async () => {
         window.rtcCore.initialize(myId);
         window.rtcCore.setupSocketHandlers();
 
+        // ✅ CORRETO: Box pulsante igual ao caller-ui.js
+        window.rtcCore.setDataChannelCallback((mensagem) => {
+            console.log('📩 Mensagem recebida no receiver:', mensagem);
+
+            const elemento = document.getElementById('texto-recebido');
+            if (elemento) {
+                // Box SEMPRE visível, mas texto vazio inicialmente (IGUAL AO CALLER)
+                elemento.textContent = ""; // ← TEXTO FICA VAZIO NO INÍCIO
+                elemento.style.opacity = '1'; // ← BOX SEMPRE VISÍVEL
+                elemento.style.transition = 'opacity 0.5s ease'; // ← Transição suave
+                
+                // ✅ PULSAÇÃO IDÊNTICA AO CALLER:
+                elemento.style.animation = 'pulsar-flutuar 2s infinite';
+                elemento.style.backgroundColor = 'rgba(76, 175, 80, 0.2)'; // Verde bem fraquinho
+            }
+
+            if (window.speechSynthesis) {
+                window.speechSynthesis.cancel();
+
+                const utterance = new SpeechSynthesisUtterance(mensagem);
+                utterance.lang = window.targetTranslationLang || 'pt-BR';
+                utterance.rate = 0.9;
+                utterance.volume = 0.8;
+
+                utterance.onstart = () => {
+                    if (elemento) {
+                        // ✅ PARA A PULSAÇÃO QUANDO A VOZ COMEÇA (IGUAL AO CALLER):
+                        elemento.style.animation = 'none';
+                        elemento.style.backgroundColor = 'white'; // Volta ao branco original
+                        
+                        // SÓ MOSTRA O TEXTO QUANDO A VOZ COMEÇA
+                        elemento.textContent = mensagem;
+                    }
+                };
+
+                window.speechSynthesis.speak(utterance);
+            }
+        });
+
         window.rtcCore.onIncomingCall = (offer, idiomaDoCaller) => {
             if (!localStream) return;
 
@@ -80,24 +157,6 @@ window.onload = async () => {
             });
         };
 
-        const TRANSLATE_ENDPOINT = 'https://chat-tradutor.onrender.com/translate';
-
-        async function translateText(text, targetLang) {
-            try {
-                const response = await fetch(TRANSLATE_ENDPOINT, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ text, targetLang })
-                });
-
-                const result = await response.json();
-                return result.translatedText || text;
-            } catch (error) {
-                console.error('Erro na tradução:', error);
-                return text;
-            }
-        }
-
         // ✅ MANTIDO: Tradução dos títulos da interface (inglês → idioma local)
         const frasesParaTraduzir = {
             "translator-label": "Real-time translation.",
@@ -115,7 +174,8 @@ window.onload = async () => {
             }
         })();
 
-        async function aplicarBandeira(langCode) {
+        // 🏳️ Aplica bandeira do idioma local (função renomeada para clareza)
+        async function aplicarBandeiraLocal(langCode) {
             try {
                 const response = await fetch('assets/bandeiras/language-flags.json');
                 const flags = await response.json();
@@ -133,6 +193,7 @@ window.onload = async () => {
             }
         }
 
+        // 🏳️ Aplica bandeira do idioma remoto
         async function aplicarBandeiraRemota(langCode) {
             try {
                 const response = await fetch('assets/bandeiras/language-flags.json');
@@ -150,39 +211,7 @@ window.onload = async () => {
             }
         }
 
-        aplicarBandeira(lang);
-
-        // ✅ CORRETO: Mostra APENAS o que recebe do outro celular
-        window.rtcCore.setDataChannelCallback((mensagem) => {
-            console.log('Mensagem recebida no receiver:', mensagem);
-            
-            if (window.speechSynthesis) {
-                window.speechSynthesis.cancel();
-
-                const elemento = document.getElementById("texto-recebido");
-                if (elemento) {
-                    elemento.textContent = ""; // Oculta o texto inicialmente
-                    elemento.style.opacity = 0; // Garante que esteja invisível
-                    elemento.style.transition = "opacity 1s ease-in-out"; // Suavidade na aparição
-                }
-
-                const utterance = new SpeechSynthesisUtterance(mensagem);
-                utterance.lang = window.targetTranslationLang || 'en-US';
-                utterance.rate = 0.9;
-                utterance.volume = 0.8;
-
-                utterance.onstart = () => {
-                    if (elemento) {
-                        elemento.textContent = mensagem; // ✅ MOSTRA APENAS O QUE RECEBE
-                        setTimeout(() => {
-                            elemento.style.opacity = 1; // Faz o texto aparecer suavemente
-                        }, 100);
-                    }
-                };
-
-                window.speechSynthesis.speak(utterance);
-            }
-        });
+        aplicarBandeiraLocal(lang);
 
         setTimeout(() => {
             if (typeof initializeTranslator === 'function') {
