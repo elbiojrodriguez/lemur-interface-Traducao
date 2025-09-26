@@ -1,4 +1,3 @@
-
 import { WebRTCCore } from '../core/webrtc-core.js';
 import { QRCodeGenerator } from './qr-code-utils.js';
 
@@ -101,7 +100,7 @@ window.onload = async () => {
 
         // ✅ MANTIDO: Tradução dos títulos da interface (inglês → idioma local)
         const frasesParaTraduzir = {
-            "translator-label": "Real-time Translation",
+            "translator-label": "Live translation. No filters. No platform.",
             "qr-modal-title": "This is your online key",
             "qr-modal-description": "You can ask to scan, share or print on your business card."
         };
